@@ -1,6 +1,14 @@
 <x-guest-layout>
     <!-- Session Status -->
-    <x-auth-session-status class="mb-4" :status="session('status')" />
+    <div class="text-center mb-6">
+    <h1 class="text-3xl font-bold">
+        DISTAN
+    </h1>
+
+    <p class="text-gray-500">
+        Sistema de Gestión Logística
+    </p>
+</div>
 
     <form method="POST" action="{{ route('login') }}">
         @csrf
