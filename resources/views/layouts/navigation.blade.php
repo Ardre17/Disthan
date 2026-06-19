@@ -97,6 +97,15 @@
 
             <div class="menu-sub">
                 <a href="/clients">Clientes</a>
+                <a href="{{ route('users.index') }}" style="
+                    display:block;
+                    padding:10px;
+                    border-radius:8px;
+                    text-decoration:none;
+                    color:#1e293b;
+                ">
+                    👤 Usuarios
+                </a>
                 <a href="/proveedores">Proveedores</a>
             </div>
         </div>

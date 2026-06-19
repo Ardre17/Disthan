@@ -9,6 +9,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\UserController;
 
     Route::resource('products', ProductController::class)
     ->middleware('auth');
@@ -100,6 +101,13 @@ use App\Http\Controllers\InventoryController;
 
     Route::post('/inventario/store', [InventoryController::class, 'store'])
     ->name('inventory.store');
+
+    Route::get('/usuarios', [UserController::class, 'index'])->name('users.index');
+    Route::get('/usuarios/create', [UserController::class, 'create'])->name('users.create');
+    Route::post('/usuarios', [UserController::class, 'store'])->name('users.store');
+    Route::get('/usuarios/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
+    Route::put('/usuarios/{user}', [UserController::class, 'update'])->name('users.update');
+    Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
 });
 
