@@ -2,7 +2,7 @@ FROM php:8.2-cli
 
 WORKDIR /app
 
-# Instalar dependencias
+# Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
     git unzip curl libpq-dev nodejs npm \
     && docker-php-ext-install pdo pdo_pgsql
@@ -20,13 +20,14 @@ RUN composer install --no-dev --optimize-autoloader
 RUN npm install
 RUN npm run build
 
-# Permisos
+# Permisos correctos
 RUN chmod -R 777 storage bootstrap/cache
 
-# Limpiar cache + migrar + correr
-CMD php artisan config:clear && php artisan cache:clear && php artisan route:clear && php artisan view:clear && php artisan migrate --force || true && php artisan serve --host=0.0.0.0 --port=10000
+# 🔥 LIMPIAR CACHE + MIGRAR + CORRER
+CMD php artisan config:clear && \
+    php artisan cache:clear && \
+    php artisan route:clear && \
+    php artisan view:clear && \
+    php artisan migrate --force || true && \
+    php artisan serve --host=0.0.0.0 --port=10000
 
-php artisan config:clear
-php artisan cache:clear
-php artisan route:clear
-php artisan view:clear
