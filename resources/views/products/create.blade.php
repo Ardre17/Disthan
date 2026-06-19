@@ -1,52 +1,193 @@
-<x-app-layout>
+@extends('layouts.app')
 
-    <div class="p-6 max-w-xl">
+@section('content')
 
-        <h1 class="text-2xl font-bold mb-6">
-            Nuevo Producto
-        </h1>
+<style>
 
-        <form action="{{ route('products.store') }}" method="POST">
+.page{
+    padding:30px;
+}
 
-            @csrf
+.card{
+    background:white;
+    max-width:900px;
+    margin:auto;
+    padding:25px;
+    border-radius:12px;
+    box-shadow:0 3px 15px rgba(0,0,0,.1);
+}
 
-            <div class="mb-4">
-                <label>Código</label>
-                <input type="text"
-                       name="codigo"
-                       class="w-full border rounded p-2">
-            </div>
+.row{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    gap:15px;
+}
 
-            <div class="mb-4">
-                <label>Nombre</label>
-                <input type="text"
-                       name="nombre"
-                       class="w-full border rounded p-2">
-            </div>
+.form-group{
+    margin-bottom:15px;
+}
 
-            <div class="mb-4">
-                <label>Unidad</label>
-                <input type="text"
-                       name="unidad"
-                       value="UND"
-                       class="w-full border rounded p-2">
-            </div>
+label{
+    display:block;
+    font-weight:bold;
+    margin-bottom:5px;
+}
 
-            <div class="mb-4">
-                <label>Stock</label>
-                <input type="number"
-                       name="stock"
-                       value="0"
-                       class="w-full border rounded p-2">
-            </div>
+input,select,textarea{
+    width:100%;
+    padding:10px;
+    border:1px solid #ccc;
+    border-radius:6px;
+    box-sizing:border-box;
+}
 
-            <button type="submit"
-        style="background:#16a34a;color:white;padding:10px 20px;border-radius:6px;">
-    Guardar
+.btn-save{
+    background:#16a34a;
+    color:white;
+    border:none;
+    padding:12px 20px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+</style>
+
+<div class="page">
+
+<div class="card">
+
+<h2>📦 Nuevo Producto</h2>
+
+<form action="{{ route('products.store') }}"
+      method="POST"
+      enctype="multipart/form-data">
+
+@csrf
+
+<div class="row">
+
+<div class="form-group">
+<label>SKU</label>
+<input type="text" name="sku">
+</div>
+
+<div class="form-group">
+<label>Código de Barras</label>
+<input type="text" name="barcode">
+</div>
+
+<div class="form-group">
+<label>Nombre</label>
+<input type="text" name="nombre">
+</div>
+
+<div class="form-group">
+<label>Marca</label>
+<input type="text" name="marca">
+</div>
+
+<div class="form-group">
+
+    <label>Categoría</label>
+
+    <select name="category_id" required>
+
+        <option value="">
+            Seleccionar Categoría
+        </option>
+
+        @foreach($categories as $category)
+
+            <option value="{{ $category->id }}">
+
+                {{ $category->nombre }}
+
+            </option>
+
+        @endforeach
+
+    </select>
+
+</div>
+
+<div class="form-group">
+<label>Cantidad por Caja</label>
+<input type="number" name="cantidad_por_caja">
+</div>
+
+<div style="margin-bottom:15px;">
+
+    <label>Peso (gramos)</label>
+
+    <input
+        type="number"
+        name="peso"
+        value="{{ old('peso', $product->peso ?? '') }}"
+        placeholder="Ej: 425"
+        style="
+            width:100%;
+            padding:10px;
+            border:1px solid #ddd;
+            border-radius:8px;
+        ">
+
+</div>
+
+<div class="form-group">
+<label>Lote</label>
+<input type="text" name="lote">
+</div>
+
+<div class="form-group">
+<label>Rotación</label>
+<select name="rotacion">
+<option>MUY_ALTA</option>
+<option>ALTA</option>
+<option>MEDIA</option>
+<option>BAJA</option>
+</select>
+</div>
+
+<div class="form-group">
+<label>Fecha Producción</label>
+<input type="date" name="fecha_produccion">
+</div>
+
+<div class="form-group">
+<label>Fecha Vencimiento</label>
+<input type="date" name="fecha_vencimiento">
+</div>
+
+<div class="form-group">
+<label>Stock</label>
+<input type="number" step="0.01" name="stock">
+</div>
+
+<div class="form-group">
+<label>Stock Mínimo</label>
+<input type="number" step="0.01" name="stock_minimo">
+</div>
+
+</div>
+
+<div class="form-group">
+<label>Descripción</label>
+<textarea name="descripcion"></textarea>
+</div>
+
+<div class="form-group">
+<label>Imagen</label>
+<input type="file" name="imagen">
+</div>
+
+<button type="submit" class="btn-save">
+Guardar Producto
 </button>
 
-        </form>
+</form>
 
-    </div>
+</div>
 
-</x-app-layout>
+</div>
+
+@endsection

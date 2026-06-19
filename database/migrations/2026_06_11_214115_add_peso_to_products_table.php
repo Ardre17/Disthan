@@ -10,25 +10,23 @@ return new class extends Migration
      * Run the migrations.
      */
     public function up(): void
-    {
-        Schema::create('products', function (Blueprint $table) {
-    $table->id();
+{
+    Schema::table('products', function (Blueprint $table) {
 
-    $table->string('codigo')->unique();
-    $table->string('nombre');
-    $table->string('unidad')->default('UND');
+        $table->decimal('peso', 10, 3)
+              ->default(0)
+              ->after('stock_minimo');
 
-    $table->decimal('stock',10,2)->default(0);
-
-    $table->timestamps();
-});
-    }
+    });
+}
 
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('products');
+        Schema::table('products', function (Blueprint $table) {
+            //
+        });
     }
 };

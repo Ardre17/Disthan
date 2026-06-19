@@ -1,41 +1,94 @@
-<x-app-layout>
-    <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            DISTAN ERP
-        </h2>
-    </x-slot>
+@extends('layouts.app')
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+@section('content')
 
-            <div class="bg-blue-500 text-white p-6 rounded-lg shadow-lg mb-4">
-                Si ves este cuadro azul, Tailwind está funcionando.
-            </div>
+<h1 style="font-size:28px;font-weight:bold;">
+    📊 Dashboard
+</h1>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<div style="
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+    margin-top:20px;
+">
 
-                <div class="bg-white p-5 rounded-lg shadow">
-                    <h3 class="font-bold text-lg">📦 Productos</h3>
-                    <p>0 registrados</p>
-                </div>
-
-                <div class="bg-white p-5 rounded-lg shadow">
-                    <h3 class="font-bold text-lg">🛒 Pedidos</h3>
-                    <p>0 pendientes</p>
-                </div>
-
-                <div class="bg-white p-5 rounded-lg shadow">
-                    <h3 class="font-bold text-lg">🏭 Producción</h3>
-                    <p>0 órdenes</p>
-                </div>
-
-                <div class="bg-white p-5 rounded-lg shadow">
-                    <h3 class="font-bold text-lg">🚚 Transporte</h3>
-                    <p>0 despachos</p>
-                </div>
-
-            </div>
-
-        </div>
+    <div style="background:white;padding:20px;border-radius:12px;">
+        <h3>📦 Órdenes</h3>
+        <p>Total: {{ \App\Models\Order::count() }}</p>
     </div>
-</x-app-layout>
+
+    <div style="background:white;padding:20px;border-radius:12px;">
+        <h3>⏳ Pendientes</h3>
+        <p>{{ \App\Models\Order::where('estado','INCOMPLETO')->count() }}</p>
+    </div>
+
+    <div style="background:white;padding:20px;border-radius:12px;">
+        <h3>⚠️ Parciales</h3>
+        <p>{{ \App\Models\Order::where('estado','PARCIAL')->count() }}</p>
+    </div>
+
+    <div style="background:white;padding:20px;border-radius:12px;">
+        <h3>✅ Completas</h3>
+        <p>{{ \App\Models\Order::where('estado','COMPLETO')->count() }}</p>
+    </div>
+
+</div>
+<div style="
+    background:'#8b5cf6';
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,.08);
+    margin-top:20px;
+">
+
+    <h3 style="margin-bottom:15px;">
+        📊 Pedidos por Cliente (Mes Actual)
+    </h3>
+
+    <div style="
+    width:100%;
+    max-width:700px;
+    height:300px; /* 🔥 ALTURA CONTROLADA */
+    margin:auto;
+">
+        <canvas id="clientesChart"></canvas>
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+let data = @json($data ?? []);
+
+let labels = data.map(d => d.client.razon_social);
+let values = data.map(d => d.total);
+
+new Chart(document.getElementById('clientesChart'), {
+    type: 'bar',
+    data: {
+        labels: labels,
+        datasets: [{
+            label: 'Pedidos del mes',
+            data: values,
+            borderRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false, // 🔥 CLAVE
+        plugins: {
+            legend: {
+                display: false
+            }
+        },
+        scales: {
+            y: {
+                beginAtZero: true
+            }
+        }
+    }
+});
+</script>
+@endsection
