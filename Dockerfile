@@ -4,8 +4,8 @@ WORKDIR /app
 
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
-    git unzip curl libpq-dev nodejs npm \
-    && docker-php-ext-install pdo pdo_pgsql
+    git unzip zip curl libpq-dev libzip-dev nodejs npm \
+    && docker-php-ext-install pdo pdo_pgsql zip
 
 # Copiar proyecto
 COPY . .
@@ -16,14 +16,14 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Instalar dependencias Laravel
 RUN composer install --no-dev --optimize-autoloader
 
-# 🔥 INSTALAR Y COMPILAR VITE
+# Build frontend
 RUN npm install
 RUN npm run build
 
-# Permisos correctos
+# Permisos
 RUN chmod -R 777 storage bootstrap/cache
 
-# 🔥 LIMPIAR CACHE + MIGRAR + CORRER
+# Run app
 CMD php artisan config:clear && \
     php artisan cache:clear && \
     php artisan route:clear && \
