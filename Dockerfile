@@ -26,4 +26,4 @@ RUN chmod -R 777 storage bootstrap/cache
 EXPOSE 10000
 
 # Comando
-CMD php artisan serve --host=0.0.0.0 --port=10000
+CMD php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=10000
