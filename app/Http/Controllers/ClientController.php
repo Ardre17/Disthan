@@ -38,35 +38,36 @@ class ClientController extends Controller
     }
 
     public function store(Request $request)
-    {
-        $request->validate([
-            'ruc' => 'required|unique:clients',
-            'razon_social' => 'required',
-        ]);
+{
+    $request->validate([
+        'ruc' => 'required|unique:clients',
+        'razon_social' => 'required',
+    ]);
 
-        Client::create([
+    Client::create([
 
-            'ruc' => $request->ruc,
-            'razon_social' => $request->razon_social,
-            'nombre_comercial' => $request->nombre_comercial,
+        'ruc' => $request->ruc,
+        'razon_social' => $request->razon_social,
+        'nombre_comercial' => $request->nombre_comercial,
 
-            'contacto' => $request->contacto,
-            'telefono' => $request->telefono,
-            'correo' => $request->correo,
+        'contacto' => $request->contacto,
+        'telefono' => $request->telefono,
+        'correo' => $request->correo,
 
-            'direccion' => $request->direccion,
-            'distrito' => $request->distrito,
-            'ciudad' => $request->ciudad,
+        'direccion' => $request->direccion,
+        'distrito' => $request->distrito,
+        'ciudad' => $request->ciudad,
 
-            'activo' => $request->activo ? true : false,
+        // 🔥 SIEMPRE ACTIVO AL CREAR
+        'activo' => true,
 
-            'observaciones' => $request->observaciones,
-        ]);
+        'observaciones' => $request->observaciones,
+    ]);
 
-        return redirect()
-            ->route('clients.index')
-            ->with('success', 'Cliente registrado correctamente');
-    }
+    return redirect()
+        ->route('clients.index')
+        ->with('success', 'Cliente registrado correctamente');
+}
 
     public function edit(Client $client)
     {
