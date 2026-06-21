@@ -13,9 +13,13 @@ use App\Http\Controllers\InventoryController;
     Route::resource('products', ProductController::class)
     ->middleware('auth');
 
-    Route::get('/', function () {
-    return view('welcome');
-    });
+    use Illuminate\Support\Facades\Auth;
+
+        Route::get('/', function () {
+            return Auth::check() 
+                ? redirect('/dashboard') 
+                : redirect('/login');
+        });
 
     Route::get('/dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
