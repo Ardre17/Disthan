@@ -11,6 +11,13 @@ use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\UserController;
 
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/run-migrate', function () {
+    Artisan::call('migrate', ['--force' => true]);
+    return "Migraciones ejecutadas";
+});
+
     Route::resource('products', ProductController::class)
     ->middleware('auth');
 
