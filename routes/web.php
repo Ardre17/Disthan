@@ -11,6 +11,8 @@ use App\Http\Middleware\AdminMiddleware;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\UserController;
 
+use Illuminate\Support\Facades\Artisan;
+
     Route::resource('products', ProductController::class)
     ->middleware('auth');
 
@@ -112,6 +114,13 @@ use App\Http\Controllers\UserController;
     Route::get('/usuarios/{user}/edit', [UserController::class, 'edit'])->name('users.edit');
     Route::put('/usuarios/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('users.destroy');
+
+        
+
+Route::get('/run-migrate', function () {
+    Artisan::call('migrate', ['--force' => true]);
+    return "Migraciones ejecutadas";
+});
 
 });
 
