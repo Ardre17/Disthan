@@ -101,8 +101,6 @@ font-size:14px;
 
 
 <div class="logo">
-
-<<<<<<< HEAD
             <div class="menu-sub">
                 <a href="/orders">Órdenes</a>
                 <a href="/pedidos">Pedidos</a>
@@ -166,8 +164,6 @@ font-size:14px;
     </div>
 =======
 🚀 DISTAN
->>>>>>> 3a9cbd23c1b57249d29cb76e1d978b3fbd55cb99
-
 </div>
 
 
