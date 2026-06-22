@@ -16,7 +16,7 @@
     <option value="operario">Operario</option>
 </select><br><br>
 
-<button>Guardar</button>
+<button>Guardr</button>
 
 </form>
 
