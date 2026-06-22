@@ -101,67 +101,131 @@ font-size:14px;
 
 
 <div class="logo">
-            <div class="menu-sub">
-                <a href="/orders">Órdenes</a>
-                <a href="/pedidos">Pedidos</a>
-                <a href="/historial">📚 Historial</a>
-                <a href="/produccion">Producción</a>
-            </div>
-        </div>
 
-        <!-- INVENTARIO -->
-        <div>
-            <div class="menu-title" onclick="toggleMenu(this)">
-                📚 Inventario
-            </div>
+🚀 DISTAN
 
-            <div class="menu-sub">
-                <a href="/products">Productos</a>
-                <a href="/categories">Categorías</a>
-                <a href="/inventario">Inventario</a>
-            </div>
-        </div>
+</div>
 
-        <!-- COMERCIAL -->
-        <div>
-            <div class="menu-title" onclick="toggleMenu(this)">
-                🤝 Comercial
-            </div>
 
-            <div class="menu-sub">
-                <a href="/clients">Clientes</a>
-                <a href="{{ route('users.index') }}" style="
-                    display:block;
-                    padding:10px;
-                    border-radius:8px;
-                    text-decoration:none;
-                    color:#1e293b;
-                ">
-                    👤 Usuarios
-                </a>
-                <a href="/proveedores">Proveedores</a>
-            </div>
-        </div>
+<a href="/dashboard" class="menu-item {{ request()->is('dashboard') ? 'active' : '' }}">
 
-    </div>
+📊 Dashboard
 
-    <div style="padding:15px;">
-        👤 {{ Auth::user()->name }}
+</a>
 
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button style="
-                width:100%;
-                background:#dc2626;
-                color:white;
-                border:none;
-                padding:8px;
-                border-radius:6px;
-            ">
-                Cerrar sesión
-            </button>
-        </form>
-    </div>
+
+<!-- OPERACIONES -->
+
+<div>
+
+<div class="menu-title" onclick="toggleMenu(this)">
+
+📦 Operaciones
+
+</div>
+
+
+<div class="menu-sub">
+
+<a href="/orders">Órdenes</a>
+
+<a href="/pedidos">Pedidos</a>
+
+<a href="/historial">📚 Historial</a>
+
+<a href="/produccion">Producción</a>
+
+</div>
+
+</div>
+
+
+<!-- INVENTARIO -->
+
+<div>
+
+<div class="menu-title" onclick="toggleMenu(this)">
+
+📚 Inventario
+
+</div>
+
+
+<div class="menu-sub">
+
+<a href="/products">Productos</a>
+
+<a href="/categories">Categorías</a>
+
+<a href="/inventario">Inventario</a>
+
+</div>
+
+</div>
+
+
+<!-- COMERCIAL -->
+
+<div>
+
+<div class="menu-title" onclick="toggleMenu(this)">
+
+🤝 Comercial
+
+</div>
+
+
+<div class="menu-sub">
+
+<a href="/clients">Clientes</a>
+
+<a href="/proveedores">Proveedores</a>
+
+</div>
+
+</div>
+
+
+</div>
+
+
+<div style="padding:15px;">
+
+👤 {{ Auth::user()->name }}
+
+
+<form method="POST" action="{{ route('logout') }}">
+
+@csrf
+
+<button style="
+
+width:100%;
+
+background:#dc2626;
+
+color:white;
+
+border:none;
+
+padding:8px;
+
+border-radius:6px;
+
+">
+
+Cerrar sesión
+
+</button>
+
+</form>
+
+</div>
+
+
+</div>
+
+
 <script>
 
 function toggleMenu(el){
