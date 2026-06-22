@@ -18,9 +18,13 @@ use App\Http\Controllers\UserController;
 | RUTA TEMPORAL MIGRACIÓN
 |--------------------------------------------------------------------------
 */
-Route::get('/run-migrate', function () {
-    Artisan::call('migrate', ['--force' => true]);
-    return "Migraciones ejecutadas";
+Route::get('/init-db', function () {
+
+    \Illuminate\Support\Facades\Artisan::call('migrate:fresh', [
+        '--force' => true
+    ]);
+
+    return "Base de datos creada correctamente";
 });
 
 /*
