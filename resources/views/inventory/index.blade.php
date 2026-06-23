@@ -288,12 +288,14 @@ function verDetalle(id, cardEl) {
                 <div class="hist-list">${movHtml}</div>
             </div>
             <hr class="div">
-            <div>
-                <div class="hist-title" style="margin-bottom:6px;">Agregar stock</div>
-                <div class="add-row">
-                    <input type="number" class="finput" id="cantAdd" placeholder="Cantidad" min="1" style="flex:1;">
-                    <button class="btn-add" onclick="agregarStock()">➕ Agregar</button>
-                </div>
+            <div class="add-row">
+                <input type="number" class="finput" id="cantAdd" placeholder="Cantidad" min="1">
+                <button class="btn-add" onclick="agregarStock()">➕ Entrada</button>
+                <button class="btn-add" style="background:#dc2626;" onclick="salidaStock()">➖ Salida</button>
+            </div>
+
+            <div style="margin-top:10px;">
+                <button class="btn-add" style="background:#2563eb;width:100%;" onclick="verHistorial()">📊 Ver historial completo</button>
             </div>
         `;
     })
@@ -328,7 +330,65 @@ function filtrar() {
         c.style.display = (matchQ && matchP && matchE) ? '' : 'none';
     });
 }
+function salidaStock() {
+    const v = parseInt(document.getElementById('cantAdd')?.value);
 
+    if (!v || v <= 0) {
+        showAlert('Ingresa una cantidad válida', 'awk');
+        return;
+    }
+
+    fetch('/inventario/salida/' + currentId, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ cantidad: v })
+    })
+    .then(() => {
+        showAlert(`-${v} unidades descontadas`, 'aok');
+        document.getElementById('cantAdd').value = '';
+        verDetalle(currentId, document.querySelector('.card-inv.sel'));
+    })
+    .catch(() => showAlert('Error en salida', 'aer'));
+}
+function verHistorial() {
+    fetch('/inventario/' + currentId)
+    .then(res => res.json())
+    .then(data => {
+
+        let html = `
+        <div style="position:fixed;top:0;left:0;width:100%;height:100%;
+        background:rgba(0,0,0,0.5);display:flex;align-items:center;justify-content:center;z-index:9999;">
+
+            <div style="background:white;width:400px;padding:20px;border-radius:10px;max-height:80vh;overflow:auto;">
+
+                <h3>📊 Historial completo</h3>
+                <hr>
+
+                ${data.movements.map(m => `
+                    <div style="display:flex;justify-content:space-between;margin-bottom:5px;">
+                        <span>${m.motivo}</span>
+                        <strong style="color:${m.tipo === 'ENTRADA' ? 'green' : 'red'};">
+                            ${m.tipo === 'ENTRADA' ? '+' : '-'}${m.cantidad}
+                        </strong>
+                    </div>
+                `).join('')}
+
+                <button onclick="this.closest('div').parentElement.remove()"
+                style="margin-top:10px;width:100%;background:#dc2626;color:white;border:none;padding:8px;border-radius:6px;">
+                Cerrar
+                </button>
+
+            </div>
+        </div>
+        `;
+
+        document.body.insertAdjacentHTML('beforeend', html);
+
+    });
+}
 // Gráficos
 @php
     $paises = $inventories->groupBy('pais');

@@ -4,56 +4,100 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Inventory;
+use App\Models\Product;
+use App\Models\Movement;
 
 class InventoryController extends Controller
 {
+    /**
+     * 🔹 Vista de ingresos + historial
+     */
+    public function index()
+    {
+        $products = Product::all();
 
+        $movements = Movement::with('product')
+            ->where('tipo', 'ENTRADA')
+            ->latest()
+            ->get();
+
+        return view('inventory.ingresos', compact('products','movements'));
+    }
+
+    /**
+     * 🔹 Registrar ingreso manual (LO IMPORTANTE)
+     */
     public function store(Request $request)
-{
-    $inv = \App\Models\Inventory::create([
-        'product_id' => $request->product_id,
-        'pais' => $request->pais,
-        'zona' => $request->zona,
-        'stock' => $request->cantidad
-    ]);
+    {
+        $request->validate([
+            'product_id' => 'required',
+            'cantidad' => 'required|numeric|min:1',
+        ]);
 
-    // 🔥 registrar movimiento inicial
-    \App\Models\Movement::create([
-        'product_id' => $request->product_id,
-        'pais' => $request->pais,
-        'tipo' => 'ENTRADA',
-        'cantidad' => $request->cantidad,
-        'motivo' => 'CREACIÓN ETIQUETA'
-    ]);
+        $product = Product::findOrFail($request->product_id);
 
-    return back()->with('success', 'Etiqueta creada correctamente');
-}
+        // 🔥 BUSCAR SI YA EXISTE INVENTARIO (por país)
+        $inventory = Inventory::where('product_id', $product->id)
+            ->where('pais', $request->pais)
+            ->first();
+
+        if ($inventory) {
+            // 🔥 SI EXISTE → SUMAR
+            $inventory->stock += $request->cantidad;
+            $inventory->save();
+        } else {
+            // 🔥 SI NO EXISTE → CREAR
+            $inventory = Inventory::create([
+                'product_id' => $product->id,
+                'pais' => $request->pais,
+                'zona' => $request->zona,
+                'stock' => $request->cantidad
+            ]);
+        }
+
+        // 🔥 REGISTRAR MOVIMIENTO
+        Movement::create([
+            'product_id' => $product->id,
+            'pais' => $request->pais,
+            'tipo' => 'ENTRADA',
+            'cantidad' => $request->cantidad,
+            'motivo' => $request->motivo ?? 'INGRESO MANUAL'
+        ]);
+
+        return back()->with('success', 'Ingreso registrado correctamente');
+    }
+
+    /**
+     * 🔹 Sumar stock rápido (AJAX)
+     */
     public function add(Request $request, $id)
     {
-        $inv = \App\Models\Inventory::findOrFail($id);
+        $inv = Inventory::findOrFail($id);
 
         $cantidad = (int) $request->cantidad;
 
         $inv->stock += $cantidad;
         $inv->save();
 
-        \App\Models\Movement::create([
+        Movement::create([
             'product_id' => $inv->product_id,
             'pais' => $inv->pais,
             'tipo' => 'ENTRADA',
             'cantidad' => $cantidad,
-            'motivo' => 'INGRESO MANUAL'
+            'motivo' => 'INGRESO RÁPIDO'
         ]);
 
         return response()->json(['success' => true]);
     }
 
-
+    /**
+     * 🔹 Ver detalle + historial (modal o API)
+     */
     public function show($id)
     {
-        $inventory = \App\Models\Inventory::with('product')->findOrFail($id);
+        $inventory = Inventory::with('product')->findOrFail($id);
 
-        $movements = \App\Models\Movement::where('product_id', $inventory->product_id)
+        $movements = Movement::where('product_id', $inventory->product_id)
             ->where('pais', $inventory->pais)
             ->latest()
             ->get();
@@ -63,12 +107,27 @@ class InventoryController extends Controller
             'movements' => $movements
         ]);
     }
+    public function salida(Request $request, $id)
+{
+    $inv = \App\Models\Inventory::findOrFail($id);
 
-    public function index()
-    {
-        $inventories = Inventory::with('product')->get();
+    $cantidad = (int) $request->cantidad;
 
-        return view('inventory.index', compact('inventories'));
+    if ($cantidad > $inv->stock) {
+        return response()->json(['error' => 'Stock insuficiente'], 400);
     }
-}
 
+    $inv->stock -= $cantidad;
+    $inv->save();
+
+    \App\Models\Movement::create([
+        'product_id' => $inv->product_id,
+        'pais' => $inv->pais,
+        'tipo' => 'SALIDA',
+        'cantidad' => $cantidad,
+        'motivo' => 'SALIDA MANUAL'
+    ]);
+
+    return response()->json(['success' => true]);
+}
+}
