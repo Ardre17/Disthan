@@ -2,31 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use App\Models\Inventory;
+use App\Models\Movement;
 
 class InventoryController extends Controller
 {
-public function salida(Request $request, $id)
-{
-    $inv = \App\Models\Inventory::findOrFail($id);
+    // 🔥 ESTE FALTABA (MUY IMPORTANTE)
+    public function index()
+    {
+        $inventories = Inventory::with('product')->get();
 
-    $cantidad = (int) $request->cantidad;
-
-    if ($cantidad > $inv->stock) {
-        return response()->json(['error' => 'Stock insuficiente'], 400);
+        return view('inventory.index', compact('inventories'));
     }
 
-    $inv->stock -= $cantidad;
-    $inv->save();
+    // 🔥 SALIDA CORREGIDA
+    public function salida(Request $request, $id)
+    {
+        $request->validate([
+            'cantidad' => 'required|numeric|min:1'
+        ]);
 
-    \App\Models\Movement::create([
-        'product_id' => $inv->product_id,
-        'pais' => $inv->pais,
-        'tipo' => 'SALIDA',
-        'cantidad' => $cantidad,
-        'motivo' => 'SALIDA MANUAL'
-    ]);
+        $inv = Inventory::findOrFail($id);
 
-    return response()->json(['success' => true]);
-}
+        $cantidad = (int) $request->cantidad;
+
+        if ($cantidad > $inv->stock) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Stock insuficiente'
+            ], 400);
+        }
+
+        $inv->stock -= $cantidad;
+        $inv->save();
+
+        Movement::create([
+            'product_id' => $inv->product_id,
+            'pais' => $inv->pais,
+            'tipo' => 'SALIDA',
+            'cantidad' => $cantidad,
+            'motivo' => $request->motivo ?? 'SALIDA MANUAL'
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'stock_actual' => $inv->stock
+        ]);
+    }
 }
