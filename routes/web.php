@@ -143,7 +143,6 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:admin');
 
     });
-    Route::post('/inventario/salida/{id}', [InventoryController::class, 'salida']);
 });
 
 require __DIR__.'/auth.php';
