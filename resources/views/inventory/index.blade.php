@@ -230,7 +230,6 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
 </div>
 
 </div>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
 
@@ -241,56 +240,67 @@ function showAlert(msg, cls) {
     b.className = 'alert-bar show ' + cls;
     b.textContent = msg;
     clearTimeout(b._t);
-    b._t = setTimeout(() => { b.className = 'alert-bar'; }, 3500);
+    b._t = setTimeout(() => { b.className = 'alert-bar'; }, 3000);
 }
 
 function verDetalle(id, cardEl) {
     currentId = id;
+
     document.querySelectorAll('.card-inv').forEach(c => c.classList.remove('sel'));
     if (cardEl) cardEl.classList.add('sel');
 
     fetch('/inventario/' + id)
     .then(res => res.json())
     .then(data => {
+
         const inv = data.inventory;
-        const s   = inv.stock;
-        const bc  = s === 0 ? '#ef4444' : (s < 20 ? '#f59e0b' : '#22c55e');
-        const sc  = s === 0 ? '#b91c1c' : (s < 20 ? '#b45309' : '#15803d');
-        const bg  = s === 0 ? '#fee2e2' : (s < 20 ? '#fef3c7' : '#dcfce7');
-        const badgeClass = s === 0 ? 'bd' : (s < 20 ? 'bw' : 'bg');
-        const badgeLabel = s === 0 ? 'Sin stock' : (s < 20 ? 'Stock bajo' : 'En stock');
+        const s = inv.stock;
+
+        const bc = s === 0 ? '#ef4444' : (s < 20 ? '#f59e0b' : '#22c55e');
+        const sc = s === 0 ? '#b91c1c' : (s < 20 ? '#b45309' : '#15803d');
+        const bg = s === 0 ? '#fee2e2' : (s < 20 ? '#fef3c7' : '#dcfce7');
 
         const movHtml = data.movements.map(m => `
             <div class="hist-row">
                 <span>${m.motivo}</span>
-                <span class="${m.tipo === 'ENTRADA' ? 'qi' : 'qo'}">${m.tipo === 'ENTRADA' ? '+' : '−'}${m.cantidad}</span>
+                <span class="${m.tipo === 'ENTRADA' ? 'qi' : 'qo'}">
+                    ${m.tipo === 'ENTRADA' ? '+' : '-'}${m.cantidad}
+                </span>
             </div>
-        `).join('') || '<div style="font-size:12px;color:#94a3b8;padding:6px;">Sin movimientos</div>';
+        `).join('') || '<div style="font-size:12px;color:#94a3b8;">Sin movimientos</div>';
 
         document.getElementById('pEmpty').style.display = 'none';
+
         const pc = document.getElementById('pContent');
         pc.style.display = 'flex';
+
         pc.innerHTML = `
             <div>
                 <div class="p-title">${inv.product.nombre}</div>
                 <div class="p-country">🌎 ${inv.pais} · ${inv.zona || 'Sin zona'}</div>
             </div>
+
             <div class="stock-block" style="background:${bg};border-color:${bc}60;">
                 <div>
                     <div class="stock-num" style="color:${sc};">${s}</div>
                     <div style="font-size:11px;color:#64748b;">unidades disponibles</div>
                 </div>
-                <span class="badge ${badgeClass}">${badgeLabel}</span>
             </div>
+
             <hr class="div">
+
             <div>
-                <div class="hist-title">Historial de movimientos</div>
+                <div class="hist-title">Historial reciente</div>
                 <div class="hist-list">${movHtml}</div>
             </div>
+
             <hr class="div">
+
             <div class="add-row">
-                <input type="number" class="finput" id="cantAdd" placeholder="Cantidad" min="1">
+                <input type="number" id="cantAdd" class="finput" placeholder="Cantidad">
+
                 <button class="btn-add" onclick="agregarStock()">➕ Entrada</button>
+
                 <button class="btn-add" style="background:#dc2626;" onclick="salidaStock()">➖ Salida</button>
             </div>
 
@@ -298,43 +308,36 @@ function verDetalle(id, cardEl) {
                 <button class="btn-add" style="background:#2563eb;width:100%;" onclick="verHistorial()">📊 Ver historial completo</button>
             </div>
         `;
-    })
-    .catch(() => showAlert('Error al cargar el detalle', 'aer'));
+    });
 }
 
 function agregarStock() {
-    const v = parseInt(document.getElementById('cantAdd')?.value);
-    if (!v || v <= 0) { showAlert('Ingresa una cantidad válida', 'awk'); return; }
+    const v = parseInt(document.getElementById('cantAdd').value);
+
+    if (!v || v <= 0) {
+        showAlert('Cantidad inválida', 'awk');
+        return;
+    }
 
     fetch('/inventario/add/' + currentId, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRF-TOKEN': '{{ csrf_token() }}'
+        },
         body: JSON.stringify({ cantidad: v })
     })
     .then(() => {
-        showAlert(`+${v} unidades agregadas correctamente`, 'aok');
-        document.getElementById('cantAdd').value = '';
-        verDetalle(currentId, document.querySelector('.card-inv.sel'));
-    })
-    .catch(() => showAlert('Error al guardar', 'aer'));
-}
-
-function filtrar() {
-    const q = document.getElementById('filtQ').value.toLowerCase();
-    const p = document.getElementById('filtPais').value;
-    const e = document.getElementById('filtEstado').value;
-    document.querySelectorAll('.card-inv').forEach(c => {
-        const matchQ = c.dataset.nombre.includes(q);
-        const matchP = !p || c.dataset.pais === p;
-        const matchE = !e || c.dataset.estado === e;
-        c.style.display = (matchQ && matchP && matchE) ? '' : 'none';
+        showAlert(`+${v} agregado`, 'aok');
+        location.reload();
     });
 }
+
 function salidaStock() {
-    const v = parseInt(document.getElementById('cantAdd')?.value);
+    const v = parseInt(document.getElementById('cantAdd').value);
 
     if (!v || v <= 0) {
-        showAlert('Ingresa una cantidad válida', 'awk');
+        showAlert('Cantidad inválida', 'awk');
         return;
     }
 
@@ -347,12 +350,11 @@ function salidaStock() {
         body: JSON.stringify({ cantidad: v })
     })
     .then(() => {
-        showAlert(`-${v} unidades descontadas`, 'aok');
-        document.getElementById('cantAdd').value = '';
-        verDetalle(currentId, document.querySelector('.card-inv.sel'));
-    })
-    .catch(() => showAlert('Error en salida', 'aer'));
+        showAlert(`-${v} descontado`, 'aok');
+        location.reload();
+    });
 }
+
 function verHistorial() {
     fetch('/inventario/' + currentId)
     .then(res => res.json())
@@ -386,52 +388,8 @@ function verHistorial() {
         `;
 
         document.body.insertAdjacentHTML('beforeend', html);
-
     });
 }
-// Gráficos
-@php
-    $paises = $inventories->groupBy('pais');
-    $paisLabels = $paises->keys()->toJson();
-    $paisData   = $paises->map(fn($g) => $g->sum('stock'))->values()->toJson();
-    $sinStockC  = $inventories->where('stock', 0)->count();
-    $bajoC      = $inventories->where('stock', '>', 0)->where('stock', '<', 20)->count();
-    $enStockC   = $inventories->where('stock', '>=', 20)->count();
-@endphp
-
-const paisLabels = {!! $paisLabels !!};
-const paisData   = {!! $paisData !!};
-const paisColors = ['#16a34a','#3b82f6','#f59e0b','#ef4444'];
-
-new Chart(document.getElementById('chartPais'), {
-    type: 'bar',
-    data: {
-        labels: paisLabels,
-        datasets: [{ data: paisData, backgroundColor: paisColors.slice(0, paisLabels.length), borderRadius: 6, borderSkipped: false }]
-    },
-    options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { x: { grid: { display: false } }, y: { grid: { color: '#f1f5f9' } } }
-    }
-});
-document.getElementById('leg1').innerHTML = paisLabels.map((p,i) =>
-    `<span class="leg-item"><span class="leg-dot" style="background:${paisColors[i]};"></span>${p} — ${paisData[i]}</span>`
-).join('');
-
-new Chart(document.getElementById('chartEstado'), {
-    type: 'doughnut',
-    data: {
-        labels: ['En stock','Stock bajo','Sin stock'],
-        datasets: [{ data: [{{ $enStockC }}, {{ $bajoC }}, {{ $sinStockC }}], backgroundColor: ['#22c55e','#f59e0b','#ef4444'], borderWidth: 2, borderColor: '#fff' }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, cutout: '65%' }
-});
-document.getElementById('leg2').innerHTML = [
-    {l:'En stock', c:'#22c55e', v: {{ $enStockC }} },
-    {l:'Stock bajo',c:'#f59e0b', v: {{ $bajoC }} },
-    {l:'Sin stock', c:'#ef4444', v: {{ $sinStockC }} },
-].map(x => `<span class="leg-item"><span class="leg-dot" style="background:${x.c};"></span>${x.l} — ${x.v}</span>`).join('');
 
 </script>
 
