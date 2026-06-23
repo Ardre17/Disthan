@@ -185,9 +185,7 @@ public function agregarABulto(Request $request, \App\Models\Bulto $bulto)
         'precio_unitario' =>
             $request->precio_unitario,
 
-        'subtotal' =>
-            $request->cantidad_solicitada *
-            $request->precio_unitario,
+        'subtotal' => 0,
 
         'estado_item' =>
             'INCOMPLETO'
@@ -333,7 +331,7 @@ public function updateDetail(Request $request, OrderDetail $detail)
     $cantidadDespachada = (float) $request->input('cantidad_despachada');
     $precio = (float) $request->input('precio_unitario');
 
-    $subtotal = $cantidadSolicitada * $precio;
+    $subtotal = $cantidadDespachada * $precio;
 
     // 🔥 ESTADO DEL ITEM
     if ($cantidadDespachada <= 0) {

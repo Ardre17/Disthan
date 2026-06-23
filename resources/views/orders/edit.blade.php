@@ -253,7 +253,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 
                 <div class="subtotal-row" style="margin-top:7px;">
                     <span style="font-size:11px;color:#64748b;">Subtotal</span>
-                    <span class="subtotal-val">S/ {{ number_format($detail->subtotal,2) }}</span>
+                    <span class="subtotal-val">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</span>
                 </div>
 
                 <div class="btn-row-prod" style="margin-top:7px;">
