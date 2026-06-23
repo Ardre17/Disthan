@@ -137,6 +137,12 @@ Route::middleware('auth')->group(function () {
     Route::put('/usuarios/{user}', [UserController::class, 'update'])->name('users.update');
     Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
+    Route::middleware(['auth'])->group(function () {
+
+    Route::get('/usuarios', [UserController::class, 'index'])
+        ->middleware('role:admin');
+
+    });
 });
 
 require __DIR__.'/auth.php';

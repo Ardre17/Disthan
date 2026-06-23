@@ -126,8 +126,9 @@ font-size:14px;
 
 
 <div class="menu-sub">
-
-<a href="/orders">Órdenes</a>
+@if(auth()->user()->role == 'admin')
+    <a href="/orders">Órdenes</a>
+@endif
 
 <a href="/pedidos">Pedidos</a>
 
