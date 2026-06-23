@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Inventory;
 
-class InventorydController extends Controller
+class InventoryController extends Controller
 {
 public function salida(Request $request, $id)
 {
