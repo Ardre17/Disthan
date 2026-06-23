@@ -96,11 +96,12 @@
 <div class="menu-sub">
 
 @if($role == 'admin')
-    <a href="/products">📦 Productos</a>
     <a href="/categories">🏷 Categorías</a>
     <a href="/inventario">📊 Inventario</a>
 @endif
-
+@if($role == 'operario')
+    <a href="/products">📦 Productos</a>
+@endif
 </div>
 </div>
 
@@ -114,10 +115,8 @@
 
 @if($role == 'admin')
     <a href="/clients">👤 Clientes</a>
+    <a href="/proveedores">🚚 Proveedores</a>
 @endif
-
-<a href="/proveedores">🚚 Proveedores</a>
-
 </div>
 </div>
 
