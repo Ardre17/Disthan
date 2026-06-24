@@ -57,7 +57,15 @@ class InventoryController extends Controller
 
     $inventories = \App\Models\Inventory::with(['product','movements'])->get();
 
-    return view('inventory.control_etiquetas', compact('products','inventories'));
+    $movements = \App\Models\Movement::with('product')
+        ->latest()
+        ->get();
+
+    return view('inventory.control_etiquetas', compact(
+        'products',
+        'inventories',
+        'movements'
+    ));
 }
 public function storeMovimiento(Request $request)
 {
