@@ -50,4 +50,38 @@ class InventoryController extends Controller
             'stock_actual' => $inv->stock
         ]);
     }
+    public function controlEtiquetas()
+{
+    $products = \App\Models\Product::all();
+
+    $movements = \App\Models\Movement::with('product')
+        ->latest()
+        ->get();
+
+    return view('inventory.control_etiquetas', compact('products','movements'));
+}
+public function storeMovimiento(Request $request)
+{
+    $product = \App\Models\Product::findOrFail($request->product_id);
+
+    if ($request->tipo == 'ENTRADA') {
+        $product->stock += $request->cantidad;
+    } else {
+        if ($request->cantidad > $product->stock) {
+            return response()->json(['error' => 'Stock insuficiente'], 400);
+        }
+        $product->stock -= $request->cantidad;
+    }
+
+    $product->save();
+
+    \App\Models\Movement::create([
+        'product_id' => $product->id,
+        'tipo' => $request->tipo,
+        'cantidad' => $request->cantidad,
+        'motivo' => $request->motivo
+    ]);
+
+    return response()->json(['success' => true]);
+}
 }

@@ -143,8 +143,8 @@ Route::middleware('auth')->group(function () {
         ->middleware('role:admin');
 
     });
-    Route::get('/inventario', [InventoryController::class, 'index']);
-    Route::post('/inventario/salida/{id}', [InventoryController::class, 'salida']);
+    Route::get('/control-etiquetas', [InventoryController::class, 'controlEtiquetas']);
+    Route::post('/control-etiquetas/store', [InventoryController::class, 'storeMovimiento']);
 });
 
 require __DIR__.'/auth.php';
