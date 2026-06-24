@@ -94,28 +94,27 @@ public function storeMovimiento(Request $request)
 }
 public function store(Request $request)
 {
+    // 🔥 VALIDAR
     $request->validate([
-        'product_id' => 'required',
-        'idioma' => 'required',
-        'zona' => 'required',
         'cantidad' => 'required|numeric|min:1'
     ]);
 
+    // 🔥 CREAR INVENTARIO (STICKERS)
     $inv = \App\Models\Inventory::create([
-        'product_id' => $request->product_id,
+        'formato_sticker' => $request->formato_sticker,
         'idioma' => $request->idioma,
         'zona' => $request->zona,
         'stock' => $request->cantidad
     ]);
 
+    // 🔥 REGISTRAR MOVIMIENTO
     \App\Models\Movement::create([
-        'product_id' => $request->product_id,
         'tipo' => 'ENTRADA',
         'cantidad' => $request->cantidad,
-        'motivo' => 'CREACIÓN ETIQUETA'
+        'motivo' => 'CREACIÓN STICKER'
     ]);
 
-    return back()->with('success', 'Etiqueta creada');
+    return back()->with('success', 'Sticker registrado');
 }
 public function add(Request $request, $id)
 {

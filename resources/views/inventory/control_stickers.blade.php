@@ -14,12 +14,16 @@
 
 <div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;">
 
-    <select name="product_id" required>
-        <option value="">Producto</option>
-        @foreach($products as $p)
-            <option value="{{ $p->id }}">{{ $p->nombre }}</option>
-        @endforeach
-    </select>
+    <select name="formato_sticker" required>
+    <option value="">Formato</option>
+    <option value="Sticker 30 mm">Sticker 30 mm</option>
+    <option value="Sticker 43 mm">Sticker 43 mm</option>
+    <option value="Sticker 50 mm">Sticker 50 mm</option>
+    <option value="Sticker 55 mm">Sticker 55 mm</option>
+    <option value="Sticker 65 mm">Sticker 65 mm</option>
+    <option value="Sticker 70 mm">Sticker 70 mm</option>
+    <option value="Sticker 85 mm">Sticker 85 mm</option>
+</select>
 
     <select name="idioma" required>
         <option value="ES">🇪🇸 Español</option>
