@@ -50,15 +50,12 @@ class InventoryController extends Controller
             'stock_actual' => $inv->stock
         ]);
     }
+    
     public function controlEtiquetas()
 {
-    $products = \App\Models\Product::all();
+    $inventories = \App\Models\Inventory::with(['product','movements'])->get();
 
-    $movements = \App\Models\Movement::with('product')
-        ->latest()
-        ->get();
-
-    return view('inventory.control_etiquetas', compact('products','movements'));
+    return view('inventory.control_etiquetas', compact('inventories'));
 }
 public function storeMovimiento(Request $request)
 {
@@ -83,5 +80,30 @@ public function storeMovimiento(Request $request)
     ]);
 
     return response()->json(['success' => true]);
+}
+public function store(Request $request)
+{
+    $request->validate([
+        'product_id' => 'required',
+        'idioma' => 'required',
+        'zona' => 'required',
+        'cantidad' => 'required|numeric|min:1'
+    ]);
+
+    $inv = \App\Models\Inventory::create([
+        'product_id' => $request->product_id,
+        'idioma' => $request->idioma,
+        'zona' => $request->zona,
+        'stock' => $request->cantidad
+    ]);
+
+    \App\Models\Movement::create([
+        'product_id' => $request->product_id,
+        'tipo' => 'ENTRADA',
+        'cantidad' => $request->cantidad,
+        'motivo' => 'CREACIÓN ETIQUETA'
+    ]);
+
+    return back()->with('success', 'Etiqueta creada');
 }
 }

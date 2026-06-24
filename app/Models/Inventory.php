@@ -19,4 +19,8 @@ class Inventory extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    public function movements()
+    {
+        return $this->hasMany(\App\Models\Movement::class, 'product_id', 'product_id');
+    }
 }
