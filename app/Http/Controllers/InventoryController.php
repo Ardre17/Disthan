@@ -117,4 +117,31 @@ public function store(Request $request)
 
     return back()->with('success', 'Etiqueta creada');
 }
+public function add(Request $request, $id)
+{
+    $request->validate([
+        'cantidad' => 'required|numeric|min:1'
+    ]);
+
+    $inv = \App\Models\Inventory::findOrFail($id);
+
+    $cantidad = (int) $request->cantidad;
+
+    // 🔥 SUMAR STOCK
+    $inv->stock = $inv->stock + $cantidad;
+    $inv->save();
+
+    // 🔥 REGISTRAR MOVIMIENTO
+    \App\Models\Movement::create([
+        'product_id' => $inv->product_id,
+        'tipo' => 'ENTRADA',
+        'cantidad' => $cantidad,
+        'motivo' => 'ENTRADA MANUAL'
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'nuevo_stock' => $inv->stock
+    ]);
+}
 }

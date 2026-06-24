@@ -453,21 +453,37 @@ function actualizarStock(id, cambio) {
     document.getElementById('input-' + id).value = '';
 }
 
-function entrada(id) {
-    var cantidad = getCantidad(id);
-    if (!cantidad || cantidad <= 0) { showAlert('Ingresa una cantidad válida', 'awk'); return; }
+function entrada(id){
+    let cantidad = parseInt(document.getElementById('input-' + id).value);
+
+    if(!cantidad || cantidad <= 0){
+        alert('Cantidad inválida');
+        return;
+    }
 
     fetch('/inventario/add/' + id, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        body: JSON.stringify({ cantidad: cantidad })
+        headers:{
+            'Content-Type':'application/json',
+            'X-CSRF-TOKEN':'{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ cantidad })
     })
-    .then(function(res){ return res.json(); })
-    .then(function(){
-        actualizarStock(id, cantidad);
-        showAlert('+' + cantidad + ' unidades ingresadas', 'aok');
+    .then(res => res.json())
+    .then(data => {
+
+        if(!data.success){
+            alert('Error al ingresar');
+            return;
+        }
+
+        // 🔥 ACTUALIZAR STOCK REAL
+        document.getElementById('stock-' + id).innerText = data.nuevo_stock;
+
+        document.getElementById('input-' + id).value = '';
+
     })
-    .catch(function(){ showAlert('Error al registrar entrada', 'aer'); });
+    .catch(() => alert('Error en entrada'));
 }
 
 function salida(id){
