@@ -97,11 +97,9 @@
 
 @if($role == 'admin')
     <a href="/categories">🏷 Categorías</a>
-    <a href="/inventario">📊 Inventario</a>
+    <a href="/control-etiquetas">🏷️ Control de Etiquetas</a>
 @endif
-@if($role == 'operario')
     <a href="/products">📦 Productos</a>
-@endif
 </div>
 </div>
 
