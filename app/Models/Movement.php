@@ -18,5 +18,9 @@ class Movement extends Model
     {
         return $this->belongsTo(Product::class);
     }
+    public function inventory()
+{
+    return $this->belongsTo(\App\Models\Inventory::class, 'inventory_id');
+}
 }
 

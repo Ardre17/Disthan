@@ -132,10 +132,10 @@ public function add(Request $request, $id)
 
     // 🔥 REGISTRAR MOVIMIENTO
     \App\Models\Movement::create([
-        'product_id' => $inv->product_id,
-        'tipo' => 'ENTRADA',
-        'cantidad' => $cantidad,
-        'motivo' => 'ENTRADA MANUAL'
+    'inventory_id' => $inv->id,
+    'tipo' => 'ENTRADA',
+    'cantidad' => $request->cantidad,
+    'motivo' => 'CREACIÓN STICKER'
     ]);
 
     return response()->json([

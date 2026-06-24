@@ -75,11 +75,17 @@ $color = $inv->idioma == 'ES' ? '#ef4444' : '#16a34a';
     </button>
 
     <div id="hist-{{ $inv->id }}" style="display:none;margin-top:5px;">
-        @foreach($inv->movements->take(5) as $m)
-            <div>
-                {{ $m->tipo }} {{ $m->cantidad }}
-            </div>
-        @endforeach
+        @if($inv->movements && $inv->movements->count())
+    @foreach($inv->movements as $m)
+        <div style="font-size:12px;">
+            {{ $m->tipo }} {{ $m->cantidad }}
+        </div>
+    @endforeach
+@else
+    <div style="font-size:11px;color:gray;">
+        Sin movimientos
+    </div>
+@endif
     </div>
 
 </div>
