@@ -147,6 +147,9 @@ Route::middleware('auth')->group(function () {
     Route::post('/control-etiquetas/store', [InventoryController::class, 'storeMovimiento']);
     Route::post('/inventario/salida/{id}', [InventoryController::class, 'salida']);
     Route::post('/inventario/add/{id}', [InventoryController::class, 'add']);
+
+    Route::get('/control-stickers', [InventoryController::class, 'controlStickers']);
+    Route::get('/control-precintos', [InventoryController::class, 'controlPrecintos']);
 });
 
 require __DIR__.'/auth.php';

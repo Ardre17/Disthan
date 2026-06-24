@@ -144,4 +144,25 @@ public function add(Request $request, $id)
         'nuevo_stock' => $inv->stock
     ]);
 }
+public function controlStickers()
+{
+    $products = \App\Models\Product::all();
+
+    // 🔥 SOLO STICKERS (puedes filtrar por categoría si tienes)
+    $inventories = \App\Models\Inventory::with(['product','movements'])
+        ->whereIn('idioma', ['ES','PT'])
+        ->get();
+
+    return view('inventory.control_stickers', compact('products','inventories'));
+}
+public function controlPrecintos()
+{
+    $products = \App\Models\Product::all();
+
+    $inventories = \App\Models\Inventory::with(['product','movements'])
+        ->whereNotNull('tipo_precinto')
+        ->get();
+
+    return view('inventory.control_precintos', compact('products','inventories'));
+}
 }
