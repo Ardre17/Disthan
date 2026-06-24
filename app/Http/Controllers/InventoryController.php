@@ -18,38 +18,39 @@ class InventoryController extends Controller
 
     // 🔥 SALIDA CORREGIDA
     public function salida(Request $request, $id)
-    {
-        $request->validate([
-            'cantidad' => 'required|numeric|min:1'
-        ]);
+{
+    $request->validate([
+        'cantidad' => 'required|numeric|min:1'
+    ]);
 
-        $inv = Inventory::findOrFail($id);
+    $inv = \App\Models\Inventory::findOrFail($id);
 
-        $cantidad = (int) $request->cantidad;
+    $cantidad = (int) $request->cantidad;
 
-        if ($cantidad > $inv->stock) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Stock insuficiente'
-            ], 400);
-        }
-
-        $inv->stock -= $cantidad;
-        $inv->save();
-
-        Movement::create([
-            'product_id' => $inv->product_id,
-            'pais' => $inv->pais,
-            'tipo' => 'SALIDA',
-            'cantidad' => $cantidad,
-            'motivo' => $request->motivo ?? 'SALIDA MANUAL'
-        ]);
-
+    if ($cantidad > $inv->stock) {
         return response()->json([
-            'success' => true,
-            'stock_actual' => $inv->stock
+            'success' => false,
+            'message' => 'Stock insuficiente'
         ]);
     }
+
+    // 🔥 RESTAR STOCK
+    $inv->stock = $inv->stock - $cantidad;
+    $inv->save();
+
+    // 🔥 GUARDAR MOVIMIENTO
+    \App\Models\Movement::create([
+        'product_id' => $inv->product_id,
+        'tipo' => 'SALIDA',
+        'cantidad' => $cantidad,
+        'motivo' => 'SALIDA MANUAL'
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'nuevo_stock' => $inv->stock
+    ]);
+}
     
     public function controlEtiquetas()
 {

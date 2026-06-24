@@ -470,25 +470,37 @@ function entrada(id) {
     .catch(function(){ showAlert('Error al registrar entrada', 'aer'); });
 }
 
-function salida(id) {
-    var cantidad = getCantidad(id);
-    if (!cantidad || cantidad <= 0) { showAlert('Ingresa una cantidad válida', 'awk'); return; }
+function salida(id){
+    let cantidad = parseInt(document.getElementById('input-' + id).value);
+
+    if(!cantidad || cantidad <= 0){
+        alert('Cantidad inválida');
+        return;
+    }
 
     fetch('/inventario/salida/' + id, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': '{{ csrf_token() }}' },
-        body: JSON.stringify({ cantidad: cantidad })
+        headers:{
+            'Content-Type':'application/json',
+            'X-CSRF-TOKEN':'{{ csrf_token() }}'
+        },
+        body: JSON.stringify({ cantidad })
     })
-    .then(function(res){ return res.json(); })
-    .then(function(data){
-        if (data.success) {
-            actualizarStock(id, -cantidad);
-            showAlert('−' + cantidad + ' unidades retiradas', 'aok');
-        } else {
-            showAlert(data.message || 'Stock insuficiente', 'aer');
+    .then(res => res.json())
+    .then(data => {
+
+        if(!data.success){
+            alert(data.message);
+            return;
         }
+
+        // 🔥 ACTUALIZAR STOCK REAL
+        document.getElementById('stock-' + id).innerText = data.nuevo_stock;
+
+        document.getElementById('input-' + id).value = '';
+
     })
-    .catch(function(){ showAlert('Error al registrar salida', 'aer'); });
+    .catch(() => alert('Error en salida'));
 }
 
 function toggleHistorial(id) {
