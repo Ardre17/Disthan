@@ -56,9 +56,14 @@ class InventoryController extends Controller
 {
     $products = \App\Models\Product::all();
 
-    $inventories = \App\Models\Inventory::with(['product','movements'])->get();
+    // Solo inventarios que pertenecen a productos
+    $inventories = \App\Models\Inventory::with(['product','movements'])
+        ->whereNotNull('product_id')
+        ->orderBy('id')
+        ->get();
 
     $movements = \App\Models\Movement::with('product')
+        ->whereNotNull('product_id')
         ->latest()
         ->get();
 

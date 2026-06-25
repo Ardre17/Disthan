@@ -262,12 +262,14 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 @endphp
 <div class="card"
      style="border-left-color:{{ $lc }};"
-     data-nombre="{{ strtolower($inv->product->nombre) }}"
+     data-nombre="{{ strtolower($inv->product?->nombre ?? '') }}"
      data-idioma="{{ $inv->idioma }}">
 
     <div class="c-top">
         <div>
-            <div class="c-name">📦 {{ $inv->product->nombre }}</div>
+            <div class="c-name">
+                📦 {{ $inv->product?->nombre ?? 'Sin producto' }}
+            </div>
             <div class="c-meta">{{ $inv->zona }}</div>
         </div>
         <span class="lang-badge" style="background:{{ $langColor['bg'] }};color:{{ $langColor['c'] }};">
