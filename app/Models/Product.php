@@ -18,6 +18,7 @@ class Product extends Model
         'marca',
         'category_id',
         'descripcion',
+        'advertencias',
         'peso',
 
         'imagen',
