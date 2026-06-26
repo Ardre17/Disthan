@@ -261,6 +261,61 @@ BAJA
 <textarea name="descripcion">{{ $product->descripcion }}</textarea>
 </div>
 
+@php
+$advertencias = explode(',', $product->advertencias ?? '');
+@endphp
+
+<div class="form-group">
+
+<label>⚠ Advertencias Nutricionales</label>
+
+<div style="
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px;
+padding:12px;
+background:#f8fafc;
+border:1px solid #ddd;
+border-radius:8px;
+">
+
+<label>
+
+<input type="checkbox"
+name="advertencias[]"
+value="AZUCAR"
+{{ in_array('AZUCAR',$advertencias) ? 'checked' : '' }}>
+
+Alto en Azúcar
+
+</label>
+
+<label>
+
+<input type="checkbox"
+name="advertencias[]"
+value="SODIO"
+{{ in_array('SODIO',$advertencias) ? 'checked' : '' }}>
+
+Alto en Sodio
+
+</label>
+
+<label>
+
+<input type="checkbox"
+name="advertencias[]"
+value="GRASAS"
+{{ in_array('GRASAS',$advertencias) ? 'checked' : '' }}>
+
+Alto en Grasas Saturadas
+
+</label>
+
+</div>
+
+</div>
+    
 <div class="form-group">
 <label>Cambiar Imagen</label>
 <input type="file" name="imagen">
