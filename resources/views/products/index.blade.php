@@ -258,7 +258,27 @@
     margin-bottom:12px;
     border:1px solid #d7e4f6;
 }
+/* ===========================
+   OCTÓGONOS NUTRICIONALES
+===========================*/
 
+.warning-icons{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-bottom:12px;
+    margin-top:-4px;
+}
+
+.warning-icons img{
+    height:42px;
+    width:auto;
+    transition:.2s;
+}
+
+.warning-icons img:hover{
+    transform:scale(1.05);
+}
 .info{
     margin-bottom:6px;
     color:var(--erp-ink-muted);
@@ -503,7 +523,43 @@
                 <div class="category">
                     {{ $product->categoria }}
                 </div>
+                @php
 
+            $advertencias = explode(',', strtoupper($product->advertencias ?? ''));
+            
+            @endphp
+            
+            @if(count($advertencias))
+            
+            <div class="warning-icons">
+            
+            @if(in_array('AZUCAR',$advertencias))
+            
+            <img
+            src="{{ asset('img/octogonos/azucar.png') }}"
+            title="Alto en Azúcar">
+            
+            @endif
+            
+            @if(in_array('SODIO',$advertencias))
+            
+            <img
+            src="{{ asset('img/octogonos/sodio.png') }}"
+            title="Alto en Sodio">
+            
+            @endif
+            
+            @if(in_array('GRASAS',$advertencias))
+            
+            <img
+            src="{{ asset('img/octogonos/grasas.png') }}"
+            title="Alto en Grasas Saturadas">
+            
+            @endif
+            
+            </div>
+
+            @endif
                 <div class="info">
                     <span>Lote</span>
                     <span>{{ $product->lote }}</span>
