@@ -83,6 +83,9 @@ $categories = Category::where('activo', true)
             'marca' => $request->marca,
             'categoria' => $request->categoria,
             'descripcion' => $request->descripcion,
+            'advertencias' => $request->advertencias
+            ? implode(',', $request->advertencias)
+            : null,
             'peso' => $request->peso ?? 0,
             'imagen' => $imagePath,
 
@@ -148,6 +151,11 @@ $categories = Category::where('activo', true)
             'marca' => $request->marca,
             'categoria' => $request->categoria,
             'descripcion' => $request->descripcion,
+
+            'advertencias' => $request->advertencias
+                        ? implode(',', $request->advertencias)
+                        : null,
+            
             'peso' => $request->peso ?? 0,
             'imagen' => $imagePath,
 
