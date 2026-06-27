@@ -536,7 +536,7 @@
             @if(in_array('AZUCAR',$advertencias))
             
             <img
-            src="{{ asset('img/octogonos/azucar.png') }}"
+            <img src="https://pbs.twimg.com/media/F-6D6zQWEAMPN7d.png">
             title="Alto en Azúcar">
             
             @endif
