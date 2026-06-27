@@ -359,7 +359,6 @@ function beep(){
 // =====================================
 // MODAL ADVERTENCIAS
 // =====================================
-
 function mostrarModalAdvertencias(item){
 
     document.getElementById("modalProducto").innerHTML =
@@ -367,7 +366,7 @@ function mostrarModalAdvertencias(item){
 
     let html = "";
 
-    let adv = item.product.advertencias
+    let adv = (item.product.advertencias || "")
         .toUpperCase()
         .split(",");
 
@@ -375,8 +374,11 @@ function mostrarModalAdvertencias(item){
 
         html += `
         <img
-        src="/img/octogonos/azucar.png"
-        style="height:95px;">
+        src="https://pbs.twimg.com/media/F-6D6zQWEAMPN7d.png"
+        style="
+            height:120px;
+            object-fit:contain;
+        ">
         `;
 
     }
@@ -385,8 +387,11 @@ function mostrarModalAdvertencias(item){
 
         html += `
         <img
-        src="/img/octogonos/sodio.png"
-        style="height:95px;">
+        src="https://blogs.ucontinental.edu.pe/wp-content/uploads/2019/06/Octogono-sodio.png"
+        style="
+            height:120px;
+            object-fit:contain;
+        ">
         `;
 
     }
@@ -395,8 +400,11 @@ function mostrarModalAdvertencias(item){
 
         html += `
         <img
-        src="/img/octogonos/grasas.png"
-        style="height:95px;">
+        src="https://dolcezzaperu.pe/wp-content/uploads/2023/06/MicrosoftTeams-image-2.png"
+        style="
+            height:120px;
+            object-fit:contain;
+        ">
         `;
 
     }
@@ -405,18 +413,8 @@ function mostrarModalAdvertencias(item){
 
     document.getElementById("modalOctogonos").style.display = "flex";
 
-    document
-.getElementById("btnEntendido")
-.onclick = function(){
-
-    document.getElementById("modalOctogonos").style.display = "none";
-
-    document.getElementById("activoCantidad").focus();
-
-    document.getElementById("activoCantidad").select();
-
 }
-}
+
 function actualizarBarra(){
     let total = 0, done = 0, ok = 0, par = 0, inc = 0;
     detalles.forEach(d => {
