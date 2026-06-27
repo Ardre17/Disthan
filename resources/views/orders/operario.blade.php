@@ -356,7 +356,67 @@ function beep(){
         o.stop(ctx.currentTime + 0.15);
     } catch(e){}
 }
+// =====================================
+// MODAL ADVERTENCIAS
+// =====================================
 
+function mostrarModalAdvertencias(item){
+
+    document.getElementById("modalProducto").innerHTML =
+        item.product.nombre;
+
+    let html = "";
+
+    let adv = item.product.advertencias
+        .toUpperCase()
+        .split(",");
+
+    if(adv.includes("AZUCAR")){
+
+        html += `
+        <img
+        src="/img/octogonos/azucar.png"
+        style="height:95px;">
+        `;
+
+    }
+
+    if(adv.includes("SODIO")){
+
+        html += `
+        <img
+        src="/img/octogonos/sodio.png"
+        style="height:95px;">
+        `;
+
+    }
+
+    if(adv.includes("GRASAS")){
+
+        html += `
+        <img
+        src="/img/octogonos/grasas.png"
+        style="height:95px;">
+        `;
+
+    }
+
+    document.getElementById("modalAdvertencias").innerHTML = html;
+
+    document.getElementById("modalOctogonos").style.display = "flex";
+
+    document
+.getElementById("btnEntendido")
+.onclick = function(){
+
+    document.getElementById("modalOctogonos").style.display = "none";
+
+    document.getElementById("activoCantidad").focus();
+
+    document.getElementById("activoCantidad").select();
+
+}
+}
 function actualizarBarra(){
     let total = 0, done = 0, ok = 0, par = 0, inc = 0;
     detalles.forEach(d => {
@@ -403,8 +463,22 @@ function mostrarActivo(item){
     document.getElementById('activoPctLabel').style.color = color;
 
     document.getElementById('activoBox').style.display = 'block';
+    document.getElementById('activoBox').style.display = 'block';
+
+// =====================================
+// VERIFICAR ADVERTENCIAS NUTRICIONALES
+// =====================================
+
+if(item.product.advertencias){
+
+    mostrarModalAdvertencias(item);
+
+}else{
+
     document.getElementById('activoCantidad').focus();
     document.getElementById('activoCantidad').select();
+
+}
 }
 
 // Update mini bar en lista
