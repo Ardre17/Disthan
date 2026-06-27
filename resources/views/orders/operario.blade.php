@@ -60,6 +60,17 @@
 .btn-cerrar{width:100%;background:#16a34a;color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:1rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;}
 .btn-cerrar:hover{background:#15803d;}
 hr.dv{border:none;border-top:1px solid #334155;margin:.75rem 0;}
+
+@keyframes popup{
+
+from{
+transform:scale(.8);
+opacity:0;
+}
+to{
+transform:scale(1);
+opacity:1;
+}}
 </style>
 
 {{-- Fondo oscuro para toda la página --}}
@@ -225,6 +236,98 @@ hr.dv{border:none;border-top:1px solid #334155;margin:.75rem 0;}
 
 </div>
 </div>
+<!-- =========================================
+     MODAL OCTÓGONOS
+========================================= -->
+
+<div id="modalOctogonos"
+style="
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,.65);
+z-index:9999;
+justify-content:center;
+align-items:center;
+">
+
+<div style="
+background:white;
+width:420px;
+max-width:92%;
+border-radius:18px;
+padding:25px;
+text-align:center;
+box-shadow:0 20px 40px rgba(0,0,0,.35);
+animation:popup .25s;
+">
+
+<h2 style="
+margin:0;
+color:#dc2626;
+font-size:24px;
+">
+⚠ Verificar Etiqueta
+</h2>
+
+<div
+id="modalProducto"
+style="
+margin-top:12px;
+font-size:18px;
+font-weight:bold;
+color:#0f172a;
+">
+Producto
+</div>
+
+<div
+id="modalAdvertencias"
+style="
+margin:25px 0;
+display:flex;
+justify-content:center;
+gap:12px;
+flex-wrap:wrap;
+">
+
+</div>
+
+<div style="
+font-size:14px;
+color:#475569;
+margin-bottom:20px;
+">
+
+Verifique que el producto tenga correctamente
+los octógonos nutricionales antes de continuar.
+
+</div>
+
+<button
+id="btnEntendido"
+style="
+background:#16a34a;
+color:white;
+border:none;
+padding:12px 35px;
+font-size:16px;
+border-radius:10px;
+cursor:pointer;
+font-weight:bold;
+">
+
+✔ Entendido
+
+</button>
+
+</div>
+
+</div>
+
 
 <script>
 let detalles = @json($order->details->load('product'));
