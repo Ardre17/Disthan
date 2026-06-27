@@ -78,7 +78,7 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
 
 {{-- ── ERP Top Bar ── --}}
 <div class="erp-bar">
-    <div class="erp-bar-title">JOYBER PERÚ · Sistema ERP</div>
+    <div class="erp-bar-title">DISTHAN · Sistema ERP</div>
     <div style="display:flex;align-items:center;gap:12px;">
         <span class="erp-breadcrumb">Ventas › Órdenes › Pedido Local</span>
         <span class="erp-user">👤 {{ auth()->user()->name ?? 'Operador' }}</span>
