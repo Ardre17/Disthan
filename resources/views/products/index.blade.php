@@ -535,25 +535,18 @@
             
             @if(in_array('AZUCAR',$advertencias))
             
-            <img
             <img src="https://pbs.twimg.com/media/F-6D6zQWEAMPN7d.png">
-            title="Alto en Azúcar">
             
             @endif
             
             @if(in_array('SODIO',$advertencias))
             
-            <img
-            src="{{ asset('img/octogonos/sodio.png') }}"
-            title="Alto en Sodio">
+            <img src="https://blogs.ucontinental.edu.pe/wp-content/uploads/2019/06/Octogono-sodio.png">
             
             @endif
             
             @if(in_array('GRASAS',$advertencias))
-            
-            <img
-            src="{{ asset('img/octogonos/grasas.png') }}"
-            title="Alto en Grasas Saturadas">
+            <img src="https://dolcezzaperu.pe/wp-content/uploads/2023/06/MicrosoftTeams-image-2.png">
             
             @endif
             
