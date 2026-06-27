@@ -413,6 +413,21 @@ function mostrarModalAdvertencias(item){
 
     document.getElementById("modalOctogonos").style.display = "flex";
 
+    document.getElementById("btnEntendido").addEventListener("click", function(){
+
+    document.getElementById("modalOctogonos").style.display = "none";
+
+    setTimeout(function(){
+
+        document.getElementById("activoCantidad").focus();
+
+        document.getElementById("activoCantidad").select();
+
+    },100);
+
+});
+
+
 }
 
 function actualizarBarra(){
