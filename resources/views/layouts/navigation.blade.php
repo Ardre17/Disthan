@@ -603,15 +603,18 @@ En línea
 </div>
 
 <a href="/dashboard" class="menu-item dashboard-active {{ request()->is('dashboard') ? 'active' : '' }}">
+<span>📊</span>
+<span>Dashboard</span>
+</a>
 
 <!-- OPERACIONES -->
-<div>
+
 <div class="menu-section operaciones-active">
 <div class="menu-title" onclick="toggleMenu(this)">
-<span> Operaciones</span>
+<span>📦 Operaciones</span>
 <span>▾</span>
 </div>
-
+</div>
 <div class="menu-sub">
 
 @if($role == 'admin')
