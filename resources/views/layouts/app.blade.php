@@ -16,10 +16,12 @@
         }
 
         .main-content {
-            margin-left:260px;
-            padding:20px;
+            margin-left:285px;
+            padding:25px;
             min-height:100vh;
+            transition:0.3s;
         }
+
     </style>
 </head>
 
