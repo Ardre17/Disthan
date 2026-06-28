@@ -234,7 +234,127 @@ opacity:1;
 }
 
 }
+/* ==========================
+   MENÚ PRINCIPAL
+==========================*/
 
+.menu-section{
+    margin-top:12px;
+}
+
+.menu-title{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    padding:14px 22px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    font-weight:600;
+
+    color:#dbeafe;
+
+    transition:.25s;
+
+}
+
+.menu-title:hover{
+
+    background:rgba(255,255,255,.06);
+
+}
+
+.menu-title span:last-child{
+
+    transition:.3s;
+
+    color:#7fb5ff;
+
+}
+
+.menu-item{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    color:#dbeafe;
+
+    text-decoration:none;
+
+    padding:13px 22px;
+
+    transition:.25s;
+
+    position:relative;
+
+}
+
+.menu-item:hover{
+
+    background:rgba(255,255,255,.08);
+
+    padding-left:28px;
+
+}
+
+.menu-item.active{
+
+    background:rgba(37,99,235,.20);
+
+    color:white;
+
+    font-weight:bold;
+
+    border-left:4px solid #3b82f6;
+
+}
+
+.menu-sub{
+
+    overflow:hidden;
+
+    max-height:0;
+
+    transition:max-height .35s ease;
+
+}
+
+.menu-sub a{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+    color:#a8c5eb;
+
+    text-decoration:none;
+
+    padding:12px 40px;
+
+    transition:.25s;
+
+    font-size:14px;
+
+}
+
+.menu-sub a:hover{
+
+    background:rgba(255,255,255,.05);
+
+    color:white;
+
+    padding-left:48px;
+
+}
 </style>
 
 <div class="sidebar">
@@ -295,26 +415,32 @@ En línea
 
 </div>
 
-<a href="/dashboard" class="menu-item {{ request()->is('dashboard') ? 'active' : '' }}">
-📊 Dashboard
+<a
+href="/dashboard"
+class="menu-item {{ request()->is('dashboard') ? 'active' : '' }}">
+<span>📊</span>
+<span>Dashboard</span>
 </a>
 
 <!-- OPERACIONES -->
-<div>
-<div class="menu-title" onclick="toggleMenu(this)">
-📦 Operaciones
+<div class="menu-section">
+
+<div class="menu-title"
+onclick="toggleMenu(this)">
+<span>📦 Operaciones</span>
+<span>▾</span>
 </div>
 
 <div class="menu-sub">
 
 @if($role == 'admin')
-    <a href="/orders">📋 Órdenes</a>
-    <a href="/historial">📚 Historial</a>
-    <a href="/produccion">🏭 Producción</a>
+    <a href="/orders"> <span>📋</span> <span>Órdenes</span> </a>
+    <a href="/historial"> <span>📚</span> <span>Historial</span> </a>
+    <a href="/produccion"> <span>🏭</span> <span>Producción</span> </a>
 @endif
 
 @if($role == 'operario')
-    <a href="/pedidos">📦 Pedidos</a>
+    <a href="/pedidos"> <span>📦</span> <span>Pedidos</span> </a>
 @endif
 
 </div>
@@ -322,33 +448,35 @@ En línea
 
 <!-- INVENTARIO -->
 <div>
-<div class="menu-title" onclick="toggleMenu(this)">
-📚 Inventario
+<div class="menu-title"
+onclick="toggleMenu(this)">
+<span>📚 Inventario</span>
+<span>▾</span>
 </div>
-
 <div class="menu-sub">
 
 @if($role == 'admin')
-    <a href="/categories">🏷 Categorías</a>
-    <a href="/control-etiquetas">🏷️ Control de Etiquetas</a>
-    <a href="/control-stickers">🏷️ Stickers de tapa</a>
-    <a href="/control-precintos">🔒 Precintos</a>
+    <a href="/categories"> <span>🏷</span> <span>Categorías</span> </a>
+    <a href="/control-etiquetas"> <span>🏷️</span> <span>Control de Etiquetas</span> </a>
+    <a href="/control-stickers"> <span>🏷️</span> <span>Stickers de tapa</span> </a>
+    <a href="/control-precintos"> <span>🔒</span> <span>Precintos</span> </a>
 @endif
-    <a href="/products">📦 Productos</a>
+    <a href="/products"> <span>📦</span> <span>Productos</span> </a>
 </div>
 </div>
 
 <!-- COMERCIAL -->
 <div>
-<div class="menu-title" onclick="toggleMenu(this)">
-🤝 Comercial
+<div class="menu-title"
+onclick="toggleMenu(this)">
+<span>🤝 Comercial</span>
+<span>▾</span>
 </div>
-
 <div class="menu-sub">
 
 @if($role == 'admin')
-    <a href="/clients">👤 Clientes</a>
-    <a href="/proveedores">🚚 Proveedores</a>
+    <a href="/clients"> <span>👤</span> <span>Clientes</span> </a>
+    <a href="/proveedores"> <span>🚚</span> <span>Proveedores</span> </a>
 @endif
 </div>
 </div>
@@ -379,12 +507,25 @@ Cerrar sesión
 
 <script>
 function toggleMenu(el){
+
     let sub = el.nextElementSibling;
 
+    let arrow = el.querySelector("span:last-child");
+
     if(sub.style.maxHeight){
+
         sub.style.maxHeight = null;
-    } else {
-        sub.style.maxHeight = sub.scrollHeight + "px";
+
+        arrow.style.transform="rotate(0deg)";
+
+    }else{
+
+        sub.style.maxHeight=sub.scrollHeight+"px";
+
+        arrow.style.transform="rotate(180deg)";
+
     }
+
 }
+
 </script>
