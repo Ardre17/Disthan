@@ -592,6 +592,7 @@ En línea
             <a href="/orders"><span>📋</span><span>Órdenes</span></a>
             <a href="/historial"><span>📚</span><span>Historial</span></a>
             <a href="/produccion"><span>🏭</span><span>Producción</span></a>
+            <a href="{{ route('products.proyectado') }}"><span>📊</span><span>Proyectado</span></a>
         @endif
         @if($role == 'operario')
             <a href="/pedidos"><span>📦</span><span>Pedidos</span></a>
@@ -611,7 +612,6 @@ En línea
             <a href="/control-etiquetas"><span>🏷️</span><span>Control de Etiquetas</span></a>
             <a href="/control-stickers"><span>🏷️</span><span>Stickers de tapa</span></a>
             <a href="/control-precintos"><span>🔒</span><span>Precintos</span></a>
-            <a href="/proyectado"><span>📊</span><span>Proyectado</span></a>
         @endif
         <a href="/products"><span>📦</span><span>Productos</span></a>
     </div>
