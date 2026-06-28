@@ -188,4 +188,28 @@ $categories = Category::where('activo', true)
             ->route('products.index')
             ->with('success', 'Producto eliminado correctamente');
     }
+    public function proyectado()
+{
+    $products = Product::with(['orderDetails' => function($q){
+        $q->where('created_at', '>=', now()->subDays(60))
+          ->whereHas('order', fn($o) => $o->where('estado','COMPLETO'));
+    }])->orderBy('nombre')->get();
+
+    $products = $products->map(function($p){
+        $totalDespachado = $p->orderDetails->sum('cantidad_despachada');
+        $ventasDiarias   = $totalDespachado / 60;
+
+        $p->ventas_diarias   = round($ventasDiarias, 2);
+        $p->proyectado_7d    = round($ventasDiarias * 7);
+        $p->proyectado_30d   = round($ventasDiarias * 30);
+        $p->cobertura_dias   = $ventasDiarias > 0
+                                ? round($p->stock / $ventasDiarias)
+                                : null;
+        return $p;
+    });
+
+    $categories = \App\Models\Category::orderBy('nombre')->get();
+
+    return view('products.proyectado', compact('products','categories'));
+}
 }
