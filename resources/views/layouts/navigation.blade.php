@@ -605,7 +605,7 @@ En línea
 <a href="/dashboard" class="menu-item dashboard-active {{ request()->is('dashboard') ? 'active' : '' }}">
 
 <!-- OPERACIONES -->
-<div class="menu-section">
+<div>
 <div class="menu-section operaciones-active">
 <div class="menu-title" onclick="toggleMenu(this)">
 <span> Operaciones</span>
