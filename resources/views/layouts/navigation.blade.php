@@ -582,67 +582,59 @@ En línea
 <span>Dashboard</span>
 </a>
 
-<!-- OPERACIONES -->
-<div>
+{{-- DESPUÉS del menu-item de Dashboard --}}
+
+{{-- OPERACIONES --}}
 <div class="menu-section operaciones-active">
-<div class="menu-title" onclick="toggleMenu(this)">
-<span>📦 Operaciones</span>
-<span>▾</span>
-</div>
-    
-<div class="menu-sub">
+    <div class="menu-title" onclick="toggleMenu(this)">
+        <span>📦 Operaciones</span>
+        <span>▾</span>
+    </div>
+    <div class="menu-sub">
+        @if($role == 'admin')
+            <a href="/orders"><span>📋</span><span>Órdenes</span></a>
+            <a href="/historial"><span>📚</span><span>Historial</span></a>
+            <a href="/produccion"><span>🏭</span><span>Producción</span></a>
+        @endif
+        @if($role == 'operario')
+            <a href="/pedidos"><span>📦</span><span>Pedidos</span></a>
+        @endif
+    </div>
+</div>  {{-- ← cierra menu-section operaciones --}}
 
-@if($role == 'admin')
-    <a href="/orders"> <span>📋</span> <span>Órdenes</span> </a>
-    <a href="/historial"> <span>📚</span> <span>Historial</span> </a>
-    <a href="/produccion"> <span>🏭</span> <span>Producción</span> </a>
-@endif
-
-@if($role == 'operario')
-    <a href="/pedidos"> <span>📦</span> <span>Pedidos</span> </a>
-@endif
-</div>
-</div>
-
-<!-- INVENTARIO -->
-<div>
+{{-- INVENTARIO --}}
 <div class="menu-section inventario-active">
-<div class="menu-title" onclick="toggleMenu(this)">
-<span>📚 Inventario</span>
-<span>▾</span>
-</div>
+    <div class="menu-title" onclick="toggleMenu(this)">
+        <span>📚 Inventario</span>
+        <span>▾</span>
+    </div>
+    <div class="menu-sub">
+        @if($role == 'admin')
+            <a href="/categories"><span>🏷</span><span>Categorías</span></a>
+            <a href="/control-etiquetas"><span>🏷️</span><span>Control de Etiquetas</span></a>
+            <a href="/control-stickers"><span>🏷️</span><span>Stickers de tapa</span></a>
+            <a href="/control-precintos"><span>🔒</span><span>Precintos</span></a>
+        @endif
+        <a href="/products"><span>📦</span><span>Productos</span></a>
+    </div>
+</div>  {{-- ← cierra menu-section inventario --}}
 
-<div class="menu-sub">
-
-@if($role == 'admin')
-    <a href="/categories"> <span>🏷</span> <span>Categorías</span> </a>
-    <a href="/control-etiquetas"> <span>🏷️</span> <span>Control de Etiquetas</span> </a>
-    <a href="/control-stickers"> <span>🏷️</span> <span>Stickers de tapa</span> </a>
-    <a href="/control-precintos"> <span>🔒</span> <span>Precintos</span> </a>
-@endif
-    <a href="/products"> <span>📦</span> <span>Productos</span> </a>
-</div>
-</div>
-
-<!-- COMERCIAL -->
-<div>
+{{-- COMERCIAL --}}
 <div class="menu-section comercial-active">
-<div class="menu-title" onclick="toggleMenu(this)">
-<span>🤝 Comercial</span>
-<span>▾</span>
-</div>
+    <div class="menu-title" onclick="toggleMenu(this)">
+        <span>🤝 Comercial</span>
+        <span>▾</span>
+    </div>
+    <div class="menu-sub">
+        @if($role == 'admin')
+            <a href="/clients"><span>👤</span><span>Clientes</span></a>
+            <a href="/proveedores"><span>🚚</span><span>Proveedores</span></a>
+        @endif
+    </div>
+</div>  {{-- ← cierra menu-section comercial --}}
 
-<div class="menu-sub">
+</div>  {{-- ← cierra el <div> wrapper superior (el que va justo después de <div class="sidebar">) --}}
 
-@if($role == 'admin')
-    <a href="/clients"> <span>👤</span> <span>Clientes</span> </a>
-    <a href="/proveedores"> <span>🚚</span> <span>Proveedores</span> </a>
-@endif
-</div>
-</div>
-</div>
-</div>
-</div>
 <div class="sidebar-footer">
 
 <div class="storage-card">
