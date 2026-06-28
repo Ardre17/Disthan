@@ -54,6 +54,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 */
 Route::middleware('auth')->group(function () {
 
+    Route::get('/products/proyectado', [ProductController::class, 'proyectado']) ->name('products.proyectado');
     Route::resource('products', ProductController::class);
     Route::resource('clients', ClientController::class);
     Route::resource('categories', CategoryController::class);
