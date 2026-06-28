@@ -115,42 +115,30 @@ USUARIO
 
     margin-top:22px;
 
-    background:rgba(255,255,255,.06);
+    background:linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04));
 
     border-radius:18px;
 
     padding:18px;
-
+    border:1px solid rgba(255,255,255,.08);
+backdrop-filter:blur(15px);
 }
-
 .avatar{
-
-    width:72px;
-
-    height:72px;
-
-    margin:auto;
-
-    border-radius:50%;
-
-    background:white;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    font-size:34px;
-
-    color:#2563eb;
-
-    font-weight:bold;
-
-    border:4px solid rgba(255,255,255,.15);
-
+width:84px;
+height:84px;
+margin:auto;
+border-radius:50%;
+background:linear-gradient(135deg,#2563eb,#60a5fa);
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:34px;
+font-weight:bold;
+color:white;
+box-shadow:
+0 8px 20px rgba(37,99,235,.35);
+border:4px solid rgba(255,255,255,.15);
 }
-
 .user-name{
 
     margin-top:14px;
@@ -306,13 +294,15 @@ opacity:1;
 
 .menu-item.active{
 
-    background:rgba(37,99,235,.20);
+    background:rgba(255,255,255,.08);
 
     color:white;
 
-    font-weight:bold;
+    font-weight:600;
 
-    border-left:4px solid #3b82f6;
+    border-left:5px solid var(--accent,#3b82f6);
+
+    box-shadow:inset 0 0 25px rgba(59,130,246,.15);
 
 }
 
@@ -353,6 +343,203 @@ opacity:1;
     color:white;
 
     padding-left:48px;
+
+}
+    /*==========================
+FOOTER
+==========================*/
+
+.sidebar-footer{
+
+padding:20px;
+
+border-top:1px solid rgba(255,255,255,.08);
+
+}
+
+.storage-card{
+
+background:rgba(255,255,255,.05);
+
+padding:14px;
+
+border-radius:14px;
+
+margin-bottom:18px;
+
+}
+
+.storage-title{
+
+font-size:13px;
+
+margin-bottom:10px;
+
+color:#dbeafe;
+
+}
+
+.storage-bar{
+
+height:9px;
+
+background:#1e3a5f;
+
+border-radius:20px;
+
+overflow:hidden;
+
+}
+
+.storage-fill{
+
+height:100%;
+
+width:82%;
+
+background:linear-gradient(90deg,#22c55e,#3b82f6);
+
+border-radius:20px;
+
+}
+
+.storage-text{
+
+margin-top:8px;
+
+font-size:12px;
+
+color:#9fb7d7;
+
+}
+
+.clock-card{
+
+text-align:center;
+
+margin-bottom:18px;
+
+}
+
+#clockTime{
+
+font-size:28px;
+
+font-weight:bold;
+
+letter-spacing:2px;
+
+}
+
+#clockDate{
+
+margin-top:6px;
+
+font-size:13px;
+
+color:#9fb7d7;
+
+}
+
+.version{
+
+text-align:center;
+
+font-size:13px;
+
+margin-bottom:18px;
+
+color:#dbeafe;
+
+}
+
+.version span{
+
+font-size:11px;
+
+color:#8ea8c8;
+
+}
+
+.logout-btn{
+
+width:100%;
+
+padding:12px;
+
+border:none;
+
+border-radius:12px;
+
+background:linear-gradient(90deg,#dc2626,#ef4444);
+
+color:white;
+
+font-weight:bold;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.logout-btn:hover{
+
+transform:translateY(-2px);
+
+box-shadow:0 10px 20px rgba(239,68,68,.25);
+
+}
+:root{
+
+--dashboard:#3b82f6;
+
+--inventario:#22c55e;
+
+--operaciones:#f59e0b;
+
+--comercial:#8b5cf6;
+
+}
+
+.dashboard-active{
+
+--accent:var(--dashboard);
+
+}
+
+.operaciones-active{
+
+--accent:var(--operaciones);
+
+}
+
+.inventario-active{
+
+--accent:var(--inventario);
+
+}
+
+.comercial-active{
+
+--accent:var(--comercial);
+
+}
+.menu-item span:first-child,
+.menu-sub span:first-child{
+
+font-size:18px;
+
+width:26px;
+
+text-align:center;
+
+}
+.menu-section{
+
+margin-top:8px;
+
+margin-bottom:8px;
 
 }
 </style>
@@ -415,20 +602,14 @@ En línea
 
 </div>
 
-<a
-href="/dashboard"
-class="menu-item {{ request()->is('dashboard') ? 'active' : '' }}">
-<span>📊</span>
-<span>Dashboard</span>
-</a>
+<a href="/dashboard" class="menu-item dashboard-active {{ request()->is('dashboard') ? 'active' : '' }}">
 
 <!-- OPERACIONES -->
 <div class="menu-section">
 
 <div class="menu-title"
 onclick="toggleMenu(this)">
-<span>📦 Operaciones</span>
-<span>▾</span>
+<a class="menu-item dashboard-active {{ request()->is('operacionws') ? 'active' : '' }}">
 </div>
 
 <div class="menu-sub">
@@ -450,7 +631,7 @@ onclick="toggleMenu(this)">
 <div>
 <div class="menu-title"
 onclick="toggleMenu(this)">
-<span>📚 Inventario</span>
+<a class="menu-item dashboard-active {{ request()->is('inventario') ? 'active' : '' }}">
 <span>▾</span>
 </div>
 <div class="menu-sub">
@@ -469,7 +650,7 @@ onclick="toggleMenu(this)">
 <div>
 <div class="menu-title"
 onclick="toggleMenu(this)">
-<span>🤝 Comercial</span>
+<a class="menu-item dashboard-active {{ request()->is('comercial') ? 'active' : '' }}">
 <span>▾</span>
 </div>
 <div class="menu-sub">
@@ -483,24 +664,69 @@ onclick="toggleMenu(this)">
 
 </div>
 
-<div style="padding:15px;">
-👤 {{ Auth::user()->name }}
+<div class="sidebar-footer">
 
-<form method="POST" action="{{ route('logout') }}">
+<div class="storage-card">
+
+<div class="storage-title">
+
+📦 Capacidad del almacén
+
+</div>
+
+<div class="storage-bar">
+
+<div class="storage-fill" id="storageFill"></div>
+
+</div>
+
+<div class="storage-text">
+
+82% utilizado
+
+</div>
+
+</div>
+
+<div class="clock-card">
+
+<div id="clockTime">
+
+00:00:00
+
+</div>
+
+<div id="clockDate">
+
+--
+
+</div>
+
+</div>
+
+<div class="version">
+
+DISTAN ERP
+
+<br>
+
+<span>Versión 1.0.0</span>
+
+</div>
+
+<form method="POST"
+action="{{ route('logout') }}">
+
 @csrf
 
-<button style="
-width:100%;
-background:#dc2626;
-color:white;
-border:none;
-padding:8px;
-border-radius:6px;
-">
-Cerrar sesión
+<button class="logout-btn">
+
+🚪 Cerrar sesión
+
 </button>
 
 </form>
+
 </div>
 
 </div>
@@ -527,5 +753,30 @@ function toggleMenu(el){
     }
 
 }
+//==========================
+// RELOJ
+//==========================
 
+function actualizarReloj(){
+
+const ahora=new Date();
+
+document.getElementById("clockTime").innerHTML=
+ahora.toLocaleTimeString();
+
+document.getElementById("clockDate").innerHTML=
+ahora.toLocaleDateString(
+'es-PE',
+{
+weekday:'long',
+day:'numeric',
+month:'long'
+}
+);
+
+}
+
+setInterval(actualizarReloj,1000);
+
+actualizarReloj();
 </script>
