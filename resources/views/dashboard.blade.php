@@ -81,13 +81,8 @@
 {{-- ── ERP Top Bar ── --}}
 <div class="erp-bar">
     <div class="erp-bar-left">
-        <div class="erp-logo">JOYBER PERÚ</div>
         <div class="erp-sep"></div>
         <div class="erp-module">Dashboard principal</div>
-    </div>
-    <div style="display:flex;align-items:center;gap:12px;">
-        <span style="font-size:11px;color:#64748b;">📅 {{ now()->format('d M Y') }}</span>
-        <span class="erp-user">👤 {{ auth()->user()->name ?? 'Administrador' }}</span>
     </div>
 </div>
 
@@ -121,7 +116,12 @@
     $maxTipo = $tiposConteo->max() ?: 1;
 
     // Datos gráfico clientes
-    $dataClientes = $data ?? collect([]);
+    $topProductos = \App\Models\OrderDetail::selectRaw('product_id, SUM(cantidad_despachada) as total_vendido')
+    ->with('product')
+    ->groupBy('product_id')
+    ->orderByDesc('total_vendido')
+    ->take(10)
+    ->get();
 
     // Facturación mensual últimos 6 meses
     $mesesLabels = [];
@@ -211,7 +211,7 @@
 
     {{-- Barra clientes --}}
     <div class="chart-card">
-        <div class="chart-title">📊 Pedidos por cliente — {{ now()->format('F Y') }}</div>
+        <div class="chart-title">🏆 Top 10 productos más vendidos</div>
         <div style="position:relative;width:100%;height:220px;">
             <canvas id="clientesChart"></canvas>
         </div>
@@ -310,8 +310,8 @@
 
 {{-- ── Scripts ── --}}
 @php
-    $labelsClientes = json_encode($dataClientes->map(fn($d) => $d->client->razon_social ?? '?')->values()->toArray());
-    $valuesClientes = json_encode($dataClientes->map(fn($d) => $d->total)->values()->toArray());
+    $labelsClientes = json_encode($topProductos->map(fn($d) => $d->product->nombre ?? '?')->values()->toArray());
+    $valuesClientes = json_encode($topProductos->map(fn($d) => (int)$d->total_vendido)->values()->toArray());
     $mesesLabelsJ   = json_encode($mesesLabels);
     $mesesDataJ     = json_encode($mesesData);
 @endphp
