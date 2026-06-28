@@ -612,6 +612,7 @@ En línea
             <a href="/control-etiquetas"><span>🏷️</span><span>Control de Etiquetas</span></a>
             <a href="/control-stickers"><span>🏷️</span><span>Stickers de tapa</span></a>
             <a href="/control-precintos"><span>🔒</span><span>Precintos</span></a>
+            <a href="/proyectado"><span>📊</span><span>Proyectado </span></a>
         @endif
         <a href="/products"><span>📦</span><span>Productos</span></a>
     </div>
