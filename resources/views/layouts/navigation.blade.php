@@ -607,10 +607,17 @@ En línea
 <!-- OPERACIONES -->
 <div class="menu-section">
 
-<div class="menu-title"
-onclick="toggleMenu(this)">
-<a class="menu-item dashboard-active {{ request()->is('operacionws') ? 'active' : '' }}">
+<div class="menu-section comercial-active">
+
+<div class="menu-title" onclick="toggleMenu(this)">
+
+<span> Operaciones</span>
+
+<span>▾</span>
+
 </div>
+
+
 
 <div class="menu-sub">
 
@@ -629,11 +636,12 @@ onclick="toggleMenu(this)">
 
 <!-- INVENTARIO -->
 <div>
-<div class="menu-title"
-onclick="toggleMenu(this)">
-<a class="menu-item dashboard-active {{ request()->is('inventario') ? 'active' : '' }}">
+<div class="menu-section inventario-active">
+<div class="menu-title" onclick="toggleMenu(this)">
+<span>📚 Inventario</span>
 <span>▾</span>
 </div>
+
 <div class="menu-sub">
 
 @if($role == 'admin')
@@ -648,11 +656,16 @@ onclick="toggleMenu(this)">
 
 <!-- COMERCIAL -->
 <div>
-<div class="menu-title"
-onclick="toggleMenu(this)">
-<a class="menu-item dashboard-active {{ request()->is('comercial') ? 'active' : '' }}">
+<div class="menu-section comercial-active">
+
+<div class="menu-title" onclick="toggleMenu(this)">
+
+<span>🤝 Comercial</span>
+
 <span>▾</span>
+
 </div>
+
 <div class="menu-sub">
 
 @if($role == 'admin')
