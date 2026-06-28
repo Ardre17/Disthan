@@ -606,18 +606,11 @@ En línea
 
 <!-- OPERACIONES -->
 <div class="menu-section">
-
-<div class="menu-section comercial-active">
-
+<div class="menu-section operaciones-active">
 <div class="menu-title" onclick="toggleMenu(this)">
-
 <span> Operaciones</span>
-
 <span>▾</span>
-
 </div>
-
-
 
 <div class="menu-sub">
 
@@ -657,13 +650,9 @@ En línea
 <!-- COMERCIAL -->
 <div>
 <div class="menu-section comercial-active">
-
 <div class="menu-title" onclick="toggleMenu(this)">
-
 <span>🤝 Comercial</span>
-
 <span>▾</span>
-
 </div>
 
 <div class="menu-sub">
