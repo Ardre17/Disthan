@@ -608,13 +608,13 @@ En línea
 </a>
 
 <!-- OPERACIONES -->
-
+<div>
 <div class="menu-section operaciones-active">
 <div class="menu-title" onclick="toggleMenu(this)">
 <span>📦 Operaciones</span>
 <span>▾</span>
 </div>
-</div>
+    
 <div class="menu-sub">
 
 @if($role == 'admin')
@@ -626,7 +626,6 @@ En línea
 @if($role == 'operario')
     <a href="/pedidos"> <span>📦</span> <span>Pedidos</span> </a>
 @endif
-
 </div>
 </div>
 
