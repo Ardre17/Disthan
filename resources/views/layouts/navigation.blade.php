@@ -545,61 +545,36 @@ margin-bottom:8px;
 </style>
 
 <div class="sidebar">
-
 <div>
 
 <div class="sidebar-header">
-
 <div class="logo">
-
-<img
-src="TU_LOGO_AQUI"
-alt="DISTAN ERP">
-
+<img src="TU_LOGO_AQUI" alt="DISTAN ERP">
 </div>
 
-<div class="system-name">
+<div class="system-name"> DISTAN ERP </div>
 
-DISTAN ERP
-
-</div>
-
-<div class="system-sub">
-
-Warehouse & Production Management
-
-</div>
+<div class="system-sub"> Warehouse & Production Management </div>
 
 <div class="user-card">
-
 <div class="avatar">
-
 {{ strtoupper(substr(Auth::user()->name,0,1)) }}
-
 </div>
 
 <div class="user-name">
-
 {{ Auth::user()->name }}
-
 </div>
 
 <div class="user-role">
-
 {{ ucfirst(auth()->user()->role) }}
-
 </div>
 
 <div class="status">
-
 <span class="status-dot"></span>
-
 En línea
-
 </div>
 
 </div>
-
 </div>
 
 <a href="/dashboard" class="menu-item dashboard-active {{ request()->is('dashboard') ? 'active' : '' }}">
@@ -665,9 +640,9 @@ En línea
 @endif
 </div>
 </div>
-
 </div>
-
+</div>
+</div>
 <div class="sidebar-footer">
 
 <div class="storage-card">
