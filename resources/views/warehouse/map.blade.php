@@ -2,21 +2,11 @@
 
 @section('content')
 
-<div style="padding:30px;">
+<div style="padding:30px">
 
-    <h1 style="font-size:32px;font-weight:bold;">
+<h1>🗺️ Mapa del Almacén</h1>
 
-        🗺️ Mapa del Almacén
-
-    </h1>
-
-    <hr>
-
-    <p>
-
-        Bienvenido al nuevo módulo del almacén.
-
-    </p>
+<p>Primer módulo del mapa del almacén.</p>
 
 </div>
 
