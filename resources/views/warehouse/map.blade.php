@@ -662,6 +662,8 @@ estado:"Reservado"
 };
 function abrirUbicacion(codigo){
 
+    document.getElementById("rackModal").style.display="none";
+
     const u = ubicaciones[codigo] || {
 
         producto:"",
@@ -673,28 +675,25 @@ function abrirUbicacion(codigo){
 
     };
 
-    document.getElementById("ubicacionTitulo").innerHTML =
-        "Ubicación " + codigo;
+    document.getElementById("panelUbicacion").innerHTML=codigo;
 
-    document.getElementById("uProducto").innerHTML =
+    document.getElementById("panelProducto").innerHTML=
         u.producto || "Sin producto";
 
-    document.getElementById("uSku").innerHTML =
+    document.getElementById("panelSku").innerHTML=
         u.sku || "-";
 
-    document.getElementById("uLote").innerHTML =
+    document.getElementById("panelLote").innerHTML=
         u.lote || "-";
 
-    document.getElementById("uStock").innerHTML =
+    document.getElementById("panelStock").innerHTML=
         u.stock + " cajas";
 
-    document.getElementById("uCapacidad").innerHTML =
+    document.getElementById("panelCapacidad").innerHTML=
         u.capacidad + " cajas";
 
-    document.getElementById("uEstado").innerHTML =
+    document.getElementById("panelEstado").innerHTML=
         u.estado;
-
-    document.getElementById("ubicacionModal").style.display="flex";
 
 }
 </script>
@@ -731,68 +730,4 @@ MODAL DE RACK
     </div>
 
 </div>
-<!-- ===========================
-MODAL UBICACIÓN
-=========================== -->
-
-<div id="ubicacionModal" class="rack-modal">
-
-    <div class="rack-modal-content" style="max-width:650px;">
-
-        <div class="rack-modal-header">
-
-            <h2 id="ubicacionTitulo">
-
-                Ubicación
-
-            </h2>
-
-            <button onclick="cerrarUbicacion()">
-
-                ✕
-
-            </button>
-
-        </div>
-
-        <div style="padding:25px;">
-
-            <div class="ubicacion-info">
-
-            <div><strong>Producto</strong><span id="uProducto"></span></div>
-
-            <div><strong>SKU</strong><span id="uSku"></span></div>
-
-            <div><strong>Lote</strong><span id="uLote"></span></div>
-
-            <div><strong>Stock</strong><span id="uStock"></span></div>
-
-            <div><strong>Capacidad</strong><span id="uCapacidad"></span></div>
-
-            <div><strong>Estado</strong><span id="uEstado"></span></div>
-
-            </div>
-
-            <div style="margin-top:25px;display:flex;gap:10px;">
-
-                <button class="primary-btn">
-
-                    📦 Asignar producto
-
-                </button>
-
-                <button class="secondary-btn">
-
-                    📄 Movimientos
-
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
 @endsection

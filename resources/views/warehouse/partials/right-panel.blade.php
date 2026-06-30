@@ -1,30 +1,48 @@
 <div class="panel-card">
 
-<h2>
+<h2>📍 Ubicación</h2>
 
-Ubicación seleccionada
+<h1 id="panelUbicacion">Ninguna</h1>
 
-</h2>
+<hr>
 
-<div id="selectedLocation">
+<p><strong>Producto</strong></p>
+<div id="panelProducto">Seleccione una ubicación</div>
 
-Seleccione una ubicación.
+<p><strong>SKU</strong></p>
+<div id="panelSku">-</div>
 
-</div>
+<p><strong>Lote</strong></p>
+<div id="panelLote">-</div>
 
-</div>
+<p><strong>Stock</strong></p>
+<div id="panelStock">-</div>
 
-<div class="panel-card">
+<p><strong>Capacidad</strong></p>
+<div id="panelCapacidad">-</div>
 
-<h2>
+<p><strong>Estado</strong></p>
+<div id="panelEstado">Disponible</div>
 
-Productos
+<div style="margin-top:25px;display:grid;gap:10px;">
 
-</h2>
+<button class="primary-btn">
 
-<div id="selectedProducts">
+📦 Asignar Producto
 
-Sin datos.
+</button>
+
+<button class="secondary-btn">
+
+📄 Ver Movimientos
+
+</button>
+
+<button class="secondary-btn">
+
+✏ Editar Ubicación
+
+</button>
 
 </div>
 
