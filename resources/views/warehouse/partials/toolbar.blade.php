@@ -20,7 +20,7 @@
 
         <button>
 
-            Nivel 2
+            Producto Terminado
 
         </button>
 

@@ -298,6 +298,126 @@ ANIMACIÓN
     opacity:.92;
 
 }
+
+/*=========================
+MODAL
+=========================*/
+
+.rack-modal{
+
+position:fixed;
+
+top:0;
+
+left:0;
+
+width:100%;
+
+height:100%;
+
+background:rgba(0,0,0,.45);
+
+display:none;
+
+justify-content:center;
+
+align-items:center;
+
+z-index:9999;
+
+}
+
+.rack-modal-content{
+
+width:720px;
+
+background:white;
+
+border-radius:20px;
+
+overflow:hidden;
+
+box-shadow:0 20px 60px rgba(0,0,0,.25);
+
+}
+
+.rack-modal-header{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:20px;
+
+background:#2563eb;
+
+color:white;
+
+}
+
+.rack-modal-header button{
+
+border:none;
+
+background:none;
+
+color:white;
+
+font-size:28px;
+
+cursor:pointer;
+
+}
+
+.rack-grid{
+
+padding:25px;
+
+display:grid;
+
+grid-template-columns:repeat(3,1fr);
+
+gap:15px;
+
+}
+
+.rack-cell{
+
+height:70px;
+
+border-radius:10px;
+
+border:2px solid #2563eb;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+font-weight:bold;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.rack-cell:hover{
+
+background:#dbeafe;
+
+}
+
+.rack-footer{
+
+padding:20px;
+
+border-top:1px solid #eee;
+
+}
 </style>
 
 @include('warehouse.partials.toolbar')
@@ -326,10 +446,67 @@ console.log("Mapa del almacén cargado.");
 
 function abrirRack(rack){
 
-    alert("Abrir ubicaciones del Rack " + rack);
+    document.getElementById("rackTitle").innerHTML="RACK "+rack;
+
+    let html="";
+
+    for(let i=1;i<=18;i++){
+
+        let codigo=rack+String(i).padStart(2,"0");
+
+        html+=`
+            <div class="rack-cell">
+                ${codigo}
+            </div>
+        `;
+
+    }
+
+    document.getElementById("rackGrid").innerHTML=html;
+
+    document.getElementById("rackModal").style.display="flex";
+
+}
+
+function cerrarRackModal(){
+
+    document.getElementById("rackModal").style.display="none";
 
 }
 
 </script>
+<!-- ===========================
+MODAL DE RACK
+=========================== -->
+
+<div id="rackModal" class="rack-modal">
+
+    <div class="rack-modal-content">
+
+        <div class="rack-modal-header">
+
+            <h2 id="rackTitle">Rack A</h2>
+
+            <button onclick="cerrarRackModal()">✕</button>
+
+        </div>
+
+        <div id="rackGrid" class="rack-grid">
+
+        </div>
+
+        <div class="rack-footer">
+
+            <strong id="rackInfo">
+
+            18 ubicaciones
+
+            </strong>
+
+        </div>
+
+    </div>
+
+</div>
 
 @endsection
