@@ -418,6 +418,37 @@ padding:20px;
 border-top:1px solid #eee;
 
 }
+.disponible{
+
+background:#ecfdf5;
+
+border-color:#22c55e;
+
+}
+
+.ocupado{
+
+background:#dbeafe;
+
+border-color:#2563eb;
+
+}
+
+.bloqueado{
+
+background:#fee2e2;
+
+border-color:#ef4444;
+
+}
+
+.reserva{
+
+background:#f3e8ff;
+
+border-color:#8b5cf6;
+
+}
 </style>
 
 @include('warehouse.partials.toolbar')
@@ -450,17 +481,34 @@ function abrirRack(rack){
 
     let html="";
 
-    for(let i=1;i<=18;i++){
+    for(let i=1;i<=10;i++){
 
-        let codigo=rack+String(i).padStart(2,"0");
+    let codigo=rack+String(i).padStart(2,"0");
 
-        html+=`
-            <div class="rack-cell">
-                ${codigo}
-            </div>
-        `;
+    let estado="disponible";
 
-    }
+    if(i==2 || i==11)
+        estado="ocupado";
+
+    if(i==6)
+        estado="bloqueado";
+
+    if(i==15)
+        estado="reserva";
+
+    html+=`
+
+    <div
+        class="rack-cell ${estado}"
+        onclick="abrirUbicacion('${codigo}')">
+
+        <strong>${codigo}</strong>
+
+    </div>
+
+    `;
+
+}
 
     document.getElementById("rackGrid").innerHTML=html;
 
@@ -471,6 +519,11 @@ function abrirRack(rack){
 function cerrarRackModal(){
 
     document.getElementById("rackModal").style.display="none";
+
+}
+function abrirUbicacion(codigo){
+
+    alert("Ubicación: "+codigo);
 
 }
 
