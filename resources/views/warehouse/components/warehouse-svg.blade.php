@@ -6,9 +6,9 @@ viewBox="0 0 1500 900"
 width="100%"
 height="100%">
 
-<!-- ===============================
+<!-- ==========================================
 FONDO
-=============================== -->
+========================================== -->
 
 <rect
 x="0"
@@ -16,392 +16,678 @@ y="0"
 width="1500"
 height="900"
 rx="18"
-fill="#f7f9fc"/>
+fill="#f8fafc"/>
 
-<!-- ===============================
-PAREDES
-=============================== -->
+<!-- ==========================================
+BORDE DEL ALMACÉN
+========================================== -->
 
 <rect
-x="20"
-y="20"
-width="1460"
-height="860"
-rx="8"
-fill="none"
-stroke="#222"
-stroke-width="8"/>
+x="40"
+y="90"
+width="1330"
+height="760"
+rx="6"
+fill="white"
+stroke="#202938"
+stroke-width="6"/>
 
-<!-- ===============================
-TITULO
-=============================== -->
+<!-- ==========================================
+TÍTULO
+========================================== -->
 
 <text
 x="60"
-y="60"
-font-size="30"
+y="55"
+font-size="34"
 font-weight="700"
-fill="#1e3a8a">
+fill="#0f172a">
 
-MAPA DEL ALMACÉN
+Mapa Visual del Almacén
 
 </text>
 
-<!-- ===============================
-NIVEL 2
-=============================== -->
-
 <text
 x="60"
+y="85"
+font-size="18"
+fill="#64748b">
+
+Vista general de ubicaciones y stock
+
+</text>
+
+<!-- ==========================================
+NIVEL 2
+========================================== -->
+
+<rect
+
+x="70"
 y="115"
-font-size="24"
-font-weight="700"
-fill="#2563eb">
 
-NIVEL 2
+width="95"
+height="36"
 
-</text>
+rx="8"
 
-<!-- ===============================
-RACK A (SUPERIOR IZQUIERDO)
-=============================== -->
-
-<rect
-id="rackSuperiorIzquierdo"
-class="rack"
-
-x="60"
-y="150"
-
-width="520"
-height="170"
-
-rx="12"/>
+fill="#2563eb"/>
 
 <text
 
-x="320"
+x="118"
 
-y="240"
-
-text-anchor="middle"
-
-font-size="28"
-
-font-weight="700"
-
-fill="#2563eb">
-
-RACK
-
-</text>
-
-<!-- ===============================
-PASILLO
-=============================== -->
-
-<rect
-
-x="610"
-
-y="120"
-
-width="90"
-
-height="420"
-
-fill="#ececec"
-
-rx="6"/>
-
-<text
-
-x="655"
-
-y="330"
-
-transform="rotate(90 655 330)"
+y="140"
 
 text-anchor="middle"
 
 font-size="20"
 
-fill="#666">
+fill="white"
 
-PASILLO
+font-weight="700">
 
-</text>
-
-<!-- ===============================
-RACK SUPERIOR DERECHO
-=============================== -->
-
-<rect
-
-id="rackSuperiorDerecho"
-
-class="rack"
-
-x="730"
-
-y="150"
-
-width="520"
-
-height="170"
-
-rx="12"/>
-
-<text
-
-x="990"
-
-y="240"
-
-text-anchor="middle"
-
-font-size="28"
-
-font-weight="700"
-
-fill="#2563eb">
-
-RACK
-
-</text>
-
-<!-- ===============================
-RACK DERECHO 1
-=============================== -->
-
-<rect
-
-id="rackDerecha1"
-
-class="rack"
-
-x="1285"
-
-y="150"
-
-width="140"
-
-height="75"
-
-rx="10"/>
-
-<!-- ===============================
-RACK DERECHO 2
-=============================== -->
-
-<rect
-
-id="rackDerecha2"
-
-class="rack"
-
-x="1285"
-
-y="245"
-
-width="140"
-
-height="75"
-
-rx="10"/>
-
-<!-- =====================================================
-                 NIVEL 1
-===================================================== -->
-
-<text
-x="60"
-y="430"
-font-size="24"
-font-weight="700"
-fill="#2563eb">
-
-NIVEL 1
+NIVEL 2
 
 </text>
 
 <!-- ==========================================
-RACK A (GRANDE)
+RACK A
 ========================================== -->
 
+<g id="rackA2">
+
 <rect
-id="rackA"
 
 class="rack"
 
-x="60"
-y="470"
+x="80"
 
-width="520"
-height="260"
+y="170"
 
-rx="12"/>
+width="210"
+
+height="340"
+
+rx="8"/>
+
+<rect
+
+x="110"
+
+y="170"
+
+width="70"
+
+height="18"
+
+rx="4"
+
+fill="#2563eb"/>
 
 <text
 
-x="320"
+x="185"
 
-y="605"
+y="330"
 
 text-anchor="middle"
 
-font-size="30"
+font-size="24"
 
 font-weight="700"
 
-fill="#2563eb">
+fill="#1d4ed8">
 
 RACK A
 
 </text>
 
+</g>
+
 <!-- ==========================================
-PASILLO ENTRE RACKS
+RACK B
 ========================================== -->
+
+<g id="rackB2">
 
 <rect
 
-x="610"
+class="rack"
 
-y="455"
+x="320"
 
-width="90"
+y="170"
 
-height="300"
+width="210"
 
-fill="#ececec"
+height="340"
 
-rx="6"/>
+rx="8"/>
+
+<rect
+
+x="350"
+
+y="170"
+
+width="70"
+
+height="18"
+
+rx="4"
+
+fill="#2563eb"/>
 
 <text
 
-x="655"
+x="425"
 
-y="605"
+y="330"
 
-transform="rotate(90 655 605)"
+text-anchor="middle"
+
+font-size="24"
+
+font-weight="700"
+
+fill="#1d4ed8">
+
+RACK B
+
+</text>
+
+</g>
+
+<!-- ==========================================
+PASILLO
+========================================== -->
+
+<line
+
+x1="565"
+
+y1="170"
+
+x2="565"
+
+y2="530"
+
+stroke="#bfc5ce"
+
+stroke-width="2"
+
+stroke-dasharray="12 12"/>
+
+<line
+
+x1="625"
+
+y1="170"
+
+x2="625"
+
+y2="530"
+
+stroke="#bfc5ce"
+
+stroke-width="2"
+
+stroke-dasharray="12 12"/>
+
+<text
+
+x="595"
+
+y="360"
+
+transform="rotate(90 595 360)"
 
 text-anchor="middle"
 
 font-size="20"
 
-fill="#666">
+font-weight="700"
+
+fill="#475569">
 
 PASILLO
 
 </text>
 
 <!-- ==========================================
-RACK B
+RACK C
 ========================================== -->
 
-<rect
+<g id="rackC2">
 
-id="rackB"
+<rect
 
 class="rack"
 
-x="730"
+x="660"
 
-y="470"
+y="170"
 
-width="520"
+width="210"
 
-height="260"
+height="340"
 
-rx="12"/>
+rx="8"/>
+
+<rect
+
+x="690"
+
+y="170"
+
+width="70"
+
+height="18"
+
+rx="4"
+
+fill="#2563eb"/>
 
 <text
 
-x="990"
+x="765"
 
-y="605"
+y="330"
 
 text-anchor="middle"
 
-font-size="30"
+font-size="24"
 
 font-weight="700"
 
-fill="#2563eb">
+fill="#1d4ed8">
 
-RACK B
+RACK C
 
 </text>
 
+</g>
+
 <!-- ==========================================
-PRODUCTOS DE BAJA ROTACIÓN
+RACK D
+========================================== -->
+
+<g id="rackD2">
+
+<rect
+
+class="rack"
+
+x="900"
+
+y="170"
+
+width="210"
+
+height="340"
+
+rx="8"/>
+
+<rect
+
+x="930"
+
+y="170"
+
+width="70"
+
+height="18"
+
+rx="4"
+
+fill="#2563eb"/>
+
+<text
+
+x="1005"
+
+y="330"
+
+text-anchor="middle"
+
+font-size="24"
+
+font-weight="700"
+
+fill="#1d4ed8">
+
+RACK D
+
+</text>
+
+</g>
+
+<!-- ==========================================
+RACK E
 ========================================== -->
 
 <rect
 
-x="1285"
+class="rackSmall"
 
-y="470"
+x="1145"
 
-width="140"
+y="185"
 
-height="260"
+width="120"
 
-rx="12"
+height="125"
 
-fill="#fff"
-
-stroke="#f59e0b"
-
-stroke-width="4"/>
+rx="8"/>
 
 <text
 
-x="1355"
+x="1205"
 
-y="540"
+y="255"
 
 text-anchor="middle"
 
 font-size="18"
 
-font-weight="700"
+font-weight="700">
 
-fill="#f59e0b">
+RACK E
+
+</text>
+
+<!-- ==========================================
+RACK F
+========================================== -->
+
+<rect
+
+class="rackSmall"
+
+x="1145"
+
+y="330"
+
+width="120"
+
+height="125"
+
+rx="8"/>
+
+<text
+
+x="1205"
+
+y="400"
+
+text-anchor="middle"
+
+font-size="18"
+
+font-weight="700">
+
+RACK F
+
+</text>
+<!-- ======================================================
+                 SEPARADOR ENTRE NIVELES
+====================================================== -->
+
+<line
+x1="40"
+y1="555"
+x2="1370"
+y2="555"
+stroke="#202938"
+stroke-width="6"/>
+
+<!-- ======================================================
+                 NIVEL 1
+====================================================== -->
+
+<rect
+x="70"
+y="575"
+width="95"
+height="36"
+rx="8"
+fill="#16a34a"/>
+
+<text
+x="118"
+y="600"
+text-anchor="middle"
+font-size="20"
+fill="white"
+font-weight="700">
+
+NIVEL 1
+
+</text>
+
+<!-- ======================================================
+RACK A
+====================================================== -->
+
+<g id="rackA1">
+
+<rect
+class="rackGreen"
+x="80"
+y="630"
+width="210"
+height="300"
+rx="8"/>
+
+<rect
+x="110"
+y="630"
+width="70"
+height="18"
+rx="4"
+fill="#16a34a"/>
+
+<text
+x="185"
+y="790"
+text-anchor="middle"
+font-size="24"
+font-weight="700"
+fill="#15803d">
+
+RACK A
+
+</text>
+
+</g>
+
+<!-- ======================================================
+RACK B
+====================================================== -->
+
+<g id="rackB1">
+
+<rect
+class="rackGreen"
+x="320"
+y="630"
+width="210"
+height="300"
+rx="8"/>
+
+<rect
+x="350"
+y="630"
+width="70"
+height="18"
+rx="4"
+fill="#16a34a"/>
+
+<text
+x="425"
+y="790"
+text-anchor="middle"
+font-size="24"
+font-weight="700"
+fill="#15803d">
+
+RACK B
+
+</text>
+
+</g>
+
+<!-- ======================================================
+PASILLO
+====================================================== -->
+
+<line
+x1="565"
+y1="630"
+x2="565"
+y2="930"
+stroke="#bfc5ce"
+stroke-width="2"
+stroke-dasharray="12 12"/>
+
+<line
+x1="625"
+y1="630"
+x2="625"
+y2="930"
+stroke="#bfc5ce"
+stroke-width="2"
+stroke-dasharray="12 12"/>
+
+<text
+x="595"
+y="790"
+transform="rotate(90 595 790)"
+text-anchor="middle"
+font-size="20"
+font-weight="700"
+fill="#475569">
+
+PASILLO
+
+</text>
+
+<!-- ======================================================
+RACK C
+====================================================== -->
+
+<g id="rackC1">
+
+<rect
+class="rackGreen"
+x="660"
+y="630"
+width="210"
+height="300"
+rx="8"/>
+
+<rect
+x="690"
+y="630"
+width="70"
+height="18"
+rx="4"
+fill="#16a34a"/>
+
+<text
+x="765"
+y="790"
+text-anchor="middle"
+font-size="24"
+font-weight="700"
+fill="#15803d">
+
+RACK C
+
+</text>
+
+</g>
+
+<!-- ======================================================
+RACK D
+====================================================== -->
+
+<g id="rackD1">
+
+<rect
+class="rackGreen"
+x="900"
+y="630"
+width="210"
+height="300"
+rx="8"/>
+
+<rect
+x="930"
+y="630"
+width="70"
+height="18"
+rx="4"
+fill="#16a34a"/>
+
+<text
+x="1005"
+y="790"
+text-anchor="middle"
+font-size="24"
+font-weight="700"
+fill="#15803d">
+
+RACK D
+
+</text>
+
+</g>
+
+<!-- ======================================================
+BAJA ROTACIÓN
+====================================================== -->
+
+<rect
+x="1145"
+y="630"
+width="120"
+height="300"
+rx="8"
+fill="#fff"
+stroke="#f59e0b"
+stroke-width="3"/>
+
+<text
+x="1205"
+y="760"
+text-anchor="middle"
+font-size="20"
+font-weight="700"
+fill="#ea580c">
 
 BAJA
 
 </text>
 
 <text
-
-x="1355"
-
-y="565"
-
+x="1205"
+y="790"
 text-anchor="middle"
-
-font-size="18"
-
+font-size="20"
 font-weight="700"
-
-fill="#f59e0b">
+fill="#ea580c">
 
 ROTACIÓN
 
 </text>
 
 <text
-
-x="1355"
-
-y="615"
-
+x="1205"
+y="850"
 text-anchor="middle"
-
-font-size="15"
-
+font-size="16"
 fill="#555">
 
 Productos
@@ -409,15 +695,10 @@ Productos
 </text>
 
 <text
-
-x="1355"
-
-y="640"
-
+x="1205"
+y="875"
 text-anchor="middle"
-
-font-size="15"
-
+font-size="16"
 fill="#555">
 
 de baja
@@ -425,18 +706,65 @@ de baja
 </text>
 
 <text
-
-x="1355"
-
-y="665"
-
+x="1205"
+y="900"
 text-anchor="middle"
-
-font-size="15"
-
+font-size="16"
 fill="#555">
 
 rotación
+
+</text>
+
+<!-- ======================================================
+ENTRADA
+====================================================== -->
+
+<line
+x1="40"
+y1="960"
+x2="560"
+y2="960"
+stroke="#444"
+stroke-width="2"
+stroke-dasharray="12 8"/>
+
+<line
+x1="640"
+y1="960"
+x2="1370"
+y2="960"
+stroke="#444"
+stroke-width="2"
+stroke-dasharray="12 8"/>
+
+<path
+d="M585 960
+L585 930
+Q595 945 605 960"
+
+fill="none"
+stroke="#444"
+stroke-width="2"/>
+
+<path
+d="M615 960
+L615 930
+Q605 945 595 960"
+
+fill="none"
+stroke="#444"
+stroke-width="2"/>
+
+<text
+x="600"
+y="990"
+text-anchor="middle"
+font-size="22"
+font-weight="700"
+fill="#222">
+
+ENTRADA
 
 </text>
 
