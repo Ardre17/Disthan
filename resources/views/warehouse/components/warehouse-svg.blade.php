@@ -95,7 +95,11 @@ NIVEL 2
 RACK A
 ========================================== -->
 
-<g id="rackA2">
+<g
+id="rackA2"
+class="warehouse-rack"
+data-rack="A"
+onclick="abrirRack('A')">
 
 <rect
 
@@ -149,7 +153,11 @@ RACK A
 RACK B
 ========================================== -->
 
-<g id="rackB2">
+<g
+id="rackB2"
+class="warehouse-rack"
+data-rack="B"
+onclick="abrirRack('B')">
 
 <rect
 
@@ -259,7 +267,11 @@ PASILLO
 RACK C
 ========================================== -->
 
-<g id="rackC2">
+<g
+id="rackC2"
+class="warehouse-rack"
+data-rack="C"
+onclick="abrirRack('C')">
 
 <rect
 
@@ -313,7 +325,11 @@ RACK C
 RACK D
 ========================================== -->
 
-<g id="rackD2">
+<g
+id="rackD2"
+class="warehouse-rack"
+data-rack="D"
+onclick="abrirRack('D')">
 
 <rect
 
@@ -367,6 +383,11 @@ RACK D
 RACK E
 ========================================== -->
 
+<g
+id="rackE"
+class="warehouse-rack"
+data-rack="E"
+onclick="abrirRack('E')">
 <rect
 
 class="rackSmall"
@@ -400,7 +421,11 @@ RACK E
 <!-- ==========================================
 RACK F
 ========================================== -->
-
+<g
+id="rackF"
+class="warehouse-rack"
+data-rack="F"
+onclick="abrirRack('F')">
 <rect
 
 class="rackSmall"
@@ -448,7 +473,7 @@ stroke-width="6"/>
 
 <rect
 x="70"
-y="605"
+y="625"
 width="95"
 height="36"
 rx="8"
@@ -456,7 +481,7 @@ fill="#16a34a"/>
 
 <text
 x="118"
-y="600"
+y="620"
 text-anchor="middle"
 font-size="20"
 fill="white"
@@ -470,7 +495,11 @@ NIVEL 1
 RACK A
 ====================================================== -->
 
-<g id="rackA1">
+<g
+id="rackA1"
+class="warehouse-rack"
+data-rack="A"
+onclick="abrirRack('A')">
 
 <rect
 class="rackGreen"
@@ -506,7 +535,11 @@ RACK A
 RACK B
 ====================================================== -->
 
-<g id="rackB1">
+<g
+id="rackB1"
+class="warehouse-rack"
+data-rack="B"
+onclick="abrirRack('B')">
 
 <rect
 class="rackGreen"
@@ -577,7 +610,11 @@ PASILLO
 RACK C
 ====================================================== -->
 
-<g id="rackC1">
+<g
+id="rackC1"
+class="warehouse-rack"
+data-rack="C"
+onclick="abrirRack('C')">
 
 <rect
 class="rackGreen"
@@ -613,7 +650,11 @@ RACK C
 RACK D
 ====================================================== -->
 
-<g id="rackD1">
+<g
+id="rackD1"
+class="warehouse-rack"
+data-rack="D"
+onclick="abrirRack('D')">
 
 <rect
 class="rackGreen"
@@ -648,6 +689,11 @@ RACK D
 <!-- ======================================================
 BAJA ROTACIÓN
 ====================================================== -->
+<g
+id="rackG"
+class="warehouse-rack"
+data-rack="G"
+onclick="abrirRack('G')">
 
 <rect
 x="1145"
@@ -661,13 +707,13 @@ stroke-width="3"/>
 
 <text
 x="1205"
-y="760"
+y="750"
 text-anchor="middle"
-font-size="20"
+font-size="22"
 font-weight="700"
 fill="#ea580c">
 
-BAJA
+RACK G
 
 </text>
 
@@ -675,11 +721,32 @@ BAJA
 x="1205"
 y="790"
 text-anchor="middle"
-font-size="20"
-font-weight="700"
-fill="#ea580c">
+font-size="15"
+fill="#555">
 
-ROTACIÓN
+Productos
+
+</text>
+
+<text
+x="1205"
+y="815"
+text-anchor="middle"
+font-size="15"
+fill="#555">
+
+de baja
+
+</text>
+
+<text
+x="1205"
+y="840"
+text-anchor="middle"
+font-size="15"
+fill="#555">
+
+rotación
 
 </text>
 
@@ -739,7 +806,7 @@ stroke-width="2"
 stroke-dasharray="12 8"/>
 
 <path
-d="M585 960
+d="M615 960
 L585 930
 Q595 945 605 960"
 

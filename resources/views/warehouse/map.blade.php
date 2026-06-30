@@ -287,6 +287,17 @@ ANIMACIÓN
 
 }
 
+.warehouse-rack{
+
+    cursor:pointer;
+
+}
+
+.warehouse-rack:hover{
+
+    opacity:.92;
+
+}
 </style>
 
 @include('warehouse.partials.toolbar')
@@ -312,6 +323,12 @@ ANIMACIÓN
 <script>
 
 console.log("Mapa del almacén cargado.");
+
+function abrirRack(rack){
+
+    alert("Abrir ubicaciones del Rack " + rack);
+
+}
 
 </script>
 
