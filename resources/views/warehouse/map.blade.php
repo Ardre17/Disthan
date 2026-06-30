@@ -486,6 +486,51 @@ border-bottom:1px solid #ececec;
 
 }
 }
+.ubicacion-info{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:18px;
+
+margin-bottom:25px;
+
+}
+
+.ubicacion-info div{
+
+background:#f8fafc;
+
+padding:15px;
+
+border-radius:12px;
+
+border:1px solid #e5e7eb;
+
+}
+
+.ubicacion-info strong{
+
+display:block;
+
+margin-bottom:8px;
+
+color:#64748b;
+
+font-size:13px;
+
+}
+
+.ubicacion-info span{
+
+font-size:17px;
+
+font-weight:600;
+
+color:#111827;
+
+}
 </style>
 
 @include('warehouse.partials.toolbar')
@@ -558,29 +603,100 @@ function cerrarRackModal(){
     document.getElementById("rackModal").style.display="none";
 
 }
+const ubicaciones = {
+
+A01:{
+producto:"Mermelada Fresa",
+sku:"MER-001",
+lote:"L240501",
+stock:180,
+capacidad:200,
+estado:"Ocupado"
+},
+
+A02:{
+producto:"Mermelada Piña",
+sku:"MER-002",
+lote:"L240502",
+stock:95,
+capacidad:200,
+estado:"Ocupado"
+},
+
+A03:{
+producto:"Salsa BBQ",
+sku:"SAL-003",
+lote:"L240503",
+stock:45,
+capacidad:200,
+estado:"Stock Bajo"
+},
+
+A04:{
+producto:"",
+sku:"",
+lote:"",
+stock:0,
+capacidad:200,
+estado:"Disponible"
+},
+
+A05:{
+producto:"",
+sku:"",
+lote:"",
+stock:0,
+capacidad:200,
+estado:"Disponible"
+},
+
+A06:{
+producto:"Reservado",
+sku:"---",
+lote:"---",
+stock:120,
+capacidad:200,
+estado:"Reservado"
+}
+
+};
 function abrirUbicacion(codigo){
 
-    document.getElementById("ubicacionTitulo").innerHTML="Ubicación "+codigo;
+    const u = ubicaciones[codigo] || {
 
-    document.getElementById("uProducto").innerHTML="Mermelada de Fresa";
+        producto:"",
+        sku:"",
+        lote:"",
+        stock:0,
+        capacidad:200,
+        estado:"Disponible"
 
-    document.getElementById("uSku").innerHTML="MER-001";
+    };
 
-    document.getElementById("uLote").innerHTML="L240501";
+    document.getElementById("ubicacionTitulo").innerHTML =
+        "Ubicación " + codigo;
 
-    document.getElementById("uStock").innerHTML="180 cajas";
+    document.getElementById("uProducto").innerHTML =
+        u.producto || "Sin producto";
 
-    document.getElementById("uEstado").innerHTML="Ocupado";
+    document.getElementById("uSku").innerHTML =
+        u.sku || "-";
+
+    document.getElementById("uLote").innerHTML =
+        u.lote || "-";
+
+    document.getElementById("uStock").innerHTML =
+        u.stock + " cajas";
+
+    document.getElementById("uCapacidad").innerHTML =
+        u.capacidad + " cajas";
+
+    document.getElementById("uEstado").innerHTML =
+        u.estado;
 
     document.getElementById("ubicacionModal").style.display="flex";
 
 }
-function cerrarUbicacion(){
-
-    document.getElementById("ubicacionModal").style.display="none";
-
-}
-
 </script>
 <!-- ===========================
 MODAL DE RACK
@@ -641,39 +757,21 @@ MODAL UBICACIÓN
 
         <div style="padding:25px;">
 
-            <table style="width:100%;border-collapse:collapse;">
+            <div class="ubicacion-info">
 
-                <tr>
-                    <td><b>Producto</b></td>
-                    <td id="uProducto">-</td>
-                </tr>
+            <div><strong>Producto</strong><span id="uProducto"></span></div>
 
-                <tr>
-                    <td><b>SKU</b></td>
-                    <td id="uSku">-</td>
-                </tr>
+            <div><strong>SKU</strong><span id="uSku"></span></div>
 
-                <tr>
-                    <td><b>Lote</b></td>
-                    <td id="uLote">-</td>
-                </tr>
+            <div><strong>Lote</strong><span id="uLote"></span></div>
 
-                <tr>
-                    <td><b>Stock</b></td>
-                    <td id="uStock">-</td>
-                </tr>
+            <div><strong>Stock</strong><span id="uStock"></span></div>
 
-                <tr>
-                    <td><b>Capacidad</b></td>
-                    <td id="uCapacidad">200 cajas</td>
-                </tr>
+            <div><strong>Capacidad</strong><span id="uCapacidad"></span></div>
 
-                <tr>
-                    <td><b>Estado</b></td>
-                    <td id="uEstado">Disponible</td>
-                </tr>
+            <div><strong>Estado</strong><span id="uEstado"></span></div>
 
-            </table>
+            </div>
 
             <div style="margin-top:25px;display:flex;gap:10px;">
 
