@@ -587,6 +587,47 @@ background:#22c55e;
 transition:.35s;
 
 }
+.rack-resumen{
+
+display:grid;
+
+grid-template-columns:repeat(2,1fr);
+
+gap:10px;
+
+margin-bottom:20px;
+
+}
+
+.resumen-item{
+
+background:#f8fafc;
+
+padding:14px;
+
+border-radius:12px;
+
+border:1px solid #e5e7eb;
+
+}
+
+.resumen-item span{
+
+display:block;
+
+font-size:13px;
+
+color:#64748b;
+
+}
+
+.resumen-item strong{
+
+font-size:24px;
+
+color:#111827;
+
+}
 </style>
 
 @include('warehouse.partials.toolbar')
@@ -615,11 +656,38 @@ console.log("Mapa del almacén cargado.");
 
 function abrirRack(rack){
 
+    document.getElementById("panelRack").innerHTML=rack;
     document.getElementById("rackTitle").innerHTML="RACK "+rack;
 
     let html="";
 
     for(let i=1;i<=10;i++){
+        let ocupadas=0;
+
+    let libres=0;
+
+    for(let codigo in ubicaciones){
+
+        if(codigo.startsWith(rack)){
+
+            if(ubicaciones[codigo].estado=="LIBRE")
+
+                libres++;
+
+            else
+
+                ocupadas++;
+
+        }
+
+    }
+
+    document.getElementById("panelOcupadas").innerHTML=ocupadas;
+
+    document.getElementById("panelLibres").innerHTML=libres;
+
+    document.getElementById("panelTotal").innerHTML=
+    ocupadas+libres;
 
     let codigo=rack+String(i).padStart(2,"0");
 

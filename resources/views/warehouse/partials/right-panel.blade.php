@@ -1,6 +1,41 @@
 <div class="panel-card">
 
 <h2>📍 Ubicación</h2>
+<div class="rack-resumen">
+
+<div class="resumen-item">
+
+<span>Rack</span>
+
+<strong id="panelRack">-</strong>
+
+</div>
+
+<div class="resumen-item">
+
+<span>Ubicaciones</span>
+
+<strong id="panelTotal">18</strong>
+
+</div>
+
+<div class="resumen-item">
+
+<span>Ocupadas</span>
+
+<strong id="panelOcupadas">0</strong>
+
+</div>
+
+<div class="resumen-item">
+
+<span>Libres</span>
+
+<strong id="panelLibres">18</strong>
+
+</div>
+
+</div>
 
 <h1 id="panelUbicacion">Ninguna</h1>
 
