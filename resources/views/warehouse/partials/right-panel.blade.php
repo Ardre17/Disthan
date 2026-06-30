@@ -23,6 +23,23 @@
 
 <p><strong>Estado</strong></p>
 <div id="panelEstado">Disponible</div>
+<p><strong>Ocupación</strong></p>
+
+<div class="progress">
+
+<div
+id="ocupacionBar"
+class="progress-fill">
+
+</div>
+
+</div>
+
+<div id="ocupacionTexto">
+
+0%
+
+</div>
 
 <div style="margin-top:25px;display:grid;gap:10px;">
 

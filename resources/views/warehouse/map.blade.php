@@ -531,6 +531,62 @@ font-weight:600;
 color:#111827;
 
 }
+.libre{
+
+background:#ecfdf5;
+
+border:2px solid #22c55e;
+
+}
+
+.ocupado{
+
+background:#dbeafe;
+
+border:2px solid #2563eb;
+
+}
+
+.stockbajo{
+
+background:#fef3c7;
+
+border:2px solid #f59e0b;
+
+}
+
+.reservado{
+
+background:#ede9fe;
+
+border:2px solid #7c3aed;
+
+}
+.progress{
+
+height:12px;
+
+background:#e5e7eb;
+
+border-radius:20px;
+
+overflow:hidden;
+
+margin-top:6px;
+
+}
+
+.progress-fill{
+
+height:100%;
+
+width:0;
+
+background:#22c55e;
+
+transition:.35s;
+
+}
 </style>
 
 @include('warehouse.partials.toolbar')
@@ -581,11 +637,38 @@ function abrirRack(rack){
     html+=`
 
     <div
-        class="rack-cell ${estado}"
-        onclick="abrirUbicacion('${codigo}')">
+        let clase="libre";
 
-        <strong>${codigo}</strong>
+switch(u.estado){
 
+case "OCUPADO":
+clase="ocupado";
+break;
+
+case "STOCK_BAJO":
+clase="stockbajo";
+break;
+
+case "RESERVADO":
+clase="reservado";
+break;
+
+case "LIBRE":
+clase="libre";
+break;
+
+}
+html+=`
+
+<div
+class="rack-cell ${clase}"
+onclick="abrirUbicacion('${codigo}')">
+
+<strong>${codigo}</strong>
+
+</div>
+
+`;
     </div>
 
     `;
@@ -694,6 +777,11 @@ function abrirUbicacion(codigo){
 
     document.getElementById("panelEstado").innerHTML=
         u.estado;
+        document.getElementById("ocupacionBar").style.width =
+    u.ocupacion+"%";
+
+    document.getElementById("ocupacionTexto").innerHTML =
+    u.ocupacion+"%";
 
 }
 </script>
