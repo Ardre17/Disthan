@@ -2,7 +2,7 @@
 
 <svg
 id="warehouseMap"
-viewBox="0 0 1500 900"
+viewBox="0 0 1500 1120"
 width="100%"
 height="100%">
 
@@ -26,7 +26,7 @@ BORDE DEL ALMACÉN
 x="40"
 y="90"
 width="1330"
-height="760"
+height="990"
 rx="6"
 fill="white"
 stroke="#202938"
@@ -436,9 +436,9 @@ RACK F
 
 <line
 x1="40"
-y1="555"
+y1="585"
 x2="1370"
-y2="555"
+y2="585"
 stroke="#202938"
 stroke-width="6"/>
 
@@ -448,7 +448,7 @@ stroke-width="6"/>
 
 <rect
 x="70"
-y="575"
+y="605"
 width="95"
 height="36"
 rx="8"
@@ -475,14 +475,14 @@ RACK A
 <rect
 class="rackGreen"
 x="80"
-y="630"
+y="660"
 width="210"
 height="300"
 rx="8"/>
 
 <rect
 x="110"
-y="630"
+y="660"
 width="70"
 height="18"
 rx="4"
@@ -722,18 +722,18 @@ ENTRADA
 
 <line
 x1="40"
-y1="960"
+y1="1035"
 x2="560"
-y2="960"
+y2="1035"
 stroke="#444"
 stroke-width="2"
 stroke-dasharray="12 8"/>
 
 <line
 x1="640"
-y1="960"
+y1="1035"
 x2="1370"
-y2="960"
+y2="1035"
 stroke="#444"
 stroke-width="2"
 stroke-dasharray="12 8"/>
@@ -758,7 +758,7 @@ stroke-width="2"/>
 
 <text
 x="600"
-y="990"
+y="1070"
 text-anchor="middle"
 font-size="22"
 font-weight="700"

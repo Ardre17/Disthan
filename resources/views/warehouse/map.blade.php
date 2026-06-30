@@ -7,30 +7,44 @@ MAPA DEL ALMACÉN
 ====================================================*/
 
 .warehouse-layout{
+
     display:grid;
-    grid-template-columns:1fr 290px;
-    gap:22px;
-    margin-top:20px;
+
+    grid-template-columns:78% 22%;
+
+    gap:24px;
+
+    align-items:start;
+
 }
 
 .warehouse-map{
 
     background:white;
 
-    border-radius:18px;
+    border-radius:20px;
 
-    padding:20px;
+    padding:25px;
 
-    box-shadow:
-        0 10px 30px rgba(0,0,0,.08);
+    box-shadow:0 12px 30px rgba(0,0,0,.08);
+
+    overflow:auto;
+
+    min-height:980px;
 
 }
 
 .warehouse-panel{
 
     display:flex;
+
     flex-direction:column;
+
     gap:18px;
+
+    position:sticky;
+
+    top:20px;
 
 }
 
