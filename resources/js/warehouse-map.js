@@ -166,3 +166,10 @@ function abrirUbicacion(codigo){
     u.ocupacion+"%";
 
 }
+// ===============================
+// Exponer funciones al navegador
+// ===============================
+
+window.abrirRack = abrirRack;
+window.abrirUbicacion = abrirUbicacion;
+window.cerrarRackModal = cerrarRackModal;
