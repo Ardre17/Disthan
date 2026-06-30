@@ -448,6 +448,43 @@ background:#f3e8ff;
 
 border-color:#8b5cf6;
 
+.primary-btn{
+
+background:#2563eb;
+
+color:white;
+
+border:none;
+
+padding:12px 18px;
+
+border-radius:10px;
+
+cursor:pointer;
+
+}
+
+.secondary-btn{
+
+background:white;
+
+border:1px solid #d1d5db;
+
+padding:12px 18px;
+
+border-radius:10px;
+
+cursor:pointer;
+
+}
+
+table td{
+
+padding:10px;
+
+border-bottom:1px solid #ececec;
+
+}
 }
 </style>
 
@@ -523,7 +560,24 @@ function cerrarRackModal(){
 }
 function abrirUbicacion(codigo){
 
-    alert("Ubicación: "+codigo);
+    document.getElementById("ubicacionTitulo").innerHTML="Ubicación "+codigo;
+
+    document.getElementById("uProducto").innerHTML="Mermelada de Fresa";
+
+    document.getElementById("uSku").innerHTML="MER-001";
+
+    document.getElementById("uLote").innerHTML="L240501";
+
+    document.getElementById("uStock").innerHTML="180 cajas";
+
+    document.getElementById("uEstado").innerHTML="Ocupado";
+
+    document.getElementById("ubicacionModal").style.display="flex";
+
+}
+function cerrarUbicacion(){
+
+    document.getElementById("ubicacionModal").style.display="none";
 
 }
 
@@ -552,9 +606,90 @@ MODAL DE RACK
 
             <strong id="rackInfo">
 
-            18 ubicaciones
+            10 ubicaciones
 
             </strong>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- ===========================
+MODAL UBICACIÓN
+=========================== -->
+
+<div id="ubicacionModal" class="rack-modal">
+
+    <div class="rack-modal-content" style="max-width:650px;">
+
+        <div class="rack-modal-header">
+
+            <h2 id="ubicacionTitulo">
+
+                Ubicación
+
+            </h2>
+
+            <button onclick="cerrarUbicacion()">
+
+                ✕
+
+            </button>
+
+        </div>
+
+        <div style="padding:25px;">
+
+            <table style="width:100%;border-collapse:collapse;">
+
+                <tr>
+                    <td><b>Producto</b></td>
+                    <td id="uProducto">-</td>
+                </tr>
+
+                <tr>
+                    <td><b>SKU</b></td>
+                    <td id="uSku">-</td>
+                </tr>
+
+                <tr>
+                    <td><b>Lote</b></td>
+                    <td id="uLote">-</td>
+                </tr>
+
+                <tr>
+                    <td><b>Stock</b></td>
+                    <td id="uStock">-</td>
+                </tr>
+
+                <tr>
+                    <td><b>Capacidad</b></td>
+                    <td id="uCapacidad">200 cajas</td>
+                </tr>
+
+                <tr>
+                    <td><b>Estado</b></td>
+                    <td id="uEstado">Disponible</td>
+                </tr>
+
+            </table>
+
+            <div style="margin-top:25px;display:flex;gap:10px;">
+
+                <button class="primary-btn">
+
+                    📦 Asignar producto
+
+                </button>
+
+                <button class="secondary-btn">
+
+                    📄 Movimientos
+
+                </button>
+
+            </div>
 
         </div>
 
