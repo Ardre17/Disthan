@@ -191,7 +191,6 @@
     <div class="kpi" style="border-left-color:#0b5ed7;">
         <div class="kpi-icon">👥</div>
         <div class="kpi-label">Total clientes</div>
-        <div class="kpi-val">{{ $totalClientes }}</div>
         <div class="kpi-sub">registrados en el sistema</div>
     </div>
     <div class="kpi" style="border-left-color:#15803d;">
@@ -236,17 +235,8 @@
     </form>
 </div>
 
-{{-- ── Resultado ── --}}
-<div class="result-bar">
-    <div class="result-count">
-        Mostrando <strong id="countVisible">{{ $clients->count() }}</strong>
-        de <strong>{{ $totalClientes }}</strong> clientes
-        @if(request('search'))
-            — búsqueda: <em>"{{ request('search') }}"</em>
-        @endif
-    </div>
-    <div style="font-size:11px;color:#94a3b8;">Ordenado por nombre</div>
-</div>
+
+
 
 {{-- ── Lista ── --}}
 <div id="clienteLista">

@@ -13,7 +13,15 @@ class RawMaterialController extends Controller
 }
     public function index()
 {
-    $materials = RawMaterial::orderBy('status')->orderBy('name');
+    $materials = RawMaterial::orderByRaw("
+        CASE
+            WHEN status='AGOTADO' THEN 1
+            WHEN status='STOCK_BAJO' THEN 2
+            ELSE 3
+        END
+    ")
+    ->orderBy('name')
+    ->get();
 
     $total = RawMaterial::count();
 

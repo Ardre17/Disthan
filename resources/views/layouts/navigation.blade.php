@@ -592,7 +592,7 @@ En línea
             <a href="/orders"><span>📋</span><span>Órdenes</span></a>
             <a href="/historial"><span>📚</span><span>Historial</span></a>
             <a href="/produccion"><span>🏭</span><span>Producción</span></a>
-            <a href="{{ route('raw-materials.index') }}" class="nav-link">
+            <a href="{{ route('raw-materials.index') }}">
                 📦 <span>Materia Prima</span>
             </a>
             <a href="{{ route('products.proyectado') }}"><span>📊</span><span>Proyectado</span></a>

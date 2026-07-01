@@ -5,9 +5,9 @@
 <div class="container-fluid">
 
     <div class="d-flex justify-content-between align-items-center mb-4">
-
         <div>
             <h2 class="fw-bold mb-1">📦 Materia Prima</h2>
+        </div>
             <small class="text-muted">
                 Control de materias primas disponibles para producción.
             </small>
@@ -118,15 +118,6 @@
 
     </div>
 
-    @if(session('success'))
-
-        <div class="alert alert-success">
-
-            {{ session('success') }}
-
-        </div>
-
-    @endif
 <div class="card shadow-sm border-0 mb-4">
 
     <div class="card-body">
@@ -190,21 +181,15 @@ border-danger
 
                     </p>
 
-                    <p>
-
-                        <strong>Proveedor:</strong>
-                        <p>
-
-<strong>Color:</strong>
-
-{{ $material->color }}
-
-</p>
-
+                   <p>
+                    <strong>Proveedor:</strong>
                         {{ $material->supplier }}
-
                     </p>
 
+                    <p>
+                        <strong>Color:</strong>
+                        {{ $material->color }}
+                    </p>
                     <p>
 
                         <strong>Stock:</strong>
