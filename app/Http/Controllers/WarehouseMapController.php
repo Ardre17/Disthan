@@ -9,10 +9,17 @@ use Illuminate\Http\JsonResponse;
 
 class WarehouseMapController extends Controller
 {
-    public function index()
-    {
-        return view('warehouse.map');
-    }
+    use App\Models\WarehouseRack;
+
+public function index()
+{
+    $racks = WarehouseRack::where('active', true)
+                ->orderByDesc('level')
+                ->orderBy('rack')
+                ->get();
+
+    return view('warehouse.map', compact('racks'));
+}
     public function locations(): JsonResponse
     {
         $locations = WarehouseLocation::with('product')

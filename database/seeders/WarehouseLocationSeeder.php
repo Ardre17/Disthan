@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\WarehouseLocation;
+use App\Models\WarehouseRack;
 
 class WarehouseLocationSeeder extends Seeder
 {
@@ -11,61 +12,53 @@ class WarehouseLocationSeeder extends Seeder
     {
         WarehouseLocation::truncate();
 
-        $racks = [
+        $racks = WarehouseRack::orderBy('level')
+            ->orderBy('rack')
+            ->get();
 
-            ['rack'=>'A','level'=>2,'total'=>18],
-            ['rack'=>'B','level'=>2,'total'=>18],
-            ['rack'=>'C','level'=>2,'total'=>18],
-            ['rack'=>'D','level'=>2,'total'=>18],
+        foreach ($racks as $rack) {
 
-            ['rack'=>'E','level'=>2,'total'=>8],
-            ['rack'=>'F','level'=>2,'total'=>8],
+    $total = $rack->rows * $rack->columns;
 
-            ['rack'=>'A','level'=>1,'total'=>18],
-            ['rack'=>'B','level'=>1,'total'=>18],
-            ['rack'=>'C','level'=>1,'total'=>18],
-            ['rack'=>'D','level'=>1,'total'=>18],
+    for ($i = 1; $i <= $total; $i++) {
 
-            ['rack'=>'G','level'=>1,'total'=>18],
+        WarehouseLocation::create([
 
-        ];
+            'code' => $rack->level .
+                $rack->rack .
+                str_pad($i,2,'0',STR_PAD_LEFT),
 
-        foreach($racks as $r){
+            'full_code' => $rack->level .
+                '-' .
+                $rack->rack .
+                str_pad($i,2,'0',STR_PAD_LEFT),
 
-            for($i=1;$i<=$r['total'];$i++){
+            'rack' => $rack->rack,
 
-                WarehouseLocation::create([
+            'rack_name' => $rack->name,
 
-                    'code' => $r['level'].$r['rack'].str_pad($i,2,'0',STR_PAD_LEFT),
+            'level' => $rack->level,
 
-                    'full_code' => $r['level'].'-'.$r['rack'].str_pad($i,2,'0',STR_PAD_LEFT),
+            'row' => ceil($i / $rack->columns),
 
-                    'rack'=>$r['rack'],
+            'column' => (($i - 1) % $rack->columns) + 1,
 
-                    'rack_name'=>'Rack '.$r['rack'],
+            'status' => 'FREE',
 
-                    'level'=>$r['level'],
+            'product_id' => null,
 
-                    'row'=>ceil($i/3),
+            'stock' => 0,
 
-                    'column'=>(($i-1)%3)+1,
+            'capacity' => 200,
 
-                    'status'=>'FREE',
+            'max_weight' => 0,
 
-                    'product_id'=>null,
+            'notes' => null,
 
-                    'stock'=>0,
+        ]);
 
-                    'capacity'=>200,
+    }
 
-                    'max_weight'=>0,
-
-                    'notes'=>null
-
-                ]);
-
-            }
-
-        }
+}
     }
 }

@@ -1,5 +1,9 @@
 <div class="warehouse-canvas">
+<pre>
 
+{{ $racks }}
+
+</pre>
 <svg
 id="warehouseMap"
 viewBox="0 0 1500 1120"
