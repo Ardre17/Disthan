@@ -175,16 +175,6 @@
 
 <div class="body">
 
-{{-- ── PHP vars ── --}}
-@php
-    $totalClientes  = $clients->total();
-    $conOrdenes     = \App\Models\Order::distinct('client_id')
-                        ->whereMonth('created_at', now()->month)
-                        ->count('client_id');
-    $ordenesActivas = \App\Models\Order::whereIn('estado',['INCOMPLETO','PARCIAL'])->count();
-    $facturado      = \App\Models\Order::where('estado','COMPLETO')->sum('total');
-@endphp
-
 {{-- ── Header ── --}}
 <div class="page-hdr">
     <div>
