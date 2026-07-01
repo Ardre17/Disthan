@@ -3,15 +3,13 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\WarehouseLocation;
 use Illuminate\Http\JsonResponse;
-
+use App\Models\WarehouseLocation;
+use App\Models\WarehouseRack;
 
 class WarehouseMapController extends Controller
 {
-    use App\Models\WarehouseRack;
-
-public function index()
+    public function index()
 {
     $racks = WarehouseRack::where('active', true)
                 ->orderByDesc('level')
