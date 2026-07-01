@@ -13,6 +13,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseMapController;
+use App\Http\Controllers\RawMaterialController;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,6 +29,7 @@ Route::get('/init-db', function () {
     return "Base de datos creada correctamente";
 });
 
+Route::resource('raw-materials', RawMaterialController::class);
 /*
 |--------------------------------------------------------------------------
 | HOME
