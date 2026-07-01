@@ -61,6 +61,9 @@ Route::middleware('auth')->group(function () {
     Route::resource('categories', CategoryController::class);
     Route::resource('orders', OrderController::class);
     Route::get('/warehouse-map', [WarehouseMapController::class, 'index']) ->name('warehouse.map');
+    Route::get('/warehouse-map/locations', [WarehouseMapController::class, 'locations'])
+    ->name('warehouse.locations');
+
 
 
     /*

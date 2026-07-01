@@ -49,4 +49,9 @@ class Product extends Model
 {
     return $this->hasMany(OrderDetail::class);
 }
+ public function locations()
+{
+    return $this->hasMany(WarehouseLocation::class);
+}
+
 }
