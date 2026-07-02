@@ -196,7 +196,6 @@
     <div class="kpi" style="border-left-color:#15803d;">
         <div class="kpi-icon">✅</div>
         <div class="kpi-label">Activos este mes</div>
-        <div class="kpi-val" style="color:#15803d;">{{ $conOrdenes }}</div>
         <div class="kpi-sub">con órdenes en {{ now()->format('M Y') }}</div>
     </div>
     <div class="kpi" style="border-left-color:#b45309;">

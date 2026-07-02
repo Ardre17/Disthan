@@ -14,6 +14,7 @@ use App\Http\Controllers\InventoryController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseMapController;
 use App\Http\Controllers\RawMaterialController;
+use App\Http\Controllers\ProductionOrderController;
 
 /*
 |--------------------------------------------------------------------------
@@ -30,6 +31,12 @@ Route::get('/init-db', function () {
 });
 
 Route::resource('raw-materials', RawMaterialController::class);
+Route::resource('production-orders', ProductionOrderController::class);
+
+Route::post(
+    'production-orders/{production_order}/finish',
+    [ProductionOrderController::class,'finish']
+)->name('production-orders.finish');
 /*
 |--------------------------------------------------------------------------
 | HOME
