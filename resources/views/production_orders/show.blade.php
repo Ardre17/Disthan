@@ -78,6 +78,19 @@ class="btn btn-success btn-lg">
 🏁 FINALIZAR PRODUCCIÓN
 
 </button>
+<form method="POST"
+      action="{{ route('production-orders.destroy', $production_order) }}"
+      onsubmit="return confirm('¿Está seguro de eliminar esta orden de producción? Esta acción restaurará el inventario si la producción ya fue finalizada.');"
+      class="mt-3">
+
+    @csrf
+    @method('DELETE')
+
+    <button class="btn btn-danger">
+        🗑 Eliminar Producción
+    </button>
+
+</form>
 
 </form>
 

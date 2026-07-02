@@ -137,9 +137,49 @@ public function create()
      * Remove the specified resource from storage.
      */
     public function destroy(ProductionOrder $production_order)
-    {
-        //
-    }
+{
+    DB::transaction(function () use ($production_order) {
+
+        // Si ya estaba finalizada, revertimos inventario
+        if ($production_order->status === 'FINALIZADA') {
+
+            $material = $production_order->rawMaterial;
+            $producto = $production_order->product;
+
+            // Devolver materia prima
+            $material->stock += $production_order->consumed_quantity;
+
+            // Recalcular estado
+            if ($material->stock <= 0) {
+                $material->status = 'AGOTADO';
+            } elseif ($material->stock <= $material->minimum_stock) {
+                $material->status = 'STOCK_BAJO';
+            } else {
+                $material->status = 'DISPONIBLE';
+            }
+
+            $material->save();
+
+            // Restar producto terminado
+            $producto->stock -= $production_order->produced_quantity;
+
+            // Evitar stock negativo
+            if ($producto->stock < 0) {
+                $producto->stock = 0;
+            }
+
+            $producto->save();
+        }
+
+        // Eliminar la orden
+        $production_order->delete();
+
+    });
+
+    return redirect()
+        ->route('production-orders.index')
+        ->with('success', 'La orden de producción fue eliminada y el inventario restaurado correctamente.');
+}
     public function finish(ProductionOrder $production_order)
 {
     if($production_order->status=='FINALIZADA'){
