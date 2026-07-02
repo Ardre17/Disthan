@@ -50,7 +50,7 @@
 
                         <br>
 
-                        {{ $order->product->name }}
+                        {{ $order->product->nombre }}
 
                     </p>
 

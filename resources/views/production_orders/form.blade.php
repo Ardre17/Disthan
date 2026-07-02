@@ -42,7 +42,7 @@ Seleccione...
 <option
 value="{{ $product->id }}">
 
-{{ $product->name }}
+{{ $product->nombre }}
 
 </option>
 

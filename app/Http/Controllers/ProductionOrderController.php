@@ -37,7 +37,7 @@ public function create()
 {
     return view('production_orders.create', [
 
-        'products' => Product::orderBy('name')->get(),
+        'products' => Product::orderBy('nombre')->get(),
 
         'materials' => RawMaterial::orderBy('name')->get(),
 

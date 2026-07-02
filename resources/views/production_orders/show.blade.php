@@ -22,7 +22,7 @@
 
 <strong>Producto:</strong>
 
-{{ $production_order->product->name }}
+{{ $production_order->product->nombre }}
 
 </p>
 
