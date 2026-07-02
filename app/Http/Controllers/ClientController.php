@@ -8,29 +8,28 @@ use Illuminate\Http\Request;
 class ClientController extends Controller
 {
     public function index(Request $request)
-    {
-        $query = Client::query();
+{
+    $query = Client::query();
 
-        if ($request->filled('search')) {
+    if ($request->filled('search')) {
 
-            $query->where(function($q) use ($request){
+        $query->where(function ($q) use ($request) {
 
-                $q->where('ruc', 'like', '%'.$request->search.'%')
-                  ->orWhere('razon_social', 'like', '%'.$request->search.'%')
-                  ->orWhere('nombre_comercial', 'like', '%'.$request->search.'%');
+            $q->where('ruc', 'like', '%' . $request->search . '%')
+              ->orWhere('razon_social', 'like', '%' . $request->search . '%')
+              ->orWhere('nombre_comercial', 'like', '%' . $request->search . '%');
 
-            });
-        }
+        });
 
-        $clients = $query
-            ->latest()
-            ->get();
-
-        return view(
-            'clients.index',
-            compact('clients')
-        );
     }
+
+    $clients = $query
+        ->orderBy('razon_social')
+        ->paginate(15)
+        ->withQueryString();
+
+    return view('clients.index', compact('clients'));
+}
 
     public function create()
     {
