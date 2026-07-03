@@ -16,6 +16,11 @@ use App\Http\Controllers\WarehouseMapController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\ProductionOrderController;
 use App\Http\Controllers\KardexController;
+use App\Http\Controllers\LabelController;
+
+Route::resource('labels', LabelController::class);
+Route::post('labels/{label}/movimiento', [LabelController::class, 'movimiento'])
+     ->name('labels.movimiento');
 
 Route::get('/kardex', [KardexController::class, 'index'])->name('kardex.index');
 
