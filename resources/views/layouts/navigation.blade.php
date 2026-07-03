@@ -594,6 +594,7 @@ En línea
             <a href="{{ route('production-orders.index') }}"><span>🏭</span><span>Producción</span></a>
             <a href="{{ route('raw-materials.index') }}"><span>📦</span><span>Materia Prima</span> </a>
             <a href="{{ route('products.proyectado') }}"><span>📊</span><span>Proyectado</span></a>
+            <a href="{{ route('kardex.index') }}"><span>📒</span><span>Kardex</span></a>
         @endif
         @if($role == 'operario')
             <a href="/pedidos"><span>📦</span><span>Pedidos</span></a>
