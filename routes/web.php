@@ -15,6 +15,7 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseMapController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\ProductionOrderController;
+use App\Http\Controllers\KardexController;
 
 Route::get('/kardex', [KardexController::class, 'index'])->name('kardex.index');
 
