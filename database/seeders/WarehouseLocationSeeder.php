@@ -4,61 +4,50 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\WarehouseLocation;
-use App\Models\WarehouseRack;
 
 class WarehouseLocationSeeder extends Seeder
 {
     public function run(): void
     {
-        WarehouseLocation::truncate();
+        // ── Racks normales: 2 niveles × 2 filas × 4 espacios × 4 slots = 64 celdas
+        foreach ([1, 2] as $nivel) {
+            foreach (['A', 'B'] as $fila) {
+                for ($espacio = 1; $espacio <= 4; $espacio++) {
+                    for ($slot = 1; $slot <= 4; $slot++) {
+                        WarehouseLocation::firstOrCreate([
+                            'nivel'   => $nivel,
+                            'tipo'    => 'RACK',
+                            'fila'    => $fila,
+                            'espacio' => $espacio,
+                            'slot'    => $slot,
+                        ], ['product_id' => null, 'cantidad' => 0]);
+                    }
+                }
+            }
+        }
 
-        $racks = WarehouseRack::orderBy('level')
-            ->orderBy('rack')
-            ->get();
+        // ── Zona poca rotación Nivel 1: 10 espacios
+        for ($espacio = 1; $espacio <= 10; $espacio++) {
+            WarehouseLocation::firstOrCreate([
+                'nivel'   => 1,
+                'tipo'    => 'ROTACION',
+                'fila'    => null,
+                'espacio' => $espacio,
+                'slot'    => null,
+            ], ['product_id' => null, 'cantidad' => 0]);
+        }
 
-        foreach ($racks as $rack) {
+        // ── Zona poca rotación Nivel 2: 5 espacios
+        for ($espacio = 1; $espacio <= 5; $espacio++) {
+            WarehouseLocation::firstOrCreate([
+                'nivel'   => 2,
+                'tipo'    => 'ROTACION',
+                'fila'    => null,
+                'espacio' => $espacio,
+                'slot'    => null,
+            ], ['product_id' => null, 'cantidad' => 0]);
+        }
 
-    $total = $rack->rows * $rack->columns;
-
-    for ($i = 1; $i <= $total; $i++) {
-
-        WarehouseLocation::create([
-
-            'code' => $rack->level .
-                $rack->rack .
-                str_pad($i,2,'0',STR_PAD_LEFT),
-
-            'full_code' => $rack->level .
-                '-' .
-                $rack->rack .
-                str_pad($i,2,'0',STR_PAD_LEFT),
-
-            'rack' => $rack->rack,
-
-            'rack_name' => $rack->name,
-
-            'level' => $rack->level,
-
-            'row' => ceil($i / $rack->columns),
-
-            'column' => (($i - 1) % $rack->columns) + 1,
-
-            'status' => 'FREE',
-
-            'product_id' => null,
-
-            'stock' => 0,
-
-            'capacity' => 200,
-
-            'max_weight' => 0,
-
-            'notes' => null,
-
-        ]);
-
-    }
-
-}
+        $this->command->info('✅ 79 celdas creadas correctamente.');
     }
 }

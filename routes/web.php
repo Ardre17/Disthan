@@ -18,6 +18,13 @@ use App\Http\Controllers\ProductionOrderController;
 use App\Http\Controllers\KardexController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\RawMaterialEntryController;
+use App\Http\Controllers\WarehouseController;
+
+Route::prefix('warehouse')->name('warehouse.')->middleware('auth')->group(function () {
+    Route::get('/',                       [WarehouseController::class, 'index'])->name('index');
+    Route::post('/{location}/assign',     [WarehouseController::class, 'assign'])->name('assign');
+    Route::delete('/{location}/clear',    [WarehouseController::class, 'clear'])->name('clear');
+});
 
 Route::get(
     '/raw-material-entries/create',

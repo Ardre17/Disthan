@@ -617,6 +617,7 @@ En línea
         @endif
         <a href="/products"><span>📦</span><span>Productos</span></a>
         <a href="{{ route('warehouse.map') }}"><span>🗺️</span><span>Mapa del Almacén</span></a>
+        <a href="{{ route('warehouse.index') }}"><span>🏭</span><span>Almacén</span></a>
 
     </div>
 </div>  {{-- ← cierra menu-section inventario --}}
