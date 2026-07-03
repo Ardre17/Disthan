@@ -15,7 +15,12 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\WarehouseMapController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\ProductionOrderController;
+use App\Http\Controllers\InventoryMovementController;
 
+Route::get(
+    '/inventory-movements',
+    [InventoryMovementController::class,'index']
+)->name('inventory-movements.index');
 /*
 |--------------------------------------------------------------------------
 | RUTA TEMPORAL MIGRACIÓN

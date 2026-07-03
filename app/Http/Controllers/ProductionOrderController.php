@@ -6,6 +6,7 @@ use App\Models\ProductionOrder;
 use App\Models\Product;
 use App\Models\RawMaterial;
 use Illuminate\Http\Request;
+use App\Services\InventoryService;
 use Illuminate\Support\Facades\DB;
 
 class ProductionOrderController extends Controller
@@ -204,40 +205,43 @@ public function create()
             );
 
         }
+        InventoryService::salidaMateriaPrima(
 
-        // Descontar materia prima
+    $material,
 
-$material->stock -= $production_order->consumed_quantity;
+    $production_order->consumed_quantity,
 
-// Actualizar estado automáticamente
+    $production_order->number,
 
-if($material->stock <= 0){
+    'PRODUCCION',
 
-    $material->status = 'AGOTADO';
+    auth()->id(),
 
-}
-elseif($material->stock <= $material->minimum_stock){
+    'Consumo por producción',
 
-    $material->status = 'STOCK_BAJO';
+    $production_order->id
 
-}
-else{
+);
 
-    $material->status = 'DISPONIBLE';
+InventoryService::entradaProducto(
 
-}
+    $producto,
 
-// Guardar cambios
+    $production_order->produced_quantity,
 
-$material->save();
+    $production_order->number,
 
-        // Aumentar producto terminado
+    'PRODUCCION',
 
-        $producto->stock +=
-            $production_order->produced_quantity;
+    null,
 
-        $producto->save();
+    auth()->id(),
 
+    'Ingreso por producción',
+
+    $production_order->id
+
+);
         // Cambiar estado
 
         $production_order->status='FINALIZADA';
