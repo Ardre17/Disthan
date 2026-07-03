@@ -471,6 +471,10 @@
     <a href="{{ route('raw-materials.create') }}" class="btn-new">
         ➕ Nueva materia prima
     </a>
+    <a href="{{ route('raw-material-entries.create') }}"
+   class="btn btn-success">
+    📥 Entrada
+</a>
 </div>
 
 @endforelse

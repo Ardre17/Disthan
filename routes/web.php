@@ -17,6 +17,17 @@ use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\ProductionOrderController;
 use App\Http\Controllers\KardexController;
 use App\Http\Controllers\LabelController;
+use App\Http\Controllers\RawMaterialEntryController;
+
+Route::get(
+    '/raw-material-entries/create',
+    [RawMaterialEntryController::class,'create']
+)->name('raw-material-entries.create');
+
+Route::post(
+    '/raw-material-entries',
+    [RawMaterialEntryController::class,'store']
+)->name('raw-material-entries.store');
 
 Route::resource('labels', LabelController::class);
 Route::post('labels/{label}/movimiento', [LabelController::class, 'movimiento'])
