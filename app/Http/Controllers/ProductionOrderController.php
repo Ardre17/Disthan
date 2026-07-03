@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\InventoryService;
 use App\Models\ProductionOrder;
 use App\Models\Product;
 use App\Models\RawMaterial;
 use Illuminate\Http\Request;
-use App\Services\InventoryService;
 use Illuminate\Support\Facades\DB;
 
 class ProductionOrderController extends Controller
@@ -205,43 +205,20 @@ public function create()
             );
 
         }
-        InventoryService::salidaMateriaPrima(
+        
+    // Descontar materia prima
 
-    $material,
+$material->stock -= $production_order->consumed_quantity;
 
-    $production_order->consumed_quantity,
+// Actualizar estado...
 
-    $production_order->number,
+$material->save();
 
-    'PRODUCCION',
+// Aumentar producto
 
-    auth()->id(),
+$producto->stock += $production_order->produced_quantity;
 
-    'Consumo por producción',
-
-    $production_order->id
-
-);
-
-InventoryService::entradaProducto(
-
-    $producto,
-
-    $production_order->produced_quantity,
-
-    $production_order->number,
-
-    'PRODUCCION',
-
-    null,
-
-    auth()->id(),
-
-    'Ingreso por producción',
-
-    $production_order->id
-
-);
+$producto->save();
         // Cambiar estado
 
         $production_order->status='FINALIZADA';

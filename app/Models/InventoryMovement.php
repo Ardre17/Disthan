@@ -8,33 +8,29 @@ class InventoryMovement extends Model
 {
     protected $fillable = [
 
-        'product_id',
+    'product_id',
 
-        'raw_material_id',
+    'raw_material_id',
 
-        'client_id',
+    'client_id',
 
-        'user_id',
+    'user_id',
 
-        'movement_type',
+    'movement_type',
 
-        'module',
+    'entry',
 
-        'reference_id',
+    'exit',
 
-        'entry',
+    'stock_before',
 
-        'exit',
+    'stock_after',
 
-        'stock_before',
+    'document_number',
 
-        'stock_after',
+    'observation'
 
-        'document_number',
-
-        'observation'
-
-    ];
+];
 
     public function product()
     {
