@@ -611,7 +611,7 @@ En línea
     <div class="menu-sub">
         @if($role == 'admin')
             <a href="/categories"><span>🏷</span><span>Categorías</span></a>
-            <a href="/control-etiquetas"><span>🏷️</span><span>Control de Etiquetas</span></a>
+            <a href="{{ route('labels.index') }}"><span>📒</span><span>Control de Etiquetas</span></a>
             <a href="/control-stickers"><span>🏷️</span><span>Stickers de tapa</span></a>
             <a href="/control-precintos"><span>🔒</span><span>Precintos</span></a>
         @endif
