@@ -8,7 +8,6 @@
     $espacios = [1, 2, 3, 4];
     $slots    = [1, 2, 3, 4];
     $rotacionPorNivel = [1 => 10, 2 => 5];
-
     $dotColor = ['ok' => '#52c41a', 'warn' => '#faad14', 'crit' => '#ff4d4f', 'empty' => '#d0d0d0'];
 @endphp
 
@@ -31,8 +30,9 @@
     .wh-nivel.active { display:block; }
 
     /* Fila */
-    .wh-fila-label { font-size:11px; font-weight:700; color:#8c8c8c; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
-    .wh-fila-row   { display:flex; gap:12px; align-items:flex-start; flex-wrap:wrap; }
+    .wh-fila-label  { font-size:11px; font-weight:700; color:#8c8c8c; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
+    .wh-fila-scroll { overflow-x:auto; padding-bottom:4px; margin-bottom:10px; }
+    .wh-fila-row    { display:flex; gap:12px; align-items:flex-start; flex-wrap:nowrap; width:max-content; }
 
     /* Rack block */
     .rack-block { border:2px solid #3B5BDB; border-radius:7px; background:#f0f4ff; overflow:hidden; flex-shrink:0; width:130px; }
@@ -54,20 +54,20 @@
     .slot-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
 
     /* Pasillo */
-    .wh-pasillo { display:flex; align-items:center; justify-content:center; height:26px; margin:10px 0;
+    .wh-pasillo { display:flex; align-items:center; justify-content:center; height:26px; margin:4px 0 10px;
         background:repeating-linear-gradient(90deg,#e8e8e8 0,#e8e8e8 8px,#f5f5f5 8px,#f5f5f5 16px);
-        border-radius:3px; font-size:10px; color:#8c8c8c; font-weight:600; letter-spacing:.08em; max-width:600px; }
+        border-radius:3px; font-size:10px; color:#8c8c8c; font-weight:600; letter-spacing:.08em; }
 
     /* Zona rotación */
     .zona-rot { border:2px dashed #FF9800; border-radius:8px; background:#FFF8F0; padding:8px 10px; flex-shrink:0; }
-    .zona-rot-title { font-size:10px; color:#E65100; font-weight:700; text-align:center; margin-bottom:6px; }
-    .zona-rot-grid  { display:flex; flex-wrap:wrap; gap:4px; }
+    .zona-rot-title { font-size:10px; color:#E65100; font-weight:700; text-align:center; margin-bottom:6px; white-space:nowrap; }
+    .zona-rot-grid  { display:flex; flex-wrap:wrap; gap:4px; max-width:220px; }
     .zona-slot {
         border-radius:5px; border:1.5px solid #FF9800; background:#FFF3E0;
         color:#E65100; font-size:10px; font-weight:500;
         cursor:pointer; display:flex; align-items:center; justify-content:center;
-        padding:4px 6px; min-height:28px; width:90px;
-        transition:transform .1s;
+        padding:4px 6px; min-height:28px; width:96px;
+        transition:transform .1s; white-space:nowrap;
     }
     .zona-slot:hover { transform:scale(1.05); }
     .zona-slot.empty { background:#f5f5f5; border-color:#d0d0d0; color:#bbb; font-style:italic; }
@@ -86,13 +86,11 @@
     .wh-modal-hd { padding:16px 20px; border-bottom:1px solid #f0f0f0; display:flex; align-items:center; justify-content:space-between; }
     .wh-modal-bd { padding:20px; }
     .wh-modal-ft { padding:14px 20px; border-top:1px solid #f0f0f0; display:flex; gap:8px; justify-content:flex-end; }
-
     .wh-info-panel { background:#f8faff; border-radius:8px; padding:12px; margin-bottom:16px; }
     .wh-info-row   { display:flex; justify-content:space-between; font-size:12px; padding:5px 0; border-bottom:1px solid #f0f0f0; }
     .wh-info-row:last-child { border:none; }
     .wh-info-label { color:#8c8c8c; }
     .wh-info-val   { font-weight:600; color:#1a1a2e; }
-
     .m-label  { font-size:11px; font-weight:600; color:#595959; display:block; margin:12px 0 4px; }
     .m-label:first-child { margin-top:0; }
     .m-select, .m-input  { width:100%; padding:9px 11px; border:1px solid #e2e8f0; border-radius:7px; font-size:13px; outline:none; background:white; }
@@ -103,15 +101,11 @@
     .wh-btn-primary { background:#1890ff; color:white; }
     .wh-btn-danger  { background:#ff4d4f; color:white; }
     .wh-btn-ghost   { background:#f0f0f0; color:#595959; }
-
     .wh-toast { position:fixed; bottom:24px; right:24px; background:#1a1a2e; color:white; padding:12px 20px; border-radius:8px; font-size:13px; z-index:2000; opacity:0; transform:translateY(10px); transition:all .25s; pointer-events:none; }
     .wh-toast.show { opacity:1; transform:translateY(0); }
 
     @media (max-width:900px) {
         .wh-kpi-grid { grid-template-columns:repeat(2,1fr) !important; }
-        .wh-fila-row { gap:8px !important; }
-        .rack-block  { width:110px !important; }
-        .zona-slot   { width:78px !important; }
     }
 </style>
 
@@ -152,7 +146,7 @@
     {{-- PLANO --}}
     <div class="wh-card" style="padding:20px;">
 
-        {{-- Tabs de nivel --}}
+        {{-- Tabs --}}
         <div class="wh-tab-bar">
             @foreach($niveles as $n)
             <div class="wh-tab {{ $n === 1 ? 'active' : '' }}" onclick="showNivel({{ $n }}, this)">
@@ -161,16 +155,18 @@
             @endforeach
         </div>
 
-        {{-- ═══ POR CADA NIVEL ═══ --}}
         @foreach($niveles as $nivel)
         <div class="wh-nivel {{ $nivel === 1 ? 'active' : '' }}" id="nivel{{ $nivel }}">
 
             @foreach($filas as $fila)
 
             <div class="wh-fila-label">Fila {{ $fila }}</div>
-            <div class="wh-fila-row" style="margin-bottom:10px;">
 
-                {{-- 4 Espacios de rack --}}
+            {{-- Scroll wrapper: evita que la zona naranja baje --}}
+            <div class="wh-fila-scroll">
+            <div class="wh-fila-row">
+
+                {{-- 4 espacios de rack --}}
                 @foreach($espacios as $espacio)
                 @php $eLabel = $fila . $espacio; @endphp
                 <div class="rack-block">
@@ -178,12 +174,12 @@
                     <div class="rack-slots">
                         @foreach($slots as $slot)
                         @php
-                            $cell  = $racks->get("{$nivel}-{$fila}-{$espacio}-{$slot}");
+                            $cell   = $racks->get("{$nivel}-{$fila}-{$espacio}-{$slot}");
                             $estado = $cell ? $cell->color_estado : 'empty';
-                            $etiq   = $cell ? $cell->etiqueta : '— libre';
-                            $cid    = $cell ? $cell->id : '';
-                            $dot    = $dotColor[$estado] ?? '#d0d0d0';
-                            $prod   = $cell ? $cell->product : null;
+                            $etiq   = $cell ? $cell->etiqueta     : '— libre';
+                            $cid    = $cell ? $cell->id           : '';
+                            $dot    = $dotColor[$estado]          ?? '#d0d0d0';
+                            $prod   = $cell ? $cell->product      : null;
                         @endphp
                         <div
                             class="wh-slot {{ $estado }}"
@@ -210,24 +206,22 @@
                 </div>
                 @endforeach
 
-                {{-- Zona poca rotación (solo en Fila A) --}}
+                {{-- Zona poca rotación — solo en Fila A, al lado de los racks --}}
                 @if($fila === 'A')
                 @php $totalRot = $rotacionPorNivel[$nivel]; @endphp
                 <div class="zona-rot">
-                    <div class="zona-rot-title">🟠 Poca rotación · N{{ $nivel }} ({{ $totalRot }} espacios)</div>
+                    <div class="zona-rot-title">🟠 Poca rotación · N{{ $nivel }} ({{ $totalRot }})</div>
                     <div class="zona-rot-grid">
                         @for($rSlot = 1; $rSlot <= $totalRot; $rSlot++)
                         @php
-                            $rCell   = $rotacion->get("{$nivel}-{$rSlot}");
-                            $rEstado = $rCell && $rCell->product_id ? 'ok' : 'empty';
-                            $rEtiq   = $rCell ? $rCell->etiqueta : '— libre';
-                            $rProd   = $rCell ? $rCell->product : null;
+                            $rCell  = $rotacion->get("{$nivel}-{$rSlot}");
+                            $rEstado = ($rCell && $rCell->product_id) ? 'ok' : 'empty';
+                            $rProd  = $rCell ? $rCell->product : null;
                         @endphp
                         <div
                             class="zona-slot {{ $rEstado }}"
-                            id="slot-{{ $rCell ? $rCell->id : 'r'.$nivel.$rSlot }}"
                             data-id="{{ $rCell ? $rCell->id : '' }}"
-                            data-label="Rotación N{{ $nivel }} · Espacio {{ $rSlot }}"
+                            data-label="Rotación N{{ $nivel }} · Esp. {{ $rSlot }}"
                             data-product-id="{{ optional($rProd)->id }}"
                             data-product-nombre="{{ optional($rProd)->nombre }}"
                             data-product-sku="{{ optional($rProd)->sku }}"
@@ -247,15 +241,17 @@
                 </div>
                 @endif
 
-            </div>
+            </div>{{-- /.wh-fila-row --}}
+            </div>{{-- /.wh-fila-scroll --}}
 
-            {{-- Pasillo entre filas --}}
+            {{-- Pasillo entre Fila A y Fila B --}}
             @if(!$loop->last)
             <div class="wh-pasillo">← &nbsp; PASILLO CENTRAL &nbsp; →</div>
             @endif
 
             @endforeach
-        </div>
+
+        </div>{{-- /.wh-nivel --}}
         @endforeach
 
         {{-- Leyenda --}}
@@ -266,13 +262,13 @@
             <div class="leg-item"><div class="leg-dot" style="background:#FFF3E0;border:1.5px solid #FF9800;"></div>Poca rotación</div>
             <div class="leg-item"><div class="leg-dot" style="background:#f5f5f5;border:1.5px solid #d0d0d0;"></div>Libre</div>
         </div>
-    </div>
-</div>
 
-{{-- ═══════════════ MODAL ═══════════════ --}}
+    </div>{{-- /.wh-card --}}
+</div>{{-- /.wh-page --}}
+
+{{-- MODAL --}}
 <div class="wh-overlay" id="whOverlay" onclick="closeOnOverlay(event)">
     <div class="wh-modal">
-
         <div class="wh-modal-hd">
             <div>
                 <p style="font-weight:700;font-size:15px;margin:0;color:#1a1a2e;" id="mTitle"></p>
@@ -280,25 +276,20 @@
             </div>
             <button onclick="closeModal()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#8c8c8c;padding:2px 6px;">✕</button>
         </div>
-
         <div class="wh-modal-bd">
-
-            {{-- Info actual --}}
             <div id="mInfoPanel" class="wh-info-panel" style="display:none;">
-                <div class="wh-info-row"><span class="wh-info-label">🏷️ Producto</span>  <span class="wh-info-val" id="iProd"></span></div>
-                <div class="wh-info-row"><span class="wh-info-label">🔖 SKU</span>         <span class="wh-info-val" id="iSku"></span></div>
-                <div class="wh-info-row"><span class="wh-info-label">🏢 Marca</span>       <span class="wh-info-val" id="iMarca"></span></div>
-                <div class="wh-info-row"><span class="wh-info-label">📦 Stock global</span><span class="wh-info-val" id="iStock"></span></div>
-                <div class="wh-info-row"><span class="wh-info-label">⚠️ Stock mínimo</span><span class="wh-info-val" id="iMin"></span></div>
-                <div class="wh-info-row"><span class="wh-info-label">🔢 Lote</span>        <span class="wh-info-val" id="iLote"></span></div>
-                <div class="wh-info-row"><span class="wh-info-label">📅 Vencimiento</span> <span class="wh-info-val" id="iVence"></span></div>
+                <div class="wh-info-row"><span class="wh-info-label">🏷️ Producto</span>   <span class="wh-info-val" id="iProd"></span></div>
+                <div class="wh-info-row"><span class="wh-info-label">🔖 SKU</span>          <span class="wh-info-val" id="iSku"></span></div>
+                <div class="wh-info-row"><span class="wh-info-label">🏢 Marca</span>        <span class="wh-info-val" id="iMarca"></span></div>
+                <div class="wh-info-row"><span class="wh-info-label">📦 Stock global</span> <span class="wh-info-val" id="iStock"></span></div>
+                <div class="wh-info-row"><span class="wh-info-label">⚠️ Stock mínimo</span> <span class="wh-info-val" id="iMin"></span></div>
+                <div class="wh-info-row"><span class="wh-info-label">🔢 Lote</span>         <span class="wh-info-val" id="iLote"></span></div>
+                <div class="wh-info-row"><span class="wh-info-label">📅 Vencimiento</span>  <span class="wh-info-val" id="iVence"></span></div>
                 <div class="wh-info-row"><span class="wh-info-label">📍 Cant. en slot</span><span class="wh-info-val" id="iCant"></span></div>
             </div>
             <div id="mEmptyMsg" style="text-align:center;padding:16px 0;color:#bfbfbf;font-size:13px;display:none;">
                 📭 Slot vacío — sin producto asignado
             </div>
-
-            {{-- Formulario --}}
             <label class="m-label">Asignar producto</label>
             <select class="m-select" id="mProdSelect">
                 <option value="">— Dejar vacío —</option>
@@ -311,22 +302,19 @@
                     data-min="{{ $p->stock_minimo }}"
                     data-lote="{{ $p->lote }}"
                     data-vence="{{ $p->fecha_vencimiento }}">
-                    {{ $p->nombre }} @if($p->sku)({{ $p->sku }})@endif · Stock: {{ $p->stock }}
+                    {{ $p->nombre }}@if($p->sku) ({{ $p->sku }})@endif · Stock: {{ $p->stock }}
                 </option>
                 @endforeach
             </select>
-
             <label class="m-label">Cantidad en este slot</label>
-            <input type="number" class="m-input" id="mCantidad" placeholder="0" min="0">
-
+            <input type="number" class="m-input" id="mCantidad" placeholder="0" min="0" style="margin-top:0;">
             <label class="m-label">Observaciones</label>
             <textarea class="m-textarea" id="mObs" rows="2" placeholder="Opcional..."></textarea>
         </div>
-
         <div class="wh-modal-ft">
-            <button class="wh-btn wh-btn-ghost"   onclick="closeModal()">Cancelar</button>
+            <button class="wh-btn wh-btn-ghost"  onclick="closeModal()">Cancelar</button>
             <button class="wh-btn wh-btn-danger"  id="mBtnClear" onclick="clearSlot()">🗑 Vaciar</button>
-            <button class="wh-btn wh-btn-primary"  onclick="saveSlot()">💾 Guardar</button>
+            <button class="wh-btn wh-btn-primary" onclick="saveSlot()">💾 Guardar</button>
         </div>
     </div>
 </div>
@@ -334,10 +322,10 @@
 <div class="wh-toast" id="whToast"></div>
 
 <script>
-const CSRF = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+const CSRF    = document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+const BASE_URL = '{{ rtrim(config("app.url"), "/") }}';
 let currentEl = null;
 
-// ── Tabs de nivel ──────────────────────────────────────────────────────────
 function showNivel(n, el) {
     document.querySelectorAll('.wh-nivel').forEach(d => d.classList.remove('active'));
     document.querySelectorAll('.wh-tab').forEach(t => t.classList.remove('active'));
@@ -345,120 +333,84 @@ function showNivel(n, el) {
     el.classList.add('active');
 }
 
-// ── Abrir modal ────────────────────────────────────────────────────────────
 function openModal(el) {
     currentEl = el;
     const d = el.dataset;
     const hasProduct = !!d.productId;
-
     document.getElementById('mTitle').textContent = d.label;
     document.getElementById('mSub').textContent   = hasProduct ? '📦 ' + d.productNombre : 'Slot vacío';
-
     document.getElementById('mInfoPanel').style.display = hasProduct ? 'block' : 'none';
     document.getElementById('mEmptyMsg').style.display  = hasProduct ? 'none'  : 'block';
     document.getElementById('mBtnClear').style.display  = hasProduct ? 'inline-block' : 'none';
-
     if (hasProduct) {
-        document.getElementById('iProd').textContent  = d.productNombre  || '—';
-        document.getElementById('iSku').textContent   = d.productSku     || '—';
-        document.getElementById('iMarca').textContent = d.productMarca   || '—';
-        document.getElementById('iStock').textContent = (d.productStock  || '0') + ' u.';
-        document.getElementById('iMin').textContent   = (d.productStockMin || '—') + ' u.';
-        document.getElementById('iLote').textContent  = d.productLote    || '—';
-        document.getElementById('iVence').textContent = d.productVence   || '—';
-        document.getElementById('iCant').textContent  = (d.cantidad || '0') + ' u.';
+        document.getElementById('iProd').textContent  = d.productNombre   || '—';
+        document.getElementById('iSku').textContent   = d.productSku      || '—';
+        document.getElementById('iMarca').textContent = d.productMarca    || '—';
+        document.getElementById('iStock').textContent = (d.productStock   || '0') + ' u.';
+        document.getElementById('iMin').textContent   = (d.productStockMin|| '—') + ' u.';
+        document.getElementById('iLote').textContent  = d.productLote     || '—';
+        document.getElementById('iVence').textContent = d.productVence    || '—';
+        document.getElementById('iCant').textContent  = (d.cantidad       || '0') + ' u.';
     }
-
-    // Pre-llenar formulario
     document.getElementById('mProdSelect').value = d.productId || '';
     document.getElementById('mCantidad').value   = d.cantidad  || '';
     document.getElementById('mObs').value        = d.obs       || '';
-
     document.getElementById('whOverlay').classList.add('open');
 }
 
-function closeModal() { document.getElementById('whOverlay').classList.remove('open'); }
-function closeOnOverlay(e) { if (e.target.id === 'whOverlay') closeModal(); }
+function closeModal()        { document.getElementById('whOverlay').classList.remove('open'); }
+function closeOnOverlay(e)   { if (e.target.id === 'whOverlay') closeModal(); }
 
-// ── Guardar asignación ────────────────────────────────────────────────────
 async function saveSlot() {
-    const id  = currentEl?.dataset?.id;
-    if (!id) { showToast('❌ Slot sin ID registrado'); return; }
-
+    const id = currentEl?.dataset?.id;
+    if (!id) { showToast('❌ Slot sin ID'); return; }
     const productId = document.getElementById('mProdSelect').value;
     const cantidad  = document.getElementById('mCantidad').value;
     const obs       = document.getElementById('mObs').value;
-
     try {
-        const res  = await fetch(`/warehouse/${id}/assign`, {
+        const res  = await fetch(`${BASE_URL}/warehouse/${id}/assign`, {
             method : 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF },
+            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
             body   : JSON.stringify({ product_id: productId || null, cantidad, observaciones: obs }),
         });
         const data = await res.json();
-
-        if (data.success) {
-            updateSlotUI(currentEl, data);
-            showToast('✅ ' + data.message);
-            closeModal();
-        } else {
-            showToast('❌ Error al guardar');
-        }
-    } catch (e) {
-        showToast('❌ Error de conexión');
-    }
+        if (data.success) { updateSlotUI(currentEl, data); showToast('✅ ' + data.message); closeModal(); }
+        else showToast('❌ Error al guardar');
+    } catch { showToast('❌ Error de conexión'); }
 }
 
-// ── Vaciar slot ───────────────────────────────────────────────────────────
 async function clearSlot() {
     const id = currentEl?.dataset?.id;
-    if (!id) return;
-    if (!confirm('¿Vaciar este slot?')) return;
-
+    if (!id || !confirm('¿Vaciar este slot?')) return;
     try {
-        const res  = await fetch(`/warehouse/${id}/clear`, {
-            method : 'DELETE',
-            headers: { 'X-CSRF-TOKEN': CSRF },
-        });
+        const res  = await fetch(`${BASE_URL}/warehouse/${id}/clear`, { method:'DELETE', headers:{'X-CSRF-TOKEN':CSRF,'X-Requested-With':'XMLHttpRequest'} });
         const data = await res.json();
-        if (data.success) {
-            updateSlotUI(currentEl, { color_estado: 'empty', etiqueta: '— libre', product: null });
-            showToast('✅ Slot vaciado');
-            closeModal();
-        }
-    } catch (e) {
-        showToast('❌ Error de conexión');
-    }
+        if (data.success) { updateSlotUI(currentEl, {color_estado:'empty',etiqueta:'— libre',product:null}); showToast('✅ Slot vaciado'); closeModal(); }
+    } catch { showToast('❌ Error de conexión'); }
 }
 
-// ── Actualizar celda en el DOM sin recargar ───────────────────────────────
 function updateSlotUI(el, data) {
     const colorMap = { ok:'#52c41a', warn:'#faad14', crit:'#ff4d4f', empty:'#d0d0d0' };
     const estado   = data.color_estado ?? 'empty';
     const etiqueta = data.etiqueta ?? '— libre';
     const p        = data.product;
+    const isZona   = el.classList.contains('zona-slot');
 
-    el.className = el.classList.contains('zona-slot')
+    el.className = isZona
         ? `zona-slot ${estado === 'empty' ? 'empty' : ''}`
         : `wh-slot ${estado}`;
 
-    if (el.classList.contains('zona-slot')) {
-        el.textContent = etiqueta.replace('— libre', '— libre');
-    } else {
-        el.innerHTML = `<div class="slot-dot" style="background:${colorMap[estado]};width:7px;height:7px;border-radius:50%;flex-shrink:0;"></div>
-                        <span style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:100px;">${etiqueta}</span>`;
-    }
+    el.innerHTML = isZona
+        ? etiqueta
+        : `<div class="slot-dot" style="background:${colorMap[estado]};width:7px;height:7px;border-radius:50%;flex-shrink:0;"></div>
+           <span style="overflow:hidden;white-space:nowrap;text-overflow:ellipsis;max-width:100px;">${etiqueta}</span>`;
 
-    // Actualizar data-attributes
     if (p) {
-        el.dataset.productId       = p.id        ?? '';
-        el.dataset.productNombre   = p.nombre    ?? '';
-        el.dataset.productSku      = p.sku       ?? '';
-        el.dataset.productStock    = p.stock     ?? '';
-        el.dataset.productStockMin = p.stock_minimo ?? '';
-        el.dataset.productLote     = p.lote      ?? '';
-        el.dataset.productVence    = p.fecha_vencimiento ?? '';
-        el.dataset.productMarca    = p.marca     ?? '';
+        Object.assign(el.dataset, {
+            productId: p.id ?? '', productNombre: p.nombre ?? '', productSku: p.sku ?? '',
+            productStock: p.stock ?? '', productStockMin: p.stock_minimo ?? '',
+            productLote: p.lote ?? '', productVence: p.fecha_vencimiento ?? '', productMarca: p.marca ?? ''
+        });
     } else {
         el.dataset.productId = '';
         el.dataset.productNombre = '';
@@ -467,7 +419,6 @@ function updateSlotUI(el, data) {
     el.dataset.obs      = document.getElementById('mObs').value;
 }
 
-// ── Toast ──────────────────────────────────────────────────────────────────
 function showToast(msg) {
     const t = document.getElementById('whToast');
     t.textContent = msg;
