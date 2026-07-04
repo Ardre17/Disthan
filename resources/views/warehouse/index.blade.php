@@ -123,6 +123,13 @@
         <span style="font-size:12px;color:#8c8c8c;">🕒 {{ now()->format('d/m/Y H:i') }}</span>
     </div>
 
+    {{-- Flash message --}}
+    @if(session('success'))
+    <div style="background:#f6ffed;border:1px solid #b7eb8f;border-radius:8px;padding:12px 18px;margin-bottom:16px;color:#237804;font-size:13px;font-weight:500;">
+        ✅ {{ session('success') }}
+    </div>
+    @endif
+
     {{-- KPIs --}}
     <div class="wh-kpi-grid">
         <div class="wh-kpi" style="border-top-color:#1890ff;">
@@ -361,32 +368,40 @@ function openModal(el) {
 function closeModal()        { document.getElementById('whOverlay').classList.remove('open'); }
 function closeOnOverlay(e)   { if (e.target.id === 'whOverlay') closeModal(); }
 
-async function saveSlot() {
+function postForm(action, fields) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = action;
+    form.style.display = 'none';
+    const csrfInput = document.createElement('input');
+    csrfInput.type = 'hidden'; csrfInput.name = '_token'; csrfInput.value = CSRF;
+    form.appendChild(csrfInput);
+    Object.entries(fields).forEach(([key, val]) => {
+        const input = document.createElement('input');
+        input.type = 'hidden'; input.name = key; input.value = val ?? '';
+        form.appendChild(input);
+    });
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function saveSlot() {
     const id = currentEl?.dataset?.id;
     if (!id) { showToast('❌ Slot sin ID'); return; }
     const productId = document.getElementById('mProdSelect').value;
     const cantidad  = document.getElementById('mCantidad').value;
     const obs       = document.getElementById('mObs').value;
-    try {
-        const res  = await fetch(`${BASE_URL}/warehouse/${id}/assign`, {
-            method : 'POST',
-            headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': CSRF, 'X-Requested-With': 'XMLHttpRequest' },
-            body   : JSON.stringify({ product_id: productId || null, cantidad, observaciones: obs }),
-        });
-        const data = await res.json();
-        if (data.success) { updateSlotUI(currentEl, data); showToast('✅ ' + data.message); closeModal(); }
-        else showToast('❌ Error al guardar');
-    } catch { showToast('❌ Error de conexión'); }
+    postForm(`/warehouse/${id}/assign`, {
+        product_id:    productId || '',
+        cantidad:      cantidad,
+        observaciones: obs,
+    });
 }
 
-async function clearSlot() {
+function clearSlot() {
     const id = currentEl?.dataset?.id;
     if (!id || !confirm('¿Vaciar este slot?')) return;
-    try {
-        const res  = await fetch(`${BASE_URL}/warehouse/${id}/clear`, { method:'DELETE', headers:{'X-CSRF-TOKEN':CSRF,'X-Requested-With':'XMLHttpRequest'} });
-        const data = await res.json();
-        if (data.success) { updateSlotUI(currentEl, {color_estado:'empty',etiqueta:'— libre',product:null}); showToast('✅ Slot vaciado'); closeModal(); }
-    } catch { showToast('❌ Error de conexión'); }
+    postForm(`/warehouse/${id}/clear`, { _method: 'DELETE' });
 }
 
 function updateSlotUI(el, data) {
