@@ -36,6 +36,7 @@ class WarehouseController extends Controller
     // Asignar producto — acepta form POST normal
     public function assign(Request $request, WarehouseLocation $location)
     {
+        dd($request->all());
         $request->validate([
             'product_id'    => 'nullable|exists:products,id',
             'cantidad'      => 'nullable|numeric|min:0',
