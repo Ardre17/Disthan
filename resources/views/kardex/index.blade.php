@@ -210,7 +210,7 @@
                 <tfoot>
                     <tr>
                         <td colspan="5" style="text-align:right;color:#595959;">TOTALES</td>
-                        <td style="text-align:right;">{{ number_format($movimientos->sum('cantidad_solicitada')) }}</td>
+                        <td style="text-align:right;">{{ number_format($movimientosPaginados->sum('cantidad_solicitada')) }}</td>
                         <td style="text-align:right;">{{ number_format($totalSalidas) }}</td>
                         <td></td>
                         <td style="text-align:right;">S/ {{ number_format($totalFacturado, 2) }}</td>
@@ -266,7 +266,7 @@
                 <p style="font-size:11px;color:#8c8c8c;margin:3px 0 0;">Saldo por producto en inventario</p>
             </div>
             <div style="padding:12px 20px;max-height:320px;overflow-y:auto;">
-                @php $maxStock = $stockProductos->max('stock') ?: 1; @endphp
+                @php $maxStock = max($stockProductos->max('stock'), 1); @endphp
                 @forelse($stockProductos as $prod)
                 @php
                     $color = $prod->stock <= ($prod->stock_minimo ?? 5)
@@ -282,7 +282,7 @@
                         <p style="font-size:11px;color:#bfbfbf;margin:1px 0 0;">SKU: {{ $prod->sku }}</p>
                         @endif
                         <div class="kx-inv-bar">
-                            <div class="kx-inv-fill" style="width:{{ round(($prod->stock/$maxStock)*100) }}%;background:{{ $color }};"></div>
+                            <div class="kx-inv-fill" style="width:{{ $maxStock > 0 ? round(($prod->stock/$maxStock)*100) : 0 }}%;background:{{ $color }};"></div>
                         </div>
                     </div>
                     <div style="text-align:right;flex-shrink:0;margin-left:10px;">
@@ -307,7 +307,7 @@
             </div>
             <div style="padding:12px 20px;">
                 @php
-                    $topClientes = $movimientos->groupBy('cliente')
+                    $topClientes = $movimientosPaginados->groupBy('cliente')
                         ->map(fn($g) => ['uds' => $g->sum('cantidad_despachada'), 'total' => $g->sum('subtotal')])
                         ->sortByDesc('uds')->take(5);
                     $maxCli = $topClientes->max('uds') ?: 1;
