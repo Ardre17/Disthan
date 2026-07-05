@@ -59,15 +59,15 @@
         border-radius:3px; font-size:10px; color:#8c8c8c; font-weight:600; letter-spacing:.08em; width:100%; }
 
     /* Zona rotación */
-    .zona-rot { border:2px dashed #FF9800; border-radius:8px; background:#FFF8F0; padding:8px 10px; flex-shrink:0; }
+    .zona-rot { border:2px dashed #FF9800; border-radius:8px; background:#FFF8F0; padding:8px 10px; flex-shrink:0; width:220px; min-width:220px; }
     .zona-rot-title { font-size:10px; color:#E65100; font-weight:700; text-align:center; margin-bottom:6px; white-space:nowrap; }
-    .zona-rot-grid  { display:flex; flex-wrap:wrap; gap:4px; }
+    .zona-rot-grid  { display:flex; flex-wrap:wrap; gap:4px; width:204px; }
     .zona-slot {
         border-radius:5px; border:1.5px solid #FF9800; background:#FFF3E0;
         color:#E65100; font-size:10px; font-weight:500;
         cursor:pointer; display:flex; align-items:center; justify-content:center;
         padding:4px 6px; min-height:28px; width:96px;
-        transition:transform .1s; white-space:nowrap; flex:1; min-width:80px;
+        transition:transform .1s; white-space:nowrap; width:96px; flex-shrink:0;
     }
     .zona-slot:hover { transform:scale(1.05); }
     .zona-slot.empty { background:#f5f5f5; border-color:#d0d0d0; color:#bbb; font-style:italic; }
@@ -313,16 +313,20 @@
                 </option>
                 @endforeach
             </select>
+            
             <label class="m-label">Cantidad en este slot</label>
             <input type="number" class="m-input" id="mCantidad" placeholder="0" min="0" style="margin-top:0;">
             <label class="m-label">Observaciones</label>
             <textarea class="m-textarea" id="mObs" rows="2" placeholder="Opcional..."></textarea>
+            
         </div>
+        @if($role == 'admin')
         <div class="wh-modal-ft">
             <button class="wh-btn wh-btn-ghost"  onclick="closeModal()">Cancelar</button>
             <button class="wh-btn wh-btn-danger"  id="mBtnClear" onclick="clearSlot()">🗑 Vaciar</button>
             <button class="wh-btn wh-btn-primary" onclick="saveSlot()">💾 Guardar</button>
         </div>
+        @endif
     </div>
 </div>
 

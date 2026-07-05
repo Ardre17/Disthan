@@ -549,7 +549,7 @@ margin-bottom:8px;
 
 <div class="sidebar-header">
 <div class="logo">
-<img src="TU_LOGO_AQUI" alt="DISTAN ERP">
+<img src="https://drive.google.com/file/d/1aVrmrEw96E3_gOSLe3CxqOqhu91E4N6o/view?usp=drive_link" alt="DISTAN ERP">
 </div>
 <div class="system-sub"> Warehouse & Production Management </div>
 
@@ -591,11 +591,11 @@ En línea
         @if($role == 'admin')
             <a href="/orders"><span>📋</span><span>Órdenes</span></a>
             <a href="/historial"><span>📚</span><span>Historial</span></a>
-            <a href="{{ route('production-orders.index') }}"><span>🏭</span><span>Producción</span></a>
             <a href="{{ route('raw-materials.index') }}"><span>📦</span><span>Materia Prima</span> </a>
             <a href="{{ route('products.proyectado') }}"><span>📊</span><span>Proyectado</span></a>
             <a href="{{ route('kardex.index') }}"><span>📒</span><span>Kardex</span></a>
         @endif
+        <a href="{{ route('production-orders.index') }}"><span>🏭</span><span>Producción</span></a>
         @if($role == 'operario')
             <a href="/pedidos"><span>📦</span><span>Pedidos</span></a>
         @endif
@@ -616,8 +616,7 @@ En línea
             <a href="/control-precintos"><span>🔒</span><span>Precintos</span></a>
         @endif
         <a href="/products"><span>📦</span><span>Productos</span></a>
-        <a href="{{ route('warehouse.map') }}"><span>🗺️</span><span>Mapa del Almacén</span></a>
-        <a href="{{ route('warehouse.index') }}"><span>🏭</span><span>Almacén</span></a>
+        <a href="{{ route('warehouse.index') }}"><span>🗺️</span><span>Mapa del Almacén</span></a>
 
     </div>
 </div>  {{-- ← cierra menu-section inventario --}}
