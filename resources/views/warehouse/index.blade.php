@@ -12,8 +12,8 @@
 @endphp
 
 <style>
-    .wh-page  { background:#f0f2f5; min-height:100vh; padding:24px; }
-    .wh-card  { background:white; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.07); }
+    .wh-page  { background:#f0f2f5; min-height:100vh; padding:16px; width:100%; box-sizing:border-box; }
+    .wh-card  { background:white; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.07); width:100%; box-sizing:border-box; }
 
     /* KPIs */
     .wh-kpi-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:14px; margin-bottom:18px; }
@@ -31,11 +31,11 @@
 
     /* Fila */
     .wh-fila-label  { font-size:11px; font-weight:700; color:#8c8c8c; text-transform:uppercase; letter-spacing:.06em; margin-bottom:6px; }
-    .wh-fila-scroll { overflow-x:auto; padding-bottom:4px; margin-bottom:10px; }
-    .wh-fila-row    { display:flex; gap:12px; align-items:flex-start; flex-wrap:nowrap; width:max-content; }
+    .wh-fila-scroll { overflow-x:auto; padding-bottom:4px; margin-bottom:10px; width:100%; }
+    .wh-fila-row    { display:flex; gap:12px; align-items:flex-start; flex-wrap:nowrap; min-width:max-content; width:100%; }
 
     /* Rack block */
-    .rack-block { border:2px solid #3B5BDB; border-radius:7px; background:#f0f4ff; overflow:hidden; flex-shrink:0; width:130px; }
+    .rack-block { border:2px solid #3B5BDB; border-radius:7px; background:#f0f4ff; overflow:hidden; flex-shrink:0; min-width:130px; flex:1; }
     .rack-header { background:#3B5BDB; color:white; font-size:10px; font-weight:700; text-align:center; padding:4px 0; letter-spacing:.04em; }
     .rack-slots  { display:flex; flex-direction:column; gap:3px; padding:5px; }
 
@@ -56,18 +56,18 @@
     /* Pasillo */
     .wh-pasillo { display:flex; align-items:center; justify-content:center; height:26px; margin:4px 0 10px;
         background:repeating-linear-gradient(90deg,#e8e8e8 0,#e8e8e8 8px,#f5f5f5 8px,#f5f5f5 16px);
-        border-radius:3px; font-size:10px; color:#8c8c8c; font-weight:600; letter-spacing:.08em; }
+        border-radius:3px; font-size:10px; color:#8c8c8c; font-weight:600; letter-spacing:.08em; width:100%; }
 
     /* Zona rotación */
     .zona-rot { border:2px dashed #FF9800; border-radius:8px; background:#FFF8F0; padding:8px 10px; flex-shrink:0; }
     .zona-rot-title { font-size:10px; color:#E65100; font-weight:700; text-align:center; margin-bottom:6px; white-space:nowrap; }
-    .zona-rot-grid  { display:flex; flex-wrap:wrap; gap:4px; max-width:220px; }
+    .zona-rot-grid  { display:flex; flex-wrap:wrap; gap:4px; }
     .zona-slot {
         border-radius:5px; border:1.5px solid #FF9800; background:#FFF3E0;
         color:#E65100; font-size:10px; font-weight:500;
         cursor:pointer; display:flex; align-items:center; justify-content:center;
         padding:4px 6px; min-height:28px; width:96px;
-        transition:transform .1s; white-space:nowrap;
+        transition:transform .1s; white-space:nowrap; flex:1; min-width:80px;
     }
     .zona-slot:hover { transform:scale(1.05); }
     .zona-slot.empty { background:#f5f5f5; border-color:#d0d0d0; color:#bbb; font-style:italic; }
@@ -385,17 +385,75 @@ function postForm(action, fields) {
     form.submit();
 }
 
-function saveSlot() {
+async function saveSlot() {
+
     const id = currentEl?.dataset?.id;
-    if (!id) { showToast('❌ Slot sin ID'); return; }
+
+    if (!id) {
+        showToast('❌ Slot sin ID');
+        return;
+    }
+
     const productId = document.getElementById('mProdSelect').value;
     const cantidad  = document.getElementById('mCantidad').value;
     const obs       = document.getElementById('mObs').value;
-    postForm(`/warehouse/${id}/assign`, {
-        product_id:    productId || '',
-        cantidad:      cantidad,
-        observaciones: obs,
-    });
+
+    try {
+
+        const response = await fetch(`/warehouse/${id}/assign`, {
+
+            method: 'POST',
+
+            headers: {
+
+                'Content-Type': 'application/json',
+
+                'Accept': 'application/json',
+
+                'X-CSRF-TOKEN': CSRF
+
+            },
+
+            body: JSON.stringify({
+
+                product_id: productId || null,
+
+                cantidad: cantidad,
+
+                observaciones: obs
+
+            })
+
+        });
+
+        const data = await response.json();
+
+        if(data.success){
+
+            showToast('✅ ' + data.message);
+
+            closeModal();
+
+            setTimeout(function(){
+
+                location.reload();
+
+            },500);
+
+        }else{
+
+            showToast('❌ Error al guardar');
+
+        }
+
+    }catch(e){
+
+        console.error(e);
+
+        showToast('❌ Error de conexión');
+
+    }
+
 }
 
 function clearSlot() {
