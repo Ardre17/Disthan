@@ -322,13 +322,15 @@
             <textarea class="m-textarea" id="mObs" rows="2" placeholder="Opcional..."></textarea>
             
         </div>
-        @if($role == 'admin')
+        
         <div class="wh-modal-ft">
             <button class="wh-btn wh-btn-ghost"  onclick="closeModal()">Cancelar</button>
             <button class="wh-btn wh-btn-danger"  id="mBtnClear" onclick="clearSlot()">🗑 Vaciar</button>
+            @if($role == 'admin')
             <button class="wh-btn wh-btn-primary" onclick="saveSlot()">💾 Guardar</button>
+            @endif
         </div>
-        @endif
+        
     </div>
 </div>
 
