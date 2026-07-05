@@ -137,7 +137,7 @@
     <div class="kx-card" style="overflow:hidden;">
         <div style="padding:14px 20px;border-bottom:1px solid #f0f0f0;display:flex;justify-content:space-between;align-items:center;">
             <p style="font-weight:700;font-size:14px;margin:0;color:#1a1a2e;">📋 Movimientos de despacho</p>
-            <span style="font-size:12px;color:#8c8c8c;">{{ $movimientos->count() }} registros</span>
+            <span style="font-size:12px;color:#8c8c8c;">{{ $totalMovimientos }} registros · página {{ $movimientosPaginados->currentPage() }} de {{ $movimientosPaginados->lastPage() }}</span>
         </div>
         <div style="overflow-x:auto;">
             <table class="kx-table">
@@ -156,7 +156,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse($movimientos as $i => $mov)
+                    @forelse($movimientosPaginados as $i => $mov)
                     @php
                         $estadoItemColors = [
                             'COMPLETO'   => ['bg'=>'#f6ffed','color'=>'#389e0d'],
@@ -206,7 +206,7 @@
                     </tr>
                     @endforelse
                 </tbody>
-                @if($movimientos->count() > 0)
+                @if($movimientosPaginados->total() > 0)
                 <tfoot>
                     <tr>
                         <td colspan="5" style="text-align:right;color:#595959;">TOTALES</td>
@@ -220,6 +220,40 @@
                 @endif
             </table>
         </div>
+        @if($movimientosPaginados->hasPages())
+        <div style="padding:14px 20px;border-top:1px solid #f0f0f0;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;">
+            <p style="font-size:12px;color:#8c8c8c;margin:0;">
+                Mostrando {{ $movimientosPaginados->firstItem() }}–{{ $movimientosPaginados->lastItem() }} de {{ $movimientosPaginados->total() }} movimientos
+            </p>
+            <div style="display:flex;gap:4px;align-items:center;">
+                {{-- Anterior --}}
+                @if($movimientosPaginados->onFirstPage())
+                    <span style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#d0d0d0;cursor:default;">‹ Ant.</span>
+                @else
+                    <a href="{{ $movimientosPaginados->previousPageUrl() }}" style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#1890ff;text-decoration:none;">‹ Ant.</a>
+                @endif
+
+                {{-- Páginas --}}
+                @foreach($movimientosPaginados->getUrlRange(
+                    max(1, $movimientosPaginados->currentPage() - 2),
+                    min($movimientosPaginados->lastPage(), $movimientosPaginados->currentPage() + 2)
+                ) as $page => $url)
+                    @if($page == $movimientosPaginados->currentPage())
+                        <span style="padding:6px 12px;border:1px solid #1890ff;border-radius:6px;font-size:12px;background:#1890ff;color:white;font-weight:600;">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}" style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#595959;text-decoration:none;">{{ $page }}</a>
+                    @endif
+                @endforeach
+
+                {{-- Siguiente --}}
+                @if($movimientosPaginados->hasMorePages())
+                    <a href="{{ $movimientosPaginados->nextPageUrl() }}" style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#1890ff;text-decoration:none;">Sig. ›</a>
+                @else
+                    <span style="padding:6px 12px;border:1px solid #e2e8f0;border-radius:6px;font-size:12px;color:#d0d0d0;cursor:default;">Sig. ›</span>
+                @endif
+            </div>
+        </div>
+        @endif
     </div>
 
     {{-- PANEL DERECHO --}}
@@ -265,7 +299,7 @@
         </div>
 
         {{-- Top clientes --}}
-        @if($movimientos->count() > 0)
+        @if($movimientosPaginados->total() > 0)
         <div class="kx-card" style="overflow:hidden;">
             <div style="padding:14px 20px;border-bottom:1px solid #f0f0f0;">
                 <p style="font-weight:700;font-size:14px;margin:0;color:#1a1a2e;">👥 Top clientes</p>
