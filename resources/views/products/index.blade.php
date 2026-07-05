@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-
+@php
+    $role = auth()->user()->role;
+@endphp
 <style>
 
 :root{
@@ -649,9 +651,9 @@ if($product->fecha_vencimiento){
                     {{ str_replace('_',' ',$product->rotacion) }}
 
                 </div>
-
+                @if($role == 'admin')
                 <div class="actions">
-
+                    
                     <a href="{{ route('products.edit',$product) }}"
                        class="btn-edit">
                         Editar
@@ -678,7 +680,7 @@ if($product->fecha_vencimiento){
                     </form>
 
                 </div>
-
+                @endif
             </div>
 
         </div>

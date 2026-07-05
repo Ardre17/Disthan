@@ -327,12 +327,12 @@ Alto en Grasas Saturadas
    class="btn-back">
    Volver
 </a>
-@if($role == 'admin')
+
 <button type="submit"
         class="btn-update">
     Actualizar Producto
 </button>
-@endif
+
 </div>
 
 </form>

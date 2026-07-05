@@ -19,6 +19,17 @@ use App\Http\Controllers\KardexController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\RawMaterialEntryController;
 use App\Http\Controllers\WarehouseController;
+use App\Http\Controllers\StickerController;
+use App\Http\Controllers\PrecintoController;
+
+
+Route::resource('stickers', StickerController::class);
+Route::post('stickers/{sticker}/movimiento', [StickerController::class, 'movimiento'])
+     ->name('stickers.movimiento');
+
+Route::resource('precintos', PrecintoController::class);
+Route::post('precintos/{precinto}/movimiento', [PrecintoController::class, 'movimiento'])
+     ->name('precintos.movimiento');
 
 Route::prefix('warehouse')->name('warehouse.')->middleware('auth')->group(function () {
     Route::get('/',                       [WarehouseController::class, 'index'])->name('index');

@@ -549,7 +549,7 @@ margin-bottom:8px;
 
 <div class="sidebar-header">
 <div class="logo">
-<img src="https://drive.google.com/file/d/1aVrmrEw96E3_gOSLe3CxqOqhu91E4N6o/view?usp=drive_link" alt="DISTAN ERP">
+<img alt="DISTAN ERP">
 </div>
 <div class="system-sub"> Warehouse & Production Management </div>
 
@@ -612,8 +612,8 @@ En línea
         @if($role == 'admin')
             <a href="/categories"><span>🏷</span><span>Categorías</span></a>
             <a href="{{ route('labels.index') }}"><span>📒</span><span>Control de Etiquetas</span></a>
-            <a href="/control-stickers"><span>🏷️</span><span>Stickers de tapa</span></a>
-            <a href="/control-precintos"><span>🔒</span><span>Precintos</span></a>
+            <a href="{{ route('stickers.index') }}"><span>🏷️</span><span>Stickers de tapa</span></a>
+            <a href="{{ route('precintos.index') }}"><span>🔒</span><span>Precintos</span></a>
         @endif
         <a href="/products"><span>📦</span><span>Productos</span></a>
         <a href="{{ route('warehouse.index') }}"><span>🗺️</span><span>Mapa del Almacén</span></a>

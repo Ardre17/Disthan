@@ -1,7 +1,9 @@
 @extends('layouts.app')
 
 @section('content')
-
+@php
+    $role = auth()->user()->role;
+@endphp
 @php
     $niveles  = [1, 2];
     $filas    = ['A', 'B'];
