@@ -35,8 +35,9 @@ class WarehouseController extends Controller
 
     // Asignar producto — acepta form POST normal
     public function assign(Request $request, WarehouseLocation $location)
-    {
-        dd($request->all());
+{
+    try {
+
         $request->validate([
             'product_id'    => 'nullable|exists:products,id',
             'cantidad'      => 'nullable|numeric|min:0',
@@ -49,9 +50,19 @@ class WarehouseController extends Controller
             'observaciones' => $request->observaciones,
         ]);
 
-        return redirect()->route('warehouse.index')
-            ->with('success', $request->product_id ? 'Producto asignado correctamente.' : 'Slot vaciado correctamente.');
+        $location->load('product');
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Producto asignado correctamente.',
+        ]);
+
+    } catch (\Throwable $e) {
+
+        dd($e);
+
     }
+}
 
     // Vaciar slot — acepta DELETE desde form con _method
     public function clear(WarehouseLocation $location)
