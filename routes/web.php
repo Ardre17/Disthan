@@ -21,6 +21,11 @@ use App\Http\Controllers\RawMaterialEntryController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\StickerController;
 use App\Http\Controllers\PrecintoController;
+use App\Http\Controllers\CajaController;
+
+Route::resource('cajas', CajaController::class);
+Route::post('cajas/{caja}/movimiento', [CajaController::class, 'movimiento'])
+     ->name('cajas.movimiento');
 
 
 Route::resource('stickers', StickerController::class);
