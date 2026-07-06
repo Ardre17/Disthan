@@ -25,7 +25,6 @@
 .scanner-input{width:100%;padding:10px 14px;font-size:16px;border-radius:8px;border:none;background:#1e293b;color:#f8fafc;outline:none;letter-spacing:1px;}
 .scanner-input::placeholder{color:#475569;}
 .scanner-input:focus{box-shadow:0 0 0 2px #2563eb;}
-.scanner-pulse{width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 1.5s infinite;}
 @keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
 .section-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1.1rem 1.25rem;}
 .sec-title{font-size:13px;font-weight:600;color:#1e293b;margin-bottom:.85rem;display:flex;align-items:center;gap:7px;}
@@ -78,6 +77,112 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .legend{display:flex;flex-direction:column;gap:5px;margin-top:4px;}
 .leg-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;}
 .leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:5px;display:inline-block;}
+
+/* ══════════════════════════════
+   MAPA DE PALETAS
+══════════════════════════════ */
+.paleta-map-card {
+    background:#fff; border:1px solid #e2e8f0;
+    border-radius:12px; overflow:hidden;
+}
+.paleta-map-header {
+    background:#0f172a; padding:10px 14px;
+    display:flex; align-items:center; justify-content:space-between;
+}
+.paleta-map-title {
+    font-size:12px; font-weight:700; color:#f8fafc;
+    display:flex; align-items:center; gap:7px;
+}
+.paleta-map-body { padding:12px; }
+
+.paleta-map-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(110px,1fr));
+    gap:8px;
+}
+
+/* Cada caja de paleta en el mapa */
+.paleta-box {
+    border-radius:10px; border:2px solid transparent;
+    padding:10px 8px; text-align:center;
+    cursor:pointer; transition:transform .15s, box-shadow .15s;
+    position:relative; user-select:none;
+}
+.paleta-box:hover {
+    transform:translateY(-3px);
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+}
+.paleta-box.estado-completo  { background:#dcfce7; border-color:#86efac; }
+.paleta-box.estado-parcial   { background:#fef3c7; border-color:#fde68a; }
+.paleta-box.estado-incompleto{ background:#fee2e2; border-color:#fca5a5; }
+.paleta-box.estado-vacia     { background:#f8fafc; border-color:#e2e8f0; }
+
+.paleta-box-icon  { font-size:22px; margin-bottom:4px; }
+.paleta-box-name  { font-size:12px; font-weight:800; color:#0f172a; }
+.paleta-box-items { font-size:10px; color:#64748b; margin-top:2px; }
+.paleta-box-pct   { font-size:11px; font-weight:700; margin-top:3px; }
+.paleta-box-bar   { height:4px; border-radius:99px; background:#e5e7eb; overflow:hidden; margin-top:5px; }
+.paleta-box-fill  { height:100%; border-radius:99px; }
+
+/* Sin paleta chip */
+.no-paleta-chip {
+    display:flex; align-items:center; justify-content:space-between;
+    background:#fff8f0; border:1px dashed #fed7aa;
+    border-radius:8px; padding:7px 10px; font-size:12px;
+    color:#92400e; margin-top:8px; cursor:pointer;
+    transition:background .15s;
+}
+.no-paleta-chip:hover { background:#fef3e2; }
+
+/* ══════════════════════════════
+   MODAL DE DETALLE
+══════════════════════════════ */
+.pm-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.45); z-index:1000;
+    align-items:center; justify-content:center; padding:16px;
+}
+.pm-overlay.open { display:flex; }
+.pm-modal {
+    background:#fff; border-radius:14px;
+    width:480px; max-width:100%; max-height:90vh;
+    overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2);
+    animation:mIn .16s ease;
+}
+@keyframes mIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.pm-header {
+    padding:14px 18px; display:flex; align-items:center;
+    justify-content:space-between; border-bottom:1px solid #f1f5f9;
+    position:sticky; top:0; background:#fff; z-index:1;
+}
+.pm-title  { font-size:15px; font-weight:700; color:#0f172a; }
+.pm-sub    { font-size:11px; color:#94a3b8; margin-top:2px; }
+.pm-body   { padding:16px 18px; }
+.pm-close  { background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; padding:2px 6px; }
+
+.pm-kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+.pm-kpi  {
+    background:#f8fafc; border-radius:9px; padding:8px 10px;
+    text-align:center; border:1px solid #e2e8f0;
+}
+.pm-kpi-label { font-size:10px; color:#94a3b8; font-weight:600; text-transform:uppercase; }
+.pm-kpi-val   { font-size:17px; font-weight:700; color:#1e293b; margin-top:2px; }
+
+.pm-prog-wrap { background:#f8fafc; border-radius:9px; padding:10px 12px; margin-bottom:14px; }
+.pm-prog-hdr  { display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-bottom:5px; }
+.pm-prog-bar  { height:8px; background:#e5e7eb; border-radius:99px; overflow:hidden; }
+.pm-prog-fill { height:100%; border-radius:99px; }
+
+.pm-item {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 0; border-bottom:1px solid #f1f5f9;
+}
+.pm-item:last-child { border-bottom:none; }
+.pm-item-dot  { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.pm-item-name { flex:1; font-size:12px; font-weight:500; color:#374151; }
+.pm-item-right{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.pm-item-qty  { font-size:12px; font-weight:700; color:#0f172a; }
+.pm-item-badge{ font-size:10px; font-weight:700; padding:2px 7px; border-radius:99px; }
 </style>
 
 <div class="pg">
@@ -91,6 +196,14 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     $faltantes   = $totalItems - $completados;
     $porcentaje  = $totalItems > 0 ? round(($completados / $totalItems) * 100) : 0;
     $progColor   = $porcentaje === 100 ? '#22c55e' : ($porcentaje > 40 ? '#f59e0b' : '#ef4444');
+
+    // ── Preparar datos de paletas para el mapa ──────────────────────────
+    $paletas = $order->details
+        ->filter(fn($d) => !empty($d->paleta))
+        ->groupBy('paleta')
+        ->sortKeys();
+
+    $sinPaleta = $order->details->filter(fn($d) => empty($d->paleta));
 @endphp
 
 <div class="top-hdr">
@@ -184,7 +297,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 
     {{-- Productos --}}
     <div class="products-grid">
-
         @foreach($order->details as $detail)
         @php
             $s  = $detail->estado_item;
@@ -199,7 +311,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 
         <div class="prod-card" id="producto-{{ $detail->product->barcode }}"
              style="border-left-color:{{ $bc }};">
-
             <div class="prod-top">
                 <div>
                     <div class="prod-name">📦 {{ $detail->product->nombre }}</div>
@@ -207,7 +318,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 </div>
                 <span class="prod-badge {{ $badgeCls }}">{{ $s }}</span>
             </div>
-
             <div class="info-strip">
                 <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
                 <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
@@ -217,11 +327,8 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                     <span style="font-size:10px;font-weight:700;color:{{ $sc }};margin-left:2px;">{{ $pct }}%</span>
                 </div>
             </div>
-
             <form method="POST" action="{{ route('orders.updateDetail',$detail) }}">
-                @csrf
-                @method('PUT')
-
+                @csrf @method('PUT')
                 <div class="fields-box">
                     <div class="field-row">
                         <div><label class="flabel">Solicitado</label>
@@ -231,9 +338,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                     </div>
                     <div><label class="flabel">Precio</label>
                         <input type="number" step="0.01" name="precio_unitario" class="finput" value="{{ $detail->precio_unitario }}"></div>
-
                     <hr class="dv">
-
                     <div><label class="flabel">Vencimiento</label>
                         <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}"></div>
                     <div class="field-row">
@@ -243,39 +348,121 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                             <input type="text" name="ubicacion" class="finput" value="{{ $detail->ubicacion }}"></div>
                     </div>
                 </div>
-
                 <div style="margin-top:7px;">
                     <label class="flabel">Paleta</label>
                     <input type="text" name="paleta" class="paleta-input"
                         value="{{ $detail->paleta }}" placeholder="P01"
                         oninput="this.value=this.value.toUpperCase()">
                 </div>
-
                 <div class="subtotal-row" style="margin-top:7px;">
                     <span style="font-size:11px;color:#64748b;">Subtotal</span>
                     <span class="subtotal-val">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</span>
                 </div>
-
                 <div class="btn-row-prod" style="margin-top:7px;">
                     <button type="submit" class="btn btn-blue" style="width:100%;">💾 Guardar</button>
                 </div>
             </form>
-
             <form method="POST" action="{{ route('orders.details.destroy',$detail) }}"
                 onsubmit="return confirm('¿Eliminar {{ $detail->product->nombre }}?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn btn-red" style="width:100%;margin-top:4px;">🗑 Eliminar</button>
             </form>
-
         </div>
         @endforeach
-
     </div>
 
-</div>
+</div>{{-- /.left-col --}}
 
 {{-- ── Right col ── --}}
 <div class="right-col">
+
+    {{-- ══════════════════════════════════════════
+         MAPA DE PALETAS
+    ══════════════════════════════════════════ --}}
+    <div class="paleta-map-card">
+        <div class="paleta-map-header">
+            <div class="paleta-map-title">
+                🪵 Mapa de paletas
+                <span style="background:#1e293b;color:#94a3b8;font-size:10px;padding:2px 8px;border-radius:99px;">
+                    {{ $paletas->count() }} paleta{{ $paletas->count() !== 1 ? 's' : '' }}
+                </span>
+            </div>
+            <span style="font-size:10px;color:#475569;">Clic para ver detalle</span>
+        </div>
+
+        <div class="paleta-map-body">
+
+            @if($paletas->isEmpty() && $sinPaleta->isEmpty())
+                <div style="text-align:center;padding:24px 0;color:#94a3b8;font-size:12px;">
+                    <div style="font-size:28px;margin-bottom:6px;">🪵</div>
+                    Sin paletas asignadas aún
+                </div>
+            @else
+
+            <div class="paleta-map-grid">
+            @foreach($paletas as $nombrePaleta => $items)
+            @php
+                $totUds  = $items->sum('cantidad_solicitada');
+                $despUds = $items->sum('cantidad_despachada');
+                $pesoKg  = $items->sum(fn($i) => ($i->product->peso ?? 0) * $i->cantidad_solicitada / 1000);
+                $pctP    = $totUds > 0 ? round(($despUds / $totUds) * 100) : 0;
+                $todoC   = $items->every(fn($i) => $i->estado_item === 'COMPLETO');
+                $algunP  = $items->contains(fn($i) => $i->estado_item === 'PARCIAL');
+                $estClass = $todoC ? 'estado-completo' : ($algunP ? 'estado-parcial' : 'estado-incompleto');
+                $pctColor = $todoC ? '#15803d' : ($algunP ? '#b45309' : '#b91c1c');
+                $fillColor= $todoC ? '#22c55e' : ($algunP ? '#f59e0b' : '#ef4444');
+                $icon     = $todoC ? '✅' : ($algunP ? '⏳' : '⚠️');
+
+                // Serializar items para el modal
+                $itemsJson = $items->map(fn($i) => [
+                    'nombre'   => $i->product->nombre ?? 'Producto',
+                    'sku'      => $i->product->sku ?? '',
+                    'solicitada'=> $i->cantidad_solicitada,
+                    'despachada'=> $i->cantidad_despachada,
+                    'estado'   => $i->estado_item,
+                    'precio'   => $i->precio_unitario,
+                    'subtotal' => $i->subtotal,
+                    'peso'     => number_format(($i->product->peso ?? 0) / 1000, 3),
+                ])->values()->toJson();
+            @endphp
+
+            <div class="paleta-box {{ $estClass }}"
+                onclick="abrirPaleta({{ json_encode($nombrePaleta) }}, {{ $items->count() }}, {{ $totUds }}, {{ $despUds }}, {{ round($pesoKg,1) }}, {{ $pctP }}, {{ json_encode($fillColor) }}, {{ $itemsJson }})">
+                <div class="paleta-box-icon">🪵</div>
+                <div class="paleta-box-name">{{ $nombrePaleta }}</div>
+                <div class="paleta-box-items">{{ $items->count() }} ítem{{ $items->count() > 1 ? 's' : '' }}</div>
+                <div class="paleta-box-pct" style="color:{{ $pctColor }};">{{ $icon }} {{ $pctP }}%</div>
+                <div class="paleta-box-bar">
+                    <div class="paleta-box-fill" style="width:{{ $pctP }}%;background:{{ $fillColor }};"></div>
+                </div>
+            </div>
+            @endforeach
+            </div>
+
+            {{-- Sin paleta --}}
+            @if($sinPaleta->count())
+            @php
+                $spJson = $sinPaleta->map(fn($i) => [
+                    'nombre'    => $i->product->nombre ?? 'Producto',
+                    'sku'       => $i->product->sku ?? '',
+                    'solicitada'=> $i->cantidad_solicitada,
+                    'despachada'=> $i->cantidad_despachada,
+                    'estado'    => $i->estado_item,
+                    'precio'    => $i->precio_unitario,
+                    'subtotal'  => $i->subtotal,
+                    'peso'      => number_format(($i->product->peso ?? 0) / 1000, 3),
+                ])->values()->toJson();
+            @endphp
+            <div class="no-paleta-chip"
+                onclick="abrirPaleta('Sin paleta', {{ $sinPaleta->count() }}, {{ $sinPaleta->sum('cantidad_solicitada') }}, {{ $sinPaleta->sum('cantidad_despachada') }}, 0, 0, '#94a3b8', {{ $spJson }})">
+                <span>⚠️ Sin paleta asignada</span>
+                <span style="font-weight:700;">{{ $sinPaleta->count() }} ítem{{ $sinPaleta->count() > 1 ? 's' : '' }} →</span>
+            </div>
+            @endif
+
+            @endif
+        </div>
+    </div>
 
     {{-- Resumen financiero --}}
     <div class="resumen-card">
@@ -319,20 +506,68 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         <div class="resumen-row"><span>Estado</span><span style="font-size:11px;font-weight:700;color:{{ $estadoColor }};">{{ $order->estado }}</span></div>
     </div>
 
-</div>
-</div>
+</div>{{-- /.right-col --}}
+</div>{{-- /.main-layout --}}
+</div>{{-- /.pg --}}
 
+{{-- ══════════════════════════════
+     MODAL DETALLE DE PALETA
+══════════════════════════════ --}}
+<div class="pm-overlay" id="pmOverlay" onclick="cerrarPaleta(event)">
+    <div class="pm-modal">
+        <div class="pm-header">
+            <div>
+                <div class="pm-title" id="pmTitle"></div>
+                <div class="pm-sub"  id="pmSub"></div>
+            </div>
+            <button class="pm-close" onclick="document.getElementById('pmOverlay').classList.remove('open')">✕</button>
+        </div>
+        <div class="pm-body">
+
+            {{-- Mini KPIs --}}
+            <div class="pm-kpis">
+                <div class="pm-kpi">
+                    <div class="pm-kpi-label">Ítems</div>
+                    <div class="pm-kpi-val" id="pmItems"></div>
+                </div>
+                <div class="pm-kpi">
+                    <div class="pm-kpi-label">Unidades</div>
+                    <div class="pm-kpi-val" id="pmUds"></div>
+                </div>
+                <div class="pm-kpi">
+                    <div class="pm-kpi-label">Peso total</div>
+                    <div class="pm-kpi-val" id="pmPeso"></div>
+                </div>
+            </div>
+
+            {{-- Progreso --}}
+            <div class="pm-prog-wrap">
+                <div class="pm-prog-hdr">
+                    <span>Progreso de despacho</span>
+                    <span id="pmPct" style="font-weight:700;"></span>
+                </div>
+                <div class="pm-prog-bar">
+                    <div class="pm-prog-fill" id="pmProgFill"></div>
+                </div>
+                <div style="font-size:10px;color:#94a3b8;margin-top:3px;" id="pmProgSub"></div>
+            </div>
+
+            {{-- Lista de productos --}}
+            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Productos en esta paleta</div>
+            <div id="pmItemsList"></div>
+
+        </div>
+    </div>
 </div>
 
 <script>
+// ── Scanner ──────────────────────────────────────────────────────────────
 let scanner = document.getElementById('scanner');
-
 scanner.addEventListener('keydown', function(e){
     if(e.key !== 'Enter') return;
     e.preventDefault();
     let codigo = this.value.trim();
     if(!codigo) return;
-
     let card = document.getElementById('producto-' + codigo);
     if(card){
         card.scrollIntoView({ behavior:'smooth', block:'center' });
@@ -343,7 +578,6 @@ scanner.addEventListener('keydown', function(e){
         this.value = '';
         return;
     }
-
     fetch(`/api/producto/${codigo}`)
     .then(res => res.json())
     .then(producto => {
@@ -353,9 +587,57 @@ scanner.addEventListener('keydown', function(e){
         document.querySelector('[name=precio_unitario]').value = producto.precio ?? 0;
         document.querySelector('[name=cantidad_solicitada]').focus();
     });
-
     this.value = '';
 });
+
+// ── Modal de paleta ──────────────────────────────────────────────────────
+function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, items) {
+    document.getElementById('pmTitle').textContent   = '🪵 ' + nombre;
+    document.getElementById('pmSub').textContent     = 'Detalle de contenido · ' + nItems + ' ítem' + (nItems !== 1 ? 's' : '');
+    document.getElementById('pmItems').textContent   = nItems;
+    document.getElementById('pmUds').textContent     = totUds;
+    document.getElementById('pmPeso').textContent    = pesoKg + ' kg';
+    document.getElementById('pmPct').textContent     = pct + '%';
+    document.getElementById('pmPct').style.color     = fillColor;
+    document.getElementById('pmProgFill').style.width      = pct + '%';
+    document.getElementById('pmProgFill').style.background = fillColor;
+    document.getElementById('pmProgSub').textContent = despUds + ' de ' + totUds + ' unidades despachadas';
+
+    const estadoColors = {
+        'COMPLETO'  : { bg:'#dcfce7', color:'#15803d', dot:'#22c55e' },
+        'PARCIAL'   : { bg:'#fef3c7', color:'#b45309', dot:'#f59e0b' },
+        'INCOMPLETO': { bg:'#fee2e2', color:'#b91c1c', dot:'#ef4444' },
+    };
+
+    let html = '';
+    items.forEach(item => {
+        const ec = estadoColors[item.estado] ?? { bg:'#f1f5f9', color:'#64748b', dot:'#94a3b8' };
+        const itemPct = item.solicitada > 0 ? Math.round((item.despachada / item.solicitada) * 100) : 0;
+        html += `
+        <div class="pm-item">
+            <div class="pm-item-dot" style="background:${ec.dot};"></div>
+            <div class="pm-item-name">
+                <div style="font-weight:600;">${item.nombre}</div>
+                <div style="font-size:10px;color:#94a3b8;">${item.sku ? 'SKU: '+item.sku+' · ' : ''}${item.peso} kg · S/ ${parseFloat(item.precio).toFixed(2)}</div>
+                <div style="height:3px;background:#e5e7eb;border-radius:99px;margin-top:4px;overflow:hidden;">
+                    <div style="height:100%;width:${itemPct}%;background:${ec.dot};border-radius:99px;"></div>
+                </div>
+            </div>
+            <div class="pm-item-right">
+                <div class="pm-item-qty">${item.despachada}/${item.solicitada}</div>
+                <span class="pm-item-badge" style="background:${ec.bg};color:${ec.color};">${item.estado}</span>
+            </div>
+        </div>`;
+    });
+
+    document.getElementById('pmItemsList').innerHTML = html;
+    document.getElementById('pmOverlay').classList.add('open');
+}
+
+function cerrarPaleta(e) {
+    if(e.target.id === 'pmOverlay')
+        document.getElementById('pmOverlay').classList.remove('open');
+}
 </script>
 
 @endsection
