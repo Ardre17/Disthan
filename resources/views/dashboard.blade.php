@@ -532,68 +532,50 @@ document.addEventListener("DOMContentLoaded", function () {
         saludo = "🌙 Buenas noches";
     }
 
-    function escribir(texto, velocidad = 25) {
+    const primeraVez = !sessionStorage.getItem("fano_saludo");
 
-        mensaje.innerHTML = "";
+    if (primeraVez) {
+        sessionStorage.setItem("fano_saludo", "1");
+    }
 
-        let i = 0;
+    function esperar(ms){
+        return new Promise(resolve=>setTimeout(resolve,ms));
+    }
 
-        return new Promise(resolve => {
+    async function escribir(texto, velocidad = 22){
 
-            const intervalo = setInterval(() => {
+        mensaje.innerHTML="";
 
-                mensaje.innerHTML += texto.charAt(i);
+        for(let i=0;i<texto.length;i++){
 
-                i++;
+            if(texto[i]=="\n"){
+                mensaje.innerHTML+="<br>";
+            }else{
+                mensaje.innerHTML+=texto[i];
+            }
 
-                if (i >= texto.length) {
+            await esperar(velocidad);
 
-                    clearInterval(intervalo);
-
-                    resolve();
-
-                }
-
-            }, velocidad);
-
-        });
+        }
 
     }
 
-    async function iniciarFano() {
+    async function mostrarResumen(){
 
-        clearTimeout(window.fanoOcultar);
-
-        boton.style.display = "none";
-
-        chat.classList.remove("fano-hidden");
-        chat.classList.add("fano-show");
-
-        imagen.src="/assets/fano/expresiones/invierno/Saludando.png";
-
-        await escribir(
-            saludo + "\nBienvenido a DISTAN 👋",
-            22
-        );
-
-        await new Promise(r => setTimeout(r,700));
+        boton.style.display="none";
 
         imagen.src="/assets/fano/expresiones/invierno/Pensando.png";
 
-        await escribir(
-            "🔎 Revisando el almacén...",
-            25
-        );
+        await escribir("🔎 Revisando el almacén...");
 
-        await new Promise(r => setTimeout(r,1000));
+        await esperar(800);
 
         if(stock==0){
 
             imagen.src="/assets/fano/expresiones/invierno/Saludando.png";
 
             await escribir(
-                "✅ Todo está en orden.\nNo encontré productos con stock bajo.",
-                22
+                "✅ Todo está en orden.\nNo encontré productos con stock bajo."
             );
 
         }else{
@@ -601,15 +583,39 @@ document.addEventListener("DOMContentLoaded", function () {
             imagen.src="/assets/fano/expresiones/invierno/Pensando.png";
 
             await escribir(
-                "⚠ Encontré "+stock+" productos con stock bajo.",
-                22
+                "⚠ Encontré "+stock+" productos con stock bajo."
             );
 
             boton.style.display="block";
 
         }
 
-        window.fanoOcultar=setTimeout(function(){
+    }
+
+    async function iniciarFano(){
+
+        clearTimeout(window.fanoTimer);
+
+        chat.classList.remove("fano-hidden");
+        chat.classList.add("fano-show");
+
+        boton.style.display="none";
+
+        if(primeraVez){
+
+            imagen.src="/assets/fano/expresiones/invierno/Saludando.png";
+
+            await escribir(
+                saludo+"\nHola, bienvenido a DISTAN 👋"
+            );
+
+            await esperar(1200);
+
+        }
+
+        await mostrarResumen();
+
+        window.fanoTimer=setTimeout(function(){
 
             chat.classList.remove("fano-show");
             chat.classList.add("fano-hidden");
