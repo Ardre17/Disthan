@@ -11,31 +11,25 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
-        #fano-container{
+   #fano-container{
 
     position:fixed;
 
-    right:25px;
+    right:20px;
 
     bottom:20px;
 
     z-index:9999;
 
-    display:flex;
-
-    align-items:flex-end;
-
-    gap:15px;
-
 }
 
 #fano-img{
 
-    width:240px;
-
-    transition:.3s;
+    width:210px;
 
     cursor:pointer;
+
+    transition:.3s;
 
 }
 
@@ -47,37 +41,57 @@
 
 #fano-chat{
 
-    background:#fff;
+    position:absolute;
+
+    bottom:190px;
+
+    right:40px;
+
+    width:240px;
+
+    background:white;
 
     border-radius:18px;
 
-    padding:18px;
+    padding:16px;
 
-    width:220px;
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
 
-    box-shadow:0 10px 35px rgba(0,0,0,.15);
-
-    position:relative;
-
-    font-size:15px;
+    transition:.4s;
 
 }
 
-#fano-chat:after{
+#fano-chat::after{
 
     content:"";
 
     position:absolute;
 
-    right:-18px;
+    bottom:-14px;
 
-    bottom:30px;
+    right:45px;
 
-    border-top:10px solid transparent;
+    border-left:12px solid transparent;
 
-    border-bottom:10px solid transparent;
+    border-right:12px solid transparent;
 
-    border-left:20px solid white;
+    border-top:16px solid white;
+
+}
+
+.fano-hidden{
+
+    opacity:0;
+
+    visibility:hidden;
+
+}
+
+.fano-show{
+
+    opacity:1;
+
+    visibility:visible;
 
 }
         body {
@@ -95,7 +109,7 @@
 
     </style>
 </head>
-<x-fano />
+
 <body>
 
     @include('layouts.navigation')
@@ -103,6 +117,6 @@
     <div class="main-content">
         @yield('content')
     </div>
-
+<x-fano />
 </body>
 </html>

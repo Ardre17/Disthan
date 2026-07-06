@@ -1,8 +1,11 @@
 <div id="fano-container">
 
-    <div id="fano-chat">
-        <strong>¡Hola!</strong><br>
-        ¿En qué puedo ayudarte hoy?
+    <div id="fano-chat" class="fano-show">
+
+        <div id="fano-message">
+
+        </div>
+
     </div>
 
     <img

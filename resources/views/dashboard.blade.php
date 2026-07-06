@@ -400,5 +400,76 @@ new Chart(document.getElementById('facturacionChart'), {
     }
 });
 </script>
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    let stock = {{ $stockBajo }};
+
+    let hora = new Date().getHours();
+
+    let saludo = "";
+
+    if(hora < 12){
+
+        saludo = "☀️ Buenos días";
+
+    }else if(hora < 18){
+
+        saludo = "🌤️ Buenas tardes";
+
+    }else{
+
+        saludo = "🌙 Buenas noches";
+
+    }
+
+    const chat = document.getElementById("fano-chat");
+
+    const mensaje = document.getElementById("fano-message");
+
+    const imagen = document.getElementById("fano-img");
+
+    mensaje.innerHTML = "<strong>"+saludo+"</strong><br>Bienvenido a DISTAN.";
+
+    imagen.src="/assets/fano/expresiones/invierno/saludando.png";
+
+    setTimeout(function(){
+
+        if(stock==0){
+
+            mensaje.innerHTML="<strong>✅ Todo está correcto.</strong><br>No encontré productos con stock bajo.";
+
+            imagen.src="/assets/fano/expresiones/invierno/saludando.png";
+
+        }else{
+
+            mensaje.innerHTML="<strong>⚠ Atención.</strong><br>Encontré <b>"+stock+"</b> productos con stock bajo.";
+
+            imagen.src="/assets/fano/expresiones/invierno/pensando.png";
+
+        }
+
+    },2500);
+
+    setTimeout(function(){
+
+        chat.classList.remove("fano-show");
+
+        chat.classList.add("fano-hidden");
+
+    },8000);
+
+    imagen.onclick=function(){
+
+        chat.classList.remove("fano-hidden");
+
+        chat.classList.add("fano-show");
+
+    };
+
+});
+
+</script>
 
 @endsection
