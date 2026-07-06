@@ -109,7 +109,7 @@
 
     </style>
 </head>
-
+<x-fano />
 <body>
 
     @include('layouts.navigation')
@@ -117,6 +117,6 @@
     <div class="main-content">
         @yield('content')
     </div>
-<x-fano />
+
 </body>
 </html>
