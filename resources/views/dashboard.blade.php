@@ -432,7 +432,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
     mensaje.innerHTML = "<strong>"+saludo+"</strong><br>Bienvenido a DISTAN.";
 
-    imagen.src="/assets/fano/expresiones/invierno/saludando.png";
+    imagen.src="/assets/fano/expresiones/invierno/Saludando.png";
 
     setTimeout(function(){
 
@@ -440,13 +440,13 @@ document.addEventListener("DOMContentLoaded", function(){
 
             mensaje.innerHTML="<strong>✅ Todo está correcto.</strong><br>No encontré productos con stock bajo.";
 
-            imagen.src="/assets/fano/expresiones/invierno/saludando.png";
+            imagen.src="/assets/fano/expresiones/invierno/Saludando.png";
 
         }else{
 
             mensaje.innerHTML="<strong>⚠ Atención.</strong><br>Encontré <b>"+stock+"</b> productos con stock bajo.";
 
-            imagen.src="/assets/fano/expresiones/invierno/pensando.png";
+            imagen.src="/assets/fano/expresiones/invierno/Pensando.png";
 
         }
 
