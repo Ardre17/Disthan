@@ -74,6 +74,115 @@
 .legend{display:flex;gap:12px;flex-wrap:wrap;margin-bottom:8px;}
 .leg-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#64748b;}
 .leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
+
+#fano-container{
+
+    position:fixed;
+
+    right:20px;
+
+    bottom:20px;
+
+    z-index:9999;
+
+}
+
+#fano-img{
+    width:200px;
+    height:auto;
+}
+
+#fano-img:hover{
+
+    transform:scale(1.05);
+
+}
+
+#fano-chat{
+
+    position:absolute;
+
+    bottom:260px;
+
+    right:120px;
+
+    width:250px;
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    box-shadow:0 10px 30px rgba(0,0,0,.18);
+
+    transition:.4s;
+
+    z-index:10000;
+
+}
+#fano-chat::after{
+
+    content:"";
+
+    position:absolute;
+
+    right:-14px;
+
+    bottom:30px;
+
+    border-top:12px solid transparent;
+
+    border-bottom:12px solid transparent;
+
+    border-left:16px solid white;
+
+}
+
+.fano-hidden{
+
+    opacity:0;
+
+    visibility:hidden;
+
+}
+
+.fano-show{
+
+    opacity:1;
+
+    visibility:visible;
+
+}
+#fano-btn{
+
+    margin-top:15px;
+
+    width:100%;
+
+    border:none;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+#fano-btn:hover{
+
+    background:#1d4ed8;
+
+}
 </style>
 
 <div class="page">
@@ -307,7 +416,7 @@
 
 </div>
 </div>
-
+<x-fano />
 {{-- ── Scripts ── --}}
 @php
     $labelsClientes = json_encode($topProductos->map(fn($d) => $d->product->nombre ?? '?')->values()->toArray());
@@ -402,117 +511,129 @@ new Chart(document.getElementById('facturacionChart'), {
 </script>
 <script>
 
-document.addEventListener("DOMContentLoaded", function(){
+document.addEventListener("DOMContentLoaded", function () {
 
-    let stock = {{ $stockBajo }};
+    const stock = {{ $stockBajo }};
 
-    let hora = new Date().getHours();
+    const chat = document.getElementById("fano-chat");
+    const mensaje = document.getElementById("fano-message");
+    const imagen = document.getElementById("fano-img");
+    const boton = document.getElementById("fano-btn");
+
+    const hora = new Date().getHours();
 
     let saludo = "";
 
-    if(hora < 12){
-
+    if (hora < 12) {
         saludo = "☀️ Buenos días";
-
-    }else if(hora < 18){
-
+    } else if (hora < 18) {
         saludo = "🌤️ Buenas tardes";
-
-    }else{
-
+    } else {
         saludo = "🌙 Buenas noches";
+    }
+
+    function escribir(texto, velocidad = 25) {
+
+        mensaje.innerHTML = "";
+
+        let i = 0;
+
+        return new Promise(resolve => {
+
+            const intervalo = setInterval(() => {
+
+                mensaje.innerHTML += texto.charAt(i);
+
+                i++;
+
+                if (i >= texto.length) {
+
+                    clearInterval(intervalo);
+
+                    resolve();
+
+                }
+
+            }, velocidad);
+
+        });
 
     }
 
-    const chat = document.getElementById("fano-chat");
+    async function iniciarFano() {
 
-    const mensaje = document.getElementById("fano-message");
+        clearTimeout(window.fanoOcultar);
 
-    const imagen = document.getElementById("fano-img");
-    const boton=document.getElementById("fano-btn");
+        boton.style.display = "none";
 
-    mensaje.innerHTML = "<strong>"+saludo+"</strong><br>Bienvenido a DISTAN.";
+        chat.classList.remove("fano-hidden");
+        chat.classList.add("fano-show");
 
-    imagen.src="/assets/fano/expresiones/invierno/Saludando.png";
+        imagen.src="/assets/fano/expresiones/invierno/Saludando.png";
 
-    setTimeout(function(){
+        await escribir(
+            saludo + "\nBienvenido a DISTAN 👋",
+            22
+        );
+
+        await new Promise(r => setTimeout(r,700));
+
+        imagen.src="/assets/fano/expresiones/invierno/Pensando.png";
+
+        await escribir(
+            "🔎 Revisando el almacén...",
+            25
+        );
+
+        await new Promise(r => setTimeout(r,1000));
 
         if(stock==0){
 
-            mensaje.innerHTML="<strong>✅ Todo está correcto.</strong><br>No encontré productos con stock bajo.";
-
             imagen.src="/assets/fano/expresiones/invierno/Saludando.png";
+
+            await escribir(
+                "✅ Todo está en orden.\nNo encontré productos con stock bajo.",
+                22
+            );
 
         }else{
 
-            mensaje.innerHTML="<strong>⚠ Atención.</strong><br>Encontré <b>"+stock+"</b> productos con stock bajo.";
-
-            boton.style.display="block";
             imagen.src="/assets/fano/expresiones/invierno/Pensando.png";
 
-        }
+            await escribir(
+                "⚠ Encontré "+stock+" productos con stock bajo.",
+                22
+            );
 
-    },2500);
-
-    setTimeout(function(){
-
-        chat.classList.remove("fano-show");
-
-        chat.classList.add("fano-hidden");
-
-    },8000);
-
-    function mostrarFano() {
-
-    chat.classList.remove("fano-hidden");
-    chat.classList.add("fano-show");
-
-    // Vuelve a saludar
-    imagen.src = "/assets/fano/expresiones/invierno/Saludando.png";
-    mensaje.innerHTML = "<strong>👋 ¡Hola de nuevo!</strong><br>¿En qué puedo ayudarte?";
-
-    clearTimeout(window.fanoTimer);
-
-    // Después de 2.5 segundos revisa el stock
-    setTimeout(function () {
-
-        if (stock == 0) {
-
-            mensaje.innerHTML = "<strong>✅ Todo está correcto.</strong><br>No encontré productos con stock bajo.";
-
-            imagen.src = "/assets/fano/expresiones/invierno/Saludando.png";
-            boton.style.display="none";
-
-        } else {
-
-            mensaje.innerHTML = "<strong>⚠ Atención.</strong><br>Encontré <b>" + stock + "</b> productos con stock bajo.";
-
-            imagen.src = "/assets/fano/expresiones/invierno/Pensando.png";
-            boton.style.display="none";
+            boton.style.display="block";
 
         }
 
-    }, 2500);
+        window.fanoOcultar=setTimeout(function(){
 
-    window.fanoTimer = setTimeout(function () {
+            chat.classList.remove("fano-show");
+            chat.classList.add("fano-hidden");
 
-        chat.classList.remove("fano-show");
-        chat.classList.add("fano-hidden");
+        },8000);
 
-    }, 8000);
+    }
 
-}
+    imagen.addEventListener("click",function(){
 
-mostrarFano();
+        iniciarFano();
 
-imagen.addEventListener("click", mostrarFano);
+    });
+
+    boton.addEventListener("click",function(){
+
+        window.location.href="{{ route('products.index') }}";
+
+    });
+
+    iniciarFano();
 
 });
-boton.onclick=function(){
 
-    window.location.href="{{ route('products.index') }}";
-
-};
 </script>
 
 @endsection
