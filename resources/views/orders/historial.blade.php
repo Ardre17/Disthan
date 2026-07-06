@@ -59,7 +59,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 </style>
 
 <div class="erp-bar">
-    <div class="erp-bar-title">JOYBER PERÚ · Sistema ERP</div>
     <span class="erp-breadcrumb">Ventas › Historial de órdenes completadas</span>
 </div>
 

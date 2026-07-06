@@ -51,6 +51,92 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
 .btn-gray{background:#f8fafc;color:#475569;}
 .btn-red{background:#fef2f2;color:#b91c1c;}
 .btn-full{grid-column:1/-1;}
+
+/* ── PALETAS ── */
+.paletas-toggle {
+    display:flex; align-items:center; justify-content:space-between;
+    padding:8px 11px; background:#f8fafc; border:1px solid #e2e8f0;
+    border-radius:9px; cursor:pointer; transition:background .15s;
+    font-size:12px; font-weight:600; color:#475569; user-select:none;
+}
+.paletas-toggle:hover { background:#f1f5f9; }
+.paletas-toggle .arrow { font-size:10px; transition:transform .2s; }
+.paletas-toggle.open .arrow { transform:rotate(180deg); }
+
+.paletas-panel {
+    display:none; margin-top:8px;
+    border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;
+}
+.paletas-panel.open { display:block; }
+
+.paletas-header {
+    background:#1e293b; color:#fff;
+    padding:8px 12px; font-size:11px; font-weight:700;
+    letter-spacing:.05em; text-transform:uppercase;
+    display:flex; align-items:center; justify-content:space-between;
+}
+
+.paleta-grid { display:flex; flex-direction:column; gap:0; }
+
+.paleta-row {
+    border-bottom:1px solid #f1f5f9;
+    padding:8px 12px;
+    transition:background .12s;
+}
+.paleta-row:last-child { border-bottom:none; }
+.paleta-row:hover { background:#f8fafc; }
+
+.paleta-name {
+    display:flex; align-items:center; justify-content:space-between;
+    margin-bottom:5px;
+}
+.paleta-badge {
+    display:inline-flex; align-items:center; gap:4px;
+    background:#1e293b; color:#fff;
+    font-size:11px; font-weight:700; padding:3px 9px;
+    border-radius:99px; letter-spacing:.04em;
+}
+.paleta-stats {
+    display:flex; gap:10px; font-size:10px; color:#94a3b8; font-weight:500;
+}
+.paleta-stat { display:flex; align-items:center; gap:3px; }
+
+.paleta-items { display:flex; flex-direction:column; gap:3px; }
+.paleta-item {
+    display:flex; align-items:center; justify-content:space-between;
+    font-size:11px; padding:3px 7px; border-radius:6px;
+    background:#f8fafc; border:1px solid #f1f5f9;
+}
+.paleta-item-name { color:#374151; font-weight:500; display:flex; align-items:center; gap:5px; }
+.paleta-item-right { display:flex; align-items:center; gap:8px; }
+.paleta-item-qty { font-weight:700; color:#1e293b; font-size:11px; }
+.paleta-item-estado {
+    font-size:10px; font-weight:600; padding:1px 6px;
+    border-radius:99px;
+}
+.est-completo  { background:#dcfce7; color:#15803d; }
+.est-parcial   { background:#fef3c7; color:#b45309; }
+.est-incompleto{ background:#fee2e2; color:#b91c1c; }
+
+.paleta-peso-bar {
+    margin-top:5px; height:4px; background:#e5e7eb;
+    border-radius:99px; overflow:hidden;
+}
+.paleta-peso-fill { height:100%; border-radius:99px; background:#2563eb; }
+
+.paletas-empty {
+    padding:16px; text-align:center;
+    font-size:12px; color:#94a3b8;
+}
+
+.paleta-summary-chips {
+    display:flex; flex-wrap:wrap; gap:4px; margin-top:4px;
+}
+.chip {
+    font-size:10px; padding:2px 8px; border-radius:99px;
+    background:#eff6ff; color:#2563eb; font-weight:600;
+    border:1px solid #bfdbfe;
+}
 </style>
 
 <div class="pg">
@@ -137,6 +223,17 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
                  : ($order->estado === 'PARCIAL'  ? 'bp' : 'bi');
     $badgeIcon   = $order->estado === 'COMPLETO' ? '✅'
                  : ($order->estado === 'PARCIAL'  ? '⏳' : '⚠️');
+
+    // ── Agrupar items por paleta ──────────────────────────────────────────
+    $paletas = $order->details
+        ->filter(fn($d) => !empty($d->paleta))
+        ->groupBy('paleta')
+        ->sortKeys();
+
+    // Items sin paleta asignada
+    $sinPaleta = $order->details->filter(fn($d) => empty($d->paleta));
+
+    $totalPaletas = $paletas->count();
 @endphp
 
 <div class="order-card" style="border-top-color:{{ $topColor }};">
@@ -192,6 +289,128 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
 
     <hr class="div">
 
+    {{-- ══════════════════════════════════════════
+         PANEL DE PALETAS
+    ══════════════════════════════════════════ --}}
+    @if($totalPaletas > 0 || $sinPaleta->count() > 0)
+
+    {{-- Chips resumen --}}
+    <div class="paleta-summary-chips">
+        <span style="font-size:11px;color:#64748b;font-weight:600;align-self:center;">🪵 Paletas:</span>
+        @foreach($paletas as $nombrePaleta => $items)
+            @php
+                $todosCompletos = $items->every(fn($i) => $i->estado_item === 'COMPLETO');
+                $algunoParcial  = $items->contains(fn($i) => $i->estado_item === 'PARCIAL');
+                $chipColor = $todosCompletos ? '#dcfce7' : ($algunoParcial ? '#fef3c7' : '#fee2e2');
+                $chipText  = $todosCompletos ? '#15803d' : ($algunoParcial ? '#b45309' : '#b91c1c');
+            @endphp
+            <span class="chip" style="background:{{ $chipColor }};color:{{ $chipText }};border-color:{{ $chipColor }};">
+                {{ $nombrePaleta }} · {{ $items->count() }} ítem{{ $items->count() > 1 ? 's' : '' }}
+            </span>
+        @endforeach
+        @if($sinPaleta->count())
+            <span class="chip" style="background:#f1f5f9;color:#94a3b8;border-color:#e2e8f0;">
+                Sin asignar · {{ $sinPaleta->count() }}
+            </span>
+        @endif
+    </div>
+
+    {{-- Toggle expandible --}}
+    <div class="paletas-toggle" onclick="togglePaletas(this)" id="toggle-{{ $order->id }}">
+        <span>🪵 Ver detalle de paletas ({{ $totalPaletas }})</span>
+        <span class="arrow">▼</span>
+    </div>
+
+    <div class="paletas-panel" id="panel-{{ $order->id }}">
+
+        <div class="paletas-header">
+            <span>🪵 Distribución de paletas — {{ $order->numero_orden }}</span>
+            <span>{{ $totalPaletas }} paleta{{ $totalPaletas !== 1 ? 's' : '' }}</span>
+        </div>
+
+        <div class="paleta-grid">
+        @foreach($paletas as $nombrePaleta => $items)
+        @php
+            $totalUds    = $items->sum('cantidad_solicitada');
+            $despachadas = $items->sum('cantidad_despachada');
+            $pesoTotal   = $items->sum(fn($i) => ($i->product->peso ?? 0) * $i->cantidad_solicitada / 1000);
+            $pctPaleta   = $totalUds > 0 ? round(($despachadas / $totalUds) * 100) : 0;
+            $colorPaleta = $pctPaleta === 100 ? '#22c55e' : ($pctPaleta > 40 ? '#f59e0b' : '#ef4444');
+        @endphp
+        <div class="paleta-row">
+
+            {{-- Nombre + stats --}}
+            <div class="paleta-name">
+                <span class="paleta-badge">🪵 {{ $nombrePaleta }}</span>
+                <div class="paleta-stats">
+                    <span class="paleta-stat">📦 {{ $totalUds }} u.</span>
+                    <span class="paleta-stat">⚖️ {{ number_format($pesoTotal, 1) }} kg</span>
+                    <span class="paleta-stat" style="color:{{ $colorPaleta }};font-weight:700;">{{ $pctPaleta }}%</span>
+                </div>
+            </div>
+
+            {{-- Barra de progreso de la paleta --}}
+            <div class="paleta-peso-bar" style="margin-bottom:6px;">
+                <div class="paleta-peso-fill" style="width:{{ $pctPaleta }}%;background:{{ $colorPaleta }};"></div>
+            </div>
+
+            {{-- Items de la paleta --}}
+            <div class="paleta-items">
+            @foreach($items as $item)
+            @php
+                $estadoClass = $item->estado_item === 'COMPLETO'   ? 'est-completo'
+                             : ($item->estado_item === 'PARCIAL'    ? 'est-parcial'
+                             : 'est-incompleto');
+                $dot = $item->estado_item === 'COMPLETO' ? '#22c55e'
+                     : ($item->estado_item === 'PARCIAL'  ? '#f59e0b' : '#ef4444');
+            @endphp
+            <div class="paleta-item">
+                <span class="paleta-item-name">
+                    <span style="width:7px;height:7px;border-radius:50%;background:{{ $dot }};flex-shrink:0;display:inline-block;"></span>
+                    {{ \Str::limit($item->product->nombre ?? 'Producto', 28) }}
+                </span>
+                <span class="paleta-item-right">
+                    <span class="paleta-item-qty">{{ $item->cantidad_despachada }}/{{ $item->cantidad_solicitada }}</span>
+                    <span class="paleta-item-estado {{ $estadoClass }}">{{ $item->estado_item }}</span>
+                </span>
+            </div>
+            @endforeach
+            </div>
+
+        </div>
+        @endforeach
+
+        {{-- Items sin paleta --}}
+        @if($sinPaleta->count())
+        <div class="paleta-row" style="background:#fafafa;">
+            <div class="paleta-name">
+                <span class="paleta-badge" style="background:#94a3b8;">⚠️ Sin paleta</span>
+                <div class="paleta-stats">
+                    <span class="paleta-stat">📦 {{ $sinPaleta->count() }} ítem{{ $sinPaleta->count() > 1 ? 's' : '' }}</span>
+                </div>
+            </div>
+            <div class="paleta-items" style="margin-top:5px;">
+            @foreach($sinPaleta as $item)
+            <div class="paleta-item" style="background:#fff8f0;border-color:#fed7aa;">
+                <span class="paleta-item-name" style="color:#92400e;">
+                    <span style="width:7px;height:7px;border-radius:50%;background:#f59e0b;flex-shrink:0;display:inline-block;"></span>
+                    {{ \Str::limit($item->product->nombre ?? 'Producto', 28) }}
+                </span>
+                <span class="paleta-item-qty" style="color:#92400e;">{{ $item->cantidad_solicitada }} u.</span>
+            </div>
+            @endforeach
+            </div>
+        </div>
+        @endif
+
+        </div>{{-- /.paleta-grid --}}
+    </div>{{-- /.paletas-panel --}}
+
+    @endif
+    {{-- ── FIN PALETAS ── --}}
+
+    <hr class="div">
+
     {{-- Botones --}}
     <div class="btn-row">
         <a href="{{ route('orders.edit',$order) }}" class="btn btn-blue">✏️ Editar</a>
@@ -207,17 +426,27 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
         <button type="submit" class="btn btn-red btn-full" style="width:100%;">🗑 Eliminar orden</button>
     </form>
 
-</div>
+</div>{{-- /.order-card --}}
 
 @endforeach
-
-</div>
+</div>{{-- /.cards --}}
 
 {{-- Paginación --}}
 <div style="margin-top:1.25rem;">
     {{ $orders->links() }}
 </div>
 
-</div>
+</div>{{-- /.pg --}}
+
+<script>
+function togglePaletas(el) {
+    const orderId = el.id.replace('toggle-', '');
+    const panel   = document.getElementById('panel-' + orderId);
+    const isOpen  = panel.classList.contains('open');
+
+    panel.classList.toggle('open', !isOpen);
+    el.classList.toggle('open', !isOpen);
+}
+</script>
 
 @endsection

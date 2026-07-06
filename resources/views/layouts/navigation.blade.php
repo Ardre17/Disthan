@@ -616,6 +616,7 @@ En línea
             <a href="{{ route('precintos.index') }}"><span>🔒</span><span>Precintos</span></a>
             <a href="{{ route('cajas.index') }}"><span>📦</span><span>Cajas</span></a>
         @endif
+        <a href="{{ route('cajas.index') }}"><span>📦</span><span>Cajas</span></a>
         <a href="/products"><span>📦</span><span>Productos</span></a>
         <a href="{{ route('warehouse.index') }}"><span>🗺️</span><span>Mapa del Almacén</span></a>
 
