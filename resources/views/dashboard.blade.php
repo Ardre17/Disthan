@@ -429,6 +429,7 @@ document.addEventListener("DOMContentLoaded", function(){
     const mensaje = document.getElementById("fano-message");
 
     const imagen = document.getElementById("fano-img");
+    const boton=document.getElementById("fano-btn");
 
     mensaje.innerHTML = "<strong>"+saludo+"</strong><br>Bienvenido a DISTAN.";
 
@@ -446,6 +447,7 @@ document.addEventListener("DOMContentLoaded", function(){
 
             mensaje.innerHTML="<strong>⚠ Atención.</strong><br>Encontré <b>"+stock+"</b> productos con stock bajo.";
 
+            boton.style.display="block";
             imagen.src="/assets/fano/expresiones/invierno/Pensando.png";
 
         }
@@ -460,16 +462,57 @@ document.addEventListener("DOMContentLoaded", function(){
 
     },8000);
 
-    imagen.onclick=function(){
+    function mostrarFano() {
 
-        chat.classList.remove("fano-hidden");
+    chat.classList.remove("fano-hidden");
+    chat.classList.add("fano-show");
 
-        chat.classList.add("fano-show");
+    // Vuelve a saludar
+    imagen.src = "/assets/fano/expresiones/invierno/Saludando.png";
+    mensaje.innerHTML = "<strong>👋 ¡Hola de nuevo!</strong><br>¿En qué puedo ayudarte?";
 
-    };
+    clearTimeout(window.fanoTimer);
+
+    // Después de 2.5 segundos revisa el stock
+    setTimeout(function () {
+
+        if (stock == 0) {
+
+            mensaje.innerHTML = "<strong>✅ Todo está correcto.</strong><br>No encontré productos con stock bajo.";
+
+            imagen.src = "/assets/fano/expresiones/invierno/Saludando.png";
+            boton.style.display="none";
+
+        } else {
+
+            mensaje.innerHTML = "<strong>⚠ Atención.</strong><br>Encontré <b>" + stock + "</b> productos con stock bajo.";
+
+            imagen.src = "/assets/fano/expresiones/invierno/Pensando.png";
+            boton.style.display="none";
+
+        }
+
+    }, 2500);
+
+    window.fanoTimer = setTimeout(function () {
+
+        chat.classList.remove("fano-show");
+        chat.classList.add("fano-hidden");
+
+    }, 8000);
+
+}
+
+mostrarFano();
+
+imagen.addEventListener("click", mostrarFano);
 
 });
+boton.onclick=function(){
 
+    window.location.href="{{ route('products.index') }}";
+
+};
 </script>
 
 @endsection

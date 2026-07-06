@@ -2,9 +2,13 @@
 
     <div id="fano-chat" class="fano-show">
 
-        <div id="fano-message">
+        <div id="fano-message"></div>
 
-        </div>
+        <button
+            id="fano-btn"
+            style="display:none;">
+            Ver productos
+        </button>
 
     </div>
 

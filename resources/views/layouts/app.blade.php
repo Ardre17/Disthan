@@ -24,13 +24,8 @@
 }
 
 #fano-img{
-
-    width:210px;
-
-    cursor:pointer;
-
-    transition:.3s;
-
+    width:200px;
+    height:auto;
 }
 
 #fano-img:hover{
@@ -43,39 +38,40 @@
 
     position:absolute;
 
-    bottom:190px;
+    bottom:260px;
 
-    right:40px;
+    right:120px;
 
-    width:240px;
+    width:250px;
 
-    background:white;
+    background:#fff;
 
     border-radius:18px;
 
-    padding:16px;
+    padding:18px;
 
     box-shadow:0 10px 30px rgba(0,0,0,.18);
 
     transition:.4s;
 
-}
+    z-index:10000;
 
+}
 #fano-chat::after{
 
     content:"";
 
     position:absolute;
 
-    bottom:-14px;
+    right:-14px;
 
-    right:45px;
+    bottom:30px;
 
-    border-left:12px solid transparent;
+    border-top:12px solid transparent;
 
-    border-right:12px solid transparent;
+    border-bottom:12px solid transparent;
 
-    border-top:16px solid white;
+    border-left:16px solid white;
 
 }
 
@@ -92,6 +88,35 @@
     opacity:1;
 
     visibility:visible;
+
+}
+#fano-btn{
+
+    margin-top:15px;
+
+    width:100%;
+
+    border:none;
+
+    background:#2563eb;
+
+    color:white;
+
+    padding:12px;
+
+    border-radius:12px;
+
+    cursor:pointer;
+
+    font-weight:bold;
+
+    transition:.3s;
+
+}
+
+#fano-btn:hover{
+
+    background:#1d4ed8;
 
 }
         body {
