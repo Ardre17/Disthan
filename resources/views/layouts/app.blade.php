@@ -11,6 +11,75 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 
     <style>
+        #fano-container{
+
+    position:fixed;
+
+    right:25px;
+
+    bottom:20px;
+
+    z-index:9999;
+
+    display:flex;
+
+    align-items:flex-end;
+
+    gap:15px;
+
+}
+
+#fano-img{
+
+    width:240px;
+
+    transition:.3s;
+
+    cursor:pointer;
+
+}
+
+#fano-img:hover{
+
+    transform:scale(1.05);
+
+}
+
+#fano-chat{
+
+    background:#fff;
+
+    border-radius:18px;
+
+    padding:18px;
+
+    width:220px;
+
+    box-shadow:0 10px 35px rgba(0,0,0,.15);
+
+    position:relative;
+
+    font-size:15px;
+
+}
+
+#fano-chat:after{
+
+    content:"";
+
+    position:absolute;
+
+    right:-18px;
+
+    bottom:30px;
+
+    border-top:10px solid transparent;
+
+    border-bottom:10px solid transparent;
+
+    border-left:20px solid white;
+
+}
         body {
             margin:0;
             font-family:sans-serif;
@@ -26,7 +95,7 @@
 
     </style>
 </head>
-
+<x-fano />
 <body>
 
     @include('layouts.navigation')

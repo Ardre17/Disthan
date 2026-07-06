@@ -614,7 +614,6 @@ En línea
             <a href="{{ route('labels.index') }}"><span>📒</span><span>Control de Etiquetas</span></a>
             <a href="{{ route('stickers.index') }}"><span>🏷️</span><span>Stickers de tapa</span></a>
             <a href="{{ route('precintos.index') }}"><span>🔒</span><span>Precintos</span></a>
-            <a href="{{ route('cajas.index') }}"><span>📦</span><span>Cajas</span></a>
         @endif
         <a href="{{ route('cajas.index') }}"><span>📦</span><span>Cajas</span></a>
         <a href="/products"><span>📦</span><span>Productos</span></a>
