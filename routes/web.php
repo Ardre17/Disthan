@@ -22,6 +22,7 @@ use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\StickerController;
 use App\Http\Controllers\PrecintoController;
 use App\Http\Controllers\CajaController;
+use App\Http\Controllers\OrderPreparationController;
 
 Route::resource('cajas', CajaController::class);
 Route::post('cajas/{caja}/movimiento', [CajaController::class, 'movimiento'])
@@ -208,6 +209,25 @@ Route::middleware('auth')->group(function () {
 
     Route::get('/control-stickers', [InventoryController::class, 'controlStickers']);
     Route::get('/control-precintos', [InventoryController::class, 'controlPrecintos']);
+
+    /*
+|--------------------------------------------------------------------------
+| PREPARACIÓN DE PEDIDOS
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('preparation')
+    ->name('preparation.')
+    ->controller(OrderPreparationController::class)
+    ->group(function () {
+
+        Route::get('/', 'index')
+            ->name('index');
+
+        Route::get('/{order}', 'show')
+            ->name('show');
+
+    });
 });
 
 require __DIR__.'/auth.php';
