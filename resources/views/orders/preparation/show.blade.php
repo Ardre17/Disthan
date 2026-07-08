@@ -44,64 +44,220 @@
 
     </div>
 
-    @foreach($order->details as $detail)
+    @if($productoActual)
 
-    <div class="card mb-3">
+<div class="card shadow-lg border-0">
 
-        <div class="card-body">
+    <div class="card-body p-5">
 
-            <div class="row">
+        <div class="d-flex justify-content-between align-items-center mb-4">
 
-                <div class="col-md-8">
+            <h4 class="mb-0">
+                Producto {{ $numeroProducto }} de {{ $total }}
+            </h4>
 
-                    <h5>
+            <span class="badge bg-primary fs-6">
+                {{ $progreso }}%
+            </span>
 
-                        {{ $detail->product->nombre }}
+        </div>
 
-                    </h5>
+        <div class="progress mb-4" style="height:12px;">
+            <div class="progress-bar bg-success"
+                style="width: {{ $progreso }}%">
+            </div>
+        </div>
 
-                    <small>
+        <div class="text-center mb-4">
 
-                        SKU:
-                        {{ $detail->product->sku }}
+            <div class="text-muted mb-2">
+                SKU {{ $productoActual->product->sku }}
+            </div>
 
-                    </small>
+            <h1 class="fw-bold">
+                {{ $productoActual->product->nombre }}
+            </h1>
 
-                </div>
+        </div>
 
-                <div class="col-md-2">
+        @if(!empty($productoActual->product->advertencias))
 
-                    <strong>
+            <div class="alert alert-warning text-center">
 
-                        Solicitado
+                <strong>
 
-                    </strong>
+                    {{ $productoActual->product->advertencias }}
 
-                    <br>
+                </strong>
 
-                    {{ $detail->cantidad_solicitada }}
+            </div>
 
-                </div>
+        @endif
 
-                <div class="col-md-2 text-end">
+        <div class="row text-center mt-4">
 
-                    <button
-                        class="btn btn-success">
+            <div class="col-md-4">
 
-                        ✔ Preparado
+                <h6>Solicitado</h6>
 
-                    </button>
+                <h2>
 
-                </div>
+                    {{ $productoActual->cantidad_solicitada }}
+
+                </h2>
+
+            </div>
+
+            <div class="col-md-4">
+
+                <h6>Preparado</h6>
+
+                <input
+                    id="cantidad_preparada"
+                    type="number"
+                    class="form-control form-control-lg text-center"
+                    value="{{ $productoActual->cantidad_solicitada }}">
+
+            </div>
+
+            <div class="col-md-4">
+
+                <h6>Precio</h6>
+
+                <h2>
+
+                    S/
+
+                    {{ number_format($productoActual->precio_unitario,2) }}
+
+                </h2>
 
             </div>
 
         </div>
 
+        <div class="d-grid gap-3 mt-5">
+
+            <button
+                id="btnPreparado"
+                class="btn btn-success btn-lg">
+
+                ✔ PRODUCTO PREPARADO
+
+            </button>
+
+            <button
+                id="btnNoEncontrado"
+                class="btn btn-danger btn-lg">
+
+                ❌ NO ENCONTRADO
+
+            </button>
+
+            <button
+                id="btnSaltar"
+                class="btn btn-warning btn-lg">
+
+                ⏭ SALTAR
+
+            </button>
+
+        </div>
+
     </div>
 
-    @endforeach
+</div>
+
+@else
+
+<div class="alert alert-success text-center">
+
+    <h3>
+
+        🎉 Pedido armado correctamente
+
+    </h3>
+
+    <p>
+
+        Todos los productos fueron preparados.
+
+    </p>
+
+</div>
+
+@endif
 
 </div>
 
 @endsection
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const btn = document.getElementById("btnPreparado");
+
+    if (!btn) return;
+
+    btn.addEventListener("click", function () {
+
+        btn.disabled = true;
+        btn.innerHTML = "Guardando...";
+
+        fetch("{{ route('preparation.save', $productoActual->id) }}", {
+
+            method: "POST",
+
+            headers: {
+
+                "Content-Type": "application/json",
+
+                "X-CSRF-TOKEN": "{{ csrf_token() }}",
+
+                "Accept": "application/json"
+
+            },
+
+            body: JSON.stringify({
+
+                cantidad_preparada: document.getElementById("cantidad_preparada").value,
+
+                observacion: ""
+
+            })
+
+        })
+
+        .then(response => response.json())
+
+        .then(data => {
+
+            if (data.finished) {
+
+                location.reload();
+
+                return;
+
+            }
+
+            location.reload();
+
+        })
+
+        .catch(error => {
+
+            console.error(error);
+
+            alert("Ocurrió un error al guardar.");
+
+            btn.disabled = false;
+
+            btn.innerHTML = "✔ PRODUCTO PREPARADO";
+
+        });
+
+    });
+
+});
+
+</script>
