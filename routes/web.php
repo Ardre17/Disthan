@@ -24,6 +24,7 @@ use App\Http\Controllers\PrecintoController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\OrderPreparationController;
 
+
 Route::resource('cajas', CajaController::class);
 Route::post('cajas/{caja}/movimiento', [CajaController::class, 'movimiento'])
      ->name('cajas.movimiento');

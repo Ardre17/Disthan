@@ -16,35 +16,25 @@ class KardexController extends Controller
         $clientId   = $request->input('client_id');
         $dateFrom   = $request->input('date_from');
         $dateTo     = $request->input('date_to');
-        $perPage    = 20; // filas por página
+        $perPage    = 20;
 
-        // Órdenes con sus detalles y relaciones
         $query = Order::with(['client', 'details.product'])
             ->whereIn('estado', ['COMPLETO', 'PARCIAL', 'INCOMPLETO'])
             ->orderBy('fecha_pedido', 'desc');
 
-        if ($clientId) {
-            $query->where('client_id', $clientId);
-        }
-        if ($dateFrom) {
-            $query->whereDate('fecha_pedido', '>=', $dateFrom);
-        }
-        if ($dateTo) {
-            $query->whereDate('fecha_pedido', '<=', $dateTo);
-        }
+        if ($clientId)  $query->where('client_id', $clientId);
+        if ($dateFrom)  $query->whereDate('fecha_pedido', '>=', $dateFrom);
+        if ($dateTo)    $query->whereDate('fecha_pedido', '<=', $dateTo);
         if ($productId) {
             $query->whereHas('details', fn($q) => $q->where('product_id', $productId));
         }
 
         $orders = $query->get();
 
-        // Construir colección completa de movimientos
         $movimientos = collect();
-
         foreach ($orders as $order) {
             foreach ($order->details as $detail) {
                 if ($productId && $detail->product_id != $productId) continue;
-
                 $movimientos->push([
                     'fecha'               => $order->fecha_pedido,
                     'numero_orden'        => $order->numero_orden,
@@ -62,17 +52,48 @@ class KardexController extends Controller
             }
         }
 
-        // KPIs — sobre el total completo (antes de paginar)
+        // KPIs globales
         $totalSalidas       = $movimientos->sum('cantidad_despachada');
         $totalMovimientos   = $movimientos->count();
         $clientesActivos    = $movimientos->pluck('client_id')->unique()->count();
         $productosMovidos   = $movimientos->pluck('product_id')->unique()->count();
         $totalFacturado     = $movimientos->sum('subtotal');
 
-        // Paginación manual sobre la colección
-        $currentPage  = LengthAwarePaginator::resolveCurrentPage();
-        $paginados    = $movimientos->slice(($currentPage - 1) * $perPage, $perPage)->values();
+        // ── Datos para el gráfico (agrupados por mes) ──────────────────────
+        // Solo se construye cuando hay filtro de producto o cliente
+        $chartData = null;
+        if ($productId || $clientId) {
+            $porMes = $movimientos
+                ->groupBy(fn($m) => \Carbon\Carbon::parse($m['fecha'])->format('Y-m'))
+                ->sortKeys()
+                ->take(-12)
+                ->map(fn($g) => [
+                    'despachado' => $g->sum('cantidad_despachada'),
+                    'solicitado' => $g->sum('cantidad_solicitada'),
+                    'subtotal'   => $g->sum('subtotal'),
+                    'ordenes'    => $g->pluck('numero_orden')->unique()->count(),
+                ]);
 
+            $chartData = [
+                'labels'     => $porMes->keys()
+                                    ->map(fn($k) => \Carbon\Carbon::parse($k.'-01')->translatedFormat('M Y'))
+                                    ->values(),
+                'despachado' => $porMes->pluck('despachado')->values(),
+                'solicitado' => $porMes->pluck('solicitado')->values(),
+                'subtotal'   => $porMes->pluck('subtotal')->values(),
+                'ordenes'    => $porMes->pluck('ordenes')->values(),
+                'producto'   => $productId
+                                ? optional(Product::find($productId))->nombre
+                                : null,
+                'cliente'    => $clientId
+                                ? optional(Client::find($clientId))->razon_social
+                                : null,
+            ];
+        }
+
+        // Paginación manual
+        $currentPage = LengthAwarePaginator::resolveCurrentPage();
+        $paginados   = $movimientos->slice(($currentPage - 1) * $perPage, $perPage)->values();
         $movimientosPaginados = new LengthAwarePaginator(
             $paginados,
             $movimientos->count(),
@@ -81,12 +102,10 @@ class KardexController extends Controller
             ['path' => $request->url(), 'query' => $request->query()]
         );
 
-        // Stock actual directo desde Product
         $productosQuery = Product::where('activo', true)->orderBy('nombre');
         if ($productId) $productosQuery->where('id', $productId);
         $stockProductos = $productosQuery->get();
 
-        // Selectores de filtro
         $productos = Product::where('activo', true)->orderBy('nombre')->get();
         $clientes  = Client::orderBy('razon_social')->get();
 
@@ -103,7 +122,8 @@ class KardexController extends Controller
             'productId',
             'clientId',
             'dateFrom',
-            'dateTo'
+            'dateTo',
+            'chartData'
         ));
     }
 }

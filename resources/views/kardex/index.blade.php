@@ -130,6 +130,154 @@
     </form>
 </div>
 
+
+{{-- ═══════════════════════════════════════════════════════
+     GRÁFICO DE TENDENCIAS — solo visible al filtrar
+═══════════════════════════════════════════════════════ --}}
+@if(!is_null($chartData))
+@php
+    $chartTitle = $chartData['producto']
+        ? '📈 Tendencia de despachos · ' . $chartData['producto']
+        : ($chartData['cliente'] ? '📈 Tendencia de despachos · ' . $chartData['cliente'] : '📈 Tendencia');
+    $totalDesp  = collect($chartData['despachado'])->sum();
+    $totalSoli  = collect($chartData['solicitado'])->sum();
+    $totalFact  = collect($chartData['subtotal'])->sum();
+    $totalOrd   = collect($chartData['ordenes'])->sum();
+    $eficiencia = $totalSoli > 0 ? round(($totalDesp / $totalSoli) * 100, 1) : 0;
+@endphp
+
+<div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;margin-bottom:20px;">
+
+    {{-- Header azul --}}
+    <div style="background:#1890ff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
+        <div style="font-size:13px;font-weight:700;color:white;">{{ $chartTitle }}</div>
+        <span style="font-size:11px;color:rgba(255,255,255,.7);">Últimos 12 meses · agrupado por mes</span>
+    </div>
+
+    {{-- Mini KPIs del gráfico --}}
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid #f0f0f0;">
+        <div style="padding:12px 18px;border-right:1px solid #f0f0f0;">
+            <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Total despachado</p>
+            <p style="font-size:20px;font-weight:700;color:#cf1322;margin:3px 0 0;">{{ number_format($totalDesp) }} u.</p>
+        </div>
+        <div style="padding:12px 18px;border-right:1px solid #f0f0f0;">
+            <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Total solicitado</p>
+            <p style="font-size:20px;font-weight:700;color:#595959;margin:3px 0 0;">{{ number_format($totalSoli) }} u.</p>
+        </div>
+        <div style="padding:12px 18px;border-right:1px solid #f0f0f0;">
+            <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Facturado (filtro)</p>
+            <p style="font-size:20px;font-weight:700;color:#389e0d;margin:3px 0 0;">S/ {{ number_format($totalFact, 2) }}</p>
+        </div>
+        <div style="padding:12px 18px;">
+            <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Eficiencia despacho</p>
+            <p style="font-size:20px;font-weight:700;margin:3px 0 0;
+                color:{{ $eficiencia >= 90 ? '#389e0d' : ($eficiencia >= 60 ? '#d48806' : '#cf1322') }};">
+                {{ $eficiencia }}%
+            </p>
+        </div>
+    </div>
+
+    {{-- Canvas --}}
+    <div style="padding:16px 20px;">
+        @if(count($chartData['labels']) === 0)
+            <div style="text-align:center;padding:40px;color:#bfbfbf;">
+                <p style="font-size:28px;margin:0;">📭</p>
+                <p style="margin:8px 0 0;font-size:13px;">Sin movimientos en el período seleccionado</p>
+            </div>
+        @else
+            <div style="height:240px;position:relative;">
+                <canvas id="kardexChart"></canvas>
+            </div>
+        @endif
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+(function(){
+    const labels     = @json($chartData['labels']);
+    const despachado = @json($chartData['despachado']);
+    const solicitado = @json($chartData['solicitado']);
+    const subtotales = @json($chartData['subtotal']);
+
+    if (!labels.length) return;
+
+    const ctx = document.getElementById('kardexChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels,
+            datasets: [
+                {
+                    label: 'Despachado',
+                    data: despachado,
+                    borderColor: '#cf1322',
+                    backgroundColor: 'rgba(207,19,34,.07)',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#cf1322',
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    tension: 0.35,
+                    fill: true,
+                    yAxisID: 'y',
+                },
+                {
+                    label: 'Solicitado',
+                    data: solicitado,
+                    borderColor: '#1890ff',
+                    backgroundColor: 'rgba(24,144,255,.05)',
+                    borderWidth: 2,
+                    pointBackgroundColor: '#1890ff',
+                    pointRadius: 3,
+                    pointHoverRadius: 5,
+                    tension: 0.35,
+                    fill: false,
+                    borderDash: [5,3],
+                    yAxisID: 'y',
+                },
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { font:{ size:11 }, boxWidth:12, padding:16 }
+                },
+                tooltip: {
+                    callbacks: {
+                        afterBody: function(items) {
+                            const idx = items[0]?.dataIndex;
+                            if (idx === undefined) return '';
+                            const sub = subtotales[idx] ?? 0;
+                            return ['', `💰 Facturado: S/ ${parseFloat(sub).toLocaleString('es-PE', {minimumFractionDigits:2})}`];
+                        },
+                        label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()} u.`
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: { color:'#f5f5f5' },
+                    ticks: { font:{ size:10 }, color:'#8c8c8c',
+                        callback: v => v.toLocaleString() + ' u.'
+                    }
+                },
+                x: {
+                    grid: { display:false },
+                    ticks: { font:{ size:10 }, color:'#8c8c8c' }
+                }
+            }
+        }
+    });
+})();
+</script>
+@endif
+{{-- ── FIN GRÁFICO ── --}}
+
 {{-- GRID PRINCIPAL --}}
 <div class="kx-main-grid" style="display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start;">
 
