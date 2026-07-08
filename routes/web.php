@@ -217,16 +217,39 @@ Route::middleware('auth')->group(function () {
 |--------------------------------------------------------------------------
 */
 
+/*
+|--------------------------------------------------------------------------
+| PREPARACIÓN DE PEDIDOS
+|--------------------------------------------------------------------------
+*/
+
 Route::prefix('preparation')
     ->name('preparation.')
     ->controller(OrderPreparationController::class)
     ->group(function () {
 
+        // Bandeja
         Route::get('/', 'index')
             ->name('index');
 
+        // Asistente de preparación
         Route::get('/{order}', 'show')
             ->name('show');
+
+        // Acciones del asistente
+        Route::post('/detail/{detail}/save', 'save')
+            ->name('save');
+
+        Route::post('/detail/{detail}/skip', 'skip')
+            ->name('skip');
+
+        Route::post('/detail/{detail}/not-found', 'notFound')
+            ->name('notFound');
+
+        // Finalizar preparación
+        Route::post('/{order}/finish', 'finish')
+            ->name('finish');
+    });
 
     });
 });

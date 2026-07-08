@@ -313,7 +313,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 id="producto-{{ $detail->product->barcode }}"
                 data-barcode="{{ $detail->product->barcode }}"
                 data-box-barcode="{{ $detail->product->box_barcode }}">
-             style="border-left-color:{{ $bc }};">
             <div class="prod-top">
                 <div>
                     <div class="prod-name">📦 {{ $detail->product->nombre }}</div>
