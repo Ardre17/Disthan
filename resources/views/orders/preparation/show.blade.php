@@ -402,68 +402,95 @@ body{background:var(--erp-bg) !important;}
 
 </div>
 </div>
-
+@if($productoActual)
 <script>
+
 document.addEventListener("DOMContentLoaded", function () {
 
-    var btn = document.getElementById("btnPreparado");
-    if (!btn) return;
+    const btnPreparado = document.getElementById("btnPreparado");
+    const btnNoEncontrado = document.getElementById("btnNoEncontrado");
+    const btnSaltar = document.getElementById("btnSaltar");
 
-    btn.addEventListener("click", function () {
-        btn.disabled = true;
+    function enviar(url, datos = {}){
+
         document.getElementById("savingOverlay").classList.add("show");
 
-        fetch("{{ route('preparation.save', $productoActual->id) }}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRF-TOKEN": "{{ csrf_token() }}",
-                "Accept": "application/json"
-            },
-            body: JSON.stringify({
-                cantidad_preparada: document.getElementById("cantidad_preparada").value,
-                observacion: ""
-            })
-        })
-        .then(function(response){ return response.json(); })
-        .then(function(data){
-            document.getElementById("savingOverlay").classList.remove("show");
-            if (data.finished) {
-                window.location.reload();
-                return;
-            }
-            window.location.reload();
-        })
-        .catch(function(error){
-            console.error(error);
-            alert("Ocurrió un error. Intenta de nuevo.");
-            document.getElementById("savingOverlay").classList.remove("show");
-            btn.disabled = false;
-        });
-    });
+        fetch(url,{
 
-    // Botón no encontrado y saltar — sin lógica adicional, 
-    // agregar routes cuando estén disponibles
-    var btnNo = document.getElementById("btnNoEncontrado");
-    if (btnNo) {
-        btnNo.addEventListener("click", function(){
-            if(confirm("¿Confirmas que este producto NO fue encontrado?")){
-                // Aquí conectas tu ruta cuando la tengas
-                // window.location.href = route;
-            }
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json",
+                "X-CSRF-TOKEN":"{{ csrf_token() }}",
+                "Accept":"application/json"
+            },
+
+            body:JSON.stringify(datos)
+
+        })
+
+        .then(r=>r.json())
+
+        .then(data=>{
+
+            location.reload();
+
+        })
+
+        .catch(e=>{
+
+            console.error(e);
+
+            alert("Ocurrió un error.");
+
+            document.getElementById("savingOverlay").classList.remove("show");
+
         });
+
     }
 
-    var btnSaltar = document.getElementById("btnSaltar");
-    if (btnSaltar) {
-        btnSaltar.addEventListener("click", function(){
-            if(confirm("¿Deseas saltar este producto y continuar con el siguiente?")){
-                window.location.reload();
-            }
+    if(btnPreparado){
+
+        btnPreparado.addEventListener("click",function(){
+
+            enviar(
+                "{{ route('preparation.save',$productoActual->id) }}",
+                {
+                    cantidad_preparada:document.getElementById("cantidad_preparada").value,
+                    observacion:""
+                }
+            );
+
         });
+
+    }
+
+    if(btnNoEncontrado){
+
+        btnNoEncontrado.addEventListener("click",function(){
+
+            enviar(
+                "{{ route('preparation.notFound',$productoActual->id) }}"
+            );
+
+        });
+
+    }
+
+    if(btnSaltar){
+
+        btnSaltar.addEventListener("click",function(){
+
+            enviar(
+                "{{ route('preparation.skip',$productoActual->id) }}"
+            );
+
+        });
+
     }
 
 });
-</script>
 
+</script>
+@endif
 @endsection
