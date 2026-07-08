@@ -210,13 +210,24 @@
         </div>
         <p style="margin:10px 0 0;color:#475569;">👤 {{ $nombreCliente }}</p>
 
-        <a href="{{ route('orders.operario', $order) }}"
-           style="
-            display:block;margin-top:14px;background:#16a34a;color:white;
-            padding:10px;text-align:center;border-radius:8px;text-decoration:none;
-           ">
-            🚀 Iniciar Despacho
-        </a>
+        <div style="display:flex;flex-direction:column;gap:10px;margin-top:14px;">
+
+
+    <a href="{{ route('preparation.show', $order) }}"
+       style="
+        display:block;
+        background:#2563eb;
+        color:white;
+        padding:10px;
+        text-align:center;
+        border-radius:8px;
+        text-decoration:none;
+        font-weight:bold;
+       ">
+        📦 Iniciar Preparación
+    </a>
+
+</div>
     </div>
 @empty
     <div class="pd-card" style="grid-column:1/-1;text-align:center;padding:60px 20px;color:#94a3b8;">
