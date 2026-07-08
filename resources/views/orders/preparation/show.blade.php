@@ -262,7 +262,6 @@ body{background:var(--erp-bg) !important;}
 
 <div class="erp-bar">
     <div class="erp-bar-left">
-        <div class="erp-logo">JOYBER PERÚ</div>
         <div class="erp-sep"></div>
         <div class="erp-module">Preparación de pedido</div>
     </div>

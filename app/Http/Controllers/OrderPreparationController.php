@@ -104,11 +104,16 @@ class OrderPreparationController extends Controller
     */
 
     public function skip(OrderDetail $detail)
-    {
-        return response()->json(
-            $this->obtenerSiguienteProducto($detail->order)
-        );
-    }
+{
+    $detail->update([
+        'preparado' => true,
+        'observacion_preparacion' => 'SALTADO'
+    ]);
+
+    return response()->json(
+        $this->obtenerSiguienteProducto($detail->order)
+    );
+}
 
     /*
     |--------------------------------------------------------------------------
@@ -117,15 +122,16 @@ class OrderPreparationController extends Controller
     */
 
     public function notFound(OrderDetail $detail)
-    {
-        $detail->update([
-            'observacion_preparacion' => 'PRODUCTO NO ENCONTRADO'
-        ]);
+{
+    $detail->update([
+        'preparado' => true,
+        'observacion_preparacion' => 'PRODUCTO NO ENCONTRADO'
+    ]);
 
-        return response()->json(
-            $this->obtenerSiguienteProducto($detail->order)
-        );
-    }
+    return response()->json(
+        $this->obtenerSiguienteProducto($detail->order)
+    );
+}
 
     /*
     |--------------------------------------------------------------------------
