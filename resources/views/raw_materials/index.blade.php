@@ -266,13 +266,31 @@
 
 {{-- ── Header ── --}}
 <div class="page-hdr">
+
     <div>
-        <div class="page-title">Control de materia prima</div>
-        <div class="page-sub">Control de materias primas disponibles para producción</div>
+        <div class="page-title">
+            Control de materia prima
+        </div>
+
+        <div class="page-sub">
+            Control de materias primas disponibles para producción
+        </div>
     </div>
-    <a href="{{ route('raw-materials.create') }}" class="btn-new">
-        ➕ Nueva materia prima
-    </a>
+
+    <div style="display:flex;gap:8px;">
+
+        <a href="{{ route('raw-material-entries.create') }}"
+           class="btn-new">
+            📥 Entrada de stock
+        </a>
+
+        <a href="{{ route('raw-materials.create') }}"
+           class="btn-new">
+            ➕ Nueva materia prima
+        </a>
+
+    </div>
+
 </div>
 
 {{-- ── Alertas sesión ── --}}
