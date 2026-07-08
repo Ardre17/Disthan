@@ -249,7 +249,6 @@ Route::prefix('preparation')
         // Finalizar preparación
         Route::post('/{order}/finish', 'finish')
             ->name('finish');
-
     });
 });
 

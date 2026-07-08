@@ -149,7 +149,6 @@ public function save(Request $request, OrderDetail $detail)
 
 ]);
 
-}
 public function skip(OrderDetail $detail)
 {
     $order = $detail->order;
