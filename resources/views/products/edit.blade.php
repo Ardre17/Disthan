@@ -123,6 +123,15 @@ textarea{
 </div>
 
 <div class="form-group">
+    <label class="form-label">Código de Caja</label>
+    <input
+        type="text"
+        class="form-control"
+        name="box_barcode"
+        value="{{ old('box_barcode', $product->box_barcode ?? '') }}">
+</div>
+
+<div class="form-group">
 <label>Nombre</label>
 <input type="text"
        name="nombre"

@@ -13,7 +13,7 @@ class Product extends Model
 
         'sku',
         'barcode',
-
+        'box_barcode',
         'nombre',
         'marca',
         'category_id',

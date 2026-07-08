@@ -630,8 +630,13 @@ if($product->fecha_vencimiento){
 </div>
 
                 <div class="info">
-                    <span>Código</span>
+                    <span>Código Unidad</span>
                     <span>{{ $product->barcode }}</span>
+                </div>
+
+                <div class="info">
+                    <span>Código Caja</span>
+                    <span>{{ $product->box_barcode }}</span>
                 </div>
 
                 <div class="rotation

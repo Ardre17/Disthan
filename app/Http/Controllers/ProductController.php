@@ -18,10 +18,10 @@ class ProductController extends Controller
         $query->where(function($q) use ($request){
 
             $q->where('nombre', 'like', '%'.$request->search.'%')
-              ->orWhere('sku', 'like', '%'.$request->search.'%')
-              ->orWhere('barcode', 'like', '%'.$request->search.'%')
-              ->orWhere('lote', 'like', '%'.$request->search.'%');
-
+                ->orWhere('sku', 'like', '%'.$request->search.'%')
+                ->orWhere('barcode', 'like', '%'.$request->search.'%')
+                ->orWhere('box_barcode', 'like', '%'.$request->search.'%')
+                ->orWhere('lote', 'like', '%'.$request->search.'%');
         });
     }
 
@@ -78,6 +78,7 @@ $categories = Category::where('activo', true)
         Product::create([
             'sku' => $request->sku,
             'barcode' => $request->barcode,
+            'box_barcode' => $request->box_barcode,
             'category_id' => $request->category_id,
             'nombre' => $request->nombre,
             'marca' => $request->marca,
@@ -146,6 +147,7 @@ $categories = Category::where('activo', true)
 
             'sku' => $request->sku,
             'barcode' => $request->barcode,
+            'box_barcode' => $request->box_barcode,
             'category_id' => $request->category_id,
             'nombre' => $request->nombre,
             'marca' => $request->marca,

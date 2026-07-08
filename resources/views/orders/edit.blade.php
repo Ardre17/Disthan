@@ -309,7 +309,10 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                  : 0;
         @endphp
 
-        <div class="prod-card" id="producto-{{ $detail->product->barcode }}"
+        <div class="prod-card"
+                id="producto-{{ $detail->product->barcode }}"
+                data-barcode="{{ $detail->product->barcode }}"
+                data-box-barcode="{{ $detail->product->box_barcode }}">
              style="border-left-color:{{ $bc }};">
             <div class="prod-top">
                 <div>
@@ -568,12 +571,14 @@ scanner.addEventListener('keydown', function(e){
     e.preventDefault();
     let codigo = this.value.trim();
     if(!codigo) return;
-    let card = document.getElementById('producto-' + codigo);
+    let card = document.querySelector(
+    '[data-barcode="' + codigo + '"], [data-box-barcode="' + codigo + '"]');
     if(card){
         card.scrollIntoView({ behavior:'smooth', block:'center' });
         card.style.boxShadow = "0 0 0 3px #2563eb";
         setTimeout(() => { card.style.boxShadow = ""; }, 1500);
-        let input = document.getElementById('despachado-' + codigo);
+        let barcode = card.dataset.barcode;
+        let input = document.getElementById('despachado-' + barcode);
         if(input){ input.focus(); input.select(); }
         this.value = '';
         return;
