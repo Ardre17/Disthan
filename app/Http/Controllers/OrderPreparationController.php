@@ -9,7 +9,6 @@ use Illuminate\Support\Facades\Auth;
 
 class OrderPreparationController extends Controller
 {
-
     /*
     |--------------------------------------------------------------------------
     | Bandeja de preparación
@@ -23,181 +22,176 @@ class OrderPreparationController extends Controller
             ->latest()
             ->get();
 
-        return view(
-            'orders.preparation.index',
-            compact('orders')
-        );
+        return view('orders.preparation.index', compact('orders'));
     }
-/*
-|--------------------------------------------------------------------------
-| Asistente de preparación
-|--------------------------------------------------------------------------
-*/
 
-public function show(Order $order)
-{
-    $order->load([
-        'client',
-        'details.product'
-    ]);
+    /*
+    |--------------------------------------------------------------------------
+    | Asistente de preparación
+    |--------------------------------------------------------------------------
+    */
 
-    // Total de productos del pedido
-    $total = $order->details->count();
+    public function show(Order $order)
+    {
+        $order->load([
+            'client',
+            'details.product'
+        ]);
 
-    // Productos preparados
-    $preparados = $order->details
-        ->where('preparado', true)
-        ->count();
+        $total = $order->details->count();
 
-    // Porcentaje de avance
-    $progreso = $total > 0
-        ? round(($preparados / $total) * 100)
-        : 0;
-
-    // Buscar el siguiente producto pendiente
-    $productoActual = $order->details()
-        ->where('preparado', false)
-        ->with('product')
-        ->orderBy('orden_preparacion')
-        ->first();
-
-    // Posición del producto actual (1 de X)
-    $numeroProducto = 0;
-
-    if ($productoActual) {
-
-        $numeroProducto = $order->details()
-            ->where('orden_preparacion', '<=', $productoActual->orden_preparacion)
+        $preparados = $order->details
+            ->where('preparado', true)
             ->count();
 
+        $progreso = $total > 0
+            ? round(($preparados / $total) * 100)
+            : 0;
+
+        $productoActual = $order->details()
+            ->where('preparado', false)
+            ->with('product')
+            ->orderBy('orden_preparacion')
+            ->first();
+
+        $numeroProducto = 0;
+
+        if ($productoActual) {
+
+            $numeroProducto = $order->details()
+                ->where('orden_preparacion', '<=', $productoActual->orden_preparacion)
+                ->count();
+        }
+
+        return view(
+            'orders.preparation.show',
+            compact(
+                'order',
+                'productoActual',
+                'numeroProducto',
+                'total',
+                'preparados',
+                'progreso'
+            )
+        );
     }
 
-    return view(
-        'orders.preparation.show',
-        compact(
-            'order',
-            'productoActual',
-            'numeroProducto',
-            'total',
-            'preparados',
-            'progreso'
-        )
-    );
-}
+    /*
+    |--------------------------------------------------------------------------
+    | Guardar producto preparado
+    |--------------------------------------------------------------------------
+    */
 
-public function save(Request $request, OrderDetail $detail)
-{
-    $detail->update([
+    public function save(Request $request, OrderDetail $detail)
+    {
+        $detail->update([
+            'cantidad_preparada'      => $request->cantidad_preparada,
+            'preparado'               => true,
+            'preparado_por'           => Auth::id(),
+            'fecha_preparacion'       => now(),
+            'observacion_preparacion' => $request->observacion,
+        ]);
 
-        'cantidad_preparada'      => $request->cantidad_preparada,
+        return response()->json(
+            $this->obtenerSiguienteProducto($detail->order)
+        );
+    }
 
-        'preparado'               => true,
+    /*
+    |--------------------------------------------------------------------------
+    | Saltar producto
+    |--------------------------------------------------------------------------
+    */
 
-        'preparado_por'           => Auth::id(),
+    public function skip(OrderDetail $detail)
+    {
+        return response()->json(
+            $this->obtenerSiguienteProducto($detail->order)
+        );
+    }
 
-        'fecha_preparacion'       => now(),
+    /*
+    |--------------------------------------------------------------------------
+    | Producto no encontrado
+    |--------------------------------------------------------------------------
+    */
 
-        'observacion_preparacion' => $request->observacion
+    public function notFound(OrderDetail $detail)
+    {
+        $detail->update([
+            'observacion_preparacion' => 'PRODUCTO NO ENCONTRADO'
+        ]);
 
-    ]);
+        return response()->json(
+            $this->obtenerSiguienteProducto($detail->order)
+        );
+    }
 
-    $order = $detail->order;
+    /*
+    |--------------------------------------------------------------------------
+    | Finalizar pedido
+    |--------------------------------------------------------------------------
+    */
 
-    $siguiente = $order->details()
-        ->where('preparado', false)
-        ->with('product')
-        ->orderBy('orden_preparacion')
-        ->first();
-
-    if (!$siguiente) {
-
+    public function finish(Order $order)
+    {
         $order->estado_preparacion = 'ARMADO';
 
         $order->save();
 
+        return response()->json([
+            'success' => true
+        ]);
+    }
 
-    return response()->json([
+    /*
+    |--------------------------------------------------------------------------
+    | Obtener siguiente producto
+    |--------------------------------------------------------------------------
+    */
 
-    'finished' => false,
+    private function obtenerSiguienteProducto(Order $order)
+    {
+        $siguiente = $order->details()
+            ->where('preparado', false)
+            ->with('product')
+            ->orderBy('orden_preparacion')
+            ->first();
 
-    'next' => [
+        if (!$siguiente) {
 
-        'id' => $siguiente->id,
+            $order->estado_preparacion = 'ARMADO';
+            $order->save();
 
-        'cantidad_solicitada' => $siguiente->cantidad_solicitada,
+            return [
+                'finished' => true
+            ];
+        }
 
-        'cantidad_preparada' => $siguiente->cantidad_preparada,
+        return [
 
-        'precio_unitario' => $siguiente->precio_unitario,
+            'finished' => false,
 
-        'sku' => $siguiente->product->sku,
+            'next' => [
 
-        'barcode' => $siguiente->product->barcode,
+                'id' => $siguiente->id,
 
-        'nombre' => $siguiente->product->nombre,
+                'cantidad_solicitada' => $siguiente->cantidad_solicitada,
 
-        'advertencias' => $siguiente->product->advertencias,
+                'cantidad_preparada' => $siguiente->cantidad_preparada,
 
-    ]
+                'precio_unitario' => $siguiente->precio_unitario,
 
-]);
-}
+                'sku' => $siguiente->product->sku,
 
-public function skip(OrderDetail $detail)
-{
-    $order = $detail->order;
+                'barcode' => $siguiente->product->barcode,
 
-    $siguiente = $order->details()
-        ->where('preparado', false)
-        ->where('id', '!=', $detail->id)
-        ->with('product')
-        ->orderBy('orden_preparacion')
-        ->first();
+                'nombre' => $siguiente->product->nombre,
 
-    return response()->json([
+                'advertencias' => $siguiente->product->advertencias,
 
-        'success' => true,
+            ]
 
-        'next' => $siguiente
-
-    ]);
-}
-public function notFound(OrderDetail $detail)
-{
-    $detail->update([
-
-        'observacion_preparacion' => 'PRODUCTO NO ENCONTRADO'
-
-    ]);
-
-    $order = $detail->order;
-
-    $siguiente = $order->details()
-        ->where('preparado', false)
-        ->where('id', '!=', $detail->id)
-        ->with('product')
-        ->orderBy('orden_preparacion')
-        ->first();
-
-    return response()->json([
-
-        'success' => true,
-
-        'next' => $siguiente
-
-    ]);
-}
-public function finish(Order $order)
-{
-
-    $order->estado_preparacion = 'ARMADO';
-
-    $order->save();
-
-    return response()->json([
-
-        'success' => true
-
-    ]);
-
+        ];
+    }
 }
