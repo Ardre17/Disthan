@@ -81,8 +81,11 @@ class PrecintoController extends Controller
 
     public function show(Precinto $precinto)
     {
+        $colores   = self::COLORES;          // ← línea agregada
+        $motivos   = self::MOTIVOS;          // ← útil para el form de movimiento en show
         $movements = $precinto->movements()->paginate(20);
-        return view('precintos.show', compact('precinto','movements'));
+
+        return view('precintos.show', compact('precinto', 'movements', 'colores', 'motivos'));
     }
 
     public function edit(Precinto $precinto)
@@ -112,10 +115,10 @@ class PrecintoController extends Controller
     public function movimiento(Request $request, Precinto $precinto)
     {
         $request->validate([
-            'tipo'      => 'required|in:ENTRADA,SALIDA',
-            'cantidad'  => 'required|numeric|min:0.01',
-            'motivo'    => 'required|string|max:255',
-            'referencia'=> 'nullable|string|max:100',
+            'tipo'       => 'required|in:ENTRADA,SALIDA',
+            'cantidad'   => 'required|numeric|min:0.01',
+            'motivo'     => 'required|string|max:255',
+            'referencia' => 'nullable|string|max:100',
         ]);
 
         $cantidad = floatval($request->cantidad);
