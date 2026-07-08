@@ -115,13 +115,6 @@ public function save(Request $request, OrderDetail $detail)
 
         $order->save();
 
-        return response()->json([
-
-            'finished' => true
-
-        ]);
-
-    }
 
     return response()->json([
 
@@ -148,6 +141,7 @@ public function save(Request $request, OrderDetail $detail)
     ]
 
 ]);
+}
 
 public function skip(OrderDetail $detail)
 {
