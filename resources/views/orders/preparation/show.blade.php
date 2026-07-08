@@ -209,50 +209,33 @@ document.addEventListener("DOMContentLoaded", function () {
             method: "POST",
 
             headers: {
-
                 "Content-Type": "application/json",
-
                 "X-CSRF-TOKEN": "{{ csrf_token() }}",
-
                 "Accept": "application/json"
-
             },
 
             body: JSON.stringify({
-
                 cantidad_preparada: document.getElementById("cantidad_preparada").value,
-
                 observacion: ""
-
             })
 
         })
+        .then(async response => {
 
-        .then(response => response.json())
+            console.log("STATUS:", response.status);
 
-        .then(data => {
+            const text = await response.text();
 
-            if (data.finished) {
+            console.log("RESPUESTA:", text);
 
-                location.reload();
-
-                return;
-
-            }
-
-            location.reload();
+            return text;
 
         })
-
         .catch(error => {
 
             console.error(error);
 
-            alert("Ocurrió un error al guardar.");
-
-            btn.disabled = false;
-
-            btn.innerHTML = "✔ PRODUCTO PREPARADO";
+            alert("Error de conexión.");
 
         });
 

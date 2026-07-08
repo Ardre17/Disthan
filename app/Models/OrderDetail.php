@@ -14,6 +14,16 @@ class OrderDetail extends Model
     'cantidad_solicitada',
     'cantidad_despachada',
 
+    // PREPARACIÓN
+    'cantidad_preparada',
+    'preparado',
+    'preparado_por',
+    'fecha_preparacion',
+    'observacion_preparacion',
+    'inicio_preparacion',
+    'fin_preparacion',
+    'orden_preparacion',
+
     'precio_unitario',
 
     'subtotal',
