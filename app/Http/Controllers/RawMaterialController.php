@@ -7,9 +7,38 @@ use Illuminate\Http\Request;
 
 class RawMaterialController extends Controller
 {
-    public function show(RawMaterial $raw_material)
+// Reemplaza tu método show() en RawMaterialController
+// También agrega el use de RawMaterialEntry al inicio del controlador si no lo tienes:
+// use App\Models\RawMaterialEntry;
+// use App\Models\ProductionOrder;
+
+public function show(RawMaterial $raw_material)
 {
-    return view('raw_materials.show',compact('raw_material'));
+    // Entradas registradas para esta materia prima
+    // 👉 AJUSTA: si tu modelo se llama distinto cámbialo aquí
+    $entradas = \App\Models\RawMaterialEntry::where('raw_material_id', $raw_material->id)
+        ->orderByDesc('created_at')
+        ->paginate(10);
+
+    // Órdenes de producción donde se usó esta materia prima
+    $produccionesUsadas = \App\Models\ProductionOrder::where('raw_material_id', $raw_material->id)
+        ->orderByDesc('created_at')
+        ->take(10)
+        ->get();
+
+    // Total entradas y total consumido
+    $totalEntradas = \App\Models\RawMaterialEntry::where('raw_material_id', $raw_material->id)->sum('quantity');
+    $totalConsumido = \App\Models\ProductionOrder::where('raw_material_id', $raw_material->id)
+        ->where('status', 'FINALIZADA')
+        ->sum('consumed_quantity');
+
+    return view('raw_materials.show', compact(
+        'raw_material',
+        'entradas',
+        'produccionesUsadas',
+        'totalEntradas',
+        'totalConsumido'
+    ));
 }
     public function index()
 {
