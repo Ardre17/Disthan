@@ -580,7 +580,22 @@ En línea
 </a>
 
 {{-- DESPUÉS del menu-item de Dashboard --}}
+{{-- OPERACIONES --}}
+<div class="menu-section operaciones-active">
+    <div class="menu-title" onclick="toggleMenu(this)">
+        <span>🏚️ Almacenes</span>
+        <span>▾</span>
+    </div>
+    <div class="menu-sub">
+        @if($role == 'admin')
+            <a href="{{ route('joselito.index') }}">
+                <span>🏚️</span><span>Joselito</span>
+            </a>
+        @endif
+        
+    </div>
 
+</div>  {{-- ← cierra menu-section operaciones --}}
 {{-- OPERACIONES --}}
 <div class="menu-section operaciones-active">
     <div class="menu-title" onclick="toggleMenu(this)">

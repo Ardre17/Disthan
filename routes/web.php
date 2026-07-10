@@ -24,6 +24,13 @@ use App\Http\Controllers\PrecintoController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\OrderPreparationController;
 use App\Http\Controllers\ProductEntryController;
+use App\Http\Controllers\JoselitoController;
+
+Route::resource('joselito', JoselitoController::class)
+     ->only(['index','create','store','show']);
+
+Route::post('joselito/{joselito}/movimiento', [JoselitoController::class, 'movimiento'])
+     ->name('joselito.movimiento');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/product-entries',        [ProductEntryController::class, 'index'])->name('product-entries.index');
