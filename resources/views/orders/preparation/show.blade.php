@@ -384,7 +384,7 @@ body{background:var(--erp-bg) !important;}
                 Todos los productos fueron preparados.
             </div>
             <div style="margin-top:1.5rem;">
-                <a href="{{ route('orders.index') }}"
+                <a href="{{route('pedidos.index')}}"
                    style="
                        display:inline-flex;align-items:center;gap:6px;
                        padding:10px 20px;
