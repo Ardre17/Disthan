@@ -23,6 +23,13 @@ use App\Http\Controllers\StickerController;
 use App\Http\Controllers\PrecintoController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\OrderPreparationController;
+use App\Http\Controllers\ProductEntryController;
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/product-entries',        [ProductEntryController::class, 'index'])->name('product-entries.index');
+    Route::get('/product-entries/create', [ProductEntryController::class, 'create'])->name('product-entries.create');
+    Route::post('/product-entries',       [ProductEntryController::class, 'store'])->name('product-entries.store');
+});
 
 
 Route::resource('cajas', CajaController::class);

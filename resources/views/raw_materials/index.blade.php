@@ -283,6 +283,7 @@
            class="btn-new">
             📥 Entrada de stock
         </a>
+        <a href="{{ route('product-entries.index') }}" class="btn-new">📥 Entrada Tienda</a>
 
         <a href="{{ route('raw-materials.create') }}"
            class="btn-new">
