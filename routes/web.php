@@ -245,9 +245,10 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['auth'])->group(function () {
 
     Route::get('/usuarios', [UserController::class, 'index'])
-        ->middleware('role:admin');
+        ->middleware('role:admin')
+        ->name('users.index'); });
 
-    });
+  
     Route::get('/control-etiquetas', [InventoryController::class, 'controlEtiquetas']);
     Route::post('/control-etiquetas/store', [InventoryController::class, 'storeMovimiento']);
     Route::post('/inventario/salida/{id}', [InventoryController::class, 'salida']);
