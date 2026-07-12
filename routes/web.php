@@ -27,6 +27,23 @@ use App\Http\Controllers\ProductEntryController;
 use App\Http\Controllers\ProductLogisticController;
 use App\Http\Controllers\JoselitoController;
 use App\Http\Controllers\DalsaController;
+use App\Http\Controllers\PalletController;
+
+Route::get('/generar/{order}', [PalletController::class, 'generar'])
+    ->name('pallets.generar');
+
+Route::prefix('pallets')->group(function () {
+
+    Route::get('/', [PalletController::class, 'index'])
+        ->name('pallets.index');
+
+    Route::get('/configuracion', [PalletController::class, 'configuracion'])
+        ->name('pallets.configuracion');
+
+    Route::get('/simulador', [PalletController::class, 'simulador'])
+        ->name('pallets.simulador');
+
+});
 
 Route::resource('dalsa', DalsaController::class)
      ->only(['index','create','store','show']);

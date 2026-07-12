@@ -167,6 +167,94 @@
                         </select>
 
                     </div>
+                    <div class="col-md-4 mb-3">
+
+    <label class="form-label">
+        Prioridad de apilado
+    </label>
+
+    <input
+        type="number"
+        name="prioridad_apilado"
+        class="form-control"
+        value="{{ old('prioridad_apilado',$logistic->prioridad_apilado) }}">
+
+</div>
+<div class="col-md-4 mb-3">
+
+    <label class="form-label">
+        Grupo logístico
+    </label>
+
+    <select
+        name="grupo_logistico"
+        class="form-select">
+
+        <option value="GENERAL"
+            {{ $logistic->grupo_logistico=='GENERAL'?'selected':'' }}>
+            General
+        </option>
+
+        <option value="LIQUIDOS"
+            {{ $logistic->grupo_logistico=='LIQUIDOS'?'selected':'' }}>
+            Líquidos
+        </option>
+
+        <option value="CONSERVAS"
+            {{ $logistic->grupo_logistico=='CONSERVAS'?'selected':'' }}>
+            Conservas
+        </option>
+
+        <option value="VIDRIO"
+            {{ $logistic->grupo_logistico=='VIDRIO'?'selected':'' }}>
+            Vidrio
+        </option>
+
+        <option value="FRAGIL"
+            {{ $logistic->grupo_logistico=='FRAGIL'?'selected':'' }}>
+            Frágil
+        </option>
+
+    </select>
+
+</div>
+<div class="col-md-4 mb-3">
+
+    <label class="form-label">
+        ¿Se puede apilar?
+    </label>
+
+    <select
+        name="apilable"
+        class="form-select">
+
+        <option value="1"
+            {{ $logistic->apilable ? 'selected':'' }}>
+            Sí
+        </option>
+
+        <option value="0"
+            {{ !$logistic->apilable ? 'selected':'' }}>
+            No
+        </option>
+
+    </select>
+
+</div>
+<div class="col-md-4 mb-3">
+
+    <label class="form-label">
+        Peso máximo sobre el producto (Kg)
+    </label>
+
+    <input
+        type="number"
+        step="0.01"
+        name="peso_maximo_encima"
+        class="form-control"
+        value="{{ old('peso_maximo_encima',$logistic->peso_maximo_encima) }}">
+
+</div>
 
                     <div class="col-md-4 mb-3">
 

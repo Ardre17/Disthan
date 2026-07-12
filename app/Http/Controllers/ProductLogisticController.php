@@ -23,6 +23,10 @@ class ProductLogisticController extends Controller
                 'permite_mezcla' => true,
                 'orientacion' => 'NORMAL',
                 'activo' => true,
+                'prioridad_apilado' => 1,
+                'grupo_logistico' => null,
+                'apilable' => true,
+                'peso_maximo_encima' => 0,
             ]
         );
 
@@ -42,6 +46,10 @@ class ProductLogisticController extends Controller
             'permite_mezcla' => 'required|boolean',
             'orientacion' => 'required|in:NORMAL,ACOSTADO,VERTICAL',
             'activo' => 'required|boolean',
+            'prioridad_apilado' => 'required|integer|min:1',
+            'grupo_logistico' => 'nullable|string|max:50',
+            'apilable' => 'required|boolean',
+            'peso_maximo_encima' => 'required|numeric|min:0',
         ]);
 
         ProductLogistic::updateOrCreate(
@@ -57,6 +65,10 @@ class ProductLogisticController extends Controller
                 'permite_mezcla' => $request->permite_mezcla,
                 'orientacion' => $request->orientacion,
                 'activo' => $request->activo,
+                'prioridad_apilado' => 'required|integer|min:1',
+                'grupo_logistico' => 'nullable|string|max:50',
+                'apilable' => 'required|boolean',
+                'peso_maximo_encima' => 'required|numeric|min:0',
             ]
         );
 
