@@ -418,7 +418,7 @@ html,body{
 
         <div class="form-title">Bienvenido</div>
         <div class="form-sub">
-            Ingresa tus credenciales para acceder<br>al sistema ERP de Joyber Perú.
+            Ingresa tus credenciales para acceder<br>al sistema ERP de DISTAN.
         </div>
 
         <div class="divider"></div>
@@ -440,7 +440,7 @@ html,body{
                         type="email"
                         name="email"
                         class="field-input email-input"
-                        placeholder="usuario@joyber.pe"
+                        placeholder="usuario@disthan.com"
                         value="{{ old('email') }}"
                         autocomplete="email"
                         required>
