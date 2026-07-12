@@ -3,13 +3,31 @@ $role = auth()->user()->role;
 @endphp
 
 <style>
+    .main-content{
+
+    margin-left:270px;
+
+    transition:margin-left .30s ease;
+
+    min-height:100vh;
+
+}
+.main-content.sidebar-collapsed{
+
+    margin-left:56px;
+
+}
 /* ============================================================
    SIDEBAR — JOYBER PERÚ ERP
    Compatible con: toggleMenu(), reloj, roles admin/operario
 ============================================================ */
 
 *{box-sizing:border-box;}
+:root{
 
+    --sidebar-width:270px;
+
+}
 :root{
     --sb-bg1:#060f1e;
     --sb-bg2:#0a1628;
@@ -363,6 +381,9 @@ $role = auth()->user()->role;
     width:56px;
 }
 .sidebar.collapsed .sb-brand-info,
+.sidebar.collapsed .sb-brand-icon{
+    display:none;
+}
 .sidebar.collapsed .sb-user-info,
 .sidebar.collapsed .sb-status,
 .sidebar.collapsed .sb-section-left span:last-child,
@@ -377,13 +398,15 @@ $role = auth()->user()->role;
 .sidebar.collapsed .sb-logout span:last-child{
     display:none;
 }
-.sidebar.collapsed .sb-brand{justify-content:center;}
+.sidebar.collapsed .sb-brand{justify-content:center;
+    min-height:40px;
+}
 .sidebar.collapsed .sb-user{justify-content:center;padding:8px;}
 .sidebar.collapsed .sb-avatar{margin:0;}
 .sidebar.collapsed .sb-item{justify-content:center;padding:10px;}
 .sidebar.collapsed .sb-section-title{justify-content:center;padding:10px;}
-.sidebar.collapsed #clockTime{font-size:14px;letter-spacing:1px;}
-.sidebar.collapsed .sb-clock{padding:8px;}
+.sidebar.collapsed .sb-clock{
+    display:none;}
 .sidebar.collapsed .sb-collapse-btn{
     display:flex;
     position:absolute;
@@ -392,6 +415,9 @@ $role = auth()->user()->role;
     width:26px;
     height:26px;
     z-index:1002;
+}
+.sidebar.collapsed .sb-collapse-btn{
+    display:none;
 }
 
 /* ── RESPONSIVE ── */
@@ -650,14 +676,17 @@ function toggleMenu(el) {
 var sbCollapsed = false;
 function toggleSidebar(){
 
-    const sb  = document.getElementById('sidebar');
-    const btn = document.querySelector('.sb-collapse-btn');
+    const sb   = document.getElementById('sidebar');
+    const main = document.getElementById('mainContent');
 
     sbCollapsed = !sbCollapsed;
 
     sb.classList.toggle('collapsed', sbCollapsed);
 
-    btn.innerHTML = sbCollapsed ? '☰' : '‹';
+    main.classList.toggle(
+        'sidebar-collapsed',
+        sbCollapsed
+    );
 
     localStorage.setItem(
         'sb_collapsed',
@@ -667,20 +696,20 @@ function toggleSidebar(){
 }
 
 /* Restaurar estado al cargar */
-document.addEventListener('DOMContentLoaded', function() {
-    if (localStorage.getItem('sb_collapsed') === '1') {
-        var sb  = document.getElementById('sidebar');
-        var btn = sb.querySelector('.sb-collapse-btn');
-        sbCollapsed = true;
-        sb.classList.add('collapsed');
-        if(btn){
+document.addEventListener("DOMContentLoaded",function(){
 
-    btn.innerHTML = sbCollapsed
-        ? '☰'
-        : '‹';
+    const sb   = document.getElementById("sidebar");
+    const main = document.getElementById("mainContent");
 
-}
+    if(localStorage.getItem("sb_collapsed")=="1"){
+
+        sb.classList.add("collapsed");
+
+        main.classList.add("sidebar-collapsed");
+
     }
+
+});
 
     // Abrir la sección activa automáticamente
     var links = document.querySelectorAll('.sb-sub a');
