@@ -1,22 +1,122 @@
 @php
 $role = auth()->user()->role;
+
+// ── Detectar sección activa para el color del menú ──
+$seccionActiva = 'dash';
+$url = request()->path();
+
+if (
+    str_contains($url, 'joselito') ||
+    str_contains($url, 'dalsa')
+) {
+    $seccionActiva = 'alm';
+
+} elseif (
+    str_contains($url, 'orders') ||
+    str_contains($url, 'historial') ||
+    str_contains($url, 'raw-materials') ||
+    str_contains($url, 'proyectado') ||
+    str_contains($url, 'kardex') ||
+    str_contains($url, 'production') ||
+    str_contains($url, 'pedidos') ||
+    str_contains($url, 'produccion')
+) {
+    $seccionActiva = 'ops';
+
+} elseif (
+    str_contains($url, 'categories') ||
+    str_contains($url, 'labels') ||
+    str_contains($url, 'stickers') ||
+    str_contains($url, 'precintos') ||
+    str_contains($url, 'cajas') ||
+    str_contains($url, 'products') ||
+    str_contains($url, 'warehouse')
+) {
+    $seccionActiva = 'inv';
+
+} elseif (
+    str_contains($url, 'clients') ||
+    str_contains($url, 'proveedores')
+) {
+    $seccionActiva = 'com';
+}
+
+// Colores por sección
+$temas = [
+    'dash' => [
+        'grad1' => '#060f1e',
+        'grad2' => '#0a1628',
+        'grad3' => '#0d1f38',
+        'accent'=> '#3b82f6',
+        'glow'  => 'rgba(59,130,246,.12)',
+        'link'  => '#93c5fd',
+        'sub'   => '#60a5fa',
+        'icon'  => '#3b82f6',
+        'label' => 'Dashboard',
+    ],
+    'alm' => [
+        'grad1' => '#061818',
+        'grad2' => '#082020',
+        'grad3' => '#0a2828',
+        'accent'=> '#06b6d4',
+        'glow'  => 'rgba(6,182,212,.12)',
+        'link'  => '#67e8f9',
+        'sub'   => '#22d3ee',
+        'icon'  => '#06b6d4',
+        'label' => 'Almacenes',
+    ],
+    'ops' => [
+        'grad1' => '#1a1000',
+        'grad2' => '#1f1500',
+        'grad3' => '#251a00',
+        'accent'=> '#f59e0b',
+        'glow'  => 'rgba(245,158,11,.12)',
+        'link'  => '#fcd34d',
+        'sub'   => '#fbbf24',
+        'icon'  => '#f59e0b',
+        'label' => 'Operaciones',
+    ],
+    'inv' => [
+        'grad1' => '#061a0a',
+        'grad2' => '#082010',
+        'grad3' => '#0a2814',
+        'accent'=> '#22c55e',
+        'glow'  => 'rgba(34,197,94,.12)',
+        'link'  => '#86efac',
+        'sub'   => '#4ade80',
+        'icon'  => '#22c55e',
+        'label' => 'Inventario',
+    ],
+    'com' => [
+        'grad1' => '#120820',
+        'grad2' => '#160a28',
+        'grad3' => '#1a0c30',
+        'accent'=> '#8b5cf6',
+        'glow'  => 'rgba(139,92,246,.12)',
+        'link'  => '#c4b5fd',
+        'sub'   => '#a78bfa',
+        'icon'  => '#8b5cf6',
+        'label' => 'Comercial',
+    ],
+];
+
+$t = $temas[$seccionActiva];
 @endphp
 
 <style>
 *{box-sizing:border-box;}
 
 :root{
-    --sb-bg1:#060f1e;
-    --sb-bg2:#0a1628;
-    --sb-bg3:#0d1f38;
+    --sb-bg1:{{ $t['grad1'] }};
+    --sb-bg2:{{ $t['grad2'] }};
+    --sb-bg3:{{ $t['grad3'] }};
+    --sb-accent:{{ $t['accent'] }};
+    --sb-glow:{{ $t['glow'] }};
+    --sb-link:{{ $t['link'] }};
+    --sb-sub:{{ $t['sub'] }};
     --sb-border:rgba(255,255,255,.06);
     --sb-text:#c8daf0;
     --sb-text-muted:#5b7da8;
-    --sb-accent-dash:#3b82f6;
-    --sb-accent-ops:#f59e0b;
-    --sb-accent-inv:#22c55e;
-    --sb-accent-com:#8b5cf6;
-    --sb-accent-alm:#06b6d4;
     --sb-ok:#22c55e;
     --sb-width:270px;
     --font:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;
@@ -51,7 +151,7 @@ $role = auth()->user()->role;
     box-shadow:0 2px 10px rgba(0,0,0,.4);
     transition:background .2s;
 }
-.sb-toggle:hover{background:#0d1f38;}
+.sb-toggle:hover{background:var(--sb-accent);}
 .sb-toggle-icon{display:flex;flex-direction:column;gap:4px;}
 .sb-toggle-icon span{
     display:block;width:18px;height:2px;
@@ -77,22 +177,41 @@ $role = auth()->user()->role;
     top:0;left:0;
     overflow-y:auto;
     overflow-x:hidden;
-    background:linear-gradient(180deg,var(--sb-bg1) 0%,var(--sb-bg2) 50%,var(--sb-bg3) 100%);
+    background:linear-gradient(
+        180deg,
+        var(--sb-bg1) 0%,
+        var(--sb-bg2) 50%,
+        var(--sb-bg3) 100%
+    );
     color:var(--sb-text);
     display:flex;
     flex-direction:column;
     justify-content:space-between;
-    box-shadow:6px 0 24px rgba(0,0,0,.4);
-    border-right:1px solid var(--sb-border);
+    box-shadow:
+        6px 0 24px rgba(0,0,0,.4),
+        inset -1px 0 0 var(--sb-border);
     font-family:var(--font);
     font-size:13px;
     z-index:1000;
     transition:width .3s cubic-bezier(.16,1,.3,1),
                transform .3s cubic-bezier(.16,1,.3,1);
 }
+
+/* Glow de color en el sidebar */
+.sidebar::before{
+    content:'';
+    position:absolute;
+    top:0;left:0;right:0;
+    height:200px;
+    background:radial-gradient(ellipse at top left, var(--sb-glow), transparent 70%);
+    pointer-events:none;
+    z-index:0;
+}
+.sidebar > *{position:relative;z-index:1;}
+
 .sidebar::-webkit-scrollbar{width:4px;}
 .sidebar::-webkit-scrollbar-track{background:transparent;}
-.sidebar::-webkit-scrollbar-thumb{background:#1f3a5f;border-radius:99px;}
+.sidebar::-webkit-scrollbar-thumb{background:var(--sb-accent);border-radius:99px;opacity:.3;}
 
 /* ── Header ── */
 .sb-header{
@@ -106,11 +225,12 @@ $role = auth()->user()->role;
 }
 .sb-brand-icon{
     width:36px;height:36px;flex-shrink:0;
-    background:linear-gradient(135deg,#1d4ed8,#2563eb);
+    background:linear-gradient(135deg,var(--sb-accent),var(--sb-sub));
     border-radius:8px;
     display:flex;align-items:center;justify-content:center;
     font-size:18px;
-    box-shadow:0 4px 14px rgba(37,99,235,.35);
+    box-shadow:0 4px 14px var(--sb-glow);
+    transition:background .4s;
 }
 .sb-brand-name{
     font-size:14px;font-weight:800;
@@ -129,11 +249,14 @@ $role = auth()->user()->role;
     display:flex;align-items:center;justify-content:center;
     cursor:pointer;color:var(--sb-text-muted);
     font-size:16px;font-weight:700;
-    transition:background .15s,color .15s;
-    line-height:1;
-    user-select:none;
+    transition:background .15s,color .15s,border-color .15s;
+    line-height:1;user-select:none;
 }
-.sb-collapse-btn:hover{background:rgba(255,255,255,.1);color:#f1f5f9;}
+.sb-collapse-btn:hover{
+    background:var(--sb-accent);
+    border-color:var(--sb-accent);
+    color:#fff;
+}
 
 /* User card */
 .sb-user{
@@ -142,15 +265,18 @@ $role = auth()->user()->role;
     border-radius:8px;
     padding:12px;
     display:flex;align-items:center;gap:10px;
+    transition:border-color .4s;
 }
+.sb-user:hover{border-color:var(--sb-accent);}
 .sb-avatar{
     width:38px;height:38px;flex-shrink:0;
     border-radius:50%;
-    background:linear-gradient(135deg,#2563eb,#60a5fa);
+    background:linear-gradient(135deg,var(--sb-accent),var(--sb-sub));
     display:flex;align-items:center;justify-content:center;
     font-size:16px;font-weight:800;color:#fff;
-    box-shadow:0 4px 12px rgba(37,99,235,.3);
+    box-shadow:0 4px 12px var(--sb-glow);
     border:2px solid rgba(255,255,255,.12);
+    transition:background .4s,box-shadow .4s;
 }
 .sb-user-info{flex:1;min-width:0;}
 .sb-user-name{
@@ -163,18 +289,21 @@ $role = auth()->user()->role;
 }
 .sb-status{
     display:inline-flex;align-items:center;gap:4px;
-    background:rgba(34,197,94,.1);
-    border:1px solid rgba(34,197,94,.2);
     border-radius:99px;
     padding:2px 8px;
-    font-size:10px;color:#86efac;
+    font-size:10px;
     margin-top:4px;font-weight:600;
+    background:color-mix(in srgb, var(--sb-accent) 15%, transparent);
+    border:1px solid color-mix(in srgb, var(--sb-accent) 30%, transparent);
+    color:var(--sb-link);
+    transition:background .4s,border-color .4s,color .4s;
 }
 .sb-status-dot{
     width:6px;height:6px;border-radius:50%;
-    background:var(--sb-ok);
+    background:var(--sb-accent);
     animation:sbPulse 1.5s ease infinite;
     flex-shrink:0;
+    transition:background .4s;
 }
 @keyframes sbPulse{
     0%,100%{opacity:1;transform:scale(1);}
@@ -190,14 +319,17 @@ $role = auth()->user()->role;
     text-decoration:none;
     padding:10px 16px;
     border-left:3px solid transparent;
-    transition:background .15s,color .15s;
+    transition:background .15s,color .15s,border-color .15s;
     font-size:13px;font-weight:500;
 }
-.sb-item:hover{background:rgba(255,255,255,.05);color:#f1f5f9;}
+.sb-item:hover{
+    background:color-mix(in srgb, var(--sb-accent) 8%, transparent);
+    color:#f1f5f9;
+}
 .sb-item.active{
-    background:rgba(59,130,246,.1);
+    background:color-mix(in srgb, var(--sb-accent) 12%, transparent);
     color:#fff;font-weight:700;
-    border-left-color:var(--sb-accent-dash);
+    border-left-color:var(--sb-accent);
 }
 .sb-item .sb-icon{
     width:24px;height:24px;flex-shrink:0;
@@ -219,7 +351,7 @@ $role = auth()->user()->role;
     user-select:none;
 }
 .sb-section-title:hover{
-    background:rgba(255,255,255,.04);
+    background:color-mix(in srgb, var(--sb-accent) 6%, transparent);
     color:var(--sb-text);
 }
 .sb-section-left{display:flex;align-items:center;gap:8px;}
@@ -228,13 +360,14 @@ $role = auth()->user()->role;
     font-size:11px;color:var(--sb-text-muted);
     transition:transform .3s;flex-shrink:0;
 }
-.sb-section-title.open .sb-section-arrow{transform:rotate(180deg);}
-
-/* Colores accent por sección */
-.sb-section.alm-s .sb-section-title.open{color:#67e8f9;border-left-color:var(--sb-accent-alm);}
-.sb-section.ops-s .sb-section-title.open{color:#fcd34d;border-left-color:var(--sb-accent-ops);}
-.sb-section.inv-s .sb-section-title.open{color:#86efac;border-left-color:var(--sb-accent-inv);}
-.sb-section.com-s .sb-section-title.open{color:#c4b5fd;border-left-color:var(--sb-accent-com);}
+.sb-section-title.open{
+    color:var(--sb-link);
+    border-left-color:var(--sb-accent);
+}
+.sb-section-title.open .sb-section-arrow{
+    transform:rotate(180deg);
+    color:var(--sb-accent);
+}
 
 /* Submenú */
 .sb-sub{
@@ -244,17 +377,18 @@ $role = auth()->user()->role;
 }
 .sb-sub a{
     display:flex;align-items:center;gap:9px;
-    color:#8baecf;
+    color:var(--sb-text-muted);
     text-decoration:none;
     padding:8px 16px 8px 40px;
     font-size:12.5px;
     border-left:3px solid transparent;
-    transition:background .15s,color .15s,padding-left .15s;
+    transition:background .15s,color .15s,padding-left .15s,border-color .15s;
 }
 .sb-sub a:hover{
-    background:rgba(255,255,255,.04);
-    color:#f1f5f9;
+    background:color-mix(in srgb, var(--sb-accent) 8%, transparent);
+    color:var(--sb-link);
     padding-left:46px;
+    border-left-color:color-mix(in srgb, var(--sb-accent) 40%, transparent);
 }
 .sb-sub a .sb-icon{
     width:20px;height:20px;flex-shrink:0;
@@ -263,7 +397,9 @@ $role = auth()->user()->role;
 }
 
 .sb-divider{
-    height:1px;background:var(--sb-border);
+    height:1px;
+    background:linear-gradient(90deg, var(--sb-accent) 0%, transparent 100%);
+    opacity:.15;
     margin:6px 16px;
 }
 
@@ -276,16 +412,18 @@ $role = auth()->user()->role;
 .sb-clock{
     text-align:center;
     margin-bottom:12px;
-    background:rgba(255,255,255,.03);
-    border:1px solid var(--sb-border);
+    background:color-mix(in srgb, var(--sb-accent) 6%, transparent);
+    border:1px solid color-mix(in srgb, var(--sb-accent) 20%, transparent);
     border-radius:7px;
     padding:10px;
+    transition:background .4s,border-color .4s;
 }
 #clockTime{
     font-family:var(--font-mono);
     font-size:22px;font-weight:700;
-    color:#f1f5f9;letter-spacing:2px;
-    line-height:1;
+    color:var(--sb-link);
+    letter-spacing:2px;line-height:1;
+    transition:color .4s;
 }
 #clockDate{
     margin-top:5px;font-size:11px;
@@ -298,19 +436,52 @@ $role = auth()->user()->role;
     margin-bottom:6px;
 }
 .sb-storage-label{font-size:11px;color:var(--sb-text-muted);}
-.sb-storage-pct{font-size:11px;font-weight:700;color:#86efac;font-family:var(--font-mono);}
-.sb-storage-bar{height:5px;background:rgba(255,255,255,.07);border-radius:99px;overflow:hidden;}
-.sb-storage-fill{height:100%;width:82%;background:linear-gradient(90deg,#22c55e,#3b82f6);border-radius:99px;}
+.sb-storage-pct{
+    font-size:11px;font-weight:700;
+    color:var(--sb-link);
+    font-family:var(--font-mono);
+    transition:color .4s;
+}
+.sb-storage-bar{
+    height:5px;background:rgba(255,255,255,.07);
+    border-radius:99px;overflow:hidden;
+}
+.sb-storage-fill{
+    height:100%;width:82%;
+    background:linear-gradient(90deg, var(--sb-accent), var(--sb-sub));
+    border-radius:99px;
+    transition:background .4s;
+}
 .sb-version{
     text-align:center;font-size:10px;
     color:var(--sb-text-muted);margin-bottom:10px;
     font-family:var(--font-mono);
 }
+
+/* Indicador de sección activa */
+.sb-section-indicator{
+    display:flex;align-items:center;justify-content:center;gap:6px;
+    margin-bottom:10px;
+    padding:5px 10px;
+    background:color-mix(in srgb, var(--sb-accent) 10%, transparent);
+    border:1px solid color-mix(in srgb, var(--sb-accent) 25%, transparent);
+    border-radius:5px;
+    font-size:10px;font-weight:700;
+    color:var(--sb-link);
+    text-transform:uppercase;letter-spacing:.06em;
+    transition:background .4s,border-color .4s,color .4s;
+}
+.sb-section-indicator-dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--sb-accent);
+    transition:background .4s;
+}
+
 .sb-logout{
     width:100%;padding:9px 12px;
     border:1px solid rgba(239,68,68,.2);
     border-radius:6px;
-    background:rgba(239,68,68,.1);
+    background:rgba(239,68,68,.08);
     color:#fca5a5;
     font-size:12px;font-weight:700;
     cursor:pointer;
@@ -324,7 +495,7 @@ $role = auth()->user()->role;
     transform:translateY(-1px);
 }
 
-/* ── COLAPSADO (solo desktop) ── */
+/* ── COLAPSADO ── */
 .sidebar.collapsed{width:56px;}
 
 .sidebar.collapsed .sb-brand-info,
@@ -339,6 +510,7 @@ $role = auth()->user()->role;
 .sidebar.collapsed .sb-storage-pct,
 .sidebar.collapsed .sb-storage-bar,
 .sidebar.collapsed .sb-version,
+.sidebar.collapsed .sb-section-indicator,
 .sidebar.collapsed .sb-logout span:last-child,
 .sidebar.collapsed .sb-divider{
     display:none !important;
@@ -349,21 +521,25 @@ $role = auth()->user()->role;
 .sidebar.collapsed .sb-item{justify-content:center;padding:10px 0;}
 .sidebar.collapsed .sb-section-title{justify-content:center;padding:10px 0;}
 .sidebar.collapsed .sb-clock{padding:8px;}
-.sidebar.collapsed #clockTime{font-size:12px;letter-spacing:1px;}
+.sidebar.collapsed #clockTime{font-size:11px;letter-spacing:0;}
 .sidebar.collapsed .sb-logout{justify-content:center;padding:9px 0;}
 .sidebar.collapsed .sb-collapse-btn{display:none;}
+.sidebar.collapsed .sb-storage{display:none;}
 
-/* Botón expandir cuando está colapsado */
+/* Botón expandir colapsado */
 .sb-expand-btn{
     display:none;
     width:100%;padding:10px 0;
     background:none;border:none;
-    color:var(--sb-text-muted);
+    color:var(--sb-accent);
     font-size:18px;cursor:pointer;
-    transition:color .15s;
     font-weight:700;
+    transition:color .15s,transform .15s;
 }
-.sb-expand-btn:hover{color:#f1f5f9;}
+.sb-expand-btn:hover{
+    color:var(--sb-link);
+    transform:scale(1.2);
+}
 .sidebar.collapsed .sb-expand-btn{display:block;}
 
 /* ── RESPONSIVE ── */
@@ -394,7 +570,7 @@ $role = auth()->user()->role;
 <div class="sidebar" id="sidebar">
 
     <div>
-        {{-- ── Header ── --}}
+        {{-- Header --}}
         <div class="sb-header">
             <div class="sb-brand">
                 <div class="sb-brand-icon">🚀</div>
@@ -408,8 +584,7 @@ $role = auth()->user()->role;
                      title="Colapsar menú">‹</div>
             </div>
 
-            {{-- Botón expandir (visible solo colapsado) --}}
-            <button class="sb-expand-btn" onclick="toggleSidebar()" title="Expandir menú">›</button>
+            <button class="sb-expand-btn" onclick="toggleSidebar()" title="Expandir">›</button>
 
             <div class="sb-user">
                 <div class="sb-avatar">
@@ -426,7 +601,7 @@ $role = auth()->user()->role;
             </div>
         </div>
 
-        {{-- ── Nav ── --}}
+        {{-- Nav --}}
         <nav class="sb-nav">
 
             <a href="/dashboard"
@@ -440,7 +615,8 @@ $role = auth()->user()->role;
             {{-- Almacenes --}}
             @if($role == 'admin')
             <div class="sb-section alm-s">
-                <div class="sb-section-title" onclick="toggleMenu(this)">
+                <div class="sb-section-title {{ $seccionActiva === 'alm' ? 'open' : '' }}"
+                     onclick="toggleMenu(this)">
                     <div class="sb-section-left">
                         <span class="sb-section-icon">🏢</span>
                         <span>Almacenes</span>
@@ -449,12 +625,10 @@ $role = auth()->user()->role;
                 </div>
                 <div class="sb-sub">
                     <a href="{{ route('joselito.index') }}">
-                        <span class="sb-icon">🏚️</span>
-                        <span>Joselito</span>
+                        <span class="sb-icon">🏚️</span><span>Joselito</span>
                     </a>
                     <a href="{{ route('dalsa.index') }}">
-                        <span class="sb-icon">🏭</span>
-                        <span>Dalsa</span>
+                        <span class="sb-icon">🏭</span><span>Dalsa</span>
                     </a>
                 </div>
             </div>
@@ -462,7 +636,8 @@ $role = auth()->user()->role;
 
             {{-- Operaciones --}}
             <div class="sb-section ops-s">
-                <div class="sb-section-title" onclick="toggleMenu(this)">
+                <div class="sb-section-title {{ $seccionActiva === 'ops' ? 'open' : '' }}"
+                     onclick="toggleMenu(this)">
                     <div class="sb-section-left">
                         <span class="sb-section-icon">⚙️</span>
                         <span>Operaciones</span>
@@ -500,7 +675,8 @@ $role = auth()->user()->role;
 
             {{-- Inventario --}}
             <div class="sb-section inv-s">
-                <div class="sb-section-title" onclick="toggleMenu(this)">
+                <div class="sb-section-title {{ $seccionActiva === 'inv' ? 'open' : '' }}"
+                     onclick="toggleMenu(this)">
                     <div class="sb-section-left">
                         <span class="sb-section-icon">📦</span>
                         <span>Inventario</span>
@@ -537,7 +713,8 @@ $role = auth()->user()->role;
             {{-- Comercial --}}
             @if($role == 'admin')
             <div class="sb-section com-s">
-                <div class="sb-section-title" onclick="toggleMenu(this)">
+                <div class="sb-section-title {{ $seccionActiva === 'com' ? 'open' : '' }}"
+                     onclick="toggleMenu(this)">
                     <div class="sb-section-left">
                         <span class="sb-section-icon">🤝</span>
                         <span>Comercial</span>
@@ -558,8 +735,13 @@ $role = auth()->user()->role;
         </nav>
     </div>
 
-    {{-- ── Footer ── --}}
+    {{-- Footer --}}
     <div class="sb-footer">
+
+        <div class="sb-section-indicator">
+            <span class="sb-section-indicator-dot"></span>
+            {{ $t['label'] }}
+        </div>
 
         <div class="sb-clock">
             <div id="clockTime">00:00:00</div>
@@ -591,15 +773,10 @@ $role = auth()->user()->role;
 </div>
 
 <script>
-/* ============================================================
-   SIDEBAR JS — funciones independientes, sin anidamiento
-============================================================ */
-
-/* ── 1. Toggle secciones del menú ── */
+/* ── 1. Toggle secciones ── */
 function toggleMenu(el) {
     var sub   = el.nextElementSibling;
     var arrow = el.querySelector('.sb-section-arrow');
-
     if (!sub) return;
 
     if (sub.style.maxHeight && sub.style.maxHeight !== '0px') {
@@ -611,7 +788,7 @@ function toggleMenu(el) {
     }
 }
 
-/* ── 2. Colapsar / expandir sidebar (desktop) ── */
+/* ── 2. Colapsar / expandir (desktop) ── */
 var sbCollapsed = false;
 
 function toggleSidebar() {
@@ -619,7 +796,6 @@ function toggleSidebar() {
     var main = document.getElementById('mainContent');
 
     sbCollapsed = !sbCollapsed;
-
     sb.classList.toggle('collapsed', sbCollapsed);
 
     if (main) {
@@ -635,7 +811,6 @@ function openSidebar() {
     document.getElementById('sbOverlay').classList.add('show');
     document.body.style.overflow = 'hidden';
 }
-
 function closeSidebar() {
     document.getElementById('sidebar').classList.remove('mobile-open');
     document.getElementById('sbOverlay').classList.remove('show');
@@ -644,7 +819,7 @@ function closeSidebar() {
 
 /* ── 4. Reloj ── */
 function actualizarReloj() {
-    var ahora = new Date();
+    var ahora  = new Date();
     var timeEl = document.getElementById('clockTime');
     var dateEl = document.getElementById('clockDate');
     if (timeEl) timeEl.textContent = ahora.toLocaleTimeString('es-PE');
@@ -653,7 +828,7 @@ function actualizarReloj() {
     });
 }
 
-/* ── 5. Init al cargar ── */
+/* ── 5. Init ── */
 document.addEventListener('DOMContentLoaded', function() {
 
     /* Restaurar estado colapsado */
@@ -665,18 +840,14 @@ document.addEventListener('DOMContentLoaded', function() {
         if (main) main.classList.add('sidebar-collapsed');
     }
 
-    /* Abrir sección activa automáticamente */
-    document.querySelectorAll('.sb-sub a').forEach(function(link) {
-        var href = link.getAttribute('href');
-        if (href && window.location.href.indexOf(href) !== -1 && href !== '#') {
-            var sub   = link.closest('.sb-sub');
-            var title = sub ? sub.previousElementSibling : null;
-            if (sub && title) {
-                sub.style.maxHeight = sub.scrollHeight + 'px';
-                title.classList.add('open');
-            }
-        }
-    });
+    /* Abrir sección activa y expandir su submenú */
+    var seccionActiva = '{{ $seccionActiva }}';
+    if (seccionActiva !== 'dash') {
+        document.querySelectorAll('.sb-section-title.open').forEach(function(title) {
+            var sub = title.nextElementSibling;
+            if (sub) sub.style.maxHeight = sub.scrollHeight + 'px';
+        });
+    }
 
     /* Botón hamburguesa */
     var toggleBtn = document.getElementById('sbToggle');
@@ -694,6 +865,5 @@ document.addEventListener('DOMContentLoaded', function() {
     /* Reloj */
     actualizarReloj();
     setInterval(actualizarReloj, 1000);
-
 });
 </script>
