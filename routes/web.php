@@ -24,6 +24,7 @@ use App\Http\Controllers\PrecintoController;
 use App\Http\Controllers\CajaController;
 use App\Http\Controllers\OrderPreparationController;
 use App\Http\Controllers\ProductEntryController;
+use App\Http\Controllers\ProductLogisticController;
 use App\Http\Controllers\JoselitoController;
 use App\Http\Controllers\DalsaController;
 
