@@ -387,6 +387,26 @@
     font-size:11.5px;
     border:1px solid #f3c7c4;
 }
+.btn-logistic{
+    flex:1;
+    text-align:center;
+    background:#fff;
+    color:#0d6efd;
+    border:1px solid #0d6efd;
+    padding:8px;
+    border-radius:3px;
+    text-decoration:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:36px;
+    font-weight:600;
+    font-size:12px;
+}
+
+.btn-logistic:hover{
+    background:#eaf3ff;
+}
 
 </style>
 
@@ -658,10 +678,15 @@ if($product->fecha_vencimiento){
                 </div>
                 @if($role == 'admin')
                 <div class="actions">
-                    
+
                     <a href="{{ route('products.edit',$product) }}"
-                       class="btn-edit">
-                        Editar
+                    class="btn-edit">
+                        ✏️ Editar
+                    </a>
+
+                    <a href="{{ route('products.logistic.edit',$product) }}"
+                    class="btn-logistic">
+                        📦 Logística
                     </a>
 
                     <form
@@ -678,14 +703,14 @@ if($product->fecha_vencimiento){
                             style="width:100%;"
                             onclick="return confirm('¿Eliminar producto?')">
 
-                            Eliminar
+                            🗑 Eliminar
 
                         </button>
 
                     </form>
 
                 </div>
-                @endif
+@endif
             </div>
 
         </div>

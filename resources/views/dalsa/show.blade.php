@@ -59,7 +59,6 @@
 <div class="page">
 <div class="erp-bar">
     <div class="erp-bar-left">
-        <div class="erp-logo">JOYBER PERÚ</div>
         <div class="erp-sep"></div>
         <div class="erp-module">Kardex Dalsa — {{ $dalsa->nombre }}</div>
     </div>
