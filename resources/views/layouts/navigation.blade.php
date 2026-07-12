@@ -728,9 +728,6 @@ $t = $temas[$seccionActiva];
                     <a href="/proveedores">
                         <span class="sb-icon">🚚</span><span>Proveedores</span>
                     </a>
-                    <a href="/users">
-                        <span class="sb-icon">👤</span><span>Usuarios</span>
-                    </a>
                     <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active configuracion' : '' }}">
                     <span class="sb-icon">👤</span><span>Usuarios</span> </a>
                 </div>

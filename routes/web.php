@@ -245,7 +245,6 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['auth'])->group(function () {
 
     Route::get('/usuarios', [UserController::class, 'index'])
-        ->middleware('role:admin')
         ->name('users.index'); });
 
   
