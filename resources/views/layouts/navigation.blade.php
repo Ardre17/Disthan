@@ -728,6 +728,9 @@ $t = $temas[$seccionActiva];
                     <a href="/proveedores">
                         <span class="sb-icon">🚚</span><span>Proveedores</span>
                     </a>
+                    <a href="/users">
+                        <span class="sb-icon">👤</span><span>Usuarios</span>
+                    </a>
                 </div>
             </div>
             @endif
