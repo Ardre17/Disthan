@@ -25,6 +25,19 @@ use App\Http\Controllers\CajaController;
 use App\Http\Controllers\OrderPreparationController;
 use App\Http\Controllers\ProductEntryController;
 use App\Http\Controllers\JoselitoController;
+use App\Http\Controllers\DalsaController;
+
+Route::resource('dalsa', DalsaController::class)
+     ->only(['index','create','store','show']);
+
+Route::post('dalsa/{dalsa}/movimiento', [DalsaController::class, 'movimiento'])
+     ->name('dalsa.movimiento');
+
+Route::get('/products/{product}/logistic', [ProductLogisticController::class, 'edit'])
+    ->name('products.logistic.edit');
+
+Route::post('/products/{product}/logistic', [ProductLogisticController::class, 'update'])
+    ->name('products.logistic.update');
 
 Route::resource('joselito', JoselitoController::class)
      ->only(['index','create','store','show']);

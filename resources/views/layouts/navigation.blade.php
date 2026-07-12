@@ -591,6 +591,7 @@ En línea
             <a href="{{ route('joselito.index') }}">
                 <span>🏚️</span><span>Joselito</span>
             </a>
+            <a href="{{ route('dalsa.index') }}"><span>🏭</span><span>Dalsa</span></a>
         @endif
         
     </div>

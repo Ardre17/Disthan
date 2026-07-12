@@ -53,5 +53,9 @@ class Product extends Model
 {
     return $this->hasMany(WarehouseLocation::class);
 }
+public function logistic()
+{
+    return $this->hasOne(ProductLogistic::class);
+}
 
 }
