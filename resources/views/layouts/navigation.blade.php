@@ -384,7 +384,15 @@ $role = auth()->user()->role;
 .sidebar.collapsed .sb-section-title{justify-content:center;padding:10px;}
 .sidebar.collapsed #clockTime{font-size:14px;letter-spacing:1px;}
 .sidebar.collapsed .sb-clock{padding:8px;}
-.sidebar.collapsed .sb-collapse-btn{display:none;}
+.sidebar.collapsed .sb-collapse-btn{
+    display:flex;
+    position:absolute;
+    top:18px;
+    right:12px;
+    width:26px;
+    height:26px;
+    z-index:1002;
+}
 
 /* ── RESPONSIVE ── */
 @media(max-width:768px){
@@ -640,14 +648,22 @@ function toggleMenu(el) {
 
 /* ── Colapsar sidebar (desktop) ── */
 var sbCollapsed = false;
-function toggleSidebar() {
-    var sb  = document.getElementById('sidebar');
-    var btn = sb.querySelector('.sb-collapse-btn');
+function toggleSidebar(){
+
+    const sb  = document.getElementById('sidebar');
+    const btn = document.querySelector('.sb-collapse-btn');
+
     sbCollapsed = !sbCollapsed;
+
     sb.classList.toggle('collapsed', sbCollapsed);
-    btn.textContent = sbCollapsed ? '›' : '‹';
-    // Guardar preferencia
-    localStorage.setItem('sb_collapsed', sbCollapsed ? '1' : '0');
+
+    btn.innerHTML = sbCollapsed ? '☰' : '‹';
+
+    localStorage.setItem(
+        'sb_collapsed',
+        sbCollapsed ? '1' : '0'
+    );
+
 }
 
 /* Restaurar estado al cargar */
@@ -657,7 +673,13 @@ document.addEventListener('DOMContentLoaded', function() {
         var btn = sb.querySelector('.sb-collapse-btn');
         sbCollapsed = true;
         sb.classList.add('collapsed');
-        if (btn) btn.textContent = '›';
+        if(btn){
+
+    btn.innerHTML = sbCollapsed
+        ? '☰'
+        : '‹';
+
+}
     }
 
     // Abrir la sección activa automáticamente
