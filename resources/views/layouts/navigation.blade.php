@@ -733,6 +733,23 @@ $t = $temas[$seccionActiva];
                 </div>
             </div>
             @endif
+            {{-- Comercial --}}
+            @if($role == 'admin')
+            <div class="sb-section com-s">
+                <div class="sb-section-title {{ $seccionActiva === 'com' ? 'open' : '' }}"
+                     onclick="toggleMenu(this)">
+                    <div class="sb-section-left">
+                        <span class="sb-section-icon"></span>
+                        <span>Auditoria</span>
+                    </div>
+                    <span class="sb-section-arrow">▾</span>
+                    <a href="{{ route('stockcount.index') }}">Conteo físico</a>
+                </div>
+                <div class="sb-sub">
+                    
+                </div>
+            </div>
+            @endif
 
         </nav>
     </div>

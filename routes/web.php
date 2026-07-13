@@ -28,6 +28,7 @@ use App\Http\Controllers\ProductLogisticController;
 use App\Http\Controllers\JoselitoController;
 use App\Http\Controllers\DalsaController;
 use App\Http\Controllers\PalletController;
+use App\Http\Controllers\StockCountController;
 
 Route::get('/generar/{order}', [PalletController::class, 'generar'])
     ->name('pallets.generar');
@@ -243,6 +244,17 @@ Route::middleware('auth')->group(function () {
     Route::delete('/usuarios/{user}', [UserController::class, 'destroy'])->name('users.destroy');
 
     Route::middleware(['auth'])->group(function () {
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONTEO FÍSICO (inventario físico con historial de diferencias)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/conteo-fisico', [StockCountController::class, 'index'])->name('stockcount.index');
+    Route::post('/conteo-fisico/nuevo', [StockCountController::class, 'create'])->name('stockcount.nuevo');
+    Route::get('/conteo-fisico/{stockcount}/captura', [StockCountController::class, 'captura'])->name('stockcount.captura');
+    Route::post('/conteo-fisico/{stockcount}/guardar', [StockCountController::class, 'guardarCaptura'])->name('stockcount.guardar');
+    Route::get('/conteo-fisico/{stockcount}', [StockCountController::class, 'show'])->name('stockcount.show');
 
     Route::get('/usuarios', [UserController::class, 'index'])
         ->name('users.index'); });
