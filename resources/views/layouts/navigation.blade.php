@@ -743,6 +743,8 @@ $t = $temas[$seccionActiva];
                         <span>Auditoria</span>
                     </div>
                     <span class="sb-section-arrow">▾</span>
+                     </div>
+                <div class="sb-sub">
                     <a href="{{ route('stockcount.index') }}">Conteo físico</a>
                 </div>
                 <div class="sb-sub">
