@@ -32,10 +32,29 @@
 .panel-title{font-size:12px;font-weight:700;color:#1e3a5f;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px;}
 .panel-body{padding:.9rem 1rem;}
 /* ── Scanner ── */
-.scanner-erp{background:#0f172a;border-radius:4px;padding:.75rem 1rem;display:flex;align-items:center;gap:10px;border:1px solid #334155;}
+.scanner-erp{
+    background:#0f172a;
+    border-radius:4px;
+    padding:.45rem .7rem;
+    display:flex;
+    align-items:center;
+    gap:8px;
+    border:1px solid #334155;
+}
 .scan-led{width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:blink 1.4s infinite;}
 @keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
-.scan-input{flex:1;padding:9px 12px;border-radius:4px;border:1.5px solid #334155;background:#1e293b;color:#f8fafc;font-size:14px;outline:none;font-family:'Courier New',monospace;letter-spacing:2px;}
+.scan-input{
+    flex:1;
+    padding:6px 10px;
+    border-radius:4px;
+    border:1px solid #334155;
+    background:#1e293b;
+    color:#fff;
+    font-size:13px;
+    outline:none;
+    font-family:'Courier New', monospace;
+    letter-spacing:1px;
+}
 .scan-input:focus{border-color:#3b82f6;}
 .scan-input::placeholder{color:#334155;font-size:12px;letter-spacing:0;font-family:'Segoe UI',sans-serif;}
 /* ── Form ── */
@@ -74,6 +93,14 @@
 .alert-ok{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:3px;padding:7px 10px;font-size:12px;color:#15803d;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
 .alert-warn{background:#fef3c7;border:1px solid #fde68a;border-radius:3px;padding:7px 10px;font-size:12px;color:#b45309;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
 hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
+@media (max-width:768px){
+
+    .erp-table th:nth-child(3),
+    .erp-table td:nth-child(3){
+        display:none;
+    }
+
+}
 </style>
 
 {{-- ── ERP Top Bar ── --}}
@@ -158,8 +185,7 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
     {{-- Scanner --}}
     <div class="scanner-erp">
         <div class="scan-led"></div>
-        <input type="text" id="scanner" class="scan-input"
-               placeholder="Escanea o escribe código de barras y presiona Enter..." autofocus>
+        <input type="text" id="scanner" class="scan-input" placeholder="Escanea o escribe código de barras">
         <span style="font-size:10px;color:#475569;white-space:nowrap;">⏎ Enter</span>
     </div>
 
@@ -201,8 +227,8 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
             <div class="panel-title">📦 Líneas del pedido</div>
             <span style="font-size:10px;color:#94a3b8;">{{ $totalItems }} registro(s)</span>
         </div>
-        <div style="overflow-x:auto;">
-            <table class="erp-table">
+        <div style="overflow-x:auto; -webkit-overflow-scrolling:touch;">
+            <table class="erp-table" style="min-width:950px;">
                 <thead>
                     <tr>
                         <th>Est.</th>
@@ -381,14 +407,6 @@ scanner.addEventListener('keypress', function(e){
 
     this.value = '';
 });
-
-// Mantener foco solo si no hay un campo interactivo activo
-setInterval(() => {
-    const activo = document.activeElement;
-    if(activo !== scanner && !TAGS_INTERACTIVOS.includes(activo.tagName)){
-        scanner.focus();
-    }
-}, 1000);
 
 // ── Editar fila ──
 function editar(id){

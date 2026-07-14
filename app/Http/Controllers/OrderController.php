@@ -132,14 +132,87 @@ public function agregarABulto(Request $request, \App\Models\Bulto $bulto)
 
     return view('dashboard', compact('data'));
 }
-    public function historial()
-{
-    $orders = Order::with('client')
-        ->where('estado', 'COMPLETO')
-        ->latest()
-        ->paginate(20);
 
-    return view('orders.historial', compact('orders'));
+// Reemplaza tu método historial() en el controlador
+// Agrega al inicio del controlador si no los tienes:
+// use Illuminate\Http\Request;
+// use Carbon\Carbon;
+
+public function historial(Request $request)
+{
+    $query = Order::with(['client', 'details'])
+        ->where('estado', 'COMPLETO');
+
+    // ── Filtro por fecha ──────────────────────────────────────────────
+    if ($request->filled('fecha_inicio')) {
+        $query->whereDate('fecha_pedido', '>=', $request->fecha_inicio);
+    }
+    if ($request->filled('fecha_fin')) {
+        $query->whereDate('fecha_pedido', '<=', $request->fecha_fin);
+    }
+
+    // ── Filtro por cliente o número de orden ──────────────────────────
+    if ($request->filled('cliente')) {
+        $busqueda = $request->cliente;
+        $query->where(function ($q) use ($busqueda) {
+            $q->where('numero_orden', 'like', '%' . $busqueda . '%')
+              ->orWhereHas('client', fn($c) =>
+                  $c->where('razon_social', 'like', '%' . $busqueda . '%')
+              );
+        });
+    }
+
+    // ── Filtro por tipo de orden ──────────────────────────────────────
+    if ($request->filled('tipo_orden')) {
+        $query->where('tipo_orden', $request->tipo_orden);
+    }
+
+    // ── Ordenamiento ──────────────────────────────────────────────────
+    match ($request->get('orden', 'fecha_desc')) {
+        'fecha_asc'  => $query->orderBy('fecha_pedido', 'asc'),
+        'total_desc' => $query->orderBy('total', 'desc'),
+        'total_asc'  => $query->orderBy('total', 'asc'),
+        default      => $query->orderBy('fecha_pedido', 'desc'),
+    };
+
+    $orders = $query->paginate(20)->withQueryString();
+
+    // ── Datos para el gráfico de facturación mensual (últimos 6 meses) ─
+    $chartQuery = Order::where('estado', 'COMPLETO');
+
+    if ($request->filled('tipo_orden')) {
+        $chartQuery->where('tipo_orden', $request->tipo_orden);
+    }
+
+    $datosGrafico = $chartQuery
+        ->selectRaw("DATE_FORMAT(fecha_pedido, '%Y-%m') as mes, SUM(total) as monto, COUNT(*) as cant")
+        ->whereDate('fecha_pedido', '>=', now()->subMonths(5)->startOfMonth())
+        ->groupByRaw("DATE_FORMAT(fecha_pedido, '%Y-%m')")
+        ->orderBy('mes')
+        ->get();
+
+    // Rellenar los 6 meses aunque no tengan datos
+    $meses   = [];
+    $montos  = [];
+    $cantOrd = [];
+
+    for ($i = 5; $i >= 0; $i--) {
+        $fecha = now()->subMonths($i);
+        $key   = $fecha->format('Y-m');
+
+        $fila = $datosGrafico->firstWhere('mes', $key);
+
+        $meses[]   = ucfirst($fecha->locale('es')->isoFormat('MMM YY'));
+        $montos[]  = $fila ? (float) $fila->monto : 0;
+        $cantOrd[] = $fila ? (int)   $fila->cant  : 0;
+    }
+
+    return view('orders.historial', compact(
+        'orders',
+        'meses',
+        'montos',
+        'cantOrd'
+    ));
 }
 
     public function operario(Order $order)
