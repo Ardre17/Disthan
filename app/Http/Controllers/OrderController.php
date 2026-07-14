@@ -161,6 +161,25 @@ public function agregarABulto(Request $request, \App\Models\Bulto $bulto)
         $order->numero_orden.'.pdf'
     );
 }
+public function pdfEncomienda(Order $order)
+{
+    $order->load([
+        'client',
+        'details.product',
+        'bultos.detalles.product'
+    ]);
+
+    $pdf = Pdf::loadView(
+        'orders.pdf_encomienda',
+        compact('order')
+    );
+
+    $pdf->setPaper('A4', 'portrait');
+
+    return $pdf->stream(
+        'Encomienda_'.$order->numero_orden.'.pdf'
+    );
+}
 
     public function addProduct(
     Request $request,

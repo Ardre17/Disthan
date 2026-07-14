@@ -30,6 +30,11 @@ use App\Http\Controllers\DalsaController;
 use App\Http\Controllers\PalletController;
 use App\Http\Controllers\StockCountController;
 
+Route::get(
+    '/orders/{order}/pdf-encomienda',
+    [OrderController::class,'pdfEncomienda']
+)->name('orders.pdfEncomienda');
+
 Route::get('/generar/{order}', [PalletController::class, 'generar'])
     ->name('pallets.generar');
 

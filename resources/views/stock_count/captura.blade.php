@@ -345,7 +345,7 @@ textarea[name="observaciones"]:focus{
         </div>
     </div>
     <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">
-        <a href="{{ route('stock_count.index') }}" class="btn-back">
+        <a href="{{ route('stockcount.index') }}" class="btn-back">
             ← Volver al historial
         </a>
         <span class="breadcrumb">Inventario › Conteo físico › Captura</span>

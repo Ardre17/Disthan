@@ -133,6 +133,14 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
             <button type="submit" class="btn btn-green">✅ Cerrar Encomienda</button>
         </form>
         @endif
+                <a
+            href="{{ route('orders.pdfEncomienda',$order) }}"
+            target="_blank"
+            class="btn btn-red">
+
+            📄 PDF Cliente
+
+        </a>
     </div>
 </div>
 
