@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <style>
 
-@page { margin: 35px 38px; }
+@page { margin: 40px 40px; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -13,6 +13,7 @@ body {
     color: #1e293b;
     background: #fff;
     line-height: 1.4;
+    padding: 20px 24px;
 }
 
 /* HEADER */

@@ -133,11 +133,6 @@ public function agregarABulto(Request $request, \App\Models\Bulto $bulto)
     return view('dashboard', compact('data'));
 }
 
-// Reemplaza tu método historial() en el controlador
-// Agrega al inicio del controlador si no los tienes:
-// use Illuminate\Http\Request;
-// use Carbon\Carbon;
-
 public function historial(Request $request)
 {
     $query = Order::with(['client', 'details'])
@@ -185,11 +180,11 @@ public function historial(Request $request)
     }
 
     $datosGrafico = $chartQuery
-        ->selectRaw("DATE_FORMAT(fecha_pedido, '%Y-%m') as mes, SUM(total) as monto, COUNT(*) as cant")
-        ->whereDate('fecha_pedido', '>=', now()->subMonths(5)->startOfMonth())
-        ->groupByRaw("DATE_FORMAT(fecha_pedido, '%Y-%m')")
-        ->orderBy('mes')
-        ->get();
+    ->selectRaw("TO_CHAR(fecha_pedido, 'YYYY-MM') as mes, SUM(total) as monto, COUNT(*) as cant")
+    ->whereDate('fecha_pedido', '>=', now()->subMonths(5)->startOfMonth())
+    ->groupByRaw("TO_CHAR(fecha_pedido, 'YYYY-MM')")
+    ->orderBy('mes')
+    ->get();
 
     // Rellenar los 6 meses aunque no tengan datos
     $meses   = [];
