@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <style>
 
-@page { margin: 18px 22px; }
+@page { margin: 35px 38px; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -102,6 +102,9 @@ body {
         ->groupBy(fn($i) => $i->paleta ?: 'SIN PALETA')
         ->sortKeys(SORT_NATURAL);
 
+    // ── Solo paletas con nombre real (excluir SIN PALETA del conteo) ────
+    $paletasConNombre = $paletas->filter(fn($items, $key) => $key !== 'SIN PALETA');
+
     // ── Peso desde cantidad_despachada ───────────────────────────────────
     $pesoTotal = $detalles->sum(fn($d) =>
         $d->cantidad_despachada * ($d->product->peso ?? 0) / 1000
@@ -145,7 +148,7 @@ body {
         </td>
         <td>
             <div class="info-label">Paletas</div>
-            <div class="info-value">{{ $paletas->count() }}</div>
+            <div class="info-value">{{ $paletasConNombre->count() }}</div>
         </td>
     </tr>
 </table>
