@@ -328,7 +328,6 @@ textarea[name="observaciones"]:focus{
 
 <div class="erp-bar">
     <div class="erp-bar-left">
-        <div class="erp-logo">JOYBER PERÚ</div>
         <div class="erp-sep"></div>
         <div class="erp-module">Captura de conteo físico</div>
     </div>
@@ -346,7 +345,7 @@ textarea[name="observaciones"]:focus{
         </div>
     </div>
     <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">
-        <a href="{{ route('stockcount.historial') }}" class="btn-back">
+        <a href="{{ route('stock_count.index') }}" class="btn-back">
             ← Volver al historial
         </a>
         <span class="breadcrumb">Inventario › Conteo físico › Captura</span>
