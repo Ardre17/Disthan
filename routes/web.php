@@ -30,6 +30,9 @@ use App\Http\Controllers\JoselitoController;
 use App\Http\Controllers\DalsaController;
 use App\Http\Controllers\PalletController;
 use App\Http\Controllers\StockCountController;
+use App\Http\Controllers\DesmedroController;
+// Agregar dentro de routes/web.php, en el grupo con middleware(['auth'])
+
 
 Route::get(
     '/orders/{order}/pdf-encomienda',
@@ -74,7 +77,17 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/product-entries',        [ProductEntryController::class, 'index'])->name('product-entries.index');
     Route::get('/product-entries/create', [ProductEntryController::class, 'create'])->name('product-entries.create');
     Route::post('/product-entries',       [ProductEntryController::class, 'store'])->name('product-entries.store');
+
+    Route::prefix('desmedros')->name('desmedros.')->group(function () {     
+    Route::get('/', [DesmedroController::class, 'index'])->name('index');
+    Route::get('/productos/buscar', [DesmedroController::class, 'buscarProducto'])->name('productos.buscar');
+    Route::post('/detalle', [DesmedroController::class, 'agregarDetalle'])->name('detalle.store');
+    Route::delete('/detalle/{detalle}', [DesmedroController::class, 'quitarDetalle'])->name('detalle.destroy');
+    Route::post('/{desmedro}/registrar', [DesmedroController::class, 'registrar'])->name('registrar');
+    Route::delete('/{desmedro}', [DesmedroController::class, 'destroy'])->name('destroy');
+    Route::get('/{desmedro}', [DesmedroController::class, 'show'])->name('show');
 });
+    });
 
 
 Route::resource('cajas', CajaController::class);

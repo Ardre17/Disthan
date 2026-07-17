@@ -247,7 +247,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 1.5s infinite;"></div>
         <div style="flex:1;">
             <div class="scanner-label">📡 Escanear código de barras</div>
-            <input type="text" id="scanner" class="scanner-input" placeholder="Escanea o escribe el código..." autofocus>
+            <input type="text" id="scanner" class="scanner-input" placeholder="Escanea o escribe el código...">
         </div>
         <div style="font-size:10px;color:#475569;text-align:right;white-space:nowrap;">Enter para<br>confirmar</div>
     </div>

@@ -196,7 +196,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 <div class="scanner-wrap">
     <div class="scanner-pulse"></div>
     <input type="text" id="scanner" class="scanner-input"
-           placeholder="📡 Escanea un producto para ver su estado en la orden..." autofocus>
+           placeholder="📡 Escanea un producto para ver su estado en la orden...">
     <span style="font-size:10px;color:#475569;white-space:nowrap;">Enter para<br>confirmar</span>
 </div>
 
