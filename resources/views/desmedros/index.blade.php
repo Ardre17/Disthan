@@ -471,7 +471,6 @@
     </div>
 </div>
 <script src="//unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script>
 function desmedroBuilder(cfg) {
     return {
