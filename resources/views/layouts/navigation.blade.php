@@ -746,11 +746,9 @@ $t = $temas[$seccionActiva];
                      </div>
                 <div class="sb-sub">
                     <a href="{{ route('stockcount.index') }}">Conteo físico</a>
-                </div>
-                <div class="sb-sub">
+                
                     <a href="{{ route('desmedros.index') }}" class="{{ request()->routeIs('desmedros.*') ? 'active' : '' }}">
-                        <i class="fas fa-dumpster"></i>
-                        <span>Desmedros</span>
+                        <span>Desmedros</span> 
                     </a>
                 </div>
             </div>
