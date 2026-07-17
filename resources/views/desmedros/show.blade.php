@@ -2,7 +2,8 @@
 
 @section('title', 'Desmedro ' . $desmedro->codigo)
 
-@push('styles')
+
+@section('content')
 <style>
     :root {
         --dsm-navy: #1B2A4A;
@@ -111,9 +112,6 @@
         .dsmd-layout { grid-template-columns: 1fr; }
     }
 </style>
-@endpush
-
-@section('content')
 <div class="dsmd-wrap">
     <div class="dsmd-breadcrumb">
         <a href="{{ url('/') }}">Inicio</a>
@@ -230,9 +228,6 @@
         </div>
     </div>
 </div>
-@endsection
-
-@push('scripts')
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
@@ -259,4 +254,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
-@endpush
+@endsection

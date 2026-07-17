@@ -2,7 +2,8 @@
 
 @section('title', 'Desmedros')
 
-@push('styles')
+
+@section('content')
 <style>
     :root {
         --dsm-navy: #1B2A4A;
@@ -233,9 +234,6 @@
     .dsm-list-empty { padding: 50px 20px; text-align: center; color: var(--dsm-muted); font-size: 13px; }
     [x-cloak] { display: none !important; }
 </style>
-@endpush
-
-@section('content')
 <div class="dsm-wrap" x-data="desmedroBuilder({
         desmedroId: {{ $borrador?->id ?? 'null' }},
         codigo: @js($borrador?->codigo),
@@ -472,9 +470,6 @@
         </div>
     </div>
 </div>
-@endsection
-
-@push('scripts')
 <script src="//unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.4/chart.umd.min.js"></script>
 <script>
@@ -612,4 +607,4 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 </script>
-@endpush
+@endsection
