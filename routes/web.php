@@ -31,8 +31,18 @@ use App\Http\Controllers\DalsaController;
 use App\Http\Controllers\PalletController;
 use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\DesmedroController;
-// Agregar dentro de routes/web.php, en el grupo con middleware(['auth'])
+use App\Http\Controllers\RechazoController;
 
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/rechazos',          [RechazoController::class, 'index'])->name('rechazos.index');
+    Route::get('/rechazos/crear',    [RechazoController::class, 'create'])->name('rechazos.create');
+    Route::post('/rechazos',         [RechazoController::class, 'store'])->name('rechazos.store');
+
+    // AJAX
+    Route::get('/rechazos/buscar-orden',      [RechazoController::class, 'buscarOrden'])->name('rechazos.buscarOrden');
+    Route::get('/rechazos/orden/{order}',     [RechazoController::class, 'productosOrden'])->name('rechazos.productosOrden');
+});
 
 Route::get(
     '/orders/{order}/pdf-encomienda',

@@ -150,5 +150,8 @@ class OrderDetail extends Model
 
     return back();
     }
-    
+    public function rechazos()
+{
+    return $this->hasMany(Rechazo::class, 'order_detail_id');
+}
 }

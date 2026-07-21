@@ -750,6 +750,9 @@ $t = $temas[$seccionActiva];
                     <a href="{{ route('desmedros.index') }}" class="{{ request()->routeIs('desmedros.*') ? 'active' : '' }}">
                         <span>Desmedros</span> 
                     </a>
+                    <a href="{{ route('rechazos.index') }}">
+                        <span>↩</span><span>Rechazos</span>
+                    </a>
                 </div>
             </div>
             @endif
