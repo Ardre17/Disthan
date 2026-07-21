@@ -739,16 +739,16 @@ $t = $temas[$seccionActiva];
                 <div class="sb-section-title {{ $seccionActiva === 'com' ? 'open' : '' }}"
                      onclick="toggleMenu(this)">
                     <div class="sb-section-left">
-                        <span class="sb-section-icon"></span>
+                        <span class="sb-section-icon">📝</span>
                         <span>Auditoria</span>
                     </div>
                     <span class="sb-section-arrow">▾</span>
                      </div>
                 <div class="sb-sub">
-                    <a href="{{ route('stockcount.index') }}">Conteo físico</a>
+                    <a href="{{ route('stockcount.index') }}"> <span>📈</span><span>Conteo físico</span></a>
                 
                     <a href="{{ route('desmedros.index') }}" class="{{ request()->routeIs('desmedros.*') ? 'active' : '' }}">
-                        <span>Desmedros</span> 
+                        <span class="sb-icon">⛔</span><span>Desmedros</span> 
                     </a>
                     <a href="{{ route('rechazos.index') }}">
                         <span>↩</span><span>Rechazos</span>
