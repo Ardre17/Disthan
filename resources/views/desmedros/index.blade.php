@@ -519,8 +519,13 @@ function desmedroBuilder(cfg) {
                         cantidad: this.cantidad,
                     }),
                 });
-                if (!res.ok) throw new Error('No se pudo agregar el producto.');
                 const data = await res.json();
+
+if (!res.ok) {
+    console.log(data);
+    alert(data.message ?? JSON.stringify(data));
+    return;
+}
 
                 this.desmedroId = data.desmedro.id;
                 this.codigo = data.desmedro.codigo;

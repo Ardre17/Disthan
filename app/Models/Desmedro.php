@@ -32,9 +32,11 @@ class Desmedro extends Model
     }
 
     public static function generarCodigo(): string
-    {
-        $ultimo = static::withTrashed()->orderByDesc('id')->first();
-        $siguiente = $ultimo ? $ultimo->id + 1 : 1;
-        return 'DSM-' . str_pad($siguiente, 6, '0', STR_PAD_LEFT);
-    }
+{
+    $ultimo = static::orderByDesc('id')->first();
+
+    $siguiente = $ultimo ? $ultimo->id + 1 : 1;
+
+    return 'DSM-' . str_pad($siguiente, 6, '0', STR_PAD_LEFT);
+}
 }
