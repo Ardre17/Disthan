@@ -320,15 +320,50 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 </div>
                 <span class="prod-badge {{ $badgeCls }}">{{ $s }}</span>
             </div>
-            <div class="info-strip">
-                <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
-                <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
-                <div class="info-item" style="grid-column:1/-1;gap:6px;">
-                    <span style="font-size:10px;color:#94a3b8;white-space:nowrap;">Despacho:</span>
-                    <div class="prog-mini" style="flex:1;"><div class="prog-mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div></div>
-                    <span style="font-size:10px;font-weight:700;color:{{ $sc }};margin-left:2px;">{{ $pct }}%</span>
-                </div>
-            </div>
+            {{-- DESPUÉS --}}
+@php
+    $cpc         = $detail->product->cantidad_por_caja ?? 1;
+    $cajasDesp   = $cpc > 0 ? floor($detail->cantidad_despachada / $cpc) : 0;
+    $cajasSol    = $cpc > 0 ? ceil($detail->cantidad_solicitada / $cpc) : 0;
+    $unidSueltas = $cpc > 0 ? ($detail->cantidad_despachada % $cpc) : 0;
+@endphp
+<div class="info-strip" style="grid-template-columns:1fr 1fr;">
+    <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
+    <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
+
+    {{-- Cajas solicitadas --}}
+    <div class="info-item" style="grid-column:1/-1;">
+        🗃 Cajas solicitadas:
+        <span class="info-val" style="color:#2563eb;">
+            {{ $cajasSol }} caja{{ $cajasSol !== 1 ? 's' : '' }}
+        </span>
+        <span style="font-size:10px;color:#94a3b8;margin-left:3px;">
+            ({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)
+        </span>
+    </div>
+
+    {{-- Cajas despachadas --}}
+    <div class="info-item" style="grid-column:1/-1;">
+        ✅ Cajas despachadas:
+        <span class="info-val" style="color:{{ $bc }};">
+            {{ $cajasDesp }} caja{{ $cajasDesp !== 1 ? 's' : '' }}
+        </span>
+        @if($unidSueltas > 0)
+        <span style="font-size:10px;color:#f59e0b;margin-left:3px;">
+            + {{ $unidSueltas }} u. sueltas
+        </span>
+        @endif
+    </div>
+
+    {{-- Barra de progreso --}}
+    <div class="info-item" style="grid-column:1/-1;gap:6px;">
+        <span style="font-size:10px;color:#94a3b8;white-space:nowrap;">Despacho:</span>
+        <div class="prog-mini" style="flex:1;">
+            <div class="prog-mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div>
+        </div>
+        <span style="font-size:10px;font-weight:700;color:{{ $sc }};margin-left:2px;">{{ $pct }}%</span>
+    </div>
+</div>
             <form method="POST" action="{{ route('orders.updateDetail',$detail) }}">
                 @csrf @method('PUT')
                 <div class="fields-box">
@@ -416,15 +451,17 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 $icon     = $todoC ? '✅' : ($algunP ? '⏳' : '⚠️');
 
                 // Serializar items para el modal
+                {{-- DESPUÉS --}}
                 $itemsJson = $items->map(fn($i) => [
-                    'nombre'   => $i->product->nombre ?? 'Producto',
-                    'sku'      => $i->product->sku ?? '',
-                    'solicitada'=> $i->cantidad_solicitada,
-                    'despachada'=> $i->cantidad_despachada,
-                    'estado'   => $i->estado_item,
-                    'precio'   => $i->precio_unitario,
-                    'subtotal' => $i->subtotal,
-                    'peso'     => number_format(($i->product->peso ?? 0) / 1000, 3),
+                    'nombre'          => $i->product->nombre ?? 'Producto',
+                    'sku'             => $i->product->sku ?? '',
+                    'solicitada'      => $i->cantidad_solicitada,
+                    'despachada'      => $i->cantidad_despachada,
+                    'estado'          => $i->estado_item,
+                    'precio'          => $i->precio_unitario,
+                    'subtotal'        => $i->subtotal,
+                    'peso'            => number_format(($i->product->peso ?? 0) / 1000, 3),
+                    'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,  // ← NUEVO
                 ])->values()->toJson();
             @endphp
 
@@ -444,15 +481,17 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
             {{-- Sin paleta --}}
             @if($sinPaleta->count())
             @php
+                {{-- DESPUÉS --}}
                 $spJson = $sinPaleta->map(fn($i) => [
-                    'nombre'    => $i->product->nombre ?? 'Producto',
-                    'sku'       => $i->product->sku ?? '',
-                    'solicitada'=> $i->cantidad_solicitada,
-                    'despachada'=> $i->cantidad_despachada,
-                    'estado'    => $i->estado_item,
-                    'precio'    => $i->precio_unitario,
-                    'subtotal'  => $i->subtotal,
-                    'peso'      => number_format(($i->product->peso ?? 0) / 1000, 3),
+                    'nombre'          => $i->product->nombre ?? 'Producto',
+                    'sku'             => $i->product->sku ?? '',
+                    'solicitada'      => $i->cantidad_solicitada,
+                    'despachada'      => $i->cantidad_despachada,
+                    'estado'          => $i->estado_item,
+                    'precio'          => $i->precio_unitario,
+                    'subtotal'        => $i->subtotal,
+                    'peso'            => number_format(($i->product->peso ?? 0) / 1000, 3),
+                    'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,  // ← NUEVO
                 ])->values()->toJson();
             @endphp
             <div class="no-paleta-chip"
@@ -614,25 +653,52 @@ function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, it
     };
 
     let html = '';
-    items.forEach(item => {
-        const ec = estadoColors[item.estado] ?? { bg:'#f1f5f9', color:'#64748b', dot:'#94a3b8' };
-        const itemPct = item.solicitada > 0 ? Math.round((item.despachada / item.solicitada) * 100) : 0;
-        html += `
-        <div class="pm-item">
-            <div class="pm-item-dot" style="background:${ec.dot};"></div>
-            <div class="pm-item-name">
-                <div style="font-weight:600;">${item.nombre}</div>
-                <div style="font-size:10px;color:#94a3b8;">${item.sku ? 'SKU: '+item.sku+' · ' : ''}${item.peso} kg · S/ ${parseFloat(item.precio).toFixed(2)}</div>
-                <div style="height:3px;background:#e5e7eb;border-radius:99px;margin-top:4px;overflow:hidden;">
-                    <div style="height:100%;width:${itemPct}%;background:${ec.dot};border-radius:99px;"></div>
-                </div>
+    // DESPUÉS
+items.forEach(item => {
+    const ec = estadoColors[item.estado] ?? { bg:'#f1f5f9', color:'#64748b', dot:'#94a3b8' };
+    const itemPct  = item.solicitada > 0 ? Math.round((item.despachada / item.solicitada) * 100) : 0;
+
+    // ── Cálculo de cajas ──
+    const cpc         = item.cantidad_por_caja > 0 ? item.cantidad_por_caja : 1;
+    const cajasSol    = Math.ceil(item.solicitada / cpc);
+    const cajasDesp   = Math.floor(item.despachada / cpc);
+    const sueltas     = item.despachada % cpc;
+    const cajasLabel  = cajasDesp + ' / ' + cajasSol + ' caja' + (cajasSol !== 1 ? 's' : '');
+    const sueltasHtml = sueltas > 0
+        ? `<span style="font-size:10px;color:#f59e0b;margin-left:4px;">+${sueltas} u. sueltas</span>`
+        : '';
+
+    html += `
+    <div class="pm-item">
+        <div class="pm-item-dot" style="background:${ec.dot};"></div>
+        <div class="pm-item-name">
+            <div style="font-weight:600;">${item.nombre}</div>
+            <div style="font-size:10px;color:#94a3b8;">
+                ${item.sku ? 'SKU: '+item.sku+' · ' : ''}${item.peso} kg · S/ ${parseFloat(item.precio).toFixed(2)}
             </div>
-            <div class="pm-item-right">
-                <div class="pm-item-qty">${item.despachada}/${item.solicitada}</div>
-                <span class="pm-item-badge" style="background:${ec.bg};color:${ec.color};">${item.estado}</span>
+
+            {{-- Línea de cajas --}}
+            <div style="
+                display:inline-flex;align-items:center;gap:4px;
+                margin-top:3px;
+                background:#eff6ff;border:1px solid #bfdbfe;
+                border-radius:4px;padding:2px 7px;
+                font-size:10px;font-weight:700;color:#1d4ed8;
+            ">
+                🗃 ${cajasLabel}
             </div>
-        </div>`;
-    });
+            ${sueltasHtml}
+
+            <div style="height:3px;background:#e5e7eb;border-radius:99px;margin-top:5px;overflow:hidden;">
+                <div style="height:100%;width:${itemPct}%;background:${ec.dot};border-radius:99px;"></div>
+            </div>
+        </div>
+        <div class="pm-item-right">
+            <div class="pm-item-qty">${item.despachada}/${item.solicitada}</div>
+            <span class="pm-item-badge" style="background:${ec.bg};color:${ec.color};">${item.estado}</span>
+        </div>
+    </div>`;
+});
 
     document.getElementById('pmItemsList').innerHTML = html;
     document.getElementById('pmOverlay').classList.add('open');
