@@ -320,7 +320,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 </div>
                 <span class="prod-badge {{ $badgeCls }}">{{ $s }}</span>
             </div>
-            {{-- DESPUÉS --}}
 @php
     $cpc         = $detail->product->cantidad_por_caja ?? 1;
     $cajasDesp   = $cpc > 0 ? floor($detail->cantidad_despachada / $cpc) : 0;
@@ -451,7 +450,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 $icon     = $todoC ? '✅' : ($algunP ? '⏳' : '⚠️');
 
                 // Serializar items para el modal
-                {{-- DESPUÉS --}}
                 $itemsJson = $items->map(fn($i) => [
                     'nombre'          => $i->product->nombre ?? 'Producto',
                     'sku'             => $i->product->sku ?? '',
@@ -481,7 +479,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
             {{-- Sin paleta --}}
             @if($sinPaleta->count())
             @php
-                {{-- DESPUÉS --}}
                 $spJson = $sinPaleta->map(fn($i) => [
                     'nombre'          => $i->product->nombre ?? 'Producto',
                     'sku'             => $i->product->sku ?? '',
