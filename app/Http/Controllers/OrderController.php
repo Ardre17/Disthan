@@ -409,6 +409,9 @@ public function pdfEncomienda(Order $order)
         return view('orders.edit_encomienda', compact('order','products'));
     }
 
+    if ($tipo == 'EXPORTACION') {
+        return view('orders.edit_exportacion', compact('order','products'));
+    }
     return view('orders.edit', compact('order','products'));
 }
 
