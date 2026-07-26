@@ -240,9 +240,15 @@ S/
         Aquí se mostrarán los pallets creados para esta orden.
     </p>
 
-    <button type="button">
+    <form action="{{ route('exportacion.pallet.store', $order) }}" method="POST">
+
+    @csrf
+
+    <button type="submit">
         ➕ Crear Pallet
     </button>
+
+</form>
 
 </div>
 

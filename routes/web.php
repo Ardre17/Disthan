@@ -32,6 +32,10 @@ use App\Http\Controllers\PalletController;
 use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
+use App\Http\Controllers\ExportController;
+
+Route::post('/exportacion/{order}/pallet', [ExportController::class, 'storePallet'])
+    ->name('exportacion.pallet.store');
 
 Route::get('/order-details/{item}/etiqueta', [OrderController::class, 'etiqueta'])->name('orders.etiqueta');
 

@@ -6,13 +6,45 @@ use Illuminate\Database\Eloquent\Model;
 
 class Pallet extends Model
 {
-    public function order()
-{
-    return $this->belongsTo(Order::class);
-}
+    protected $fillable = [
 
-public function detalles()
-{
-    return $this->hasMany(PalletDetail::class);
-}
+        'order_id',
+
+        'codigo',
+
+        'orden',
+
+        'estado',
+
+        'peso_neto',
+
+        'peso_bruto',
+
+        'altura',
+
+        'ancho',
+
+        'largo',
+
+        'observaciones',
+
+        'cerrado',
+
+    ];
+
+    /*
+    |--------------------------------------------------------------------------
+    | Relaciones
+    |--------------------------------------------------------------------------
+    */
+
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function detalles()
+    {
+        return $this->hasMany(PalletDetail::class);
+    }
 }
