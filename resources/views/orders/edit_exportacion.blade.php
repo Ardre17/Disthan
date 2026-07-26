@@ -1,3 +1,39 @@
+@extends('layouts.app')
+
+@section('content')
+<style>
+
+.export-card{
+    background:#fff;
+    border-radius:12px;
+    padding:20px;
+    box-shadow:0 2px 8px rgba(0,0,0,.08);
+    margin-bottom:20px;
+}
+
+.export-title{
+    font-size:28px;
+    font-weight:700;
+    color:#0f172a;
+}
+
+.export-section{
+    border:1px solid #e5e7eb;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:20px;
+}
+
+.pallet-card{
+    border:1px solid #cbd5e1;
+    border-radius:10px;
+    padding:15px;
+    margin-bottom:15px;
+    background:#f8fafc;
+}
+
+</style>
+<div class="container-fluid py-3">
 <h2>🚢 Exportación</h2>
 
 <hr>
@@ -30,26 +66,33 @@
     <p>
 
         Producto
+    <select name="order_detail_id" required>
 
-        <select
-            name="product_id"
-            required>
+    <option value="">
+        Seleccione un producto
+    </option>
 
-            <option value="">
-                Seleccionar
+    @foreach($order->details as $detalle)
+
+        @php
+            $enPallets = $detalle->palletDetails->sum('cantidad');
+            $pendiente = $detalle->cantidad_solicitada - $enPallets;
+        @endphp
+
+        @if($pendiente > 0)
+
+            <option value="{{ $detalle->id }}">
+
+                {{ $detalle->product->nombre }}
+                ({{ $pendiente }} pendientes)
+
             </option>
 
-            @foreach($products as $product)
+        @endif
 
-                <option value="{{ $product->id }}">
+    @endforeach
 
-                    {{ $product->nombre }}
-
-                </option>
-
-            @endforeach
-
-        </select>
+</select>
 
     </p>
 
@@ -472,3 +515,6 @@ S/
     </tbody>
 
 </table>
+</div>
+
+@endsection
