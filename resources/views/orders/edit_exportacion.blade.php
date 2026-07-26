@@ -262,7 +262,7 @@ S/
 
                 <strong>
 
-                    {{ $pallet->nombre }}
+                    {{ $pallet->codigo }}
 
                 </strong>
 
@@ -338,29 +338,55 @@ S/
 
             <br>
 
-            <form>
+           <form action="{{ route('exportacion.pallet.agregarProducto', $pallet) }}" method="POST">
 
-                <select>
+    @csrf
 
-                    <option>
+    <select name="order_detail_id" required>
 
-                        Agregar producto...
+        <option value="">
+            Seleccione un producto
+        </option>
 
-                    </option>
+        @foreach($order->details as $detalle)
 
-                </select>
+            @php
 
-                <input
-                    type="number"
-                    placeholder="Cantidad">
+                $enPallets = $detalle->palletDetails->sum('cantidad');
 
-                <button>
+                $pendiente = $detalle->cantidad_solicitada - $enPallets;
 
-                    Agregar
+            @endphp
 
-                </button>
+            @if($pendiente > 0)
 
-            </form>
+                <option value="{{ $detalle->id }}">
+
+                    {{ $detalle->product->nombre }}
+                    ({{ $pendiente }} pendientes)
+
+                </option>
+
+            @endif
+
+        @endforeach
+
+    </select>
+
+    <input
+        type="number"
+        name="cantidad"
+        min="1"
+        required
+        placeholder="Cantidad">
+
+    <button type="submit">
+
+        Agregar
+
+    </button>
+
+</form>
 
         </fieldset>
 

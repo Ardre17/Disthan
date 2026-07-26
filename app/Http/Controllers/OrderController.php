@@ -447,9 +447,16 @@ public function pdfEncomienda(Order $order)
     }
 
     if ($tipo == 'EXPORTACION') {
-        return view('orders.edit_exportacion', compact('order','products'));
+
+    $order->load([
+        'client',
+        'details.product',
+        'pallets.detalles.product',
+        'pallets.detalles.orderDetail',
+    ]);
+
+    return view('orders.edit_exportacion', compact('order'));
     }
-    return view('orders.edit', compact('order','products'));
 }
 
 public function updateDetail(Request $request, OrderDetail $detail)
