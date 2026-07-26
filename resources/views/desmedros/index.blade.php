@@ -208,58 +208,9 @@
     .dsm-ticket::before { left: -9px; }
     .dsm-ticket::after { right: -9px; }
 
-    .dsm-list-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; flex-wrap: wrap; gap: 10px; }
+    .dsm-list-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
     .dsm-list-head h2 { font-size: 14.5px; font-weight: 700; color: var(--dsm-ink); margin: 0; }
     .dsm-list-head span { font-size: 12px; color: var(--dsm-muted); }
-
-    /* ── Filtro de fechas ── */
-    .dsm-filter-bar {
-        display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap;
-        background: var(--dsm-card); border: 1px solid var(--dsm-border); border-radius: 12px;
-        padding: 14px 16px; margin-bottom: 14px;
-    }
-    .dsm-filter-field { display: flex; flex-direction: column; gap: 4px; }
-    .dsm-filter-field label {
-        font-size: 10.5px; text-transform: uppercase; letter-spacing: .5px; color: var(--dsm-muted); font-weight: 700;
-    }
-    .dsm-filter-field input {
-        border: 1.5px solid var(--dsm-border); border-radius: 8px; padding: 8px 10px;
-        font-size: 12.5px; color: var(--dsm-ink); outline: none; transition: border-color .15s;
-    }
-    .dsm-filter-field input:focus { border-color: var(--dsm-navy); }
-    .dsm-filter-bar button {
-        background: var(--dsm-navy); color: #fff; border: none; border-radius: 8px;
-        padding: 9px 16px; font-size: 12.5px; font-weight: 600; cursor: pointer; transition: background .15s;
-        height: 34px;
-    }
-    .dsm-filter-bar button:hover { background: var(--dsm-navy-light); }
-    .dsm-filter-clear {
-        font-size: 12px; color: var(--dsm-muted); text-decoration: none; padding: 9px 4px; height: 34px;
-        display: flex; align-items: center;
-    }
-    .dsm-filter-clear:hover { color: var(--dsm-red); }
-
-    /* ── Exportar rango de cajas a PDF ── */
-    .dsm-pdf-rango-card {
-        background: var(--dsm-navy); border-radius: 12px; padding: 14px 16px; margin-bottom: 14px;
-        display: flex; align-items: flex-end; gap: 10px; flex-wrap: wrap;
-    }
-    .dsm-pdf-rango-title {
-        color: #fff; font-size: 12.5px; font-weight: 700; margin-right: 4px;
-        display: flex; align-items: center; gap: 6px; white-space: nowrap;
-    }
-    .dsm-pdf-rango-card .dsm-filter-field label { color: #B9C4D8; }
-    .dsm-pdf-rango-card .dsm-filter-field input {
-        border: 1.5px solid rgba(255,255,255,.25); background: rgba(255,255,255,.08); color: #fff;
-        width: 110px;
-    }
-    .dsm-pdf-rango-card .dsm-filter-field input::placeholder { color: #7D8CA8; }
-    .dsm-pdf-rango-card .dsm-filter-field input:focus { border-color: #fff; }
-    .dsm-pdf-rango-card button {
-        background: var(--dsm-red); color: #fff; border: none; border-radius: 8px;
-        padding: 9px 16px; font-size: 12.5px; font-weight: 700; cursor: pointer; height: 34px;
-    }
-    .dsm-pdf-rango-card button:hover { background: #A93226; }
 
     .dsm-table-card {
         background: var(--dsm-card); border: 1px solid var(--dsm-border); border-radius: 14px;
@@ -484,36 +435,6 @@
                 <span>Descuento de stock aplicado</span>
             </div>
 
-            {{-- ── Filtro por fechas ── --}}
-            <form method="GET" action="{{ route('desmedros.index') }}" class="dsm-filter-bar">
-                <div class="dsm-filter-field">
-                    <label>Desde</label>
-                    <input type="date" name="fecha_inicio" value="{{ request('fecha_inicio') }}">
-                </div>
-                <div class="dsm-filter-field">
-                    <label>Hasta</label>
-                    <input type="date" name="fecha_fin" value="{{ request('fecha_fin') }}">
-                </div>
-                <button type="submit">🔍 Filtrar</button>
-                @if(request('fecha_inicio') || request('fecha_fin'))
-                    <a href="{{ route('desmedros.index') }}" class="dsm-filter-clear">✕ Limpiar filtro</a>
-                @endif
-            </form>
-
-            {{-- ── Exportar rango de cajas a PDF ── --}}
-            <form method="GET" action="{{ route('desmedros.pdfRango') }}" target="_blank" class="dsm-pdf-rango-card">
-                <div class="dsm-pdf-rango-title">📄 Exportar rango de cajas</div>
-                <div class="dsm-filter-field">
-                    <label>Desde caja Nº</label>
-                    <input type="number" name="desde" placeholder="Ej: 728" required>
-                </div>
-                <div class="dsm-filter-field">
-                    <label>Hasta caja Nº</label>
-                    <input type="number" name="hasta" placeholder="Ej: 738" required>
-                </div>
-                <button type="submit">Generar PDF</button>
-            </form>
-
             <div class="dsm-table-card">
                 @if($desmedros->count())
                     <table class="dsm-table">
@@ -545,7 +466,7 @@
                 @endif
             </div>
 
-            <div style="margin-top:14px;">{{ $desmedros->appends(request()->query())->links() }}</div>
+            <div style="margin-top:14px;">{{ $desmedros->links() }}</div>
         </div>
     </div>
 </div>
