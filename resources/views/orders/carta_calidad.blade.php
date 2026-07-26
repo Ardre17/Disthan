@@ -537,7 +537,7 @@ body {
             · Generado el {{ $ahora->format('d/m/Y \a \l\a\s H:i') }}
         </td>
         <td>
-            {{ $order->numero_orden }} · Este documento es válido sin firma electrónica
+            {{ $order->numero_orden }} · Este documento detalla información de los productos
         </td>
     </tr>
 </table>

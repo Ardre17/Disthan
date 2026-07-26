@@ -284,13 +284,13 @@ public function pdfEncomienda(Order $order)
 
     public function addProduct(
     Request $request,
-    Order $order
+    Order $order,
+    
 )
 {
     $product = Product::findOrFail(
         $request->product_id
     );
-
     OrderDetail::create([
 
         'order_id' => $order->id,
@@ -308,7 +308,11 @@ public function pdfEncomienda(Order $order)
         'subtotal' => 0,
 
         'estado_item' =>
-            'INCOMPLETO'
+            'INCOMPLETO',
+
+        // 🔥 Snapshot del lote/vencimiento del producto al momento de agregarlo
+        'lote' => $product->lote,
+        'fecha_vencimiento' => $product->fecha_vencimiento,
     ]);
 
     return back()->with(
@@ -495,21 +499,24 @@ public function updateDetail(Request $request, OrderDetail $detail)
         $producto->stock += abs($diferencia);
         $producto->save();
     }
-
     // 🔥 ACTUALIZAR DETALLE
-    $detail->update([
+    $updateData = [
         'cantidad_solicitada' => $cantidadSolicitada,
         'cantidad_despachada' => $cantidadDespachada,
         'precio_unitario' => $precio,
-
-        'paleta' => $request->input('paleta'),
-        'fecha_vencimiento' => $request->input('fecha_vencimiento'),
-        'nivel' => $request->input('nivel'),
-        'ubicacion' => $request->input('ubicacion'),
-
         'estado_item' => $estado,
         'subtotal' => $subtotal,
-    ]);
+    ];
+
+    // Solo tocar estos campos si vienen en el request
+    // (evita que el guardado rápido de cantidad/precio borre datos ya guardados)
+    foreach (['paleta', 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
+        if ($request->has($campo)) {
+            $updateData[$campo] = $request->input($campo);
+        }
+    }
+
+    $detail->update($updateData);
 
     // 🔄 ACTUALIZAR ORDEN
     $order = $detail->order;
