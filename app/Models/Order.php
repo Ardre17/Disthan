@@ -39,4 +39,8 @@ class Order extends Model
 {
     return $this->hasMany(\App\Models\Bulto::class);
 }
+public function pallets()
+{
+    return $this->hasMany(Pallet::class);
+}
 }

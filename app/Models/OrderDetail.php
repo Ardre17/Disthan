@@ -155,4 +155,8 @@ class OrderDetail extends Model
 {
     return $this->hasMany(Rechazo::class, 'order_detail_id');
 }
+public function palletDetails()
+{
+    return $this->hasMany(PalletDetail::class);
+}
 }
