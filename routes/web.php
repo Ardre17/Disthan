@@ -33,7 +33,7 @@ use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 
-Route::get('/order-details/{item}/etiqueta', [OrderController::class, 'etiqueta'])->name('orderDetails.etiqueta');
+Route::get('/order-details/{item}/etiqueta', [OrderController::class, 'etiqueta'])->name('orders.etiqueta');
 
 Route::put('/order-details/{item}/lote', [OrderController::class, 'updateLote'])->name('orderDetails.updateLote');
 
