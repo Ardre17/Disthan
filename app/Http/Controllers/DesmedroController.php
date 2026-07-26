@@ -15,65 +15,73 @@ class DesmedroController extends Controller
     /**
      * Lista de desmedros + borrador en construcción del usuario (si existe).
      */
-    public function index()
-    {
-        $desmedros = Desmedro::withCount('detalles')
-            ->with('usuario')
-            ->where('estado', 'registrado')
-            ->latest('registrado_at')
-            ->paginate(15);
+    public function index(Request $request)
+{
+    $query = Desmedro::withCount('detalles')
+        ->with('usuario')
+        ->where('estado', 'registrado');
 
-        // Si el usuario dejó una caja a medio armar, la recuperamos
-        $borrador = Desmedro::with('detalles.producto')
-            ->where('estado', 'borrador')
-            ->where('user_id', Auth::id())
-            ->latest()
-            ->first();
-
-        // ---- KPIs ----
-        $registrados = Desmedro::where('estado', 'registrado');
-        $totalCajas = (clone $registrados)->count();
-        $totalUnidades = (float) DesmedroDetalle::whereHas('desmedro', fn ($q) => $q->where('estado', 'registrado'))->sum('cantidad');
-
-        $inicioMes = now()->startOfMonth();
-        $cajasEsteMes = (clone $registrados)->where('registrado_at', '>=', $inicioMes)->count();
-        $unidadesEsteMes = (float) DesmedroDetalle::whereHas('desmedro', fn ($q) => $q->where('estado', 'registrado')->where('registrado_at', '>=', $inicioMes))->sum('cantidad');
-
-        $promedioPorCaja = $totalCajas > 0 ? $totalUnidades / $totalCajas : 0;
-
-        $kpis = [
-            'total_cajas'       => $totalCajas,
-            'total_unidades'    => $totalUnidades,
-            'cajas_este_mes'    => $cajasEsteMes,
-            'unidades_este_mes' => $unidadesEsteMes,
-            'promedio_caja'     => $promedioPorCaja,
-        ];
-
-        // ---- Tendencia: últimos 6 meses (cajas registradas por mes) ----
-        $tendencia = collect(range(5, 0))->map(function ($i) {
-            $mes = now()->subMonths($i);
-            $cantidad = Desmedro::where('estado', 'registrado')
-                ->whereYear('registrado_at', $mes->year)
-                ->whereMonth('registrado_at', $mes->month)
-                ->count();
-            return [
-                'label'    => ucfirst($mes->translatedFormat('M')),
-                'cantidad' => $cantidad,
-            ];
-        });
-
-        // ---- Top 5 productos con más unidades desmedradas ----
-        $topProductos = DesmedroDetalle::query()
-            ->whereHas('desmedro', fn ($q) => $q->where('estado', 'registrado'))
-            ->selectRaw('producto_id, SUM(cantidad) as total')
-            ->groupBy('producto_id')
-            ->orderByDesc('total')
-            ->with('producto:id,nombre,sku')
-            ->limit(5)
-            ->get();
-
-        return view('desmedros.index', compact('desmedros', 'borrador', 'kpis', 'tendencia', 'topProductos'));
+    if ($request->filled('fecha_inicio')) {
+        $query->whereDate('registrado_at', '>=', $request->fecha_inicio);
     }
+
+    if ($request->filled('fecha_fin')) {
+        $query->whereDate('registrado_at', '<=', $request->fecha_fin);
+    }
+
+    $desmedros = $query->latest('registrado_at')->paginate(15)->withQueryString();
+
+    // Si el usuario dejó una caja a medio armar, la recuperamos
+    $borrador = Desmedro::with('detalles.producto')
+        ->where('estado', 'borrador')
+        ->where('user_id', Auth::id())
+        ->latest()
+        ->first();
+
+    // ---- KPIs ----
+    $registrados = Desmedro::where('estado', 'registrado');
+    $totalCajas = (clone $registrados)->count();
+    $totalUnidades = (float) DesmedroDetalle::whereHas('desmedro', fn ($q) => $q->where('estado', 'registrado'))->sum('cantidad');
+
+    $inicioMes = now()->startOfMonth();
+    $cajasEsteMes = (clone $registrados)->where('registrado_at', '>=', $inicioMes)->count();
+    $unidadesEsteMes = (float) DesmedroDetalle::whereHas('desmedro', fn ($q) => $q->where('estado', 'registrado')->where('registrado_at', '>=', $inicioMes))->sum('cantidad');
+
+    $promedioPorCaja = $totalCajas > 0 ? $totalUnidades / $totalCajas : 0;
+
+    $kpis = [
+        'total_cajas'       => $totalCajas,
+        'total_unidades'    => $totalUnidades,
+        'cajas_este_mes'    => $cajasEsteMes,
+        'unidades_este_mes' => $unidadesEsteMes,
+        'promedio_caja'     => $promedioPorCaja,
+    ];
+
+    // ---- Tendencia: últimos 6 meses (cajas registradas por mes) ----
+    $tendencia = collect(range(5, 0))->map(function ($i) {
+        $mes = now()->subMonths($i);
+        $cantidad = Desmedro::where('estado', 'registrado')
+            ->whereYear('registrado_at', $mes->year)
+            ->whereMonth('registrado_at', $mes->month)
+            ->count();
+        return [
+            'label'    => ucfirst($mes->translatedFormat('M')),
+            'cantidad' => $cantidad,
+        ];
+    });
+
+    // ---- Top 5 productos con más unidades desmedradas ----
+    $topProductos = DesmedroDetalle::query()
+        ->whereHas('desmedro', fn ($q) => $q->where('estado', 'registrado'))
+        ->selectRaw('producto_id, SUM(cantidad) as total')
+        ->groupBy('producto_id')
+        ->orderByDesc('total')
+        ->with('producto:id,nombre,sku')
+        ->limit(5)
+        ->get();
+
+    return view('desmedros.index', compact('desmedros', 'borrador', 'kpis', 'tendencia', 'topProductos'));
+        }
 
     /**
      * Typeahead de productos para el buscador en tiempo real.

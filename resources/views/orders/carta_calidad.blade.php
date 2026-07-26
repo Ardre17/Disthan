@@ -5,7 +5,7 @@
 <style>
 
 @page {
-    margin: 75px 65px;
+    margin: 30mm 25mm;
 }
 
 * {
@@ -20,7 +20,7 @@ body {
     color: #1e293b;
     background: #fff;
     line-height: 1.5;
-    padding: 0 14px;
+    padding: 0 20px;
 }
 
 /* ── Header ── */
@@ -369,7 +369,7 @@ body {
 
 {{-- ══ DECLARACIÓN DE CALIDAD ══ --}}
 <div class="declaracion">
-    <strong>VALLE FERTIL S.A.C.</strong> declara que los productos descritos en el presente documento
+    <strong>VALLE FERTILS.A.C.</strong> declara que los productos descritos en el presente documento
     han sido inspeccionados, verificados y despachados bajo los estándares de calidad establecidos por la empresa,
     cumpliendo con las normas de manipulación, almacenamiento y trazabilidad vigentes.
     Este certificado acredita que los productos entregados al cliente
@@ -477,6 +477,37 @@ body {
     </tr>
 </table>
 
+{{-- ══ RESUMEN DE VENCIMIENTOS ══ --}}
+@if($totalLineas > 0)
+<table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
+    <tr>
+        <td style="width:25%;padding:6px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;text-align:center;">
+            <div style="font-size:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Vigentes</div>
+            <div style="font-size:16px;font-weight:800;color:#15803d;">{{ $vigentes }}</div>
+            <div style="font-size:8px;color:#94a3b8;">productos</div>
+        </td>
+        <td style="width:3%;"></td>
+        <td style="width:25%;padding:6px 10px;background:#fef3c7;border:1px solid #fde68a;border-radius:4px;text-align:center;">
+            <div style="font-size:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Próx. a vencer</div>
+            <div style="font-size:16px;font-weight:800;color:#b45309;">{{ $proximos }}</div>
+            <div style="font-size:8px;color:#94a3b8;">≤ 30 días</div>
+        </td>
+        <td style="width:3%;"></td>
+        <td style="width:25%;padding:6px 10px;background:#fee2e2;border:1px solid #fca5a5;border-radius:4px;text-align:center;">
+            <div style="font-size:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Vencidos</div>
+            <div style="font-size:16px;font-weight:800;color:#b91c1c;">{{ $vencidos }}</div>
+            <div style="font-size:8px;color:#94a3b8;">productos</div>
+        </td>
+        <td style="width:3%;"></td>
+        <td style="width:16%;padding:6px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;text-align:center;">
+            <div style="font-size:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Sin fecha</div>
+            <div style="font-size:16px;font-weight:800;color:#64748b;">{{ $sinFecha }}</div>
+            <div style="font-size:8px;color:#94a3b8;">productos</div>
+        </td>
+    </tr>
+</table>
+@endif
+
 {{-- ══ FIRMAS ══ --}}
 <table class="firma-section" cellpadding="0" cellspacing="0">
     <tr>
@@ -489,7 +520,7 @@ body {
         </td>
         <td>
             <div style="font-size:9px;font-weight:700;color:#1e293b;">Responsable de despacho</div>
-            <div class="firma-cargo">Almacén · VALLE FERTIL S.A.C</div>
+            <div class="firma-cargo">Almacén · VALLE FERTIL/div>
         </td>
         <td>
             <div style="font-size:9px;font-weight:700;color:#1e293b;">Recibido conforme</div>
@@ -506,7 +537,7 @@ body {
             · Generado el {{ $ahora->format('d/m/Y \a \l\a\s H:i') }}
         </td>
         <td>
-            {{ $order->numero_orden }} · Este documento es válido sin firma electrónica
+            {{ $order->numero_orden }} · Este documento detalla la información de los productos
         </td>
     </tr>
 </table>

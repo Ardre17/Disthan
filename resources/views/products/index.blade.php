@@ -837,7 +837,7 @@ if($product->fecha_vencimiento){
                 @endphp
                 <button type="button" class="btn-view"
                     onclick='abrirDetalle(@json($mdData))'>
-                    👁️ Ver detalle completo
+                    Ver detalle completo
                 </button>
 
                 @if($role == 'admin')
