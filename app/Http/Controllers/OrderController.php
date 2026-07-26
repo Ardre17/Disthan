@@ -11,6 +11,19 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
+    public function cartaCalidad(Order $order)
+{
+    $detalles = $order->details()
+        ->with('product')
+        ->where('cantidad_despachada', '>', 0)
+        ->get();
+
+    $pdf = \PDF::loadView('orders.carta_calidad', compact('order', 'detalles'));
+
+    $pdf->setPaper('a4', 'portrait');
+
+    return $pdf->stream('carta-calidad-' . $order->numero_orden . '.pdf');
+}
 
     public function pedidos()
 {

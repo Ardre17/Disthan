@@ -34,6 +34,9 @@ use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 
 
+Route::get('orders/{order}/carta-calidad', [OrderController::class, 'cartaCalidad'])
+     ->name('orders.cartaCalidad');
+
 Route::middleware(['auth'])->group(function () {
     Route::get('/rechazos',          [RechazoController::class, 'index'])->name('rechazos.index');
     Route::get('/rechazos/crear',    [RechazoController::class, 'create'])->name('rechazos.create');

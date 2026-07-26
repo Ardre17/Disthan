@@ -234,13 +234,17 @@ S/
 
 <h3>🟫 Pallets</h3>
 
-<button type="button">
+<div>
 
-    ➕ Crear Pallet
+    <p>
+        Aquí se mostrarán los pallets creados para esta orden.
+    </p>
 
-</button>
+    <button type="button">
+        ➕ Crear Pallet
+    </button>
 
-<br><br>
+</div>
 
 @if($order->pallets->count())
 

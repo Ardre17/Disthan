@@ -196,6 +196,21 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
             {{ $order->estado }}
         </span>
         <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="btn-green">📄 PDF</a>
+        {{-- Solo para órdenes LOCAL --}}
+            @if($order->tipo_orden === 'LOCAL')
+            <a href="{{ route('orders.cartaCalidad', $order) }}"
+            target="_blank"
+            style="
+                display:inline-flex;align-items:center;gap:5px;
+                padding:7px 14px;border-radius:3px;
+                background:#7c3aed;color:#fff;
+                font-size:12px;font-weight:600;
+                text-decoration:none;
+                transition:opacity .15s;
+            ">
+                🏅 Carta de calidad
+            </a>
+@endif
     </div>
 </div>
 
@@ -423,12 +438,6 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
                 <div class="status-row"><span>🔴 Pendiente</span><span style="font-weight:700;color:#b91c1c;">{{ $pendientes }}</span></div>
 
                 <hr class="dv">
-
-                <a href="{{ route('orders.pdf',$order) }}" target="_blank"
-                   class="btn-green"
-                   style="display:block;text-align:center;text-decoration:none;padding:9px;margin-bottom:6px;">
-                    📄 Ver / Descargar PDF
-                </a>
             </div>
         </div>
     </div>
