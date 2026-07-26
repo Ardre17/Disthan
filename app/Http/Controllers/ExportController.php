@@ -47,4 +47,35 @@ class ExportController extends Controller
 
         return redirect()->back()->with('success', 'Pallet creado correctamente.');
     }
+    public function agregarProducto(Request $request, Pallet $pallet)
+{
+    $request->validate([
+        'order_detail_id' => 'required|exists:order_details,id',
+        'cantidad' => 'required|numeric|min:1',
+    ]);
+
+    $orderDetail = $pallet->order->details()
+        ->with('palletDetails')
+        ->findOrFail($request->order_detail_id);
+
+    $cantidadEnPallets = $orderDetail->palletDetails->sum('cantidad');
+
+    $pendiente = $orderDetail->cantidad_solicitada - $cantidadEnPallets;
+
+    if ($request->cantidad > $pendiente) {
+        return back()->with('error', 'La cantidad supera el pendiente del pedido.');
+    }
+
+    $producto = $orderDetail->product;
+
+    PalletDetail::create([
+        'pallet_id'       => $pallet->id,
+        'order_detail_id' => $orderDetail->id,
+        'product_id'      => $producto->id,
+        'cantidad'        => $request->cantidad,
+        'peso'            => ($producto->peso * $request->cantidad) / 1000,
+    ]);
+
+    return back()->with('success', 'Producto agregado al pallet.');
+}
 }

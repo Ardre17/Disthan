@@ -34,6 +34,9 @@ use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
 
+Route::post('/exportacion/pallets/{pallet}/agregar-producto',[ExportController::class, 'agregarProducto'])
+    ->name('exportacion.pallet.agregarProducto');
+
 Route::post('/exportacion/{order}/pallet', [ExportController::class, 'storePallet'])
     ->name('exportacion.pallet.store');
 
