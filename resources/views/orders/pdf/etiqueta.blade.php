@@ -64,6 +64,10 @@ body {
 }
 .col-izq {
     width: 46%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
 }
 .col-der {
     width: 54%;
@@ -76,20 +80,28 @@ body {
     color: #1e3a5f;
     margin-bottom: 2px;
     line-height: 1.25;
+    text-align: center;
+    width: 100%;
 }
+
+/* SKU */
 .sku {
     font-size: 6px;
     color: #94a3b8;
     margin-bottom: 4px;
+    text-align: center;
+    width: 100%;
 }
 
-/* Cantidad destacada */
+/* Cantidad */
 .cant-box {
     background: #f0f7ff;
     border: 1px solid #bfdbfe;
     border-radius: 2px;
     text-align: center;
     padding: 4px 0;
+    width: 90%;
+    margin-top: 4px;
 }
 .cant-num {
     font-size: 18px;
