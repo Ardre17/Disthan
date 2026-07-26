@@ -15,7 +15,7 @@ class OrderController extends Controller
 {
     $item->load('product', 'order.client');
 
-    $pdf = Pdf::loadView('pdf.etiqueta', compact('item'))
+    $pdf = Pdf::loadView('orders.pdf.etiqueta', compact('item'))
                ->setPaper([0, 0, 198.425, 198.425], 'portrait'); // 7cm x 7cm en puntos
 
     return $pdf->stream('etiqueta-' . $item->id . '.pdf');
