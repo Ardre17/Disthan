@@ -408,6 +408,129 @@
     background:#eaf3ff;
 }
 
+/* ---------- Botón Ver detalle ---------- */
+.btn-view{
+    width:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    height:36px;
+    margin-top:12px;
+    background:var(--erp-ink);
+    color:#fff;
+    border:none;
+    border-radius:3px;
+    font-weight:600;
+    font-size:12px;
+    cursor:pointer;
+    box-sizing:border-box;
+}
+.btn-view:hover{
+    background:#000;
+}
+
+/* ---------- Modal detalle producto ---------- */
+.modal-overlay{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.6);
+    z-index:9999;
+    align-items:center;
+    justify-content:center;
+    padding:1rem;
+}
+.modal-box{
+    background:#fff;
+    border-radius:6px;
+    width:100%;
+    max-width:520px;
+    max-height:88vh;
+    overflow-y:auto;
+    box-shadow:0 12px 34px rgba(0,0,0,.28);
+}
+.modal-head{
+    background:var(--erp-ink);
+    color:#fff;
+    padding:.9rem 1.1rem;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:10px;
+    position:sticky;
+    top:0;
+    z-index:1;
+}
+.modal-head-name{
+    font-size:15px;
+    font-weight:700;
+}
+.modal-head-sku{
+    font-size:11px;
+    color:#aeb9c7;
+    font-family:var(--font-mono);
+    margin-top:2px;
+}
+.modal-head button{
+    background:none;
+    border:none;
+    color:#aeb9c7;
+    font-size:20px;
+    cursor:pointer;
+    line-height:1;
+    padding:2px 4px;
+    flex-shrink:0;
+}
+.modal-body{
+    padding:1.1rem;
+}
+.modal-img{
+    width:100%;
+    max-height:170px;
+    object-fit:cover;
+    border-radius:4px;
+    border:1px solid var(--erp-border);
+    margin-bottom:12px;
+    display:block;
+}
+.modal-section-title{
+    font-size:10.5px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.6px;
+    color:var(--erp-ink-muted);
+    margin:14px 0 6px;
+    padding-bottom:4px;
+    border-bottom:2px solid var(--erp-border);
+}
+.modal-section-title:first-of-type{
+    margin-top:0;
+}
+.modal-row{
+    display:flex;
+    justify-content:space-between;
+    padding:5px 0;
+    border-bottom:1px dashed #ecf0f4;
+    font-size:12.5px;
+}
+.modal-row:last-child{ border-bottom:none; }
+.modal-row .k{ color:var(--erp-ink-muted); }
+.modal-row .v{ font-weight:600; color:var(--erp-ink); text-align:right; }
+.modal-empty-note{
+    font-size:12px;
+    color:var(--erp-ink-muted);
+    font-style:italic;
+    padding:6px 0;
+}
+.modal-warnings{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+    margin-bottom:6px;
+}
+.modal-warnings img{ height:38px; width:auto; }
+
 </style>
 
 <div class="page">
@@ -676,6 +799,40 @@ if($product->fecha_vencimiento){
                     {{ str_replace('_',' ',$product->rotacion) }}
 
                 </div>
+
+                {{-- ── Ver detalle completo (todos los roles) ── --}}
+                <button type="button" class="btn-view"
+                    onclick='abrirDetalle(@json([
+                        "sku" => $product->sku,
+                        "nombre" => $product->nombre,
+                        "categoria" => $product->categoria,
+                        "imagen" => $product->imagen ? asset("storage/".$product->imagen) : null,
+                        "advertencias" => $product->advertencias,
+                        "lote" => $product->lote,
+                        "stock" => $product->stock,
+                        "stock_minimo" => $product->stock_minimo,
+                        "cantidad_por_caja" => $product->cantidad_por_caja,
+                        "fecha_produccion" => $product->fecha_produccion,
+                        "fecha_vencimiento" => $product->fecha_vencimiento,
+                        "barcode" => $product->barcode,
+                        "box_barcode" => $product->box_barcode,
+                        "rotacion" => $product->rotacion,
+                        "logistic" => $product->logistic ? [
+                            "largo_cm" => $product->logistic->largo_cm,
+                            "ancho_cm" => $product->logistic->ancho_cm,
+                            "alto_cm" => $product->logistic->alto_cm,
+                            "peso_caja" => $product->logistic->peso_caja,
+                            "max_cajas_pallet" => $product->logistic->max_cajas_pallet,
+                            "max_niveles" => $product->logistic->max_niveles,
+                            "altura_maxima_pallet" => $product->logistic->altura_maxima_pallet,
+                            "permite_mezcla" => $product->logistic->permite_mezcla,
+                            "orientacion" => $product->logistic->orientacion,
+                            "activo" => $product->logistic->activo,
+                        ] : null,
+                    ]))'>
+                    👁️ Ver detalle completo
+                </button>
+
                 @if($role == 'admin')
                 <div class="actions">
 
@@ -732,5 +889,145 @@ if($product->fecha_vencimiento){
     </div>
 
 </div>
+
+{{-- ── Modal detalle de producto (compartido, se llena vía JS) ── --}}
+<div id="modalDetalle" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-head">
+            <div>
+                <div class="modal-head-name" id="mdNombre">—</div>
+                <div class="modal-head-sku" id="mdSku">SKU: —</div>
+            </div>
+            <button type="button" onclick="cerrarDetalle()">✕</button>
+        </div>
+        <div class="modal-body">
+
+            <img id="mdImagen" class="modal-img" style="display:none;">
+
+            <div class="modal-warnings" id="mdWarnings"></div>
+
+            <div class="modal-section-title">Información general</div>
+            <div class="modal-row"><span class="k">Categoría</span><span class="v" id="mdCategoria">—</span></div>
+            <div class="modal-row"><span class="k">Lote</span><span class="v" id="mdLote">—</span></div>
+            <div class="modal-row"><span class="k">Stock actual</span><span class="v" id="mdStock">—</span></div>
+            <div class="modal-row"><span class="k">Stock mínimo</span><span class="v" id="mdStockMin">—</span></div>
+            <div class="modal-row"><span class="k">Unidades por caja</span><span class="v" id="mdCaja">—</span></div>
+            <div class="modal-row"><span class="k">Rotación</span><span class="v" id="mdRotacion">—</span></div>
+
+            <div class="modal-section-title">Vencimiento</div>
+            <div class="modal-row"><span class="k">Fecha de producción</span><span class="v" id="mdFechaProd">—</span></div>
+            <div class="modal-row"><span class="k">Fecha de vencimiento</span><span class="v" id="mdFechaVenc">—</span></div>
+            <div class="modal-row"><span class="k">Estado</span><span class="v" id="mdEstadoVenc">—</span></div>
+
+            <div class="modal-section-title">Códigos</div>
+            <div class="modal-row"><span class="k">Código unidad</span><span class="v" id="mdBarcode">—</span></div>
+            <div class="modal-row"><span class="k">Código caja</span><span class="v" id="mdBoxBarcode">—</span></div>
+
+            <div class="modal-section-title">Logística</div>
+            <div id="mdLogistica"></div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function diasHasta(fechaStr){
+    if(!fechaStr) return null;
+    var hoy = new Date();
+    hoy.setHours(0,0,0,0);
+    var fecha = new Date(fechaStr);
+    fecha.setHours(0,0,0,0);
+    return Math.round((fecha - hoy) / (1000*60*60*24));
+}
+
+function abrirDetalle(p){
+    document.getElementById('mdNombre').textContent = p.nombre || '—';
+    document.getElementById('mdSku').textContent = 'SKU: ' + (p.sku || '—');
+
+    var img = document.getElementById('mdImagen');
+    if(p.imagen){
+        img.src = p.imagen;
+        img.style.display = 'block';
+    } else {
+        img.style.display = 'none';
+    }
+
+    // Octógonos de advertencia
+    var warnBox = document.getElementById('mdWarnings');
+    warnBox.innerHTML = '';
+    var advertencias = (p.advertencias || '').toUpperCase().split(',');
+    var iconos = {
+        'AZUCAR': 'https://pbs.twimg.com/media/F-6D6zQWEAMPN7d.png',
+        'SODIO': 'https://blogs.ucontinental.edu.pe/wp-content/uploads/2019/06/Octogono-sodio.png',
+        'GRASAS': 'https://dolcezzaperu.pe/wp-content/uploads/2023/06/MicrosoftTeams-image-2.png'
+    };
+    advertencias.forEach(function(a){
+        a = a.trim();
+        if(iconos[a]){
+            var im = document.createElement('img');
+            im.src = iconos[a];
+            warnBox.appendChild(im);
+        }
+    });
+
+    document.getElementById('mdCategoria').textContent = p.categoria || '—';
+    document.getElementById('mdLote').textContent = p.lote || '—';
+    document.getElementById('mdStock').textContent = (p.stock ?? '—');
+    document.getElementById('mdStockMin').textContent = (p.stock_minimo ?? '—');
+    document.getElementById('mdCaja').textContent = (p.cantidad_por_caja ?? '—');
+    document.getElementById('mdRotacion').textContent = p.rotacion ? p.rotacion.replace('_',' ') : '—';
+
+    document.getElementById('mdFechaProd').textContent = p.fecha_produccion || '—';
+    document.getElementById('mdFechaVenc').textContent = p.fecha_vencimiento || '—';
+
+    var estadoEl = document.getElementById('mdEstadoVenc');
+    if(p.fecha_vencimiento){
+        var dias = diasHasta(p.fecha_vencimiento);
+        if(dias < 0){
+            estadoEl.innerHTML = '<span style="color:#c0312b;">🔴 Vencido</span>';
+        } else if(dias <= 30){
+            estadoEl.innerHTML = '<span style="color:#b9690e;">🟠 Próximo a vencer (' + dias + 'd)</span>';
+        } else {
+            estadoEl.innerHTML = '<span style="color:#1c7c4d;">🟢 Vigente (' + dias + 'd)</span>';
+        }
+    } else {
+        estadoEl.textContent = '—';
+    }
+
+    document.getElementById('mdBarcode').textContent = p.barcode || '—';
+    document.getElementById('mdBoxBarcode').textContent = p.box_barcode || '—';
+
+    // Logística
+    var logBox = document.getElementById('mdLogistica');
+    if(p.logistic){
+        var l = p.logistic;
+        logBox.innerHTML =
+            fila('Dimensiones (LxAxA cm)', (l.largo_cm ?? '—') + ' x ' + (l.ancho_cm ?? '—') + ' x ' + (l.alto_cm ?? '—')) +
+            fila('Peso por caja', (l.peso_caja != null ? l.peso_caja + ' kg' : '—')) +
+            fila('Máx. cajas por pallet', l.max_cajas_pallet ?? '—') +
+            fila('Máx. niveles', l.max_niveles ?? '—') +
+            fila('Altura máx. de pallet', (l.altura_maxima_pallet != null ? l.altura_maxima_pallet + ' cm' : '—')) +
+            fila('Permite mezcla', l.permite_mezcla ? 'Sí' : 'No') +
+            fila('Orientación', l.orientacion || '—') +
+            fila('Activo', l.activo ? 'Sí' : 'No');
+    } else {
+        logBox.innerHTML = '<div class="modal-empty-note">Este producto aún no tiene datos de logística registrados.</div>';
+    }
+
+    document.getElementById('modalDetalle').style.display = 'flex';
+}
+
+function fila(k, v){
+    return '<div class="modal-row"><span class="k">' + k + '</span><span class="v">' + v + '</span></div>';
+}
+
+function cerrarDetalle(){
+    document.getElementById('modalDetalle').style.display = 'none';
+}
+
+document.getElementById('modalDetalle').addEventListener('click', function(e){
+    if(e.target === this) cerrarDetalle();
+});
+</script>
 
 @endsection
