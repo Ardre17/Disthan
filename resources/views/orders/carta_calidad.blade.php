@@ -5,7 +5,7 @@
 <style>
 
 @page {
-    margin: 55px 50px;
+    margin: 75px 65px;
 }
 
 * {
@@ -20,7 +20,7 @@ body {
     color: #1e293b;
     background: #fff;
     line-height: 1.5;
-    padding: 0 6px;
+    padding: 0 14px;
 }
 
 /* ── Header ── */
@@ -369,7 +369,7 @@ body {
 
 {{-- ══ DECLARACIÓN DE CALIDAD ══ --}}
 <div class="declaracion">
-    <strong>Valle Fertil S.A.C.</strong> declara que los productos descritos en el presente documento
+    <strong>VALLE FERTIL S.A.C.</strong> declara que los productos descritos en el presente documento
     han sido inspeccionados, verificados y despachados bajo los estándares de calidad establecidos por la empresa,
     cumpliendo con las normas de manipulación, almacenamiento y trazabilidad vigentes.
     Este certificado acredita que los productos entregados al cliente
@@ -489,7 +489,7 @@ body {
         </td>
         <td>
             <div style="font-size:9px;font-weight:700;color:#1e293b;">Responsable de despacho</div>
-            <div class="firma-cargo">Almacén · Valle Fertil S.A.C</div>
+            <div class="firma-cargo">Almacén · VALLE FERTIL S.A.C</div>
         </td>
         <td>
             <div style="font-size:9px;font-weight:700;color:#1e293b;">Recibido conforme</div>
@@ -502,11 +502,11 @@ body {
 <table class="footer-table" cellpadding="0" cellspacing="0">
     <tr>
         <td>
-            Valle Fertil S.A.C. · Carta de Calidad Nº CC-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
+            VALLE FERTIL S.A.C. · Carta de Calidad Nº CC-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
             · Generado el {{ $ahora->format('d/m/Y \a \l\a\s H:i') }}
         </td>
         <td>
-            {{ $order->numero_orden }} · Este documento detalla información de los productos
+            {{ $order->numero_orden }} · Este documento es válido sin firma electrónica
         </td>
     </tr>
 </table>
