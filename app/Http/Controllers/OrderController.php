@@ -11,6 +11,26 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
+    public function etiqueta(OrderDetail $item)
+{
+    $item->load('product', 'order.client');
+
+    $pdf = Pdf::loadView('pdf.etiqueta', compact('item'))
+               ->setPaper([0, 0, 198.425, 198.425], 'portrait'); // 7cm x 7cm en puntos
+
+    return $pdf->stream('etiqueta-' . $item->id . '.pdf');
+}
+    public function updateLote(Request $request, OrderDetail $item)
+{
+    $validated = $request->validate([
+        'lote' => 'nullable|string|max:100',
+        'fecha_vencimiento' => 'nullable|date',
+    ]);
+
+    $item->update($validated);
+
+    return back()->with('success', 'Lote y vencimiento actualizados correctamente.');
+}
     public function cartaCalidad(Order $order)
 {
     $detalles = $order->details()

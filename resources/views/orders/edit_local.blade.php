@@ -101,6 +101,22 @@
 .mini-bar{width:60px;height:5px;background:#e5e7eb;border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;}
 .mini-fill{height:100%;border-radius:99px;}
 
+/* ── Badge lote / vencimiento ── */
+.lote-badge{
+    font-size:10px;
+    font-family:'Courier New',monospace;
+    color:#475569;
+    background:#f1f5f9;
+    border:1px solid #e2e8f0;
+    border-radius:3px;
+    padding:1px 6px;
+    white-space:nowrap;
+}
+.venc-badge{font-size:10px;font-weight:700;white-space:nowrap;}
+.venc-dias{font-weight:400;color:#94a3b8;}
+.btn-lote-edit{background:none;border:none;cursor:pointer;font-size:11px;color:#7c3aed;padding:0 2px;line-height:1;}
+.btn-lote-edit:hover{opacity:.7;}
+
 /* ── Scroll hint solo en móvil ── */
 .scroll-hint-mobile{
     display:none;
@@ -134,6 +150,7 @@
 .btn-edit{background:#fef3c7;color:#b45309;border:1px solid #fde68a;}
 .btn-save{background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;}
 .btn-del{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;}
+.btn-cancel{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;}
 .btn-primary{background:#1e3a5f;color:#fff;padding:7px 14px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;transition:opacity .15s;}
 .btn-primary:hover{opacity:.9;}
 .btn-green{background:#16a34a;color:#fff;padding:7px 14px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;}
@@ -155,6 +172,15 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
     50% { top:calc(100% - 2px); }
     100%{ top:0; }
 }
+
+/* ── Modal lote/vencimiento ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;padding:1rem;}
+.modal-box{background:#fff;border-radius:6px;width:100%;max-width:380px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+.modal-head{background:#1e3a5f;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center;}
+.modal-head span{color:#fff;font-size:13px;font-weight:700;}
+.modal-head button{background:none;border:none;color:#93c5fd;font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;}
+.modal-body{padding:1rem;}
+.modal-warn{background:#fef3c7;border:1px solid #fde68a;border-radius:4px;padding:9px 10px;font-size:11px;color:#92400e;margin-bottom:12px;line-height:1.5;}
 </style>
 
 {{-- ── ERP Top Bar ── --}}
@@ -325,6 +351,19 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
                         ? ($item->cantidad_despachada / $item->cantidad_solicitada) * 100 : 0;
                     $lc  = $pct >= 100 ? '#22c55e' : ($pct > 0 ? '#f59e0b' : '#ef4444');
                     $montoColor = $pct >= 100 ? '#15803d' : ($pct > 0 ? '#b45309' : '#b91c1c');
+
+                    // Lote / vencimiento por línea
+                    $loteItem     = $item->lote;
+                    $fechaVenc    = $item->fecha_vencimiento;
+                    $vColor       = '#94a3b8';
+                    $vIcon        = '';
+                    $diasVencItem = null;
+                    if ($fechaVenc) {
+                        $diasVencItem = (int) round(now()->diffInDays(\Carbon\Carbon::parse($fechaVenc), false));
+                        if ($diasVencItem < 0)       { $vColor = '#b91c1c'; $vIcon = '🔴'; }
+                        elseif ($diasVencItem <= 30) { $vColor = '#b45309'; $vIcon = '🟡'; }
+                        else                          { $vColor = '#15803d'; $vIcon = '🟢'; }
+                    }
                 @endphp
 
                 {{-- ✅ FIX: form FUERA del tr, referenciado con form="form-X" en los inputs --}}
@@ -340,7 +379,21 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
 
                 <tr id="row-{{ $item->id }}">
                     <td><span class="state-dot" style="background:{{ $lc }};"></span></td>
-                    <td style="font-weight:600;color:#0f172a;">{{ $item->product->nombre }}</td>
+                    <td style="font-weight:600;color:#0f172a;">
+                        {{ $item->product->nombre }}
+                        <div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                            <span class="lote-badge">🏷️ {{ $loteItem ?: 'Sin lote' }}</span>
+                            <span class="venc-badge" style="color:{{ $vColor }};">
+                                {{ $vIcon }} {{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('d/m/Y') : 'Sin fecha' }}
+                                @if($diasVencItem !== null && $diasVencItem >= 0)
+                                    <span class="venc-dias">({{ $diasVencItem }}d)</span>
+                                @endif
+                            </span>
+                            <button type="button" class="btn-lote-edit"
+                                    onclick="abrirModalLote({{ $item->id }}, '{{ addslashes($loteItem ?? '') }}', '{{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('Y-m-d') : '' }}')"
+                                    title="Editar lote / vencimiento">✏️</button>
+                        </div>
+                    </td>
                     <td style="color:#94a3b8;font-size:11px;">{{ $item->product->sku ?? '—' }}</td>
                     <td style="text-align:center;">
                         <input type="number" step="0.01"
@@ -380,6 +433,8 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
                                     class="btn-xs btn-save"
                                     id="btn-save-{{ $item->id }}"
                                     style="display:none;">💾 Guardar</button>
+                            <a href="{{ route('orderDetails.etiqueta',$item) }}" target="_blank"
+                               class="btn-xs" style="background:#e0e7ff;color:#4338ca;border:1px solid #c7d2fe;text-decoration:none;">🏷️ Etiqueta</a>
                             <form method="POST"
                                   action="{{ route('orders.details.destroy',$item) }}"
                                   onsubmit="return confirm('¿Eliminar {{ addslashes($item->product->nombre) }}?')"
@@ -475,6 +530,37 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
     </div>
 </div>
 
+{{-- ── Modal editar lote / vencimiento ── --}}
+<div id="modalLote" class="modal-overlay">
+    <div class="modal-box">
+        <div class="modal-head">
+            <span>🏷️ Editar lote y vencimiento</span>
+            <button type="button" onclick="cerrarModalLote()">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-warn">
+                ⚠️ <strong>Esta edición solo debe hacerse en casos extraordinarios.</strong>
+                Si la fecha no coincide con el producto, ve a registrarla correctamente en la vista
+                <strong>Productos</strong> para mantener la información actualizada.
+            </div>
+            <form id="formLote" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <label class="flabel">Lote</label>
+                <input type="text" name="lote" id="loteInput" class="finput" style="margin-bottom:10px;" maxlength="100" placeholder="Ej: L-2026-045">
+
+                <label class="flabel">Fecha de vencimiento</label>
+                <input type="date" name="fecha_vencimiento" id="fechaVencInput" class="finput" style="margin-bottom:14px;">
+
+                <div style="display:flex;gap:8px;justify-content:flex-end;">
+                    <button type="button" class="btn-xs btn-cancel" onclick="cerrarModalLote()">Cancelar</button>
+                    <button type="submit" class="btn-xs btn-save">💾 Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 </div>{{-- fin pg --}}
 
 {{-- ZXing CDN --}}
@@ -505,6 +591,20 @@ function editar(id) {
     des.focus();
     des.select();
 }
+
+/* ── Modal lote / vencimiento ── */
+function abrirModalLote(id, lote, fecha) {
+    document.getElementById('formLote').action = '/order-details/' + id + '/lote';
+    document.getElementById('loteInput').value = lote || '';
+    document.getElementById('fechaVencInput').value = fecha || '';
+    document.getElementById('modalLote').style.display = 'flex';
+}
+function cerrarModalLote() {
+    document.getElementById('modalLote').style.display = 'none';
+}
+document.getElementById('modalLote').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModalLote();
+});
 
 /* ── Scanner (teclado / lector físico) ── */
 document.getElementById('scanner').addEventListener('keypress', function(e) {

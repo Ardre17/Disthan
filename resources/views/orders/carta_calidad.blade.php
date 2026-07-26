@@ -5,7 +5,7 @@
 <style>
 
 @page {
-    margin: 40px 45px;
+    margin: 55px 50px;
 }
 
 * {
@@ -20,6 +20,7 @@ body {
     color: #1e293b;
     background: #fff;
     line-height: 1.5;
+    padding: 0 6px;
 }
 
 /* ── Header ── */
@@ -142,7 +143,7 @@ body {
     width: 100%;
     border-collapse: collapse;
     font-size: 9.5px;
-    margin-bottom: 16px;
+    margin-bottom: 6px;
 }
 .tbl thead th {
     background: #1e3a5f;
@@ -170,6 +171,14 @@ body {
     font-size: 10px;
 }
 .tbl tfoot td.center { text-align: center; }
+
+/* Nota al pie de tabla */
+.tbl-note {
+    font-size: 8px;
+    color: #94a3b8;
+    font-style: italic;
+    margin-bottom: 16px;
+}
 
 /* Badges estado */
 .badge-completo { color: #166534; font-weight: 800; }
@@ -285,8 +294,12 @@ body {
 
 @php
     $detalles  = $order->details()->with('product')->where('cantidad_despachada', '>', 0)->get();
-    $fechaEmision = now()->format('d/m/Y');
-    $horaEmision  = now()->format('H:i');
+
+    // Hora/fecha reales de Perú (evita que salga la hora del servidor en UTC)
+    $ahora        = \Carbon\Carbon::now('America/Lima');
+    $fechaEmision = $ahora->format('d/m/Y');
+    $horaEmision  = $ahora->format('H:i');
+
     $totalUds     = $detalles->sum('cantidad_despachada');
     $totalLineas  = $detalles->count();
 
@@ -298,7 +311,7 @@ body {
     foreach ($detalles as $d) {
         $fv = $d->fecha_vencimiento ?? $d->product->fecha_vencimiento;
         if (!$fv) { $sinFecha++; continue; }
-        $dias = now()->diffInDays(\Carbon\Carbon::parse($fv), false);
+        $dias = $ahora->diffInDays(\Carbon\Carbon::parse($fv), false);
         if ($dias < 0)       $vencidos++;
         elseif ($dias <= 30) $proximos++;
         else                 $vigentes++;
@@ -356,7 +369,7 @@ body {
 
 {{-- ══ DECLARACIÓN DE CALIDAD ══ --}}
 <div class="declaracion">
-    <strong>JOYBER PERÚ S.A.C.</strong> declara que los productos descritos en el presente documento
+    <strong>Valle Fertil S.A.C.</strong> declara que los productos descritos en el presente documento
     han sido inspeccionados, verificados y despachados bajo los estándares de calidad establecidos por la empresa,
     cumpliendo con las normas de manipulación, almacenamiento y trazabilidad vigentes.
     Este certificado acredita que los productos entregados al cliente
@@ -371,12 +384,12 @@ body {
     <thead>
         <tr>
             <th style="width:4%;" class="center">#</th>
-            <th style="width:28%;">Producto</th>
+            <th style="width:27%;">Producto</th>
             <th style="width:10%;" class="center">Lote</th>
             <th style="width:12%;" class="center">Fecha prod.</th>
             <th style="width:13%;" class="center">Vencimiento</th>
             <th style="width:10%;" class="center">Despachado</th>
-            <th style="width:12%;" class="center">Peso total</th>
+            <th style="width:13%;" class="center">Peso total*</th>
             <th style="width:11%;" class="center">Estado</th>
         </tr>
     </thead>
@@ -385,7 +398,7 @@ body {
     @php
         $fv       = $d->fecha_vencimiento ?? $d->product->fecha_vencimiento;
         $fp       = $d->product->fecha_produccion;
-        $diasVenc = $fv ? now()->diffInDays(\Carbon\Carbon::parse($fv), false) : null;
+        $diasVenc = $fv ? (int) round($ahora->diffInDays(\Carbon\Carbon::parse($fv), false)) : null;
         $vencClass = '';
         $vencIcon  = '';
         if ($diasVenc !== null) {
@@ -443,6 +456,7 @@ body {
         </tr>
     </tfoot>
 </table>
+<div class="tbl-note">* El peso total es aproximado/referencial; puede variar ligeramente según el producto y no representa un valor exacto.</div>
 
 {{-- ══ CONDICIONES DE CALIDAD ══ --}}
 <div class="sec-title" style="margin-bottom:8px;">✅ Condiciones de calidad certificadas</div>
@@ -506,7 +520,7 @@ body {
         </td>
         <td>
             <div style="font-size:9px;font-weight:700;color:#1e293b;">Responsable de despacho</div>
-            <div class="firma-cargo">Almacén · JOYBER PERÚ</div>
+            <div class="firma-cargo">Almacén · Valle Fertil S.A.C</div>
         </td>
         <td>
             <div style="font-size:9px;font-weight:700;color:#1e293b;">Recibido conforme</div>
@@ -519,8 +533,8 @@ body {
 <table class="footer-table" cellpadding="0" cellspacing="0">
     <tr>
         <td>
-            JOYBER PERÚ S.A.C. · Carta de Calidad Nº CC-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
-            · Generado el {{ now()->format('d/m/Y \a \l\a\s H:i') }}
+            Valle Fertil S.A.C. · Carta de Calidad Nº CC-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
+            · Generado el {{ $ahora->format('d/m/Y \a \l\a\s H:i') }}
         </td>
         <td>
             {{ $order->numero_orden }} · Este documento es válido sin firma electrónica
