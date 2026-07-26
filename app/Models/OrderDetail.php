@@ -32,6 +32,7 @@ class OrderDetail extends Model
 
     'paleta',
     'fecha_vencimiento',
+    'lote',
     'nivel',
     'ubicacion'
 ];
