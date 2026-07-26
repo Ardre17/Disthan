@@ -801,35 +801,42 @@ if($product->fecha_vencimiento){
                 </div>
 
                 {{-- ── Ver detalle completo (todos los roles) ── --}}
+                @php
+                    $mdData = [
+                        'sku' => $product->sku,
+                        'nombre' => $product->nombre,
+                        'categoria' => $product->categoria,
+                        'imagen' => $product->imagen ? asset('storage/'.$product->imagen) : null,
+                        'advertencias' => $product->advertencias,
+                        'lote' => $product->lote,
+                        'stock' => $product->stock,
+                        'stock_minimo' => $product->stock_minimo,
+                        'cantidad_por_caja' => $product->cantidad_por_caja,
+                        'fecha_produccion' => $product->fecha_produccion,
+                        'fecha_vencimiento' => $product->fecha_vencimiento,
+                        'barcode' => $product->barcode,
+                        'box_barcode' => $product->box_barcode,
+                        'rotacion' => $product->rotacion,
+                        'logistic' => null,
+                    ];
+
+                    if ($product->logistic) {
+                        $mdData['logistic'] = [
+                            'largo_cm' => $product->logistic->largo_cm,
+                            'ancho_cm' => $product->logistic->ancho_cm,
+                            'alto_cm' => $product->logistic->alto_cm,
+                            'peso_caja' => $product->logistic->peso_caja,
+                            'max_cajas_pallet' => $product->logistic->max_cajas_pallet,
+                            'max_niveles' => $product->logistic->max_niveles,
+                            'altura_maxima_pallet' => $product->logistic->altura_maxima_pallet,
+                            'permite_mezcla' => $product->logistic->permite_mezcla,
+                            'orientacion' => $product->logistic->orientacion,
+                            'activo' => $product->logistic->activo,
+                        ];
+                    }
+                @endphp
                 <button type="button" class="btn-view"
-                    onclick='abrirDetalle(@json([
-                        "sku" => $product->sku,
-                        "nombre" => $product->nombre,
-                        "categoria" => $product->categoria,
-                        "imagen" => $product->imagen ? asset("storage/".$product->imagen) : null,
-                        "advertencias" => $product->advertencias,
-                        "lote" => $product->lote,
-                        "stock" => $product->stock,
-                        "stock_minimo" => $product->stock_minimo,
-                        "cantidad_por_caja" => $product->cantidad_por_caja,
-                        "fecha_produccion" => $product->fecha_produccion,
-                        "fecha_vencimiento" => $product->fecha_vencimiento,
-                        "barcode" => $product->barcode,
-                        "box_barcode" => $product->box_barcode,
-                        "rotacion" => $product->rotacion,
-                        "logistic" => $product->logistic ? [
-                            "largo_cm" => $product->logistic->largo_cm,
-                            "ancho_cm" => $product->logistic->ancho_cm,
-                            "alto_cm" => $product->logistic->alto_cm,
-                            "peso_caja" => $product->logistic->peso_caja,
-                            "max_cajas_pallet" => $product->logistic->max_cajas_pallet,
-                            "max_niveles" => $product->logistic->max_niveles,
-                            "altura_maxima_pallet" => $product->logistic->altura_maxima_pallet,
-                            "permite_mezcla" => $product->logistic->permite_mezcla,
-                            "orientacion" => $product->logistic->orientacion,
-                            "activo" => $product->logistic->activo,
-                        ] : null,
-                    ]))'>
+                    onclick='abrirDetalle(@json($mdData))'>
                     👁️ Ver detalle completo
                 </button>
 
