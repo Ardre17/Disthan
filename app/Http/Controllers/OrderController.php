@@ -455,7 +455,7 @@ public function pdfEncomienda(Order $order)
         'pallets.detalles.orderDetail',
     ]);
 
-    return view('orders.edit_exportacion', compact('order'));
+    return view('orders.edit_exportacion', compact('order', 'products'));
     }
 }
 
