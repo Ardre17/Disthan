@@ -477,37 +477,6 @@ body {
     </tr>
 </table>
 
-{{-- ══ RESUMEN DE VENCIMIENTOS ══ --}}
-@if($totalLineas > 0)
-<table style="width:100%;border-collapse:collapse;margin-bottom:14px;">
-    <tr>
-        <td style="width:25%;padding:6px 10px;background:#f0fdf4;border:1px solid #bbf7d0;border-radius:4px;text-align:center;">
-            <div style="font-size:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Vigentes</div>
-            <div style="font-size:16px;font-weight:800;color:#15803d;">{{ $vigentes }}</div>
-            <div style="font-size:8px;color:#94a3b8;">productos</div>
-        </td>
-        <td style="width:3%;"></td>
-        <td style="width:25%;padding:6px 10px;background:#fef3c7;border:1px solid #fde68a;border-radius:4px;text-align:center;">
-            <div style="font-size:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Próx. a vencer</div>
-            <div style="font-size:16px;font-weight:800;color:#b45309;">{{ $proximos }}</div>
-            <div style="font-size:8px;color:#94a3b8;">≤ 30 días</div>
-        </td>
-        <td style="width:3%;"></td>
-        <td style="width:25%;padding:6px 10px;background:#fee2e2;border:1px solid #fca5a5;border-radius:4px;text-align:center;">
-            <div style="font-size:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Vencidos</div>
-            <div style="font-size:16px;font-weight:800;color:#b91c1c;">{{ $vencidos }}</div>
-            <div style="font-size:8px;color:#94a3b8;">productos</div>
-        </td>
-        <td style="width:3%;"></td>
-        <td style="width:16%;padding:6px 10px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:4px;text-align:center;">
-            <div style="font-size:8px;color:#94a3b8;text-transform:uppercase;letter-spacing:.06em;">Sin fecha</div>
-            <div style="font-size:16px;font-weight:800;color:#64748b;">{{ $sinFecha }}</div>
-            <div style="font-size:8px;color:#94a3b8;">productos</div>
-        </td>
-    </tr>
-</table>
-@endif
-
 {{-- ══ FIRMAS ══ --}}
 <table class="firma-section" cellpadding="0" cellspacing="0">
     <tr>
