@@ -1,520 +1,718 @@
 @extends('layouts.app')
 
 @section('content')
+
 <style>
-
-.export-card{
-    background:#fff;
-    border-radius:12px;
-    padding:20px;
-    box-shadow:0 2px 8px rgba(0,0,0,.08);
-    margin-bottom:20px;
+:root{
+    --erp-bg:#eef1f5;--erp-surface:#fff;--erp-border:#dde2ea;
+    --erp-ink:#1c2733;--erp-ink-muted:#5b6b7d;
+    --erp-accent:#0b5ed7;--erp-accent-dark:#0a4eb3;
+    --erp-danger:#c0312b;--erp-danger-bg:#fbe9e8;
+    --erp-warn:#b9690e;--erp-warn-bg:#fdf1e2;
+    --erp-ok:#1c7c4d;--erp-ok-bg:#e8f5ee;
+    --font-ui:'Segoe UI',sans-serif;--font-mono:'Consolas',monospace;
 }
+*{box-sizing:border-box;}
+.page{background:var(--erp-bg);font-family:var(--font-ui);color:var(--erp-ink);padding:0;min-height:100vh;font-size:13px;}
+.erp-bar{background:#1e3a5f;height:38px;display:flex;align-items:center;justify-content:space-between;padding:0 1.25rem;margin:-20px -20px 0;}
+.erp-bar-left{display:flex;align-items:center;gap:10px;}
+.erp-logo{color:#fff;font-size:13px;font-weight:700;}
+.erp-sep{width:1px;height:18px;background:#334155;}
+.erp-module{color:#7eb8f7;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
+.body{padding:1.1rem;}
 
-.export-title{
-    font-size:28px;
-    font-weight:700;
-    color:#0f172a;
+/* ── Header ── */
+.page-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:8px;}
+.page-title{font-size:17px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;}
+.page-title:before{content:"";width:4px;height:20px;background:#0ea5e9;border-radius:2px;display:inline-block;}
+.page-sub{font-size:11px;color:#64748b;margin-top:2px;}
+
+/* ── KPIs ── */
+.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:1rem;}
+@media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr);}}
+.kpi{background:var(--erp-surface);border:1px solid var(--erp-border);border-radius:4px;padding:.75rem 1rem;border-left:4px solid;position:relative;overflow:hidden;}
+.kpi-icon{position:absolute;right:10px;top:50%;transform:translateY(-50%);font-size:24px;opacity:.1;}
+.kpi-label{font-size:10px;color:var(--erp-ink-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:3px;}
+.kpi-val{font-size:18px;font-weight:800;color:var(--erp-ink);line-height:1;font-family:var(--font-mono);}
+.kpi-sub{font-size:10px;color:#94a3b8;margin-top:1px;}
+
+/* ── Cards ── */
+.sec-card{background:var(--erp-surface);border:1px solid var(--erp-border);border-radius:4px;margin-bottom:10px;}
+.sec-hdr{padding:.65rem 1rem;display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--erp-border);background:#f4f6f9;border-radius:4px 4px 0 0;}
+.sec-hdr-num{width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;flex-shrink:0;}
+.sec-hdr-title{font-size:11px;font-weight:700;color:var(--erp-ink);text-transform:uppercase;letter-spacing:.06em;}
+.sec-body{padding:1rem;}
+
+/* ── Layout ── */
+.layout{display:grid;grid-template-columns:1fr 280px;gap:12px;}
+@media(max-width:900px){.layout{grid-template-columns:1fr;}}
+
+/* ── Form ── */
+.field-grid{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;}
+@media(max-width:700px){.field-grid{grid-template-columns:1fr;}}
+.field{display:flex;flex-direction:column;gap:3px;}
+.flabel{font-size:10px;font-weight:700;color:var(--erp-ink-muted);text-transform:uppercase;letter-spacing:.06em;}
+.finput,.fselect{padding:7px 9px;border:1px solid var(--erp-border);border-radius:3px;font-size:12px;color:var(--erp-ink);background:#fbfcfe;outline:none;width:100%;font-family:var(--font-ui);transition:border-color .15s;}
+.finput:focus,.fselect:focus{border-color:var(--erp-accent);box-shadow:0 0 0 2px rgba(11,94,215,.1);}
+
+/* ── Tabla ── */
+.erp-table{width:100%;border-collapse:collapse;font-size:12px;}
+.erp-table th{background:#f4f6f9;color:var(--erp-ink-muted);font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:7px 10px;border-bottom:2px solid var(--erp-border);text-align:left;white-space:nowrap;}
+.erp-table td{padding:8px 10px;border-bottom:1px solid #f1f5f9;vertical-align:middle;}
+.erp-table tbody tr:hover td{background:#f7fafc;}
+.num-mono{font-family:var(--font-mono);font-weight:700;}
+
+/* ── Botones ── */
+.btn-primary{background:var(--erp-accent);color:#fff;padding:7px 14px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;transition:background .15s;font-family:var(--font-ui);}
+.btn-primary:hover{background:var(--erp-accent-dark);}
+.btn-ok{background:var(--erp-ok);color:#fff;padding:7px 14px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--font-ui);}
+.btn-danger{background:var(--erp-danger);color:#fff;padding:6px 12px;border-radius:3px;font-size:11px;font-weight:600;cursor:pointer;border:none;font-family:var(--font-ui);}
+.btn-pdf{background:#0ea5e9;color:#fff;padding:7px 14px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:5px;}
+.btn-cerrar{background:#dc2626;color:#fff;padding:7px 16px;border-radius:3px;font-size:12px;font-weight:700;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;font-family:var(--font-ui);}
+.btn-sm-add{background:var(--erp-ok-bg);color:var(--erp-ok);border:1px solid #b7dfca;padding:5px 10px;border-radius:3px;font-size:11px;font-weight:600;cursor:pointer;font-family:var(--font-ui);}
+
+/* ── Badges ── */
+.badge{display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:3px;font-size:10.5px;font-weight:700;}
+.badge-ok{background:var(--erp-ok-bg);color:var(--erp-ok);border:1px solid #b7dfca;}
+.badge-warn{background:var(--erp-warn-bg);color:var(--erp-warn);border:1px solid #f9d5a3;}
+.badge-danger{background:var(--erp-danger-bg);color:var(--erp-danger);border:1px solid #f3c7c4;}
+.badge-blue{background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;}
+
+/* ── Resumen lateral ── */
+.sum-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:5px 0;border-bottom:1px solid #f4f6f9;color:var(--erp-ink-muted);}
+.sum-row:last-child{border:none;}
+.sum-val{font-family:var(--font-mono);font-weight:700;color:var(--erp-ink);}
+
+/* ── Pallet card ── */
+.pallet-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;margin-top:.75rem;}
+.pallet-card{background:var(--erp-surface);border:1px solid var(--erp-border);border-radius:4px;overflow:hidden;}
+.pallet-hdr{background:linear-gradient(135deg,#1e3a5f,#0f172a);padding:.75rem 1rem;display:flex;justify-content:space-between;align-items:center;}
+.pallet-code{color:#fff;font-family:var(--font-mono);font-size:13px;font-weight:700;letter-spacing:.5px;}
+.pallet-body{padding:.85rem;}
+
+/* ── Pallet 2D ── */
+.pallet-2d-wrap{
+    background:#f8fafc;border:1px solid var(--erp-border);
+    border-radius:4px;padding:.75rem;margin-bottom:.85rem;
 }
+.pallet-2d-title{font-size:10px;font-weight:700;color:var(--erp-ink-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;}
+.pallet-grid-svg{display:block;width:100%;max-width:320px;margin:0 auto;}
 
-.export-section{
-    border:1px solid #e5e7eb;
-    border-radius:10px;
-    padding:15px;
-    margin-bottom:20px;
-}
+/* ── Mini barra progreso pallet ── */
+.pallet-prog{margin-bottom:.75rem;}
+.pallet-prog-top{display:flex;justify-content:space-between;font-size:10px;color:var(--erp-ink-muted);margin-bottom:3px;}
+.pallet-prog-bar{height:6px;background:#f1f5f9;border-radius:99px;overflow:hidden;}
+.pallet-prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,#0ea5e9,#7c3aed);}
 
-.pallet-card{
-    border:1px solid #cbd5e1;
-    border-radius:10px;
-    padding:15px;
-    margin-bottom:15px;
-    background:#f8fafc;
-}
+/* ── Estado de producción tabla ── */
+.prod-row-ok td{background:var(--erp-ok-bg)!important;}
+.prod-row-warn td{background:var(--erp-warn-bg)!important;}
+.mini-bar{width:70px;height:5px;background:#e5e7eb;border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;margin-left:4px;}
+.mini-fill{height:100%;border-radius:99px;}
 
+.alert-ok{background:var(--erp-ok-bg);color:var(--erp-ok);border:1px solid #b7dfca;border-radius:4px;padding:8px 14px;font-size:12px;margin-bottom:.75rem;display:flex;align-items:center;gap:7px;}
 </style>
-<div class="container-fluid py-3">
-<h2>🚢 Exportación</h2>
 
-<hr>
-
-<h4>Orden: {{ $order->numero_orden }}</h4>
-
-<p>
-    <strong>Cliente:</strong>
-    {{ $order->client->razon_social }}
-</p>
-
-<p>
-    <strong>Fecha:</strong>
-    {{ $order->fecha_pedido }}
-</p>
-
-<p>
-    <strong>Estado:</strong>
-    {{ $order->estado }}
-</p>
-
-<hr>
-<h3>Agregar producto</h3>
-
-<form method="POST"
-      action="{{ route('orders.addProduct',$order) }}">
-
-    @csrf
-
-    <p>
-
-        Producto
-    <select name="order_detail_id" required>
-
-    <option value="">
-        Seleccione un producto
-    </option>
-
-    @foreach($order->details as $detalle)
-
-        @php
-            $enPallets = $detalle->palletDetails->sum('cantidad');
-            $pendiente = $detalle->cantidad_solicitada - $enPallets;
-        @endphp
-
-        @if($pendiente > 0)
-
-            <option value="{{ $detalle->id }}">
-
-                {{ $detalle->product->nombre }}
-                ({{ $pendiente }} pendientes)
-
-            </option>
-
-        @endif
-
-    @endforeach
-
-</select>
-
-    </p>
-
-    <p>
-
-        Cantidad
-
-        <input
-            type="number"
-            name="cantidad_solicitada"
-            required>
-
-    </p>
-
-    <p>
-
-        Precio
-
-        <input
-            type="number"
-            step="0.01"
-            name="precio_unitario"
-            required>
-
-    </p>
-
-    <button>
-
-        Agregar
-
-    </button>
-
-</form>
-
-<hr>
-<h3>Productos</h3>
-
-<table border="1" cellpadding="5">
-
-<thead>
-
-<tr>
-
-<th>Producto</th>
-
-<th>Solicitado</th>
-
-<th>Despachado</th>
-
-<th>Peso</th>
-
-<th>Subtotal</th>
-
-<th>Acciones</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-@foreach($order->details as $item)
-
-<tr>
-
-<td>
-
-{{ $item->product->nombre }}
-
-</td>
-
-<td>
-
-{{ $item->cantidad_solicitada }}
-
-</td>
-
-<td>
-
-{{ $item->cantidad_despachada }}
-
-</td>
-
-<td>
-
-{{ number_format(($item->product->peso ?? 0)/1000,3) }} kg
-
-</td>
-
-<td>
-
-S/
-
-{{ number_format($item->subtotal,2) }}
-
-</td>
-
-<td>
-
-Editar
-
-Eliminar
-
-</td>
-
-</tr>
-
-@endforeach
-
-</tbody>
-
-</table>
-<hr>
-
-<h3>Resumen</h3>
-
-<p>
-
-Productos:
-
-{{ $order->details->count() }}
-
-</p>
-
-<p>
-
-Subtotal:
-
-S/
-
-{{ number_format($order->subtotal,2) }}
-
-</p>
-
-<p>
-
-IGV:
-
-S/
-
-{{ number_format($order->igv,2) }}
-
-</p>
-
-<p>
-
-Total:
-
-S/
-
-{{ number_format($order->total,2) }}
-
-</p>
-<hr>
-
-<a
-    href="{{ route('orders.pdf',$order) }}"
-    target="_blank">
-
-    Ver PDF
-
-</a>
-
-@if($order->estado!='COMPLETO')
-
-<form
-    method="POST"
-    action="{{ route('orders.cerrar',$order) }}">
-
-    @csrf
-
-    <button>
-
-        Cerrar Exportación
-
-    </button>
-
-</form>
-
+<div class="page">
+<div class="erp-bar">
+    <div class="erp-bar-left">
+        <div class="erp-logo">JOYBER PERÚ</div>
+        <div class="erp-sep"></div>
+        <div class="erp-module">🚢 Exportación</div>
+    </div>
+    <span style="font-size:11px;color:#5a8abf;">Ventas › Exportación › {{ $order->numero_orden }}</span>
+</div>
+
+<div class="body">
+
+@if(session('success'))
+<div class="alert-ok">✅ {{ session('success') }}</div>
 @endif
-<hr>
 
-<h3>🟫 Pallets</h3>
+@php
+    $totalItems  = $order->details->count();
+    $totalPallets= $order->pallets->count();
+    $pesoTotal   = $order->details->sum(fn($d) => ($d->product->peso ?? 0) * $d->cantidad_solicitada / 1000);
+    $estadoColor = $order->estado === 'COMPLETO' ? '#15803d' : ($order->estado === 'PARCIAL' ? '#b45309' : '#b91c1c');
+    $estadoBg    = $order->estado === 'COMPLETO' ? '#dcfce7' : ($order->estado === 'PARCIAL' ? '#fef3c7' : '#fee2e2');
+@endphp
 
+{{-- ── Header ── --}}
+<div class="page-hdr">
+    <div>
+        <div class="page-title">Exportación — {{ $order->numero_orden }}</div>
+        <div class="page-sub">
+            🏢 {{ $order->client->razon_social }}
+            &nbsp;·&nbsp; 📅 {{ \Carbon\Carbon::parse($order->fecha_pedido)->format('d M Y') }}
+        </div>
+    </div>
+    <div style="display:flex;gap:7px;align-items:center;flex-wrap:wrap;">
+        <span class="badge" style="background:{{ $estadoBg }};color:{{ $estadoColor }};font-size:12px;padding:5px 12px;">
+            {{ $order->estado }}
+        </span>
+        <a href="{{ route('orders.pdf', $order) }}" target="_blank" class="btn-pdf">
+            📄 Ver PDF
+        </a>
+        @if($order->estado != 'COMPLETO')
+        <form method="POST" action="{{ route('orders.cerrar', $order) }}" style="display:inline;">
+            @csrf
+            <button type="submit" class="btn-cerrar"
+                    onclick="return confirm('¿Confirmas cerrar esta exportación?')">
+                🔒 Cerrar exportación
+            </button>
+        </form>
+        @endif
+    </div>
+</div>
+
+{{-- ── KPIs ── --}}
+<div class="kpis">
+    <div class="kpi" style="border-left-color:#0ea5e9;">
+        <div class="kpi-icon">📦</div>
+        <div class="kpi-label">Productos</div>
+        <div class="kpi-val">{{ $totalItems }}</div>
+        <div class="kpi-sub">líneas de pedido</div>
+    </div>
+    <div class="kpi" style="border-left-color:#7c3aed;">
+        <div class="kpi-icon">🟫</div>
+        <div class="kpi-label">Pallets</div>
+        <div class="kpi-val" style="color:#7c3aed;">{{ $totalPallets }}</div>
+        <div class="kpi-sub">creados</div>
+    </div>
+    <div class="kpi" style="border-left-color:var(--erp-ok);">
+        <div class="kpi-icon">⚖️</div>
+        <div class="kpi-label">Peso total</div>
+        <div class="kpi-val" style="font-size:15px;color:var(--erp-ok);">{{ number_format($pesoTotal,2) }} kg</div>
+        <div class="kpi-sub">estimado</div>
+    </div>
+    <div class="kpi" style="border-left-color:#2563eb;">
+        <div class="kpi-icon">💰</div>
+        <div class="kpi-label">Subtotal</div>
+        <div class="kpi-val" style="font-size:15px;color:#2563eb;">S/ {{ number_format($order->subtotal,2) }}</div>
+        <div class="kpi-sub">sin IGV</div>
+    </div>
+    <div class="kpi" style="border-left-color:#1e3a5f;background:#f0f7ff;">
+        <div class="kpi-icon">🧾</div>
+        <div class="kpi-label">Total</div>
+        <div class="kpi-val" style="font-size:15px;color:#1e3a5f;">S/ {{ number_format($order->total,2) }}</div>
+        <div class="kpi-sub">con IGV 18%</div>
+    </div>
+</div>
+
+<div class="layout">
 <div>
 
-    <p>
-        Aquí se mostrarán los pallets creados para esta orden.
-    </p>
+    {{-- ── Sección 1: Agregar producto ── --}}
+    <div class="sec-card">
+        <div class="sec-hdr">
+            <div class="sec-hdr-num" style="background:var(--erp-accent);">1</div>
+            <div class="sec-hdr-title">➕ Agregar línea de producto</div>
+        </div>
+        <div class="sec-body">
+            <form method="POST" action="{{ route('orders.addProduct', $order) }}">
+            @csrf
+            <div class="field-grid">
+                <div class="field">
+                    <label class="flabel">Producto</label>
+                    <select name="product_id" class="fselect" required>
+                        <option value="">Seleccione un producto</option>
+                        @foreach($products as $product)
+                            <option value="{{ $product->id }}">{{ $product->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="field">
+                    <label class="flabel">Cantidad</label>
+                    <input type="number" name="cantidad_solicitada" class="finput" min="1" required placeholder="0">
+                </div>
+                <div class="field">
+                    <label class="flabel">Precio unit.</label>
+                    <input type="number" step="0.01" min="0" name="precio_unitario" class="finput" required placeholder="0.00">
+                </div>
+                <button type="submit" class="btn-primary" style="align-self:end;">
+                    ➕ Agregar
+                </button>
+            </div>
+            </form>
+        </div>
+    </div>
 
-    <form action="{{ route('exportacion.pallet.store', $order) }}" method="POST">
+    {{-- ── Sección 2: Productos ── --}}
+    <div class="sec-card">
+        <div class="sec-hdr">
+            <div class="sec-hdr-num" style="background:#0ea5e9;">2</div>
+            <div class="sec-hdr-title">📦 Productos de la orden</div>
+        </div>
+        <div style="overflow-x:auto;">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th style="text-align:center;">Solicitado</th>
+                    <th style="text-align:center;">Despachado</th>
+                    <th style="text-align:center;">Peso</th>
+                    <th style="text-align:right;">Subtotal</th>
+                    <th style="text-align:center;">Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach($order->details as $item)
+            @php
+                $pct = $item->cantidad_solicitada > 0
+                    ? round($item->cantidad_despachada / $item->cantidad_solicitada * 100) : 0;
+                $bc  = $pct >= 100 ? 'var(--erp-ok)' : ($pct > 0 ? '#f59e0b' : 'var(--erp-danger)');
+            @endphp
+            <tr>
+                <td style="font-weight:600;">{{ $item->product->nombre }}</td>
+                <td style="text-align:center;" class="num-mono">{{ $item->cantidad_solicitada }}</td>
+                <td style="text-align:center;" class="num-mono">{{ $item->cantidad_despachada }}</td>
+                <td style="text-align:center;color:var(--erp-ink-muted);">
+                    {{ number_format(($item->product->peso ?? 0)/1000,3) }} kg
+                </td>
+                <td style="text-align:right;" class="num-mono">S/ {{ number_format($item->subtotal,2) }}</td>
+                <td style="text-align:center;">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+                        <div class="mini-bar"><div class="mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div></div>
+                        <span style="font-size:10px;font-weight:700;color:{{ $bc }};">{{ $pct }}%</span>
+                    </div>
+                </td>
+                <td>
+                    <div style="display:flex;gap:4px;">
+                        <button class="btn-sm-add">✏️ Editar</button>
+                        <button class="btn-danger">🗑</button>
+                    </div>
+                </td>
+            </tr>
+            @endforeach
+            </tbody>
+        </table>
+        </div>
+    </div>
 
-    @csrf
+    {{-- ── Sección 3: Pallets ── --}}
+    <div class="sec-card">
+        <div class="sec-hdr">
+            <div class="sec-hdr-num" style="background:#7c3aed;">3</div>
+            <div class="sec-hdr-title">🟫 Pallets de exportación</div>
+            <div style="margin-left:auto;">
+                <form action="{{ route('exportacion.pallet.store', $order) }}" method="POST" style="display:inline;">
+                    @csrf
+                    <button type="submit" class="btn-primary" style="background:#7c3aed;">
+                        ➕ Crear pallet
+                    </button>
+                </form>
+            </div>
+        </div>
+        <div class="sec-body">
 
-    <button type="submit">
-        ➕ Crear Pallet
-    </button>
+        @if($order->pallets->count())
+        <div class="pallet-wrap">
 
-</form>
+        @foreach($order->pallets as $pallet)
+        @php
+            /* ── Datos para el gráfico 2D ── */
+            $cols        = 5;
+            $rows        = 4;
+            $totalSlots  = $cols * $rows;          // 20 posiciones por capa
+            $totalCajas  = $pallet->detalles->sum('cantidad');
+
+            // Paleta de colores por producto
+            $colorPalette = [
+                '#0ea5e9','#7c3aed','#22c55e','#f59e0b',
+                '#ef4444','#06b6d4','#ec4899','#84cc16',
+                '#f97316','#8b5cf6',
+            ];
+            $prodColores = [];
+            $ci = 0;
+            foreach($pallet->detalles as $det) {
+                $prodColores[$det->product->nombre] = $colorPalette[$ci % count($colorPalette)];
+                $ci++;
+            }
+
+            // Construir slots
+            $slots = [];
+            foreach($pallet->detalles as $det) {
+                for($x = 0; $x < $det->cantidad; $x++) {
+                    $slots[] = [
+                        'nombre' => $det->product->nombre,
+                        'color'  => $prodColores[$det->product->nombre],
+                    ];
+                }
+            }
+            // Rellenar vacíos
+            while(count($slots) < $totalSlots) {
+                $slots[] = ['nombre' => null, 'color' => '#f1f5f9'];
+            }
+            $slots = array_slice($slots, 0, $totalSlots);
+            $pct   = $totalSlots > 0 ? round($totalCajas / $totalSlots * 100) : 0;
+            $pesoP = $pallet->detalles->sum(fn($d) => ($d->product->peso ?? 0) * $d->cantidad / 1000);
+        @endphp
+
+        <div class="pallet-card">
+
+            {{-- Header del pallet --}}
+            <div class="pallet-hdr">
+                <div>
+                    <div class="pallet-code">🟫 {{ $pallet->codigo }}</div>
+                    <div style="font-size:10px;color:#7eb8f7;margin-top:2px;">
+                        {{ $totalCajas }} / {{ $totalSlots }} posiciones · {{ number_format($pesoP,2) }} kg
+                    </div>
+                </div>
+                <span class="badge" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);">
+                    {{ $pct }}% lleno
+                </span>
+            </div>
+
+            <div class="pallet-body">
+
+                {{-- ── BARRA DE PROGRESO ── --}}
+                <div class="pallet-prog">
+                    <div class="pallet-prog-top">
+                        <span>Ocupación del pallet</span>
+                        <span style="font-weight:700;">{{ $pct }}%</span>
+                    </div>
+                    <div class="pallet-prog-bar">
+                        <div class="pallet-prog-fill" style="width:{{ $pct }}%;"></div>
+                    </div>
+                </div>
+
+                {{-- ── GRÁFICO 2D DEL PALLET ── --}}
+                <div class="pallet-2d-wrap">
+                    <div class="pallet-2d-title">Vista 2D del pallet — {{ $rows }} filas × {{ $cols }} columnas</div>
+
+                    {{-- SVG del pallet --}}
+                    @php
+                        $cw   = 54;    // ancho celda
+                        $ch   = 32;    // alto celda
+                        $gap  = 3;     // separación
+                        $padX = 20;    // padding izq (para labels)
+                        $padY = 14;    // padding top (para labels)
+                        $svgW = $padX + $cols * ($cw + $gap) + 10;
+                        $svgH = $padY + $rows * ($ch + $gap) + 10;
+                    @endphp
+
+                    <svg class="pallet-grid-svg"
+                         viewBox="0 0 {{ $svgW }} {{ $svgH }}"
+                         xmlns="http://www.w3.org/2000/svg">
+
+                        {{-- Fondo del pallet --}}
+                        <rect x="0" y="0" width="{{ $svgW }}" height="{{ $svgH }}"
+                              rx="4" ry="4" fill="#e2e8f0"/>
+
+                        {{-- Labels columnas --}}
+                        @for($c = 0; $c < $cols; $c++)
+                            <text
+                                x="{{ $padX + $c * ($cw + $gap) + $cw/2 }}"
+                                y="{{ $padY - 3 }}"
+                                text-anchor="middle"
+                                font-size="7"
+                                fill="#94a3b8"
+                                font-family="Consolas,monospace">
+                                {{ chr(65 + $c) }}
+                            </text>
+                        @endfor
+
+                        {{-- Labels filas --}}
+                        @for($r = 0; $r < $rows; $r++)
+                            <text
+                                x="{{ $padX - 5 }}"
+                                y="{{ $padY + $r * ($ch + $gap) + $ch/2 + 3 }}"
+                                text-anchor="end"
+                                font-size="7"
+                                fill="#94a3b8"
+                                font-family="Consolas,monospace">
+                                {{ $r + 1 }}
+                            </text>
+                        @endfor
+
+                        {{-- Celdas ── --}}
+                        @foreach($slots as $idx => $slot)
+                        @php
+                            $row  = intdiv($idx, $cols);
+                            $col  = $idx % $cols;
+                            $x    = $padX + $col * ($cw + $gap);
+                            $y    = $padY + $row * ($ch + $gap);
+                            $vacia = $slot['nombre'] === null;
+                            $fill  = $slot['color'];
+                            $stroke= $vacia ? '#cbd5e1' : 'rgba(0,0,0,.15)';
+                            // Abreviar nombre del producto
+                            $label = $vacia ? '' : implode('',array_map(fn($w)=>strtoupper(substr($w,0,1)),explode(' ',$slot['nombre'])));
+                            $label = substr($label, 0, 4);
+                        @endphp
+                        <g>
+                            <rect
+                                x="{{ $x }}" y="{{ $y }}"
+                                width="{{ $cw }}" height="{{ $ch }}"
+                                rx="3" ry="3"
+                                fill="{{ $fill }}"
+                                stroke="{{ $stroke }}"
+                                stroke-width="{{ $vacia ? '1' : '1.5' }}"
+                                opacity="{{ $vacia ? '0.5' : '1' }}"/>
+
+                            @if(!$vacia)
+                            {{-- Ícono caja --}}
+                            <text
+                                x="{{ $x + $cw/2 }}"
+                                y="{{ $y + $ch/2 - 3 }}"
+                                text-anchor="middle"
+                                font-size="10"
+                                fill="white">📦</text>
+                            {{-- Siglas --}}
+                            <text
+                                x="{{ $x + $cw/2 }}"
+                                y="{{ $y + $ch - 5 }}"
+                                text-anchor="middle"
+                                font-size="7"
+                                fill="white"
+                                font-weight="bold"
+                                font-family="Consolas,monospace">
+                                {{ $label }}
+                            </text>
+                            @else
+                            {{-- Celda vacía --}}
+                            <text
+                                x="{{ $x + $cw/2 }}"
+                                y="{{ $y + $ch/2 + 3 }}"
+                                text-anchor="middle"
+                                font-size="8"
+                                fill="#cbd5e1">—</text>
+                            @endif
+                        </g>
+                        @endforeach
+
+                    </svg>
+
+                    {{-- Leyenda colores --}}
+                    @if($pallet->detalles->count())
+                    <div style="margin-top:.6rem;display:flex;flex-wrap:wrap;gap:5px;">
+                        @foreach($pallet->detalles as $det)
+                        <span style="
+                            display:inline-flex;align-items:center;gap:4px;
+                            font-size:10px;padding:2px 7px;border-radius:3px;
+                            background:{{ $prodColores[$det->product->nombre] }};
+                            color:#fff;font-weight:700;
+                        ">
+                            {{ implode('',array_map(fn($w)=>strtoupper(substr($w,0,1)),explode(' ',$det->product->nombre))) }}
+                            — {{ $det->product->nombre }}
+                        </span>
+                        @endforeach
+                        <span style="display:inline-flex;align-items:center;gap:4px;font-size:10px;padding:2px 7px;border-radius:3px;background:#f1f5f9;color:#94a3b8;font-weight:700;">
+                            — Vacío
+                        </span>
+                    </div>
+                    @endif
+                </div>
+
+                {{-- ── TABLA DE PRODUCTOS DEL PALLET ── --}}
+                <table class="erp-table" style="margin-bottom:.75rem;">
+                    <thead>
+                        <tr>
+                            <th>Producto</th>
+                            <th style="text-align:center;">Cajas</th>
+                            <th style="text-align:center;">Peso</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @forelse($pallet->detalles as $detalle)
+                    <tr>
+                        <td>
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <span style="width:10px;height:10px;border-radius:2px;background:{{ $prodColores[$detalle->product->nombre] }};flex-shrink:0;display:inline-block;"></span>
+                                {{ $detalle->product->nombre }}
+                            </div>
+                        </td>
+                        <td style="text-align:center;" class="num-mono">{{ $detalle->cantidad }}</td>
+                        <td style="text-align:center;color:var(--erp-ink-muted);">
+                            {{ number_format(($detalle->product->peso * $detalle->cantidad)/1000,2) }} kg
+                        </td>
+                        <td style="text-align:right;">
+                            <button class="btn-danger" style="padding:3px 8px;font-size:10px;">🗑 Quitar</button>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="4" style="text-align:center;color:#94a3b8;padding:1rem;font-style:italic;">
+                            Este pallet aún no tiene productos
+                        </td>
+                    </tr>
+                    @endforelse
+                    </tbody>
+                </table>
+
+                {{-- ── FORM AGREGAR A PALLET ── --}}
+                <div style="background:#f8fafc;border:1px solid var(--erp-border);border-radius:4px;padding:.75rem;">
+                    <div style="font-size:10px;font-weight:700;color:var(--erp-ink-muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:.5rem;">
+                        ➕ Agregar producto al pallet
+                    </div>
+                    <form action="{{ route('exportacion.pallet.agregarProducto', $pallet) }}" method="POST">
+                    @csrf
+                    <div style="display:grid;grid-template-columns:2fr 1fr auto;gap:7px;align-items:end;">
+                        <div>
+                            <select name="order_detail_id" class="fselect" required>
+                                <option value="">Seleccionar producto pendiente</option>
+                                @foreach($order->details as $detalle)
+                                @php
+                                    $enPallets = $detalle->palletDetails->sum('cantidad');
+                                    $pendiente = $detalle->cantidad_solicitada - $enPallets;
+                                @endphp
+                                @if($pendiente > 0)
+                                <option value="{{ $detalle->id }}">
+                                    {{ $detalle->product->nombre }} ({{ $pendiente }} pend.)
+                                </option>
+                                @endif
+                                @endforeach
+                            </select>
+                        </div>
+                        <div>
+                            <input type="number" name="cantidad" class="finput"
+                                   min="1" required placeholder="Cantidad">
+                        </div>
+                        <button type="submit" class="btn-sm-add">✔ Agregar</button>
+                    </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        @endforeach
+        </div>
+
+        @else
+        <div style="text-align:center;padding:2rem;color:var(--erp-ink-muted);">
+            <div style="font-size:36px;margin-bottom:8px;">🟫</div>
+            <div style="font-size:14px;font-weight:600;color:var(--erp-ink);margin-bottom:4px;">No hay pallets creados</div>
+            <div style="font-size:12px;">Crea el primer pallet para comenzar la asignación de productos.</div>
+        </div>
+        @endif
+
+        </div>
+    </div>
+
+    {{-- ── Sección 4: Estado de producción ── --}}
+    <div class="sec-card">
+        <div class="sec-hdr">
+            <div class="sec-hdr-num" style="background:#f59e0b;">4</div>
+            <div class="sec-hdr-title">📊 Estado de asignación a pallets</div>
+        </div>
+        <div style="overflow-x:auto;">
+        <table class="erp-table">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th style="text-align:center;">Solicitado</th>
+                    <th style="text-align:center;">En pallets</th>
+                    <th style="text-align:center;">Pendiente</th>
+                    <th style="text-align:center;">Avance</th>
+                    <th style="text-align:right;">Peso total</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach($order->details as $detalle)
+            @php
+                $enPallets = $detalle->cantidad_en_pallets ?? 0;
+                $pendiente = $detalle->cantidad_solicitada - $enPallets;
+                $peso      = ($detalle->product->peso ?? 0) * $detalle->cantidad_solicitada;
+                $pct2      = $detalle->cantidad_solicitada > 0
+                    ? round($enPallets / $detalle->cantidad_solicitada * 100) : 0;
+                $bc2 = $pct2 >= 100 ? 'var(--erp-ok)' : ($pct2 > 0 ? '#f59e0b' : '#94a3b8');
+                $rowClass = $pct2 >= 100 ? 'prod-row-ok' : ($pct2 > 0 ? 'prod-row-warn' : '');
+            @endphp
+            <tr class="{{ $rowClass }}">
+                <td style="font-weight:600;">{{ $detalle->product->nombre }}</td>
+                <td style="text-align:center;" class="num-mono">{{ $detalle->cantidad_solicitada }}</td>
+                <td style="text-align:center;" class="num-mono" style="color:var(--erp-ok);">{{ $enPallets }}</td>
+                <td style="text-align:center;">
+                    @if($pendiente > 0)
+                    <span class="badge badge-warn">{{ $pendiente }}</span>
+                    @else
+                    <span class="badge badge-ok">✓ Completo</span>
+                    @endif
+                </td>
+                <td style="text-align:center;">
+                    <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+                        <div class="mini-bar"><div class="mini-fill" style="width:{{ $pct2 }}%;background:{{ $bc2 }};"></div></div>
+                        <span style="font-size:10px;font-weight:700;color:{{ $bc2 }};">{{ $pct2 }}%</span>
+                    </div>
+                </td>
+                <td style="text-align:right;color:var(--erp-ink-muted);">
+                    {{ number_format($peso/1000,2) }} kg
+                </td>
+            </tr>
+            @endforeach
+            </tbody>
+        </table>
+        </div>
+    </div>
 
 </div>
 
-@if($order->pallets->count())
-
-    @foreach($order->pallets as $pallet)
-
-        <fieldset style="margin-bottom:20px;">
-
-            <legend>
-
-                <strong>
-
-                    {{ $pallet->codigo }}
-
-                </strong>
-
-            </legend>
-
-            <table border="1" cellpadding="5" width="100%">
-
-                <thead>
-
-                    <tr>
-
-                        <th>Producto</th>
-
-                        <th>Cantidad</th>
-
-                        <th>Peso</th>
-
-                        <th>Acciones</th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @forelse($pallet->detalles as $detalle)
-
-                        <tr>
-
-                            <td>
-
-                                {{ $detalle->product->nombre }}
-
-                            </td>
-
-                            <td>
-
-                                {{ $detalle->cantidad }}
-
-                            </td>
-
-                            <td>
-
-                                {{ number_format(($detalle->product->peso * $detalle->cantidad)/1000,2) }} kg
-
-                            </td>
-
-                            <td>
-
-                                Quitar
-
-                            </td>
-
-                        </tr>
-
-                    @empty
-
-                        <tr>
-
-                            <td colspan="4">
-
-                                Este pallet aún no tiene productos.
-
-                            </td>
-
-                        </tr>
-
-                    @endforelse
-
-                </tbody>
-
-            </table>
-
-            <br>
-
-           <form action="{{ route('exportacion.pallet.agregarProducto', $pallet) }}" method="POST">
-
-    @csrf
-
-    <select name="order_detail_id" required>
-
-        <option value="">
-            Seleccione un producto
-        </option>
-
-        @foreach($order->details as $detalle)
-
-            @php
-
-                $enPallets = $detalle->palletDetails->sum('cantidad');
-
-                $pendiente = $detalle->cantidad_solicitada - $enPallets;
-
-            @endphp
-
-            @if($pendiente > 0)
-
-                <option value="{{ $detalle->id }}">
-
-                    {{ $detalle->product->nombre }}
-                    ({{ $pendiente }} pendientes)
-
-                </option>
-
-            @endif
-
-        @endforeach
-
-    </select>
-
-    <input
-        type="number"
-        name="cantidad"
-        min="1"
-        required
-        placeholder="Cantidad">
-
-    <button type="submit">
-
-        Agregar
-
-    </button>
-
-</form>
-
-        </fieldset>
-
-    @endforeach
-
-@else
-
-    <p>
-
-        No hay pallets creados.
-
-    </p>
-
-@endif
-<h3>📦 Estado de Producción</h3>
-
-<table border="1" cellpadding="5" width="100%">
-
-    <thead>
-
-        <tr>
-
-            <th>Producto</th>
-
-            <th>Solicitado</th>
-
-            <th>En Pallets</th>
-
-            <th>Pendiente</th>
-
-            <th>Peso Total</th>
-
-        </tr>
-
-    </thead>
-
-    <tbody>
-
-        @foreach($order->details as $detalle)
-
-            @php
-
-                $enPallets = $detalle->cantidad_en_pallets ?? 0;
-
-                $pendiente = $detalle->cantidad_solicitada - $enPallets;
-
-                $peso = ($detalle->product->peso ?? 0) * $detalle->cantidad_solicitada;
-
-            @endphp
-
-            <tr>
-
-                <td>{{ $detalle->product->nombre }}</td>
-
-                <td align="center">
-
-                    {{ $detalle->cantidad_solicitada }}
-
-                </td>
-
-                <td align="center">
-
-                    {{ $enPallets }}
-
-                </td>
-
-                <td align="center">
-
-                    {{ $pendiente }}
-
-                </td>
-
-                <td align="right">
-
-                    {{ number_format($peso/1000,2) }} kg
-
-                </td>
-
-            </tr>
-
-        @endforeach
-
-    </tbody>
-
-</table>
+{{-- ── Panel lateral ── --}}
+<div>
+    <div style="position:sticky;top:10px;display:flex;flex-direction:column;gap:10px;">
+
+        {{-- Resumen financiero --}}
+        <div class="sec-card">
+            <div class="sec-hdr">
+                <div class="sec-hdr-title">💰 Resumen financiero</div>
+            </div>
+            <div class="sec-body">
+                <div class="sum-row"><span>Productos</span><span class="sum-val">{{ $totalItems }}</span></div>
+                <div class="sum-row"><span>Pallets</span><span class="sum-val">{{ $totalPallets }}</span></div>
+                <div class="sum-row"><span>Peso estimado</span><span class="sum-val">{{ number_format($pesoTotal,2) }} kg</span></div>
+                <div class="sum-row"><span>Subtotal</span><span class="sum-val">S/ {{ number_format($order->subtotal,2) }}</span></div>
+                <div class="sum-row"><span>IGV (18%)</span><span class="sum-val">S/ {{ number_format($order->igv,2) }}</span></div>
+                <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-top:2px solid var(--erp-border);margin-top:4px;">
+                    <span style="font-size:14px;font-weight:800;color:#1e3a5f;">TOTAL</span>
+                    <span style="font-size:18px;font-weight:900;color:#1e3a5f;font-family:var(--font-mono);">S/ {{ number_format($order->total,2) }}</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Info orden --}}
+        <div class="sec-card">
+            <div class="sec-hdr"><div class="sec-hdr-title">📋 Datos de la orden</div></div>
+            <div class="sec-body">
+                <div class="sum-row"><span>N° Orden</span><span class="sum-val" style="color:var(--erp-accent);font-size:11px;">{{ $order->numero_orden }}</span></div>
+                <div class="sum-row"><span>Cliente</span><span class="sum-val" style="font-size:11px;text-align:right;max-width:150px;">{{ $order->client->razon_social }}</span></div>
+                <div class="sum-row"><span>Tipo</span><span><span class="badge badge-blue">🚢 EXPORTACIÓN</span></span></div>
+                <div class="sum-row"><span>Fecha</span><span class="sum-val">{{ \Carbon\Carbon::parse($order->fecha_pedido)->format('d M Y') }}</span></div>
+                <div class="sum-row"><span>Estado</span>
+                    <span class="badge" style="background:{{ $estadoBg }};color:{{ $estadoColor }};">{{ $order->estado }}</span>
+                </div>
+            </div>
+        </div>
+
+        {{-- Acciones --}}
+        <div class="sec-card">
+            <div class="sec-hdr"><div class="sec-hdr-title">⚡ Acciones</div></div>
+            <div class="sec-body" style="display:flex;flex-direction:column;gap:7px;">
+                <a href="{{ route('orders.pdf', $order) }}" target="_blank" class="btn-pdf" style="justify-content:center;">
+                    📄 Descargar PDF
+                </a>
+                @if($order->estado != 'COMPLETO')
+                <form method="POST" action="{{ route('orders.cerrar', $order) }}">
+                    @csrf
+                    <button type="submit" class="btn-cerrar" style="width:100%;justify-content:center;"
+                            onclick="return confirm('¿Confirmas cerrar esta exportación?')">
+                        🔒 Cerrar exportación
+                    </button>
+                </form>
+                @else
+                <div style="background:var(--erp-ok-bg);border:1px solid #b7dfca;border-radius:3px;padding:8px;text-align:center;font-size:12px;font-weight:600;color:var(--erp-ok);">
+                    ✅ Exportación cerrada
+                </div>
+                @endif
+            </div>
+        </div>
+
+    </div>
+</div>
+
+</div>{{-- fin layout --}}
+
+</div>
 </div>
 
 @endsection
