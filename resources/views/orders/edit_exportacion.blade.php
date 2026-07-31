@@ -279,7 +279,12 @@
                 </td>
                 <td>
                     <div style="display:flex;gap:4px;">
-                        <button class="btn-sm-add">✏️ Editar</button>
+                        <button
+                                type="button"
+                                class="btn-sm-add"
+                                onclick="abrirModalEditar({{ $item->id }})">
+                                ✏️ Editar
+                            </button>
                         <button class="btn-danger">🗑</button>
                     </div>
                 </td>
