@@ -265,12 +265,53 @@
             @endphp
             <tr>
                 <td style="font-weight:600;">{{ $item->product->nombre }}</td>
-                <td style="text-align:center;" class="num-mono">{{ $item->cantidad_solicitada }}</td>
-                <td style="text-align:center;" class="num-mono">{{ $item->cantidad_despachada }}</td>
+                <td style="text-align:center;">
+
+    <span id="txtSolicitada{{ $item->id }}">
+        {{ $item->cantidad_solicitada }}
+    </span>
+
+    <input
+        id="inpSolicitada{{ $item->id }}"
+        type="number"
+        class="finput"
+        value="{{ $item->cantidad_solicitada }}"
+        style="display:none;width:80px;margin:auto;">
+
+</td>
+
+<td style="text-align:center;">
+
+    <span id="txtDespachada{{ $item->id }}">
+        {{ $item->cantidad_despachada }}
+    </span>
+
+    <input
+        id="inpDespachada{{ $item->id }}"
+        type="number"
+        class="finput"
+        value="{{ $item->cantidad_despachada }}"
+        style="display:none;width:80px;margin:auto;">
+
+</td>
                 <td style="text-align:center;color:var(--erp-ink-muted);">
                     {{ number_format(($item->product->peso ?? 0)/1000,3) }} kg
                 </td>
-                <td style="text-align:right;" class="num-mono">S/ {{ number_format($item->subtotal,2) }}</td>
+                <td style="text-align:right;">
+
+    <span id="txtSubtotal{{ $item->id }}">
+        S/ {{ number_format($item->subtotal,2) }}
+    </span>
+
+    <input
+        id="inpPrecio{{ $item->id }}"
+        type="number"
+        step="0.01"
+        class="finput"
+        value="{{ $item->precio_unitario }}"
+        style="display:none;width:90px;">
+
+</td>
                 <td style="text-align:center;">
                     <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
                         <div class="mini-bar"><div class="mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div></div>
@@ -278,16 +319,74 @@
                     </div>
                 </td>
                 <td>
-                    <div style="display:flex;gap:4px;">
-                        <button
-                                type="button"
-                                class="btn-sm-add"
-                                onclick="abrirModalEditar({{ $item->id }})">
-                                ✏️ Editar
-                            </button>
-                        <button class="btn-danger">🗑</button>
-                    </div>
-                </td>
+
+<div style="display:flex;gap:4px;">
+
+<button
+    id="btnEditar{{ $item->id }}"
+    type="button"
+    class="btn-sm-add"
+    onclick="editarFila({{ $item->id }})">
+    ✏️ Editar
+</button>
+<form
+    action="{{ route('orders.details.destroy', $item) }}"
+    method="POST"
+    style="display:inline;"
+    onsubmit="return confirm('¿Deseas eliminar este producto de la orden?');">
+
+    @csrf
+    @method('DELETE')
+
+    <button type="submit" class="btn-danger">
+        🗑
+    </button>
+
+</form>
+<form
+    id="formEditar{{ $item->id }}"
+    action="{{ route('orders.updateDetail',$item) }}"
+    method="POST"
+    style="display:none;">
+
+    @csrf
+    @method('PUT')
+
+    <input
+        type="hidden"
+        name="cantidad_solicitada"
+        id="formSolicitada{{ $item->id }}">
+
+    <input
+        type="hidden"
+        name="cantidad_despachada"
+        id="formDespachada{{ $item->id }}">
+
+    <input
+        type="hidden"
+        name="precio_unitario"
+        id="formPrecio{{ $item->id }}">
+
+    <button class="btn-primary">
+        💾 Guardar
+    </button>
+
+</form>
+
+<button
+    id="btnCancelar{{ $item->id }}"
+    type="button"
+    class="btn-danger"
+    style="display:none;"
+    onclick="cancelarFila({{ $item->id }})">
+
+    ✖
+
+</button>
+
+</div>
+
+</td>
             </tr>
             @endforeach
             </tbody>
@@ -719,5 +818,48 @@
 
 </div>
 </div>
+<script>
 
+function editarFila(id){
+
+    document.getElementById('txtSolicitada'+id).style.display='none';
+    document.getElementById('txtDespachada'+id).style.display='none';
+    document.getElementById('txtSubtotal'+id).style.display='none';
+
+    document.getElementById('inpSolicitada'+id).style.display='inline-block';
+    document.getElementById('inpDespachada'+id).style.display='inline-block';
+    document.getElementById('inpPrecio'+id).style.display='inline-block';
+
+    document.getElementById('btnEditar'+id).style.display='none';
+    document.getElementById('formEditar'+id).style.display='inline-block';
+    document.getElementById('btnCancelar'+id).style.display='inline-block';
+
+}
+
+function cancelarFila(id){
+
+    location.reload();
+
+}
+
+document.querySelectorAll("form[id^='formEditar']").forEach(form=>{
+
+    form.addEventListener("submit",function(){
+
+        let id=this.id.replace('formEditar','');
+
+        document.getElementById('formSolicitada'+id).value=
+            document.getElementById('inpSolicitada'+id).value;
+
+        document.getElementById('formDespachada'+id).value=
+            document.getElementById('inpDespachada'+id).value;
+
+        document.getElementById('formPrecio'+id).value=
+            document.getElementById('inpPrecio'+id).value;
+
+    });
+
+});
+
+</script>
 @endsection

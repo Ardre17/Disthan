@@ -21,23 +21,28 @@ class ExportController extends Controller
      * Crear un nuevo pallet.
      */
     public function storePallet(Order $order)
-    {
-        $ultimo = Pallet::where('order_id', $order->id)
-                        ->max('orden');
+{
+    // Consecutivo dentro de la orden
+    $ultimo = Pallet::where('order_id', $order->id)
+                    ->max('orden');
 
-        $ultimoCodigo = Pallet::max('id') + 1;
+    $orden = $ultimo ? $ultimo + 1 : 1;
 
-        Pallet::create([
-            'order_id'   => $order->id,
-            'codigo'     => 'PLT-' . str_pad($ultimoCodigo, 6, '0', STR_PAD_LEFT),
-            'orden'      => $orden,
-            'estado'     => 'ABIERTO',
-            'peso_neto'  => 0,
-            'peso_bruto' => 0,
-            'cerrado'    => false,
-        ]);
-        return redirect()->back()->with('success', 'Pallet creado correctamente.');
-    }
+    // Consecutivo global para el código del pallet
+    $ultimoCodigo = (Pallet::max('id') ?? 0) + 1;
+
+    Pallet::create([
+        'order_id'   => $order->id,
+        'codigo'     => 'PLT-' . str_pad($ultimoCodigo, 6, '0', STR_PAD_LEFT),
+        'orden'      => $orden,
+        'estado'     => 'ABIERTO',
+        'peso_neto'  => 0,
+        'peso_bruto' => 0,
+        'cerrado'    => false,
+    ]);
+
+    return redirect()->back()->with('success', 'Pallet creado correctamente.');
+}
     public function agregarProducto(Request $request, Pallet $pallet)
 {
     $request->validate([
