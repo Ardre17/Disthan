@@ -257,139 +257,82 @@
                 </tr>
             </thead>
             <tbody>
-            @foreach($order->details as $item)
-            @php
-                $pct = $item->cantidad_solicitada > 0
-                    ? round($item->cantidad_despachada / $item->cantidad_solicitada * 100) : 0;
-                $bc  = $pct >= 100 ? 'var(--erp-ok)' : ($pct > 0 ? '#f59e0b' : 'var(--erp-danger)');
-            @endphp
-            <tr>
-                <td style="font-weight:600;">{{ $item->product->nombre }}</td>
-                <td style="text-align:center;">
-
-    <span id="txtSolicitada{{ $item->id }}">
-        {{ $item->cantidad_solicitada }}
-    </span>
-
-    <input
-        id="inpSolicitada{{ $item->id }}"
-        type="number"
-        class="finput"
-        value="{{ $item->cantidad_solicitada }}"
-        style="display:none;width:80px;margin:auto;">
-
-</td>
-
-<td style="text-align:center;">
-
-    <span id="txtDespachada{{ $item->id }}">
-        {{ $item->cantidad_despachada }}
-    </span>
-
-    <input
-        id="inpDespachada{{ $item->id }}"
-        type="number"
-        class="finput"
-        value="{{ $item->cantidad_despachada }}"
-        style="display:none;width:80px;margin:auto;">
-
-</td>
-                <td style="text-align:center;color:var(--erp-ink-muted);">
-                    {{ number_format(($item->product->peso ?? 0)/1000,3) }} kg
-                </td>
-                <td style="text-align:right;">
-
-    <span id="txtSubtotal{{ $item->id }}">
+@foreach($order->details as $item)
+@php
+    $pct = $item->cantidad_solicitada > 0
+        ? round($item->cantidad_despachada / $item->cantidad_solicitada * 100) : 0;
+    $bc  = $pct >= 100 ? 'var(--erp-ok)' : ($pct > 0 ? '#f59e0b' : 'var(--erp-danger)');
+@endphp
+<tr id="row-{{ $item->id }}">
+    <td style="font-weight:600;">{{ $item->product->nombre }}</td>
+    <td style="text-align:center;">
+        <input type="number"
+               class="num-mono"
+               id="sol-{{ $item->id }}"
+               value="{{ $item->cantidad_solicitada }}"
+               disabled
+               style="width:70px;text-align:center;border:1px solid #dde2ea;border-radius:3px;padding:4px;font-family:var(--font-mono);font-weight:700;background:#fbfcfe;"
+               oninput="syncHidden({{ $item->id }})">
+    </td>
+    <td style="text-align:center;">
+        <input type="number"
+               class="num-mono"
+               id="des-{{ $item->id }}"
+               value="{{ $item->cantidad_despachada }}"
+               disabled
+               style="width:70px;text-align:center;border:1px solid #dde2ea;border-radius:3px;padding:4px;font-family:var(--font-mono);font-weight:700;background:#fbfcfe;"
+               oninput="syncHidden({{ $item->id }});actualizarBarra({{ $item->id }})">
+    </td>
+    <td style="text-align:center;color:var(--erp-ink-muted);">
+        {{ number_format(($item->product->peso ?? 0)/1000,3) }} kg
+    </td>
+    <td style="text-align:right;" class="num-mono">
         S/ {{ number_format($item->subtotal,2) }}
-    </span>
-
-    <input
-        id="inpPrecio{{ $item->id }}"
-        type="number"
-        step="0.01"
-        class="finput"
-        value="{{ $item->precio_unitario }}"
-        style="display:none;width:90px;">
-
-</td>
-                <td style="text-align:center;">
-                    <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
-                        <div class="mini-bar"><div class="mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div></div>
-                        <span style="font-size:10px;font-weight:700;color:{{ $bc }};">{{ $pct }}%</span>
-                    </div>
-                </td>
-                <td>
-
-<div style="display:flex;gap:4px;">
-
-<button
-    id="btnEditar{{ $item->id }}"
-    type="button"
-    class="btn-sm-add"
-    onclick="editarFila({{ $item->id }})">
-    ✏️ Editar
-</button>
-<form
-    action="{{ route('orders.details.destroy', $item) }}"
-    method="POST"
-    style="display:inline;"
-    onsubmit="return confirm('¿Deseas eliminar este producto de la orden?');">
-
-    @csrf
-    @method('DELETE')
-
-    <button type="submit" class="btn-danger">
-        🗑
-    </button>
-
-</form>
-<form
-    id="formEditar{{ $item->id }}"
-    action="{{ route('orders.updateDetail',$item) }}"
-    method="POST"
-    style="display:none;">
-
-    @csrf
-    @method('PUT')
-
-    <input
-        type="hidden"
-        name="cantidad_solicitada"
-        id="formSolicitada{{ $item->id }}">
-
-    <input
-        type="hidden"
-        name="cantidad_despachada"
-        id="formDespachada{{ $item->id }}">
-
-    <input
-        type="hidden"
-        name="precio_unitario"
-        id="formPrecio{{ $item->id }}">
-
-    <button class="btn-primary">
-        💾 Guardar
-    </button>
-
-</form>
-
-<button
-    id="btnCancelar{{ $item->id }}"
-    type="button"
-    class="btn-danger"
-    style="display:none;"
-    onclick="cancelarFila({{ $item->id }})">
-
-    ✖
-
-</button>
-
-</div>
-
-</td>
-            </tr>
-            @endforeach
-            </tbody>
+    </td>
+    <td style="text-align:center;">
+        <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+            <div class="mini-bar">
+                <div class="mini-fill"
+                     id="bar-{{ $item->id }}"
+                     style="width:{{ $pct }}%;background:{{ $bc }};transition:width .3s;">
+                </div>
+            </div>
+            <span id="pct-{{ $item->id }}"
+                  style="font-size:10px;font-weight:700;color:{{ $bc }};">
+                {{ $pct }}%
+            </span>
+        </div>
+    </td>
+    <td>
+        <div style="display:flex;gap:4px;">
+            {{-- Botón editar --}}
+            <button type="button"
+                    class="btn-sm-add"
+                    id="btn-edit-{{ $item->id }}"
+                    onclick="editarFila({{ $item->id }})">
+                ✏️ Editar
+            </button>
+            {{-- Botón guardar (oculto hasta editar) --}}
+            <button type="submit"
+                    form="form-upd-{{ $item->id }}"
+                    class="btn-ok"
+                    id="btn-save-{{ $item->id }}"
+                    style="display:none;padding:5px 10px;font-size:11px;">
+                💾 Guardar
+            </button>
+            {{-- Eliminar --}}
+            <form method="POST"
+                  action="{{ route('orders.details.destroy', $item) }}"
+                  onsubmit="return confirm('¿Eliminar {{ addslashes($item->product->nombre) }}?')"
+                  style="display:inline;">
+                @csrf @method('DELETE')
+                <button type="submit" class="btn-danger">🗑</button>
+            </form>
+        </div>
+    </td>
+</tr>
+@endforeach
+</tbody>
         </table>
         </div>
     </div>
@@ -861,5 +804,64 @@ document.querySelectorAll("form[id^='formEditar']").forEach(form=>{
 
 });
 
+</script>
+{{-- Forms ocultos para actualizar cada ítem --}}
+@foreach($order->details as $item)
+<form method="POST"
+      action="{{ route('orders.updateDetail', $item) }}"
+      id="form-upd-{{ $item->id }}"
+      style="display:none;">
+    @csrf @method('PUT')
+    <input type="hidden" name="cantidad_solicitada" id="h-sol-{{ $item->id }}" value="{{ $item->cantidad_solicitada }}">
+    <input type="hidden" name="cantidad_despachada" id="h-des-{{ $item->id }}" value="{{ $item->cantidad_despachada }}">
+    <input type="hidden" name="precio_unitario"     id="h-pre-{{ $item->id }}" value="{{ $item->precio_unitario }}">
+</form>
+@endforeach
+<script>
+/* ── Sync inputs visibles → hidden ocultos ── */
+function syncHidden(id) {
+    var sol = document.getElementById('sol-' + id);
+    var des = document.getElementById('des-' + id);
+    var pre = document.getElementById('h-pre-' + id);
+
+    if (sol) document.getElementById('h-sol-' + id).value = sol.value;
+    if (des) document.getElementById('h-des-' + id).value = des.value;
+}
+
+/* ── Actualizar barra en tiempo real ── */
+function actualizarBarra(id) {
+    var sol = parseFloat(document.getElementById('sol-' + id).value) || 0;
+    var des = parseFloat(document.getElementById('des-' + id).value) || 0;
+    var pct = sol > 0 ? Math.min(100, Math.round(des / sol * 100)) : 0;
+    var bc  = pct >= 100 ? '#1c7c4d' : (pct > 0 ? '#f59e0b' : '#c0312b');
+
+    var bar  = document.getElementById('bar-' + id);
+    var pctEl = document.getElementById('pct-' + id);
+
+    if (bar)  { bar.style.width = pct + '%'; bar.style.background = bc; }
+    if (pctEl){ pctEl.textContent = pct + '%'; pctEl.style.color = bc; }
+}
+
+/* ── Habilitar edición de una fila ── */
+function editarFila(id) {
+    var sol    = document.getElementById('sol-' + id);
+    var des    = document.getElementById('des-' + id);
+    var btnE   = document.getElementById('btn-edit-' + id);
+    var btnS   = document.getElementById('btn-save-' + id);
+
+    sol.disabled = false;
+    des.disabled = false;
+
+    sol.style.borderColor     = '#0b5ed7';
+    sol.style.background      = '#eff6ff';
+    des.style.borderColor     = '#1c7c4d';
+    des.style.background      = '#e8f5ee';
+
+    btnE.style.display = 'none';
+    btnS.style.display = 'inline-flex';
+
+    des.focus();
+    des.select();
+}
 </script>
 @endsection
