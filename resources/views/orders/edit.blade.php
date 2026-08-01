@@ -491,6 +491,8 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                     'subtotal'        => $i->subtotal,
                     'peso'            => number_format(($i->product->peso ?? 0) / 1000, 3),
                     'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,  // ← NUEVO
+                    'barcode' => $i->product->barcode,
+                    'box_barcode' => $i->product->box_barcode,
                 ])->values()->toJson();
             @endphp
             <div class="no-paleta-chip"
@@ -599,7 +601,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         </div>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script>
 // ── Scanner ──────────────────────────────────────────────────────────────
 let scanner = document.getElementById('scanner');
@@ -780,6 +782,7 @@ items.forEach(item=>{
 });
 
 tabla += `
+
 </tbody>
 </table>
 
