@@ -78,116 +78,76 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .leg-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;}
 .leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:5px;display:inline-block;}
 
-/* ══════════════════════════════
-   MAPA DE PALETAS
-══════════════════════════════ */
-.paleta-map-card {
-    background:#fff; border:1px solid #e2e8f0;
-    border-radius:12px; overflow:hidden;
-}
-.paleta-map-header {
-    background:#0f172a; padding:10px 14px;
-    display:flex; align-items:center; justify-content:space-between;
-}
-.paleta-map-title {
-    font-size:12px; font-weight:700; color:#f8fafc;
-    display:flex; align-items:center; gap:7px;
-}
-.paleta-map-body { padding:12px; }
+/* ══ MAPA DE PALETAS ══ */
+.paleta-map-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden;}
+.paleta-map-header{background:#0f172a;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+.paleta-map-title{font-size:12px;font-weight:700;color:#f8fafc;display:flex;align-items:center;gap:7px;}
+.paleta-map-body{padding:12px;}
+.paleta-map-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(110px,1fr));gap:8px;}
+.paleta-box{border-radius:10px;border:2px solid transparent;padding:10px 8px;text-align:center;cursor:pointer;transition:transform .15s,box-shadow .15s;position:relative;user-select:none;}
+.paleta-box:hover{transform:translateY(-3px);box-shadow:0 6px 18px rgba(0,0,0,.12);}
+.paleta-box.estado-completo{background:#dcfce7;border-color:#86efac;}
+.paleta-box.estado-parcial{background:#fef3c7;border-color:#fde68a;}
+.paleta-box.estado-incompleto{background:#fee2e2;border-color:#fca5a5;}
+.paleta-box.estado-vacia{background:#f8fafc;border-color:#e2e8f0;}
+.paleta-box-icon{font-size:22px;margin-bottom:4px;}
+.paleta-box-name{font-size:12px;font-weight:800;color:#0f172a;}
+.paleta-box-items{font-size:10px;color:#64748b;margin-top:2px;}
+.paleta-box-pct{font-size:11px;font-weight:700;margin-top:3px;}
+.paleta-box-bar{height:4px;border-radius:99px;background:#e5e7eb;overflow:hidden;margin-top:5px;}
+.paleta-box-fill{height:100%;border-radius:99px;}
+.no-paleta-chip{display:flex;align-items:center;justify-content:space-between;background:#fff8f0;border:1px dashed #fed7aa;border-radius:8px;padding:7px 10px;font-size:12px;color:#92400e;margin-top:8px;cursor:pointer;transition:background .15s;}
+.no-paleta-chip:hover{background:#fef3e2;}
 
-.paleta-map-grid {
-    display:grid;
-    grid-template-columns:repeat(auto-fill, minmax(110px,1fr));
-    gap:8px;
-}
-
-/* Cada caja de paleta en el mapa */
-.paleta-box {
-    border-radius:10px; border:2px solid transparent;
-    padding:10px 8px; text-align:center;
-    cursor:pointer; transition:transform .15s, box-shadow .15s;
-    position:relative; user-select:none;
-}
-.paleta-box:hover {
-    transform:translateY(-3px);
-    box-shadow:0 6px 18px rgba(0,0,0,.12);
-}
-.paleta-box.estado-completo  { background:#dcfce7; border-color:#86efac; }
-.paleta-box.estado-parcial   { background:#fef3c7; border-color:#fde68a; }
-.paleta-box.estado-incompleto{ background:#fee2e2; border-color:#fca5a5; }
-.paleta-box.estado-vacia     { background:#f8fafc; border-color:#e2e8f0; }
-
-.paleta-box-icon  { font-size:22px; margin-bottom:4px; }
-.paleta-box-name  { font-size:12px; font-weight:800; color:#0f172a; }
-.paleta-box-items { font-size:10px; color:#64748b; margin-top:2px; }
-.paleta-box-pct   { font-size:11px; font-weight:700; margin-top:3px; }
-.paleta-box-bar   { height:4px; border-radius:99px; background:#e5e7eb; overflow:hidden; margin-top:5px; }
-.paleta-box-fill  { height:100%; border-radius:99px; }
-
-/* Sin paleta chip */
-.no-paleta-chip {
-    display:flex; align-items:center; justify-content:space-between;
-    background:#fff8f0; border:1px dashed #fed7aa;
-    border-radius:8px; padding:7px 10px; font-size:12px;
-    color:#92400e; margin-top:8px; cursor:pointer;
-    transition:background .15s;
-}
-.no-paleta-chip:hover { background:#fef3e2; }
-
-/* ══════════════════════════════
-   MODAL DE DETALLE
-══════════════════════════════ */
-.pm-overlay {
-    display:none; position:fixed; inset:0;
-    background:rgba(0,0,0,.45); z-index:1000;
-    align-items:center; justify-content:center; padding:16px;
-}
-.pm-overlay.open { display:flex; }
-.pm-modal {
-    background:#fff; border-radius:14px;
-    width:480px; max-width:100%; max-height:90vh;
-    overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2);
-    animation:mIn .16s ease;
-}
+/* ══ MODAL ══ */
+.pm-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;align-items:center;justify-content:center;padding:16px;}
+.pm-overlay.open{display:flex;}
+.pm-modal{background:#fff;border-radius:14px;width:660px;max-width:100%;max-height:90vh;overflow-y:auto;box-shadow:0 20px 60px rgba(0,0,0,.2);animation:mIn .16s ease;display:flex;flex-direction:column;}
 @keyframes mIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
-.pm-header {
-    padding:14px 18px; display:flex; align-items:center;
-    justify-content:space-between; border-bottom:1px solid #f1f5f9;
-    position:sticky; top:0; background:#fff; z-index:1;
-}
-.pm-title  { font-size:15px; font-weight:700; color:#0f172a; }
-.pm-sub    { font-size:11px; color:#94a3b8; margin-top:2px; }
-.pm-body   { padding:16px 18px; }
-.pm-close  { background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; padding:2px 6px; }
+.pm-header{padding:14px 18px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f1f5f9;position:sticky;top:0;background:#fff;z-index:1;}
+.pm-title{font-size:15px;font-weight:700;color:#0f172a;}
+.pm-sub{font-size:11px;color:#94a3b8;margin-top:2px;}
+.pm-body{padding:16px 18px;flex:1;overflow-y:auto;}
+.pm-close{background:none;border:none;font-size:20px;cursor:pointer;color:#94a3b8;padding:2px 6px;}
+.pm-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:14px;}
+.pm-kpi{background:#f8fafc;border-radius:9px;padding:8px 10px;text-align:center;border:1px solid #e2e8f0;}
+.pm-kpi-label{font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;}
+.pm-kpi-val{font-size:17px;font-weight:700;color:#1e293b;margin-top:2px;}
+.pm-prog-wrap{background:#f8fafc;border-radius:9px;padding:10px 12px;margin-bottom:14px;}
+.pm-prog-hdr{display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:5px;}
+.pm-prog-bar{height:8px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
+.pm-prog-fill{height:100%;border-radius:99px;}
+.pm-item{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #f1f5f9;}
+.pm-item:last-child{border-bottom:none;}
+.pm-item-dot{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.pm-item-name{flex:1;font-size:12px;font-weight:500;color:#374151;}
+.pm-item-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
+.pm-item-qty{font-size:12px;font-weight:700;color:#0f172a;}
+.pm-item-badge{font-size:10px;font-weight:700;padding:2px 7px;border-radius:99px;}
 
-.pm-kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
-.pm-kpi  {
-    background:#f8fafc; border-radius:9px; padding:8px 10px;
-    text-align:center; border:1px solid #e2e8f0;
-}
-.pm-kpi-label { font-size:10px; color:#94a3b8; font-weight:600; text-transform:uppercase; }
-.pm-kpi-val   { font-size:17px; font-weight:700; color:#1e293b; margin-top:2px; }
+/* Tabla logística en el modal */
+.log-table{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px;}
+.log-table th{background:#1e3a5f;color:#fff;padding:7px 9px;text-align:left;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;}
+.log-table th.center{text-align:center;}
+.log-table td{padding:7px 9px;border-bottom:1px solid #f0f3f7;vertical-align:middle;}
+.log-table td.center{text-align:center;font-family:Consolas,monospace;font-weight:700;}
+.log-table tbody tr:nth-child(even) td{background:#f8fafc;}
+.log-table tfoot td{background:#f4f6f9;font-weight:700;padding:7px 9px;border-top:2px solid #dde2ea;}
 
-.pm-prog-wrap { background:#f8fafc; border-radius:9px; padding:10px 12px; margin-bottom:14px; }
-.pm-prog-hdr  { display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-bottom:5px; }
-.pm-prog-bar  { height:8px; background:#e5e7eb; border-radius:99px; overflow:hidden; }
-.pm-prog-fill { height:100%; border-radius:99px; }
+/* SSCC */
+.sscc-block{margin-top:16px;text-align:center;background:#f8fafc;border:1px solid #e2e8f0;border-radius:8px;padding:12px;}
+.sscc-label{font-size:10px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.06em;margin-bottom:4px;}
+.sscc-num{font-size:18px;font-weight:800;letter-spacing:2px;color:#0f172a;font-family:Consolas,monospace;}
 
-.pm-item {
-    display:flex; align-items:center; gap:10px;
-    padding:9px 0; border-bottom:1px solid #f1f5f9;
-}
-.pm-item:last-child { border-bottom:none; }
-.pm-item-dot  { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
-.pm-item-name { flex:1; font-size:12px; font-weight:500; color:#374151; }
-.pm-item-right{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
-.pm-item-qty  { font-size:12px; font-weight:700; color:#0f172a; }
-.pm-item-badge{ font-size:10px; font-weight:700; padding:2px 7px; border-radius:99px; }
+/* Footer modal */
+.pm-footer{border-top:1px solid #e2e8f0;padding:.75rem 1.1rem;display:flex;justify-content:flex-end;gap:8px;background:#f8fafc;flex-shrink:0;position:sticky;bottom:0;}
 </style>
+
+{{-- CDN JsBarcode — necesario para el código de barras del SSCC --}}
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
 
 <div class="pg">
 
-{{-- ── Header ── --}}
 @php
     $estadoColor = $order->estado === 'COMPLETO' ? '#15803d'
                  : ($order->estado === 'PARCIAL'  ? '#b45309' : '#b91c1c');
@@ -197,15 +157,11 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     $porcentaje  = $totalItems > 0 ? round(($completados / $totalItems) * 100) : 0;
     $progColor   = $porcentaje === 100 ? '#22c55e' : ($porcentaje > 40 ? '#f59e0b' : '#ef4444');
 
-    // ── Preparar datos de paletas para el mapa ──────────────────────────
-    $paletas = $order->details
-        ->filter(fn($d) => !empty($d->paleta))
-        ->groupBy('paleta')
-        ->sortKeys();
-
+    $paletas   = $order->details->filter(fn($d) => !empty($d->paleta))->groupBy('paleta')->sortKeys();
     $sinPaleta = $order->details->filter(fn($d) => empty($d->paleta));
 @endphp
 
+{{-- Header --}}
 <div class="top-hdr">
     <div class="hdr-left">
         <h1>📋 {{ $order->numero_orden }}</h1>
@@ -218,7 +174,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     </div>
 </div>
 
-{{-- ── KPIs ── --}}
+{{-- KPIs --}}
 <div class="kpis">
     <div class="kpi">
         <div class="kpi-icon" style="background:#eff6ff;color:#2563eb;">🗂</div>
@@ -238,7 +194,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     </div>
 </div>
 
-{{-- ── Layout ── --}}
+{{-- Layout --}}
 <div class="main-layout">
 <div class="left-col">
 
@@ -305,14 +261,17 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
             $bg = $s === 'COMPLETO' ? '#dcfce7' : ($s === 'PARCIAL' ? '#fef3c7' : '#fee2e2');
             $badgeCls = $s === 'COMPLETO' ? 'bc' : ($s === 'PARCIAL' ? 'bp' : 'bi');
             $pct = $detail->cantidad_solicitada > 0
-                 ? round(($detail->cantidad_despachada / $detail->cantidad_solicitada) * 100)
-                 : 0;
+                 ? round(($detail->cantidad_despachada / $detail->cantidad_solicitada) * 100) : 0;
+            $cpc         = $detail->product->cantidad_por_caja ?? 1;
+            $cajasDesp   = $cpc > 0 ? floor($detail->cantidad_despachada / $cpc) : 0;
+            $cajasSol    = $cpc > 0 ? ceil($detail->cantidad_solicitada / $cpc) : 0;
+            $unidSueltas = $cpc > 0 ? ($detail->cantidad_despachada % $cpc) : 0;
         @endphp
-
         <div class="prod-card"
-                id="producto-{{ $detail->product->barcode }}"
-                data-barcode="{{ $detail->product->barcode }}"
-                data-box-barcode="{{ $detail->product->box_barcode }}">
+             style="border-left-color:{{ $bc }};"
+             id="producto-{{ $detail->product->barcode }}"
+             data-barcode="{{ $detail->product->barcode }}"
+             data-box-barcode="{{ $detail->product->box_barcode }}">
             <div class="prod-top">
                 <div>
                     <div class="prod-name">📦 {{ $detail->product->nombre }}</div>
@@ -320,86 +279,67 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 </div>
                 <span class="prod-badge {{ $badgeCls }}">{{ $s }}</span>
             </div>
-@php
-    $cpc         = $detail->product->cantidad_por_caja ?? 1;
-    $cajasDesp   = $cpc > 0 ? floor($detail->cantidad_despachada / $cpc) : 0;
-    $cajasSol    = $cpc > 0 ? ceil($detail->cantidad_solicitada / $cpc) : 0;
-    $unidSueltas = $cpc > 0 ? ($detail->cantidad_despachada % $cpc) : 0;
-@endphp
-<div class="info-strip" style="grid-template-columns:1fr 1fr;">
-    <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
-    <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
+            <div class="info-strip" style="grid-template-columns:1fr 1fr;">
+                <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
+                <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
+                <div class="info-item" style="grid-column:1/-1;">
+                    🗃 Solicitadas:
+                    <span class="info-val" style="color:#2563eb;">{{ $cajasSol }} cajas</span>
+                    <span style="font-size:10px;color:#94a3b8;margin-left:3px;">({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)</span>
+                </div>
+                <div class="info-item" style="grid-column:1/-1;">
+                    ✅ Despachadas:
+                    <span class="info-val" style="color:{{ $bc }};">{{ $cajasDesp }} cajas</span>
+                    @if($unidSueltas > 0)
+                        <span style="font-size:10px;color:#f59e0b;margin-left:3px;">+{{ $unidSueltas }} u. sueltas</span>
+                    @endif
+                </div>
+                <div class="info-item" style="grid-column:1/-1;gap:6px;">
+                    <span style="font-size:10px;color:#94a3b8;white-space:nowrap;">Despacho:</span>
+                    <div class="prog-mini" style="flex:1;"><div class="prog-mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div></div>
+                    <span style="font-size:10px;font-weight:700;color:{{ $bc }};margin-left:2px;">{{ $pct }}%</span>
+                </div>
+            </div>
 
-    {{-- Cajas solicitadas --}}
-    <div class="info-item" style="grid-column:1/-1;">
-        🗃 Cajas solicitadas:
-        <span class="info-val" style="color:#2563eb;">
-            {{ $cajasSol }} caja{{ $cajasSol !== 1 ? 's' : '' }}
-        </span>
-        <span style="font-size:10px;color:#94a3b8;margin-left:3px;">
-            ({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)
-        </span>
-    </div>
-
-    {{-- Cajas despachadas --}}
-    <div class="info-item" style="grid-column:1/-1;">
-        ✅ Cajas despachadas:
-        <span class="info-val" style="color:{{ $bc }};">
-            {{ $cajasDesp }} caja{{ $cajasDesp !== 1 ? 's' : '' }}
-        </span>
-        @if($unidSueltas > 0)
-        <span style="font-size:10px;color:#f59e0b;margin-left:3px;">
-            + {{ $unidSueltas }} u. sueltas
-        </span>
-        @endif
-    </div>
-
-    {{-- Barra de progreso --}}
-    <div class="info-item" style="grid-column:1/-1;gap:6px;">
-        <span style="font-size:10px;color:#94a3b8;white-space:nowrap;">Despacho:</span>
-        <div class="prog-mini" style="flex:1;">
-            <div class="prog-mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div>
-        </div>
-        <span style="font-size:10px;font-weight:700;color:{{ $sc }};margin-left:2px;">{{ $pct }}%</span>
-    </div>
-</div>
-            <form method="POST" action="{{ route('orders.updateDetail',$detail) }}">
+            {{-- Campos de edición --}}
+            <form method="POST" action="{{ route('orders.details.update',$detail) }}" id="form-det-{{ $detail->id }}">
                 @csrf @method('PUT')
                 <div class="fields-box">
                     <div class="field-row">
-                        <div><label class="flabel">Solicitado</label>
-                            <input type="number" step="0.01" name="cantidad_solicitada" class="finput" value="{{ $detail->cantidad_solicitada }}"></div>
-                        <div><label class="flabel">Despachado</label>
-                            <input type="number" step="0.01" name="cantidad_despachada" id="despachado-{{ $detail->product->barcode }}" class="finput" value="{{ $detail->cantidad_despachada }}"></div>
+                        <div>
+                            <label class="flabel">Solicitado</label>
+                            <input type="number" name="cantidad_solicitada"
+                                   value="{{ $detail->cantidad_solicitada }}"
+                                   class="finput" id="sol-{{ $detail->id }}" disabled>
+                        </div>
+                        <div>
+                            <label class="flabel">Despachado</label>
+                            <input type="number" name="cantidad_despachada"
+                                   value="{{ $detail->cantidad_despachada }}"
+                                   class="finput" id="des-{{ $detail->id }}" disabled>
+                        </div>
                     </div>
-                    <div><label class="flabel">Precio</label>
-                        <input type="number" step="0.01" name="precio_unitario" class="finput" value="{{ $detail->precio_unitario }}"></div>
-                    <hr class="dv">
-                    <div><label class="flabel">Vencimiento</label>
-                        <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}"></div>
-                    <div class="field-row">
-                        <div><label class="flabel">Nivel</label>
-                            <input type="number" name="nivel" class="finput" value="{{ $detail->nivel }}"></div>
-                        <div><label class="flabel">Ubicación</label>
-                            <input type="text" name="ubicacion" class="finput" value="{{ $detail->ubicacion }}"></div>
+                    <div>
+                        <label class="flabel">Paleta</label>
+                        <input type="text" name="paleta"
+                               value="{{ $detail->paleta }}"
+                               class="paleta-input" id="pal-{{ $detail->id }}" disabled>
+                    </div>
+                    <div class="subtotal-row">
+                        <span style="font-size:11px;color:#64748b;">Precio: S/ {{ number_format($detail->precio_unitario,2) }}</span>
+                        <span class="subtotal-val">S/ {{ number_format($detail->subtotal,2) }}</span>
                     </div>
                 </div>
-                <div style="margin-top:7px;">
-                    <label class="flabel">Paleta</label>
-                    <input type="text" name="paleta" class="paleta-input"
-                        value="{{ $detail->paleta }}" placeholder="P01"
-                        oninput="this.value=this.value.toUpperCase()">
-                </div>
-                <div class="subtotal-row" style="margin-top:7px;">
-                    <span style="font-size:11px;color:#64748b;">Subtotal</span>
-                    <span class="subtotal-val">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</span>
-                </div>
-                <div class="btn-row-prod" style="margin-top:7px;">
-                    <button type="submit" class="btn btn-blue" style="width:100%;">💾 Guardar</button>
+                <div class="btn-row-prod" style="margin-top:6px;">
+                    <button type="button" class="btn btn-gray" id="btn-edit-{{ $detail->id }}"
+                            onclick="editarFila({{ $detail->id }})">✏️ Editar</button>
+                    <button type="submit" class="btn btn-green" id="btn-save-{{ $detail->id }}"
+                            style="display:none;">💾 Guardar</button>
                 </div>
             </form>
+
             <form method="POST" action="{{ route('orders.details.destroy',$detail) }}"
-                onsubmit="return confirm('¿Eliminar {{ $detail->product->nombre }}?')">
+                  onsubmit="return confirm('¿Eliminar {{ addslashes($detail->product->nombre) }}?')">
                 @csrf @method('DELETE')
                 <button type="submit" class="btn btn-red" style="width:100%;margin-top:4px;">🗑 Eliminar</button>
             </form>
@@ -407,14 +347,12 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         @endforeach
     </div>
 
-</div>{{-- /.left-col --}}
+</div>
 
-{{-- ── Right col ── --}}
+{{-- Right col --}}
 <div class="right-col">
 
-    {{-- ══════════════════════════════════════════
-         MAPA DE PALETAS
-    ══════════════════════════════════════════ --}}
+    {{-- Mapa de paletas --}}
     <div class="paleta-map-card">
         <div class="paleta-map-header">
             <div class="paleta-map-title">
@@ -427,46 +365,40 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         </div>
 
         <div class="paleta-map-body">
-
             @if($paletas->isEmpty() && $sinPaleta->isEmpty())
                 <div style="text-align:center;padding:24px 0;color:#94a3b8;font-size:12px;">
-                    <div style="font-size:28px;margin-bottom:6px;">🪵</div>
-                    Sin paletas asignadas aún
+                    <div style="font-size:28px;margin-bottom:6px;">🪵</div>Sin paletas asignadas aún
                 </div>
             @else
-
             <div class="paleta-map-grid">
             @foreach($paletas as $nombrePaleta => $items)
             @php
-                $totUds  = $items->sum('cantidad_solicitada');
-                $despUds = $items->sum('cantidad_despachada');
-                $pesoKg  = $items->sum(fn($i) => ($i->product->peso ?? 0) * $i->cantidad_solicitada / 1000);
-                $pctP    = $totUds > 0 ? round(($despUds / $totUds) * 100) : 0;
-                $todoC   = $items->every(fn($i) => $i->estado_item === 'COMPLETO');
-                $algunP  = $items->contains(fn($i) => $i->estado_item === 'PARCIAL');
+                $totUds   = $items->sum('cantidad_solicitada');
+                $despUds  = $items->sum('cantidad_despachada');
+                $pesoKg   = $items->sum(fn($i) => ($i->product->peso ?? 0) * $i->cantidad_solicitada / 1000);
+                $pctP     = $totUds > 0 ? round(($despUds / $totUds) * 100) : 0;
+                $todoC    = $items->every(fn($i) => $i->estado_item === 'COMPLETO');
+                $algunP   = $items->contains(fn($i) => $i->estado_item === 'PARCIAL');
                 $estClass = $todoC ? 'estado-completo' : ($algunP ? 'estado-parcial' : 'estado-incompleto');
                 $pctColor = $todoC ? '#15803d' : ($algunP ? '#b45309' : '#b91c1c');
                 $fillColor= $todoC ? '#22c55e' : ($algunP ? '#f59e0b' : '#ef4444');
                 $icon     = $todoC ? '✅' : ($algunP ? '⏳' : '⚠️');
-
-                // Serializar items para el modal
                 $itemsJson = $items->map(fn($i) => [
-                    'nombre'          => $i->product->nombre ?? 'Producto',
-                    'sku'             => $i->product->sku ?? '',
-                    'solicitada'      => $i->cantidad_solicitada,
-                    'despachada'      => $i->cantidad_despachada,
-                    'estado'          => $i->estado_item,
-                    'precio'          => $i->precio_unitario,
-                    'subtotal'        => $i->subtotal,
-                    'peso'            => number_format(($i->product->peso ?? 0) / 1000, 3),
-                    'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,  // ← NUEVO
-                    'barcode' => $i->product->barcode,
-                    'box_barcode' => $i->product->box_barcode,
+                    'nombre'           => $i->product->nombre ?? 'Producto',
+                    'sku'              => $i->product->sku ?? '',
+                    'solicitada'       => $i->cantidad_solicitada,
+                    'despachada'       => $i->cantidad_despachada,
+                    'estado'           => $i->estado_item,
+                    'precio'           => $i->precio_unitario,
+                    'subtotal'         => $i->subtotal,
+                    'peso'             => number_format(($i->product->peso ?? 0) / 1000, 3),
+                    'cantidad_por_caja'=> $i->product->cantidad_por_caja ?? 1,
+                    'barcode'          => $i->product->barcode ?? '',
+                    'box_barcode'      => $i->product->box_barcode ?? '',
                 ])->values()->toJson();
             @endphp
-
             <div class="paleta-box {{ $estClass }}"
-                onclick="abrirPaleta({{ json_encode($nombrePaleta) }}, {{ $items->count() }}, {{ $totUds }}, {{ $despUds }}, {{ round($pesoKg,1) }}, {{ $pctP }}, {{ json_encode($fillColor) }}, {{ $itemsJson }})">
+                 onclick="abrirPaleta({{ json_encode($nombrePaleta) }}, {{ $items->count() }}, {{ $totUds }}, {{ $despUds }}, {{ round($pesoKg,1) }}, {{ $pctP }}, {{ json_encode($fillColor) }}, {{ $itemsJson }})">
                 <div class="paleta-box-icon">🪵</div>
                 <div class="paleta-box-name">{{ $nombrePaleta }}</div>
                 <div class="paleta-box-items">{{ $items->count() }} ítem{{ $items->count() > 1 ? 's' : '' }}</div>
@@ -478,28 +410,28 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
             @endforeach
             </div>
 
-            {{-- Sin paleta --}}
             @if($sinPaleta->count())
             @php
                 $spJson = $sinPaleta->map(fn($i) => [
-                    'nombre'          => $i->product->nombre ?? 'Producto',
-                    'sku'             => $i->product->sku ?? '',
-                    'solicitada'      => $i->cantidad_solicitada,
-                    'despachada'      => $i->cantidad_despachada,
-                    'estado'          => $i->estado_item,
-                    'precio'          => $i->precio_unitario,
-                    'subtotal'        => $i->subtotal,
-                    'peso'            => number_format(($i->product->peso ?? 0) / 1000, 3),
-                    'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,  // ← NUEVO
+                    'nombre'           => $i->product->nombre ?? 'Producto',
+                    'sku'              => $i->product->sku ?? '',
+                    'solicitada'       => $i->cantidad_solicitada,
+                    'despachada'       => $i->cantidad_despachada,
+                    'estado'           => $i->estado_item,
+                    'precio'           => $i->precio_unitario,
+                    'subtotal'         => $i->subtotal,
+                    'peso'             => number_format(($i->product->peso ?? 0) / 1000, 3),
+                    'cantidad_por_caja'=> $i->product->cantidad_por_caja ?? 1,
+                    'barcode'          => $i->product->barcode ?? '',
+                    'box_barcode'      => $i->product->box_barcode ?? '',
                 ])->values()->toJson();
             @endphp
             <div class="no-paleta-chip"
-                onclick="abrirPaleta('Sin paleta', {{ $sinPaleta->count() }}, {{ $sinPaleta->sum('cantidad_solicitada') }}, {{ $sinPaleta->sum('cantidad_despachada') }}, 0, 0, '#94a3b8', {{ $spJson }})">
+                 onclick="abrirPaleta('Sin paleta', {{ $sinPaleta->count() }}, {{ $sinPaleta->sum('cantidad_solicitada') }}, {{ $sinPaleta->sum('cantidad_despachada') }}, 0, 0, '#94a3b8', {{ $spJson }})">
                 <span>⚠️ Sin paleta asignada</span>
                 <span style="font-weight:700;">{{ $sinPaleta->count() }} ítem{{ $sinPaleta->count() > 1 ? 's' : '' }} →</span>
             </div>
             @endif
-
             @endif
         </div>
     </div>
@@ -521,8 +453,13 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     <div class="resumen-card">
         <div class="sec-title">📈 Progreso de despacho</div>
         <div class="prog-resumen">
-            <div class="prog-label"><span>Completado</span><span style="font-weight:700;color:{{ $progColor }};">{{ $porcentaje }}%</span></div>
-            <div class="prog-bar"><div class="prog-fill" style="width:{{ $porcentaje }}%;background:{{ $progColor }};"></div></div>
+            <div class="prog-label">
+                <span>Completado</span>
+                <span style="font-weight:700;color:{{ $progColor }};">{{ $porcentaje }}%</span>
+            </div>
+            <div class="prog-bar">
+                <div class="prog-fill" style="width:{{ $porcentaje }}%;background:{{ $progColor }};"></div>
+            </div>
             <div style="font-size:10px;color:#94a3b8;margin-top:3px;">{{ $completados }} de {{ $totalItems }} productos</div>
         </div>
         <hr class="dv" style="margin:8px 0;">
@@ -546,13 +483,11 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         <div class="resumen-row"><span>Estado</span><span style="font-size:11px;font-weight:700;color:{{ $estadoColor }};">{{ $order->estado }}</span></div>
     </div>
 
-</div>{{-- /.right-col --}}
-</div>{{-- /.main-layout --}}
-</div>{{-- /.pg --}}
+</div>
+</div>
+</div>
 
-{{-- ══════════════════════════════
-     MODAL DETALLE DE PALETA
-══════════════════════════════ --}}
+{{-- ══ MODAL ══ --}}
 <div class="pm-overlay" id="pmOverlay" onclick="cerrarPaleta(event)">
     <div class="pm-modal">
         <div class="pm-header">
@@ -563,68 +498,55 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
             <button class="pm-close" onclick="document.getElementById('pmOverlay').classList.remove('open')">✕</button>
         </div>
         <div class="pm-body">
-
-            {{-- Mini KPIs --}}
             <div class="pm-kpis">
-                <div class="pm-kpi">
-                    <div class="pm-kpi-label">Ítems</div>
-                    <div class="pm-kpi-val" id="pmItems"></div>
-                </div>
-                <div class="pm-kpi">
-                    <div class="pm-kpi-label">Unidades</div>
-                    <div class="pm-kpi-val" id="pmUds"></div>
-                </div>
-                <div class="pm-kpi">
-                    <div class="pm-kpi-label">Peso total</div>
-                    <div class="pm-kpi-val" id="pmPeso"></div>
-                </div>
+                <div class="pm-kpi"><div class="pm-kpi-label">Ítems</div><div class="pm-kpi-val" id="pmItems"></div></div>
+                <div class="pm-kpi"><div class="pm-kpi-label">Unidades</div><div class="pm-kpi-val" id="pmUds"></div></div>
+                <div class="pm-kpi"><div class="pm-kpi-label">Peso total</div><div class="pm-kpi-val" id="pmPeso"></div></div>
             </div>
-
-            {{-- Progreso --}}
             <div class="pm-prog-wrap">
                 <div class="pm-prog-hdr">
                     <span>Progreso de despacho</span>
                     <span id="pmPct" style="font-weight:700;"></span>
                 </div>
-                <div class="pm-prog-bar">
-                    <div class="pm-prog-fill" id="pmProgFill"></div>
-                </div>
+                <div class="pm-prog-bar"><div class="pm-prog-fill" id="pmProgFill"></div></div>
                 <div style="font-size:10px;color:#94a3b8;margin-top:3px;" id="pmProgSub"></div>
             </div>
-
-            {{-- Lista de productos --}}
-            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Productos en esta paleta</div>
+            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">
+                Productos en esta paleta
+            </div>
             <div id="pmItemsList"></div>
-
+        </div>
+        <div class="pm-footer">
+            <button onclick="document.getElementById('pmOverlay').classList.remove('open')"
+                    class="btn btn-gray">Cerrar</button>
         </div>
     </div>
 </div>
 
 <script>
-// ── Scanner ──────────────────────────────────────────────────────────────
-let scanner = document.getElementById('scanner');
+/* ── Scanner ── */
+var scanner = document.getElementById('scanner');
 scanner.addEventListener('keydown', function(e){
     if(e.key !== 'Enter') return;
     e.preventDefault();
-    let codigo = this.value.trim();
+    var codigo = this.value.trim();
     if(!codigo) return;
-    let card = document.querySelector(
-    '[data-barcode="' + codigo + '"], [data-box-barcode="' + codigo + '"]');
+    var card = document.querySelector('[data-barcode="'+codigo+'"], [data-box-barcode="'+codigo+'"]');
     if(card){
-        card.scrollIntoView({ behavior:'smooth', block:'center' });
-        card.style.boxShadow = "0 0 0 3px #2563eb";
-        setTimeout(() => { card.style.boxShadow = ""; }, 1500);
-        let barcode = card.dataset.barcode;
-        let input = document.getElementById('despachado-' + barcode);
+        card.scrollIntoView({behavior:'smooth',block:'center'});
+        card.style.boxShadow = '0 0 0 3px #2563eb';
+        setTimeout(function(){ card.style.boxShadow = ''; }, 1500);
+        var barcode = card.dataset.barcode;
+        var input = document.getElementById('despachado-'+barcode);
         if(input){ input.focus(); input.select(); }
         this.value = '';
         return;
     }
-    fetch(`/api/producto/${codigo}`)
-    .then(res => res.json())
-    .then(producto => {
+    fetch('/api/producto/'+codigo)
+    .then(function(res){ return res.json(); })
+    .then(function(producto){
         if(!producto){ alert('Producto no encontrado'); return; }
-        let select = document.querySelector('[name=product_id]');
+        var select = document.querySelector('[name=product_id]');
         select.value = producto.id;
         document.querySelector('[name=precio_unitario]').value = producto.precio ?? 0;
         document.querySelector('[name=cantidad_solicitada]').focus();
@@ -632,190 +554,131 @@ scanner.addEventListener('keydown', function(e){
     this.value = '';
 });
 
-// ── Modal de paleta ──────────────────────────────────────────────────────
+/* ── Editar fila ── */
+function editarFila(id) {
+    document.getElementById('sol-'+id).disabled = false;
+    document.getElementById('des-'+id).disabled = false;
+    document.getElementById('pal-'+id).disabled = false;
+    document.getElementById('btn-edit-'+id).style.display = 'none';
+    document.getElementById('btn-save-'+id).style.display = '';
+    document.getElementById('des-'+id).focus();
+    document.getElementById('des-'+id).select();
+}
+
+/* ── Modal paleta ── */
 function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, items) {
-    document.getElementById('pmTitle').textContent   = '🪵 ' + nombre;
-    document.getElementById('pmSub').textContent     = 'Detalle de contenido · ' + nItems + ' ítem' + (nItems !== 1 ? 's' : '');
-    document.getElementById('pmItems').textContent   = nItems;
-    document.getElementById('pmUds').textContent     = totUds;
-    document.getElementById('pmPeso').textContent    = pesoKg + ' kg';
-    document.getElementById('pmPct').textContent     = pct + '%';
-    document.getElementById('pmPct').style.color     = fillColor;
+
+    document.getElementById('pmTitle').textContent    = '🪵 ' + nombre;
+    document.getElementById('pmSub').textContent      = 'Detalle de contenido · ' + nItems + ' ítem' + (nItems !== 1 ? 's' : '');
+    document.getElementById('pmItems').textContent    = nItems;
+    document.getElementById('pmUds').textContent      = totUds;
+    document.getElementById('pmPeso').textContent     = pesoKg + ' kg';
+    document.getElementById('pmPct').textContent      = pct + '%';
+    document.getElementById('pmPct').style.color      = fillColor;
     document.getElementById('pmProgFill').style.width      = pct + '%';
     document.getElementById('pmProgFill').style.background = fillColor;
-    document.getElementById('pmProgSub').textContent = despUds + ' de ' + totUds + ' unidades despachadas';
+    document.getElementById('pmProgSub').textContent  = despUds + ' de ' + totUds + ' unidades despachadas';
 
-    const estadoColors = {
+    var estadoColors = {
         'COMPLETO'  : { bg:'#dcfce7', color:'#15803d', dot:'#22c55e' },
         'PARCIAL'   : { bg:'#fef3c7', color:'#b45309', dot:'#f59e0b' },
         'INCOMPLETO': { bg:'#fee2e2', color:'#b91c1c', dot:'#ef4444' },
     };
 
-    let html = '';
-    // DESPUÉS
-items.forEach(item => {
-    const ec = estadoColors[item.estado] ?? { bg:'#f1f5f9', color:'#64748b', dot:'#94a3b8' };
-    const itemPct  = item.solicitada > 0 ? Math.round((item.despachada / item.solicitada) * 100) : 0;
+    /* ── Cards de productos ── */
+    var html = '';
+    items.forEach(function(item) {
+        var ec       = estadoColors[item.estado] || { bg:'#f1f5f9', color:'#64748b', dot:'#94a3b8' };
+        var itemPct  = item.solicitada > 0 ? Math.round((item.despachada / item.solicitada) * 100) : 0;
+        var cpc      = item.cantidad_por_caja > 0 ? item.cantidad_por_caja : 1;
+        var cajasSol = Math.ceil(item.solicitada / cpc);
+        var cajasDesp= Math.floor(item.despachada / cpc);
+        var sueltas  = item.despachada % cpc;
+        var cajasLabel  = cajasDesp + ' / ' + cajasSol + ' caja' + (cajasSol !== 1 ? 's' : '');
+        var sueltasHtml = sueltas > 0
+            ? '<span style="font-size:10px;color:#f59e0b;margin-left:4px;">+' + sueltas + ' u. sueltas</span>'
+            : '';
 
-    // ── Cálculo de cajas ──
-    const cpc         = item.cantidad_por_caja > 0 ? item.cantidad_por_caja : 1;
-    const cajasSol    = Math.ceil(item.solicitada / cpc);
-    const cajasDesp   = Math.floor(item.despachada / cpc);
-    const sueltas     = item.despachada % cpc;
-    const cajasLabel  = cajasDesp + ' / ' + cajasSol + ' caja' + (cajasSol !== 1 ? 's' : '');
-    const sueltasHtml = sueltas > 0
-        ? `<span style="font-size:10px;color:#f59e0b;margin-left:4px;">+${sueltas} u. sueltas</span>`
-        : '';
+        html += '<div class="pm-item">' +
+            '<div class="pm-item-dot" style="background:' + ec.dot + ';"></div>' +
+            '<div class="pm-item-name">' +
+                '<div style="font-weight:600;">' + item.nombre + '</div>' +
+                '<div style="font-size:10px;color:#94a3b8;">' +
+                    (item.sku ? 'SKU: ' + item.sku + ' · ' : '') + item.peso + ' kg · S/ ' + parseFloat(item.precio).toFixed(2) +
+                '</div>' +
+                '<div style="display:inline-flex;align-items:center;gap:4px;margin-top:3px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:4px;padding:2px 7px;font-size:10px;font-weight:700;color:#1d4ed8;">' +
+                    '🗃 ' + cajasLabel +
+                '</div>' +
+                sueltasHtml +
+                '<div style="height:3px;background:#e5e7eb;border-radius:99px;margin-top:5px;overflow:hidden;">' +
+                    '<div style="height:100%;width:' + itemPct + '%;background:' + ec.dot + ';border-radius:99px;"></div>' +
+                '</div>' +
+            '</div>' +
+            '<div class="pm-item-right">' +
+                '<div class="pm-item-qty">' + item.despachada + '/' + item.solicitada + '</div>' +
+                '<span class="pm-item-badge" style="background:' + ec.bg + ';color:' + ec.color + ';">' + item.estado + '</span>' +
+            '</div>' +
+        '</div>';
+    });
 
-    html += `
-    <div class="pm-item">
-        <div class="pm-item-dot" style="background:${ec.dot};"></div>
-        <div class="pm-item-name">
-            <div style="font-weight:600;">${item.nombre}</div>
-            <div style="font-size:10px;color:#94a3b8;">
-                ${item.sku ? 'SKU: '+item.sku+' · ' : ''}${item.peso} kg · S/ ${parseFloat(item.precio).toFixed(2)}
-            </div>
+    /* ── Tabla logística ── */
+    var numeroPaleta = nombre.replace(/\D/g,'') || '0';
+    numeroPaleta = numeroPaleta.padStart(4,'0');
+    var sscc = '50000014373324' + numeroPaleta;
 
-            {{-- Línea de cajas --}}
-            <div style="
-                display:inline-flex;align-items:center;gap:4px;
-                margin-top:3px;
-                background:#eff6ff;border:1px solid #bfdbfe;
-                border-radius:4px;padding:2px 7px;
-                font-size:10px;font-weight:700;color:#1d4ed8;
-            ">
-                🗃 ${cajasLabel}
-            </div>
-            ${sueltasHtml}
+    var totalBultos = 0;
 
-            <div style="height:3px;background:#e5e7eb;border-radius:99px;margin-top:5px;overflow:hidden;">
-                <div style="height:100%;width:${itemPct}%;background:${ec.dot};border-radius:99px;"></div>
-            </div>
-        </div>
-        <div class="pm-item-right">
-            <div class="pm-item-qty">${item.despachada}/${item.solicitada}</div>
-            <span class="pm-item-badge" style="background:${ec.bg};color:${ec.color};">${item.estado}</span>
-        </div>
-    </div>`;
-});
+    var tablaRows = '';
+    items.forEach(function(item) {
+        var cpc    = item.cantidad_por_caja > 0 ? item.cantidad_por_caja : 1;
+        var bultos = Math.ceil(item.despachada / cpc);
+        totalBultos += bultos;
+        tablaRows +=
+            '<tr>' +
+                '<td style="padding:7px 9px;border-bottom:1px solid #f0f3f7;font-family:Consolas,monospace;font-weight:700;color:#0b5ed7;">' + (item.barcode || '—') + '</td>' +
+                '<td style="padding:7px 9px;border-bottom:1px solid #f0f3f7;font-family:Consolas,monospace;font-size:11px;color:#475569;">' + (item.box_barcode || '—') + '</td>' +
+                '<td style="padding:7px 9px;border-bottom:1px solid #f0f3f7;font-weight:600;color:#1c2733;">' + item.nombre + '</td>' +
+                '<td style="padding:7px 9px;border-bottom:1px solid #f0f3f7;text-align:center;font-family:Consolas,monospace;font-weight:700;color:#1c7c4d;">' + item.cantidad_por_caja + '</td>' +
+                '<td style="padding:7px 9px;border-bottom:1px solid #f0f3f7;text-align:center;font-family:Consolas,monospace;font-weight:800;font-size:14px;color:#1e3a5f;">' + bultos + '</td>' +
+            '</tr>';
+    });
 
-    // Número de la paleta
-let numeroPaleta = nombre.replace(/\D/g,'');
+    var tabla =
+        '<hr style="border:none;border-top:1px solid #e2e8f0;margin:16px 0;">' +
+        '<div style="font-size:11px;font-weight:700;color:#1e3a5f;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">📋 Hoja logística</div>' +
+        '<table class="log-table">' +
+            '<thead><tr>' +
+                '<th>DUM 13<br><span style="font-weight:400;font-size:9px;color:#93c5fd;">Cód. producto</span></th>' +
+                '<th>DUM 14<br><span style="font-weight:400;font-size:9px;color:#93c5fd;">Cód. caja</span></th>' +
+                '<th>Descripción<br><span style="font-weight:400;font-size:9px;color:#93c5fd;">Nombre del producto</span></th>' +
+                '<th class="center">UXB<br><span style="font-weight:400;font-size:9px;color:#93c5fd;">Unid. por caja</span></th>' +
+                '<th class="center">Bultos<br><span style="font-weight:400;font-size:9px;color:#93c5fd;">Cajas totales</span></th>' +
+            '</tr></thead>' +
+            '<tbody>' + tablaRows + '</tbody>' +
+            '<tfoot><tr>' +
+                '<td colspan="3" style="padding:7px 9px;background:#f4f6f9;font-weight:700;font-size:12px;border-top:2px solid #dde2ea;">TOTALES</td>' +
+                '<td style="padding:7px 9px;background:#f4f6f9;text-align:center;border-top:2px solid #dde2ea;">—</td>' +
+                '<td style="padding:7px 9px;background:#f4f6f9;text-align:center;font-weight:800;font-size:14px;color:#1e3a5f;border-top:2px solid #dde2ea;">' + totalBultos + '</td>' +
+            '</tr></tfoot>' +
+        '</table>' +
+        '<div class="sscc-block">' +
+            '<div class="sscc-label">SSCC</div>' +
+            '<div class="sscc-num">' + sscc + '</div>' +
+            '<svg id="barcodeModal" style="margin-top:10px;max-width:100%;"></svg>' +
+        '</div>';
 
-if(numeroPaleta === '')
-    numeroPaleta = '0';
+    document.getElementById('pmItemsList').innerHTML = html + tabla;
 
-numeroPaleta = numeroPaleta.padStart(4,'0');
-
-// SSCC
-let sscc = '50000014373324' + numeroPaleta;
-
-// Tabla logística
-let tabla = `
-<hr style="margin:18px 0">
-
-<h4 style="margin-bottom:10px;">
-📋 Hoja logística
-</h4>
-
-<table style="
-width:100%;
-border-collapse:collapse;
-font-size:11px;
-">
-
-<thead>
-
-<tr style="background:#f1f5f9;">
-
-<th style="padding:6px;border:1px solid #ddd;">DUM13</th>
-
-<th style="padding:6px;border:1px solid #ddd;">DUM14</th>
-
-<th style="padding:6px;border:1px solid #ddd;">DESCRIPCIÓN</th>
-
-<th style="padding:6px;border:1px solid #ddd;">UXB</th>
-
-<th style="padding:6px;border:1px solid #ddd;">BULTOS</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-`;
-
-items.forEach(item=>{
-
-    let bultos = Math.ceil(
-        item.despachada /
-        item.cantidad_por_caja
-    );
-
-    tabla += `
-    <tr>
-
-        <td style="border:1px solid #ddd;padding:5px;">
-            ${item.barcode}
-        </td>
-
-        <td style="border:1px solid #ddd;padding:5px;">
-            ${item.box_barcode}
-        </td>
-
-        <td style="border:1px solid #ddd;padding:5px;">
-            ${item.nombre}
-        </td>
-
-        <td style="border:1px solid #ddd;padding:5px;text-align:center;">
-            ${item.cantidad_por_caja}
-        </td>
-
-        <td style="border:1px solid #ddd;padding:5px;text-align:center;">
-            ${bultos}
-        </td>
-
-    </tr>
-    `;
-});
-
-tabla += `
-</tbody>
-</table>
-
-<div style="margin-top:18px;text-align:center;">
-
-<div style="font-size:13px;font-weight:bold;">
-SSCC
-</div>
-
-<div style="
-font-size:20px;
-font-weight:bold;
-letter-spacing:2px;
-margin-top:6px;
-">
-${sscc}
-</div>
-
-<svg id="barcode"></svg>
-
-</div>
-`;
-
-document.getElementById('pmItemsList').innerHTML =
-html + tabla;
-
-JsBarcode(
-    "#barcode",
-    sscc,
-    {
-        format:"CODE128",
-        width:2,
-        height:60,
-        displayValue:true
+    /* Renderizar código de barras */
+    if (typeof JsBarcode !== 'undefined') {
+        JsBarcode('#barcodeModal', sscc, {
+            format: 'CODE128',
+            width: 2,
+            height: 60,
+            displayValue: true,
+            fontSize: 12,
+        });
     }
-);
 
     document.getElementById('pmOverlay').classList.add('open');
 }
