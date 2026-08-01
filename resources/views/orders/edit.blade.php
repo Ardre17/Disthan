@@ -812,22 +812,14 @@ margin-top:15px;
 
 </div>
 `;
-
 tabla += `
-<div style="
-margin-top:20px;
-text-align:center;
-">
-
-<a
-href="/orders/{{ $order->id }}/pallet/${encodeURIComponent(nombre)}/pdf"
-target="_blank"
-class="btn btn-blue">
-
-🖨 Generar Hoja Logística
-
-</a>
-
+<div style="margin-top:20px;text-align:center;">
+    <a
+        href="/orders/{{ $order->id }}/pallet/${encodeURIComponent(nombre)}/pdf"
+        target="_blank"
+        class="btn btn-blue">
+        🖨 Generar Hoja Logística
+    </a>
 </div>
 `;
 
@@ -845,11 +837,32 @@ JsBarcode(
     }
 );
 
+document.getElementById('pmItemsList').innerHTML =
+html + tabla;
+
+JsBarcode(
+    "#barcode",
+    sscc,
+    {
+        format: "CODE128",
+        width: 2,
+        height: 60,
+        displayValue: true
+    }
+);
+
 document.getElementById('pmOverlay').classList.add('open');
 
+} // ← ESTA LLAVE CIERRA abrirPaleta()
+
 function cerrarPaleta(e) {
-    if(e.target.id === 'pmOverlay')
+
+    if (e.target.id === 'pmOverlay') {
+
         document.getElementById('pmOverlay').classList.remove('open');
+
+    }
+
 }
 </script>
 
