@@ -460,6 +460,8 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                     'subtotal'        => $i->subtotal,
                     'peso'            => number_format(($i->product->peso ?? 0) / 1000, 3),
                     'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,  // ← NUEVO
+                    'barcode' => $i->product->barcode,
+                    'box_barcode' => $i->product->box_barcode,
                 ])->values()->toJson();
             @endphp
 
@@ -697,7 +699,124 @@ items.forEach(item => {
     </div>`;
 });
 
-    document.getElementById('pmItemsList').innerHTML = html;
+    // Número de la paleta
+let numeroPaleta = nombre.replace(/\D/g,'');
+
+if(numeroPaleta === '')
+    numeroPaleta = '0';
+
+numeroPaleta = numeroPaleta.padStart(4,'0');
+
+// SSCC
+let sscc = '50000014373324' + numeroPaleta;
+
+// Tabla logística
+let tabla = `
+<hr style="margin:18px 0">
+
+<h4 style="margin-bottom:10px;">
+📋 Hoja logística
+</h4>
+
+<table style="
+width:100%;
+border-collapse:collapse;
+font-size:11px;
+">
+
+<thead>
+
+<tr style="background:#f1f5f9;">
+
+<th style="padding:6px;border:1px solid #ddd;">DUM13</th>
+
+<th style="padding:6px;border:1px solid #ddd;">DUM14</th>
+
+<th style="padding:6px;border:1px solid #ddd;">DESCRIPCIÓN</th>
+
+<th style="padding:6px;border:1px solid #ddd;">UXB</th>
+
+<th style="padding:6px;border:1px solid #ddd;">BULTOS</th>
+
+</tr>
+
+</thead>
+
+<tbody>
+`;
+
+items.forEach(item=>{
+
+    let bultos = Math.ceil(
+        item.despachada /
+        item.cantidad_por_caja
+    );
+
+    tabla += `
+    <tr>
+
+        <td style="border:1px solid #ddd;padding:5px;">
+            ${item.barcode}
+        </td>
+
+        <td style="border:1px solid #ddd;padding:5px;">
+            ${item.box_barcode}
+        </td>
+
+        <td style="border:1px solid #ddd;padding:5px;">
+            ${item.nombre}
+        </td>
+
+        <td style="border:1px solid #ddd;padding:5px;text-align:center;">
+            ${item.cantidad_por_caja}
+        </td>
+
+        <td style="border:1px solid #ddd;padding:5px;text-align:center;">
+            ${bultos}
+        </td>
+
+    </tr>
+    `;
+});
+
+tabla += `
+</tbody>
+</table>
+
+<div style="margin-top:18px;text-align:center;">
+
+<div style="font-size:13px;font-weight:bold;">
+SSCC
+</div>
+
+<div style="
+font-size:20px;
+font-weight:bold;
+letter-spacing:2px;
+margin-top:6px;
+">
+${sscc}
+</div>
+
+<svg id="barcode"></svg>
+
+</div>
+`;
+
+document.getElementById('pmItemsList').innerHTML =
+html + tabla;
+
+JsBarcode(
+    "#barcode",
+    sscc,
+    {
+        format:"CODE128",
+        width:2,
+        height:60,
+        displayValue:true
+    }
+);
+
     document.getElementById('pmOverlay').classList.add('open');
 }
 
