@@ -472,7 +472,8 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 <div class="paleta-box-items">{{ $items->count() }} ítem{{ $items->count() > 1 ? 's' : '' }}</div>
                 <div class="paleta-box-pct" style="color:{{ $pctColor }};">{{ $icon }} {{ $pctP }}%</div>
                 <div class="paleta-box-bar">
-                    <div class="paleta-box-fill" style="width:{{ $pctP }}%;background:{{ $fillColor }};"></div>
+                    <div class="paleta-box-fill" style="width:{{ $pctP }}%;background:{{ $fillColor }}"></div>
+                    
                 </div>
             </div>
             @endforeach
@@ -801,7 +802,31 @@ margin-top:6px;
 ${sscc}
 </div>
 
-<svg id="barcode"></svg>
+<div style="
+display:flex;
+justify-content:center;
+margin-top:15px;
+">
+    <svg id="barcode"></svg>
+</div>
+
+</div>
+`;
+
+tabla += `
+<div style="
+margin-top:20px;
+text-align:center;
+">
+
+<a
+href="/orders/{{ $order->id }}/pallet/${encodeURIComponent(nombre)}/pdf"
+target="_blank"
+class="btn btn-blue">
+
+🖨 Generar Hoja Logística
+
+</a>
 
 </div>
 `;
@@ -820,8 +845,7 @@ JsBarcode(
     }
 );
 
-    document.getElementById('pmOverlay').classList.add('open');
-}
+document.getElementById('pmOverlay').classList.add('open');
 
 function cerrarPaleta(e) {
     if(e.target.id === 'pmOverlay')

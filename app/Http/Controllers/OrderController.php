@@ -670,4 +670,8 @@ public function updateDetail(Request $request, OrderDetail $detail)
     );
 }
 
+    public function palletPdf(Order $order, $paleta)
+{
+    //
+}
 }
