@@ -672,6 +672,41 @@ public function updateDetail(Request $request, OrderDetail $detail)
 
     public function palletPdf(Order $order, $paleta)
 {
-    //
+    $items = $order->details()
+        ->where('paleta', $paleta)
+        ->with('product')
+        ->get();
+
+    // Obtener el número de la paleta (P01 -> 0001)
+    $numeroPaleta = preg_replace('/\D/', '', $paleta);
+
+    if (empty($numeroPaleta)) {
+        $numeroPaleta = 0;
+    }
+
+    $sscc = '50000014373324' . str_pad($numeroPaleta, 4, '0', STR_PAD_LEFT);
+
+    // Código de barras
+    $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+
+    $barcode = 'data:image/png;base64,' . base64_encode(
+        $generator->getBarcode(
+            $sscc,
+            $generator::TYPE_CODE_128
+        )
+    );
+
+    $pdf = Pdf::loadView(
+        'orders.pdf.pallet',
+        [
+            'order'   => $order,
+            'items'   => $items,
+            'paleta'  => $paleta,
+            'sscc'    => $sscc,
+            'barcode' => $barcode,
+        ]
+    );
+
+    return $pdf->stream("Paleta-{$paleta}.pdf");
 }
 }
