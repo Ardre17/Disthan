@@ -1,45 +1,33 @@
-FROM php:8.4-cli
+FROM php:8.2-cli
 
 WORKDIR /app
 
 # Instalar dependencias del sistema
 RUN apt-get update && apt-get install -y \
-    git \
-    unzip \
-    zip \
-    curl \
-    libpq-dev \
-    libzip-dev \
-    nodejs \
-    npm \
+    git unzip zip curl libpq-dev libzip-dev nodejs npm \
     && docker-php-ext-install pdo pdo_pgsql zip
 
 # Copiar proyecto
 COPY . .
 
-# Instalar Composer
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+# Instalar composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Instalar dependencias PHP
-RUN composer install \
-    --no-dev \
-    --optimize-autoloader \
-    --no-interaction
+# Instalar dependencias Laravel
+RUN composer install --no-dev --optimize-autoloader
 
-# Instalar dependencias Node
+# Build frontend
 RUN npm install
-
-# Compilar Vite
 RUN npm run build
 
 # Permisos
 RUN chmod -R 777 storage bootstrap/cache
 
-EXPOSE 10000
-
+# Run app
 CMD php artisan config:clear && \
     php artisan cache:clear && \
     php artisan route:clear && \
     php artisan view:clear && \
-    php artisan migrate --force && \
+    php artisan migrate --force || true && \
     php artisan serve --host=0.0.0.0 --port=10000
+
