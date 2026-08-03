@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\OrderDetail;
 use App\Services\Barcode\Code128Generator;
+use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
