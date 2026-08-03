@@ -7,7 +7,7 @@ use App\Models\Client;
 use Illuminate\Http\Request;
 use App\Models\Product;
 use App\Models\OrderDetail;
-use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\Barcode\Code128Generator;
 
 class OrderController extends Controller
 {
@@ -669,43 +669,31 @@ public function updateDetail(Request $request, OrderDetail $detail)
         'Pedido importado correctamente'
     );
 }
-
-    public function palletPdf(Order $order, $paleta)
+public function palletPdf(Order $order, $paleta)
 {
     $items = $order->details()
         ->where('paleta', $paleta)
         ->with('product')
         ->get();
 
-    // Obtener el número de la paleta (P01 -> 0001)
     $numeroPaleta = preg_replace('/\D/', '', $paleta);
-
     if (empty($numeroPaleta)) {
         $numeroPaleta = 0;
     }
 
     $sscc = '50000014373324' . str_pad($numeroPaleta, 4, '0', STR_PAD_LEFT);
 
-    // Código de barras
-    $generator = new \Picqer\Barcode\BarcodeGeneratorPNG();
+    // Código de barras generado en PHP puro (sin dependencias)
+    $svg = Code128Generator::generateSvg($sscc, 2, 80);
+    $barcode = 'data:image/svg+xml;base64,' . base64_encode($svg);
 
-    $barcode = 'data:image/png;base64,' . base64_encode(
-        $generator->getBarcode(
-            $sscc,
-            $generator::TYPE_CODE_128
-        )
-    );
-
-    $pdf = Pdf::loadView(
-        'orders.pdf.pallet',
-        [
-            'order'   => $order,
-            'items'   => $items,
-            'paleta'  => $paleta,
-            'sscc'    => $sscc,
-            'barcode' => $barcode,
-        ]
-    );
+    $pdf = Pdf::loadView('orders.pdf.pallet', [
+        'order'   => $order,
+        'items'   => $items,
+        'paleta'  => $paleta,
+        'sscc'    => $sscc,
+        'barcode' => $barcode,
+    ]);
 
     return $pdf->stream("Paleta-{$paleta}.pdf");
 }
