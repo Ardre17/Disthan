@@ -419,9 +419,13 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 onclick="abrirEtiqueta({
                     nombre: {{ Js::from($detail->product->nombre) }},
                     cantidadPorCaja: {{ (int) ($detail->product->cantidad_por_caja ?? 1) }},
-                    boxBarcode: {{ Js::from($detail->product->box_barcode) }},
+                    boxBarcode: {{ Js::from($detail->product->box_barcode ?? '') }},
                     lote: {{ Js::from($detail->lote ?? '') }},
-                    fecha: {{ Js::from(optional($detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento)) }},
+                    fecha: {{ Js::from($detail->fecha_vencimiento
+                        ? \Carbon\Carbon::parse($detail->fecha_vencimiento)->format('d/m/Y')
+                        : ($detail->product->fecha_vencimiento
+                            ? \Carbon\Carbon::parse($detail->product->fecha_vencimiento)->format('d/m/Y')
+                            : '')) }},
                     cantidadDespachada: {{ (float) $detail->cantidad_despachada }}
                 })">
                 🏷️ Generar etiqueta
