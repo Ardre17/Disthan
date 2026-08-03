@@ -183,6 +183,23 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .pm-item-right{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
 .pm-item-qty  { font-size:12px; font-weight:700; color:#0f172a; }
 .pm-item-badge{ font-size:10px; font-weight:700; padding:2px 7px; border-radius:99px; }
+
+.et-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1001;align-items:center;justify-content:center;padding:16px;}
+.et-overlay.open{display:flex;}
+.et-modal{background:#fff;border:1px solid #000;padding:22px 18px;width:300px;max-width:100%;text-align:center;}
+.et-label{display:flex;flex-direction:column;align-items:center;gap:6px;color:#000;}
+.et-nombre{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+.et-cpc{font-size:11px;}
+.et-info{margin-top:6px;font-size:11px;line-height:1.7;text-align:center;}
+.et-actions{margin-top:16px;display:flex;gap:8px;justify-content:center;}
+
+@media print{
+    body *{visibility:hidden;}
+    .et-label,.et-label *{visibility:visible;}
+    .et-label{position:absolute;top:0;left:0;width:100%;}
+    .et-overlay,.et-modal{position:static;box-shadow:none;border:none;background:none;padding:0;}
+    .et-actions{display:none;}
+}
 </style>
 
 <div class="pg">
@@ -398,6 +415,17 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                     <button type="submit" class="btn btn-blue" style="width:100%;">💾 Guardar</button>
                 </div>
             </form>
+            <button type="button" class="btn btn-gray" style="width:100%;margin-top:4px;"
+                onclick="abrirEtiqueta({
+                    nombre: {{ Js::from($detail->product->nombre) }},
+                    cantidadPorCaja: {{ (int) ($detail->product->cantidad_por_caja ?? 1) }},
+                    boxBarcode: {{ Js::from($detail->product->box_barcode) }},
+                    lote: {{ Js::from($detail->lote ?? '') }},
+                    fecha: {{ Js::from(optional($detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento)) }},
+                    cantidadDespachada: {{ (float) $detail->cantidad_despachada }}
+                })">
+                🏷️ Generar etiqueta
+            </button>
             <form method="POST" action="{{ route('orders.details.destroy',$detail) }}"
                 onsubmit="return confirm('¿Eliminar {{ $detail->product->nombre }}?')">
                 @csrf @method('DELETE')
@@ -599,6 +627,25 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
             <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Productos en esta paleta</div>
             <div id="pmItemsList"></div>
 
+        </div>
+    </div>
+</div>
+<div class="et-overlay" id="etOverlay" onclick="cerrarEtiqueta(event)">
+    <div class="et-modal" onclick="event.stopPropagation()">
+        <div class="et-label" id="etLabel">
+            <div class="et-nombre" id="etNombre"></div>
+            <div class="et-cpc" id="etCpc"></div>
+            <svg id="etBarcode"></svg>
+            <div class="et-info">
+                <div>Lote: <span id="etLote"></span></div>
+                <div>Fecha: <span id="etFecha"></span></div>
+                <div>Cajas: <span id="etCajas"></span></div>
+                <div>Unidades: <span id="etUnidades"></span></div>
+            </div>
+        </div>
+        <div class="et-actions">
+            <button type="button" class="btn btn-gray" onclick="window.print()">🖨 Imprimir</button>
+            <button type="button" class="btn btn-gray" onclick="document.getElementById('etOverlay').classList.remove('open')">Cerrar</button>
         </div>
     </div>
 </div>
@@ -863,6 +910,37 @@ function cerrarPaleta(e) {
 
     }
 
+}
+function abrirEtiqueta(data) {
+    document.getElementById('etNombre').textContent = data.nombre;
+    document.getElementById('etCpc').textContent = data.cantidadPorCaja + ' unid. por caja';
+
+    const cpc = data.cantidadPorCaja > 0 ? data.cantidadPorCaja : 1;
+    const cajas = Math.floor(data.cantidadDespachada / cpc);
+    const sueltas = data.cantidadDespachada % cpc;
+
+    document.getElementById('etLote').textContent = data.lote || '—';
+    document.getElementById('etFecha').textContent = data.fecha || '—';
+    document.getElementById('etCajas').textContent = cajas;
+    document.getElementById('etUnidades').textContent =
+        data.cantidadDespachada + (sueltas > 0 ? ' (' + sueltas + ' sueltas)' : '');
+
+    JsBarcode("#etBarcode", data.boxBarcode || '', {
+        format: "CODE128",
+        width: 2,
+        height: 60,
+        displayValue: true,
+        lineColor: "#000",
+        background: "#fff"
+    });
+
+    document.getElementById('etOverlay').classList.add('open');
+}
+
+function cerrarEtiqueta(e) {
+    if (e.target.id === 'etOverlay') {
+        document.getElementById('etOverlay').classList.remove('open');
+    }
 }
 </script>
 
