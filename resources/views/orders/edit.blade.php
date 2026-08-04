@@ -112,17 +112,25 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     transform:translateY(-3px);
     box-shadow:0 6px 18px rgba(0,0,0,.12);
 }
-.paleta-box.estado-completo  { background:#dcfce7; border-color:#86efac; }
-.paleta-box.estado-parcial   { background:#fef3c7; border-color:#fde68a; }
+.paleta-box.estado-completo { background:#dcfce7; border-color:#86efac; }
+.paleta-box.estado-parcial { background:#fef3c7; border-color:#fde68a; }
 .paleta-box.estado-incompleto{ background:#fee2e2; border-color:#fca5a5; }
-.paleta-box.estado-vacia     { background:#f8fafc; border-color:#e2e8f0; }
+.paleta-box.estado-vacia { background:#f8fafc; border-color:#e2e8f0; }
 
-.paleta-box-icon  { font-size:22px; margin-bottom:4px; }
-.paleta-box-name  { font-size:12px; font-weight:800; color:#0f172a; }
+.paleta-box-icon { font-size:22px; margin-bottom:4px; }
+.paleta-box-name { font-size:12px; font-weight:800; color:#0f172a; }
 .paleta-box-items { font-size:10px; color:#64748b; margin-top:2px; }
-.paleta-box-pct   { font-size:11px; font-weight:700; margin-top:3px; }
-.paleta-box-bar   { height:4px; border-radius:99px; background:#e5e7eb; overflow:hidden; margin-top:5px; }
-.paleta-box-fill  { height:100%; border-radius:99px; }
+.paleta-box-pct { font-size:11px; font-weight:700; margin-top:3px; }
+.paleta-box-bar { height:4px; border-radius:99px; background:#e5e7eb; overflow:hidden; margin-top:5px; }
+.paleta-box-fill { height:100%; border-radius:99px; }
+
+/* Aviso de paleta llena */
+.paleta-box.paleta-llena { opacity:.85; }
+.paleta-box-full-badge {
+    position:absolute; top:6px; right:6px;
+    background:#dc2626; color:#fff; font-size:9px; font-weight:800;
+    padding:1px 6px; border-radius:99px;
+}
 
 /* Sin paleta chip */
 .no-paleta-chip {
@@ -155,22 +163,22 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     justify-content:space-between; border-bottom:1px solid #f1f5f9;
     position:sticky; top:0; background:#fff; z-index:1;
 }
-.pm-title  { font-size:15px; font-weight:700; color:#0f172a; }
-.pm-sub    { font-size:11px; color:#94a3b8; margin-top:2px; }
-.pm-body   { padding:16px 18px; }
-.pm-close  { background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; padding:2px 6px; }
+.pm-title { font-size:15px; font-weight:700; color:#0f172a; }
+.pm-sub { font-size:11px; color:#94a3b8; margin-top:2px; }
+.pm-body { padding:16px 18px; }
+.pm-close { background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; padding:2px 6px; }
 
 .pm-kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
-.pm-kpi  {
+.pm-kpi {
     background:#f8fafc; border-radius:9px; padding:8px 10px;
     text-align:center; border:1px solid #e2e8f0;
 }
 .pm-kpi-label { font-size:10px; color:#94a3b8; font-weight:600; text-transform:uppercase; }
-.pm-kpi-val   { font-size:17px; font-weight:700; color:#1e293b; margin-top:2px; }
+.pm-kpi-val { font-size:17px; font-weight:700; color:#1e293b; margin-top:2px; }
 
 .pm-prog-wrap { background:#f8fafc; border-radius:9px; padding:10px 12px; margin-bottom:14px; }
-.pm-prog-hdr  { display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-bottom:5px; }
-.pm-prog-bar  { height:8px; background:#e5e7eb; border-radius:99px; overflow:hidden; }
+.pm-prog-hdr { display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-bottom:5px; }
+.pm-prog-bar { height:8px; background:#e5e7eb; border-radius:99px; overflow:hidden; }
 .pm-prog-fill { height:100%; border-radius:99px; }
 
 .pm-item {
@@ -178,10 +186,10 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     padding:9px 0; border-bottom:1px solid #f1f5f9;
 }
 .pm-item:last-child { border-bottom:none; }
-.pm-item-dot  { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.pm-item-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
 .pm-item-name { flex:1; font-size:12px; font-weight:500; color:#374151; }
 .pm-item-right{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
-.pm-item-qty  { font-size:12px; font-weight:700; color:#0f172a; }
+.pm-item-qty { font-size:12px; font-weight:700; color:#0f172a; }
 .pm-item-badge{ font-size:10px; font-weight:700; padding:2px 7px; border-radius:99px; }
 
 .et-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1001;align-items:center;justify-content:center;padding:16px;}
@@ -207,12 +215,12 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 {{-- ── Header ── --}}
 @php
     $estadoColor = $order->estado === 'COMPLETO' ? '#15803d'
-                 : ($order->estado === 'PARCIAL'  ? '#b45309' : '#b91c1c');
-    $totalItems  = $order->details->count();
+        : ($order->estado === 'PARCIAL' ? '#b45309' : '#b91c1c');
+    $totalItems = $order->details->count();
     $completados = $order->details->where('estado_item','COMPLETO')->count();
-    $faltantes   = $totalItems - $completados;
-    $porcentaje  = $totalItems > 0 ? round(($completados / $totalItems) * 100) : 0;
-    $progColor   = $porcentaje === 100 ? '#22c55e' : ($porcentaje > 40 ? '#f59e0b' : '#ef4444');
+    $faltantes = $totalItems - $completados;
+    $porcentaje = $totalItems > 0 ? round(($completados / $totalItems) * 100) : 0;
+    $progColor = $porcentaje === 100 ? '#22c55e' : ($porcentaje > 40 ? '#f59e0b' : '#ef4444');
 
     // ── Preparar datos de paletas para el mapa ──────────────────────────
     $paletas = $order->details
@@ -221,6 +229,11 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         ->sortKeys();
 
     $sinPaleta = $order->details->filter(fn($d) => empty($d->paleta));
+
+    // ── Límite de ítems por paleta ──────────────────────────────────────
+    const_paleta_max: {}
+    $paletaMax = 10;
+    $paletaCounts = $paletas->map->count();
 @endphp
 
 <div class="top-hdr">
@@ -257,331 +270,336 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 
 {{-- ── Layout ── --}}
 <div class="main-layout">
-<div class="left-col">
+    <div class="left-col">
 
-    {{-- Scanner --}}
-    <div class="scanner-card">
-        <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 1.5s infinite;"></div>
-        <div style="flex:1;">
-            <div class="scanner-label">📡 Escanear código de barras</div>
-            <input type="text" id="scanner" class="scanner-input" placeholder="Escanea o escribe el código...">
+        {{-- Scanner --}}
+        <div class="scanner-card">
+            <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 1.5s infinite;"></div>
+            <div style="flex:1;">
+                <div class="scanner-label">📡 Escanear código de barras</div>
+                <input type="text" id="scanner" class="scanner-input" placeholder="Escanea o escribe el código...">
+            </div>
+            <div style="font-size:10px;color:#475569;text-align:right;white-space:nowrap;">Enter para<br>confirmar</div>
         </div>
-        <div style="font-size:10px;color:#475569;text-align:right;white-space:nowrap;">Enter para<br>confirmar</div>
-    </div>
 
-    {{-- Importar CSV --}}
-    <div class="section-card">
-        <div class="sec-title">📄 Importar pedido CSV</div>
-        <form action="{{ route('orders.import',$order) }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="import-row">
-                <label class="file-label">
-                    📎 Seleccionar archivo .csv
-                    <input type="file" name="archivo" accept=".csv" required style="display:none;">
-                </label>
-                <button type="submit" class="btn btn-green">Importar</button>
-            </div>
-        </form>
-    </div>
-
-    {{-- Agregar producto --}}
-    <div class="section-card">
-        <div class="sec-title">➕ Agregar producto</div>
-        <form method="POST" action="{{ route('orders.addProduct',$order) }}">
-            @csrf
-            <div class="add-grid">
-                <div>
-                    <label class="flabel">Producto</label>
-                    <select name="product_id" class="finput" required>
-                        <option value="">Seleccionar producto</option>
-                        @foreach($products as $product)
-                            <option value="{{ $product->id }}">{{ $product->nombre }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="flabel">Cantidad</label>
-                    <input type="number" name="cantidad_solicitada" class="finput" placeholder="0" required>
-                </div>
-                <div>
-                    <label class="flabel">Precio</label>
-                    <input type="number" step="0.01" name="precio_unitario" class="finput" placeholder="0.00" required>
-                </div>
-                <button type="submit" class="btn btn-red" style="align-self:end;">Agregar</button>
-            </div>
-        </form>
-    </div>
-
-    {{-- Productos --}}
-    <div class="products-grid">
-        @foreach($order->details as $detail)
-        @php
-            $s  = $detail->estado_item;
-            $bc = $s === 'COMPLETO' ? '#22c55e' : ($s === 'PARCIAL' ? '#f59e0b' : '#ef4444');
-            $sc = $s === 'COMPLETO' ? '#15803d' : ($s === 'PARCIAL' ? '#b45309' : '#b91c1c');
-            $bg = $s === 'COMPLETO' ? '#dcfce7' : ($s === 'PARCIAL' ? '#fef3c7' : '#fee2e2');
-            $badgeCls = $s === 'COMPLETO' ? 'bc' : ($s === 'PARCIAL' ? 'bp' : 'bi');
-            $pct = $detail->cantidad_solicitada > 0
-                 ? round(($detail->cantidad_despachada / $detail->cantidad_solicitada) * 100)
-                 : 0;
-        @endphp
-
-        <div class="prod-card"
-                id="producto-{{ $detail->product->barcode }}"
-                data-barcode="{{ $detail->product->barcode }}"
-                data-box-barcode="{{ $detail->product->box_barcode }}">
-            <div class="prod-top">
-                <div>
-                    <div class="prod-name">📦 {{ $detail->product->nombre }}</div>
-                    <div class="prod-sku">SKU: {{ $detail->product->sku }}</div>
-                </div>
-                <span class="prod-badge {{ $badgeCls }}">{{ $s }}</span>
-            </div>
-@php
-    $cpc         = $detail->product->cantidad_por_caja ?? 1;
-    $cajasDesp   = $cpc > 0 ? floor($detail->cantidad_despachada / $cpc) : 0;
-    $cajasSol    = $cpc > 0 ? ceil($detail->cantidad_solicitada / $cpc) : 0;
-    $unidSueltas = $cpc > 0 ? ($detail->cantidad_despachada % $cpc) : 0;
-@endphp
-<div class="info-strip" style="grid-template-columns:1fr 1fr;">
-    <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
-    <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
-
-    {{-- Cajas solicitadas --}}
-    <div class="info-item" style="grid-column:1/-1;">
-        🗃 Cajas solicitadas:
-        <span class="info-val" style="color:#2563eb;">
-            {{ $cajasSol }} caja{{ $cajasSol !== 1 ? 's' : '' }}
-        </span>
-        <span style="font-size:10px;color:#94a3b8;margin-left:3px;">
-            ({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)
-        </span>
-    </div>
-
-    {{-- Cajas despachadas --}}
-    <div class="info-item" style="grid-column:1/-1;">
-        ✅ Cajas despachadas:
-        <span class="info-val" style="color:{{ $bc }};">
-            {{ $cajasDesp }} caja{{ $cajasDesp !== 1 ? 's' : '' }}
-        </span>
-        @if($unidSueltas > 0)
-        <span style="font-size:10px;color:#f59e0b;margin-left:3px;">
-            + {{ $unidSueltas }} u. sueltas
-        </span>
-        @endif
-    </div>
-
-    {{-- Barra de progreso --}}
-    <div class="info-item" style="grid-column:1/-1;gap:6px;">
-        <span style="font-size:10px;color:#94a3b8;white-space:nowrap;">Despacho:</span>
-        <div class="prog-mini" style="flex:1;">
-            <div class="prog-mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div>
-        </div>
-        <span style="font-size:10px;font-weight:700;color:{{ $sc }};margin-left:2px;">{{ $pct }}%</span>
-    </div>
-</div>
-            <form method="POST" action="{{ route('orders.updateDetail',$detail) }}">
-                @csrf @method('PUT')
-                <div class="fields-box">
-                    <div class="field-row">
-                        <div><label class="flabel">Solicitado</label>
-                            <input type="number" step="0.01" name="cantidad_solicitada" class="finput" value="{{ $detail->cantidad_solicitada }}"></div>
-                        <div><label class="flabel">Despachado</label>
-                            <input type="number" step="0.01" name="cantidad_despachada" id="despachado-{{ $detail->product->barcode }}" class="finput" value="{{ $detail->cantidad_despachada }}"></div>
-                    </div>
-                    <div><label class="flabel">Precio</label>
-                        <input type="number" step="0.01" name="precio_unitario" class="finput" value="{{ $detail->precio_unitario }}"></div>
-                    <hr class="dv">
-                    <div><label class="flabel">Vencimiento</label>
-                        <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}"></div>
-                    <div class="field-row">
-                        <div><label class="flabel">Nivel</label>
-                            <input type="number" name="nivel" class="finput" value="{{ $detail->nivel }}"></div>
-                        <div><label class="flabel">Ubicación</label>
-                            <input type="text" name="ubicacion" class="finput" value="{{ $detail->ubicacion }}"></div>
-                    </div>
-                </div>
-                <div style="margin-top:7px;">
-                    <label class="flabel">Paleta</label>
-                    <input type="text" name="paleta" class="paleta-input"
-                        value="{{ $detail->paleta }}" placeholder="P01"
-                        oninput="this.value=this.value.toUpperCase()">
-                </div>
-                <div class="subtotal-row" style="margin-top:7px;">
-                    <span style="font-size:11px;color:#64748b;">Subtotal</span>
-                    <span class="subtotal-val">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</span>
-                </div>
-                <div class="btn-row-prod" style="margin-top:7px;">
-                    <button type="submit" class="btn btn-blue" style="width:100%;">💾 Guardar</button>
+        {{-- Importar CSV --}}
+        <div class="section-card">
+            <div class="sec-title">📄 Importar pedido CSV</div>
+            <form action="{{ route('orders.import',$order) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="import-row">
+                    <label class="file-label">
+                        📎 Seleccionar archivo .csv
+                        <input type="file" name="archivo" accept=".csv" required style="display:none;">
+                    </label>
+                    <button type="submit" class="btn btn-green">Importar</button>
                 </div>
             </form>
-            <button type="button" class="btn btn-gray" style="width:100%;margin-top:4px;"
-                onclick="abrirEtiqueta({
-                    nombre: {{ Js::from($detail->product->nombre) }},
-                    cantidadPorCaja: {{ (int) ($detail->product->cantidad_por_caja ?? 1) }},
-                    boxBarcode: {{ Js::from($detail->product->box_barcode ?? '') }},
-                    lote: {{ Js::from($detail->lote ?? '') }},
-                    fecha: {{ Js::from($detail->fecha_vencimiento
-                        ? \Carbon\Carbon::parse($detail->fecha_vencimiento)->format('d/m/Y')
-                        : ($detail->product->fecha_vencimiento
-                            ? \Carbon\Carbon::parse($detail->product->fecha_vencimiento)->format('d/m/Y')
-                            : '')) }},
-                    cantidadDespachada: {{ (float) $detail->cantidad_despachada }}
-                })">
-                🏷️ Generar etiqueta
-            </button>
-            <form method="POST" action="{{ route('orders.details.destroy',$detail) }}"
-                onsubmit="return confirm('¿Eliminar {{ $detail->product->nombre }}?')">
-                @csrf @method('DELETE')
-                <button type="submit" class="btn btn-red" style="width:100%;margin-top:4px;">🗑 Eliminar</button>
+        </div>
+
+        {{-- Agregar producto --}}
+        <div class="section-card">
+            <div class="sec-title">➕ Agregar producto</div>
+            <form method="POST" action="{{ route('orders.addProduct',$order) }}">
+                @csrf
+                <div class="add-grid">
+                    <div>
+                        <label class="flabel">Producto</label>
+                        <select name="product_id" class="finput" required>
+                            <option value="">Seleccionar producto</option>
+                            @foreach($products as $product)
+                                <option value="{{ $product->id }}">{{ $product->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="flabel">Cantidad</label>
+                        <input type="number" name="cantidad_solicitada" class="finput" placeholder="0" required>
+                    </div>
+                    <div>
+                        <label class="flabel">Precio</label>
+                        <input type="number" step="0.01" name="precio_unitario" class="finput" placeholder="0.00" required>
+                    </div>
+                    <button type="submit" class="btn btn-red" style="align-self:end;">Agregar</button>
+                </div>
             </form>
         </div>
-        @endforeach
-    </div>
 
-</div>{{-- /.left-col --}}
+        {{-- Productos --}}
+        <div class="products-grid">
+            @foreach($order->details as $detail)
+                @php
+                    $s = $detail->estado_item;
+                    $bc = $s === 'COMPLETO' ? '#22c55e' : ($s === 'PARCIAL' ? '#f59e0b' : '#ef4444');
+                    $sc = $s === 'COMPLETO' ? '#15803d' : ($s === 'PARCIAL' ? '#b45309' : '#b91c1c');
+                    $bg = $s === 'COMPLETO' ? '#dcfce7' : ($s === 'PARCIAL' ? '#fef3c7' : '#fee2e2');
+                    $badgeCls = $s === 'COMPLETO' ? 'bc' : ($s === 'PARCIAL' ? 'bp' : 'bi');
+                    $pct = $detail->cantidad_solicitada > 0
+                        ? round(($detail->cantidad_despachada / $detail->cantidad_solicitada) * 100)
+                        : 0;
+                @endphp
 
-{{-- ── Right col ── --}}
-<div class="right-col">
+                <div class="prod-card"
+                    id="producto-{{ $detail->product->barcode }}"
+                    data-barcode="{{ $detail->product->barcode }}"
+                    data-box-barcode="{{ $detail->product->box_barcode }}">
+                    <div class="prod-top">
+                        <div>
+                            <div class="prod-name">📦 {{ $detail->product->nombre }}</div>
+                            <div class="prod-sku">SKU: {{ $detail->product->sku }}</div>
+                        </div>
+                        <span class="prod-badge {{ $badgeCls }}">{{ $s }}</span>
+                    </div>
+                    @php
+                        $cpc = $detail->product->cantidad_por_caja ?? 1;
+                        $cajasDesp = $cpc > 0 ? floor($detail->cantidad_despachada / $cpc) : 0;
+                        $cajasSol = $cpc > 0 ? ceil($detail->cantidad_solicitada / $cpc) : 0;
+                        $unidSueltas = $cpc > 0 ? ($detail->cantidad_despachada % $cpc) : 0;
+                    @endphp
+                    <div class="info-strip" style="grid-template-columns:1fr 1fr;">
+                        <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
+                        <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
 
-    {{-- ══════════════════════════════════════════
-         MAPA DE PALETAS
-    ══════════════════════════════════════════ --}}
-    <div class="paleta-map-card">
-        <div class="paleta-map-header">
-            <div class="paleta-map-title">
-                🪵 Mapa de paletas
-                <span style="background:#1e293b;color:#94a3b8;font-size:10px;padding:2px 8px;border-radius:99px;">
-                    {{ $paletas->count() }} paleta{{ $paletas->count() !== 1 ? 's' : '' }}
-                </span>
-            </div>
-            <span style="font-size:10px;color:#475569;">Clic para ver detalle</span>
-        </div>
+                        {{-- Cajas solicitadas --}}
+                        <div class="info-item" style="grid-column:1/-1;">
+                            🗃 Cajas solicitadas:
+                            <span class="info-val" style="color:#2563eb;">
+                                {{ $cajasSol }} caja{{ $cajasSol !== 1 ? 's' : '' }}
+                            </span>
+                            <span style="font-size:10px;color:#94a3b8;margin-left:3px;">
+                                ({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)
+                            </span>
+                        </div>
 
-        <div class="paleta-map-body">
+                        {{-- Cajas despachadas --}}
+                        <div class="info-item" style="grid-column:1/-1;">
+                            ✅ Cajas despachadas:
+                            <span class="info-val" style="color:{{ $bc }};">
+                                {{ $cajasDesp }} caja{{ $cajasDesp !== 1 ? 's' : '' }}
+                            </span>
+                            @if($unidSueltas > 0)
+                                <span style="font-size:10px;color:#f59e0b;margin-left:3px;">
+                                    + {{ $unidSueltas }} u. sueltas
+                                </span>
+                            @endif
+                        </div>
 
-            @if($paletas->isEmpty() && $sinPaleta->isEmpty())
-                <div style="text-align:center;padding:24px 0;color:#94a3b8;font-size:12px;">
-                    <div style="font-size:28px;margin-bottom:6px;">🪵</div>
-                    Sin paletas asignadas aún
+                        {{-- Barra de progreso --}}
+                        <div class="info-item" style="grid-column:1/-1;gap:6px;">
+                            <span style="font-size:10px;color:#94a3b8;white-space:nowrap;">Despacho:</span>
+                            <div class="prog-mini" style="flex:1;">
+                                <div class="prog-mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div>
+                            </div>
+                            <span style="font-size:10px;font-weight:700;color:{{ $sc }};margin-left:2px;">{{ $pct }}%</span>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ route('orders.updateDetail',$detail) }}"
+                        data-detail-form
+                        data-original-paleta="{{ $detail->paleta }}">
+                        @csrf @method('PUT')
+                        <div class="fields-box">
+                            <div class="field-row">
+                                <div><label class="flabel">Solicitado</label>
+                                    <input type="number" step="0.01" name="cantidad_solicitada" class="finput" value="{{ $detail->cantidad_solicitada }}"></div>
+                                <div><label class="flabel">Despachado</label>
+                                    <input type="number" step="0.01" name="cantidad_despachada" id="despachado-{{ $detail->product->barcode }}" class="finput" value="{{ $detail->cantidad_despachada }}"></div>
+                            </div>
+                            <div><label class="flabel">Precio</label>
+                                <input type="number" step="0.01" name="precio_unitario" class="finput" value="{{ $detail->precio_unitario }}"></div>
+                            <hr class="dv">
+                            <div><label class="flabel">Vencimiento</label>
+                                <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}"></div>
+                            <div class="field-row">
+                                <div><label class="flabel">Nivel</label>
+                                    <input type="number" name="nivel" class="finput" value="{{ $detail->nivel }}"></div>
+                                <div><label class="flabel">Ubicación</label>
+                                    <input type="text" name="ubicacion" class="finput" value="{{ $detail->ubicacion }}"></div>
+                            </div>
+                        </div>
+                        <div style="margin-top:7px;">
+                            <label class="flabel">Paleta</label>
+                            <input type="text" name="paleta" class="paleta-input"
+                                value="{{ $detail->paleta }}" placeholder="P01"
+                                oninput="this.value=this.value.toUpperCase()">
+                        </div>
+                        <div class="subtotal-row" style="margin-top:7px;">
+                            <span style="font-size:11px;color:#64748b;">Subtotal</span>
+                            <span class="subtotal-val">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</span>
+                        </div>
+                        <div class="btn-row-prod" style="margin-top:7px;">
+                            <button type="submit" class="btn btn-blue" style="width:100%;">💾 Guardar</button>
+                        </div>
+                    </form>
+                    <button type="button" class="btn btn-gray" style="width:100%;margin-top:4px;"
+                        onclick="abrirEtiqueta({
+                            nombre: {{ Js::from($detail->product->nombre) }},
+                            cantidadPorCaja: {{ (int) ($detail->product->cantidad_por_caja ?? 1) }},
+                            boxBarcode: {{ Js::from($detail->product->box_barcode ?? '') }},
+                            lote: {{ Js::from($detail->lote ?? '') }},
+                            fecha: {{ Js::from($detail->fecha_vencimiento
+                                ? \Carbon\Carbon::parse($detail->fecha_vencimiento)->format('d/m/Y')
+                                : ($detail->product->fecha_vencimiento
+                                    ? \Carbon\Carbon::parse($detail->product->fecha_vencimiento)->format('d/m/Y')
+                                    : '')) }},
+                            cantidadDespachada: {{ (float) $detail->cantidad_despachada }}
+                        })">
+                        🏷️ Generar etiqueta
+                    </button>
+                    <form method="POST" action="{{ route('orders.details.destroy',$detail) }}"
+                        onsubmit="return confirm('¿Eliminar {{ $detail->product->nombre }}?')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn btn-red" style="width:100%;margin-top:4px;">🗑 Eliminar</button>
+                    </form>
                 </div>
-            @else
-
-            <div class="paleta-map-grid">
-            @foreach($paletas as $nombrePaleta => $items)
-            @php
-                $totUds  = $items->sum('cantidad_solicitada');
-                $despUds = $items->sum('cantidad_despachada');
-                $pesoKg  = $items->sum(fn($i) => ($i->product->peso ?? 0) * $i->cantidad_solicitada / 1000);
-                $pctP    = $totUds > 0 ? round(($despUds / $totUds) * 100) : 0;
-                $todoC   = $items->every(fn($i) => $i->estado_item === 'COMPLETO');
-                $algunP  = $items->contains(fn($i) => $i->estado_item === 'PARCIAL');
-                $estClass = $todoC ? 'estado-completo' : ($algunP ? 'estado-parcial' : 'estado-incompleto');
-                $pctColor = $todoC ? '#15803d' : ($algunP ? '#b45309' : '#b91c1c');
-                $fillColor= $todoC ? '#22c55e' : ($algunP ? '#f59e0b' : '#ef4444');
-                $icon     = $todoC ? '✅' : ($algunP ? '⏳' : '⚠️');
-
-                // Serializar items para el modal
-                $itemsJson = $items->map(fn($i) => [
-                    'nombre'          => $i->product->nombre ?? 'Producto',
-                    'sku'             => $i->product->sku ?? '',
-                    'solicitada'      => $i->cantidad_solicitada,
-                    'despachada'      => $i->cantidad_despachada,
-                    'estado'          => $i->estado_item,
-                    'precio'          => $i->precio_unitario,
-                    'subtotal'        => $i->subtotal,
-                    'peso'            => number_format(($i->product->peso ?? 0) / 1000, 3),
-                    'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,  // ← NUEVO
-                    'barcode' => $i->product->barcode,
-                    'box_barcode' => $i->product->box_barcode,
-                ])->values()->toJson();
-            @endphp
-
-            <div class="paleta-box {{ $estClass }}"
-                onclick="abrirPaleta({{ json_encode($nombrePaleta) }}, {{ $items->count() }}, {{ $totUds }}, {{ $despUds }}, {{ round($pesoKg,1) }}, {{ $pctP }}, {{ json_encode($fillColor) }}, {{ $itemsJson }})">
-                <div class="paleta-box-icon">🪵</div>
-                <div class="paleta-box-name">{{ $nombrePaleta }}</div>
-                <div class="paleta-box-items">{{ $items->count() }} ítem{{ $items->count() > 1 ? 's' : '' }}</div>
-                <div class="paleta-box-pct" style="color:{{ $pctColor }};">{{ $icon }} {{ $pctP }}%</div>
-                <div class="paleta-box-bar">
-                    <div class="paleta-box-fill" style="width:{{ $pctP }}%;background:{{ $fillColor }}"></div>
-                    
-                </div>
-            </div>
             @endforeach
+        </div>
+
+    </div>{{-- /.left-col --}}
+
+    {{-- ── Right col ── --}}
+    <div class="right-col">
+
+        {{-- ══════════════════════════════════════════
+             MAPA DE PALETAS
+        ══════════════════════════════════════════ --}}
+        <div class="paleta-map-card">
+            <div class="paleta-map-header">
+                <div class="paleta-map-title">
+                    🪵 Mapa de paletas
+                    <span style="background:#1e293b;color:#94a3b8;font-size:10px;padding:2px 8px;border-radius:99px;">
+                        {{ $paletas->count() }} paleta{{ $paletas->count() !== 1 ? 's' : '' }}
+                    </span>
+                </div>
+                <span style="font-size:10px;color:#475569;">Clic para ver detalle</span>
             </div>
 
-            {{-- Sin paleta --}}
-            @if($sinPaleta->count())
+            <div class="paleta-map-body">
+
+                @if($paletas->isEmpty() && $sinPaleta->isEmpty())
+                    <div style="text-align:center;padding:24px 0;color:#94a3b8;font-size:12px;">
+                        <div style="font-size:28px;margin-bottom:6px;">🪵</div>
+                        Sin paletas asignadas aún
+                    </div>
+                @else
+
+                    <div class="paleta-map-grid">
+                        @foreach($paletas as $nombrePaleta => $items)
+                            @php
+                                $totUds = $items->sum('cantidad_solicitada');
+                                $despUds = $items->sum('cantidad_despachada');
+                                $pesoKg = $items->sum(fn($i) => ($i->product->peso ?? 0) * $i->cantidad_solicitada / 1000);
+                                $pctP = $totUds > 0 ? round(($despUds / $totUds) * 100) : 0;
+                                $todoC = $items->every(fn($i) => $i->estado_item === 'COMPLETO');
+                                $algunP = $items->contains(fn($i) => $i->estado_item === 'PARCIAL');
+                                $estClass = $todoC ? 'estado-completo' : ($algunP ? 'estado-parcial' : 'estado-incompleto');
+                                $pctColor = $todoC ? '#15803d' : ($algunP ? '#b45309' : '#b91c1c');
+                                $fillColor= $todoC ? '#22c55e' : ($algunP ? '#f59e0b' : '#ef4444');
+                                $icon = $todoC ? '✅' : ($algunP ? '⏳' : '⚠️');
+                                $llena = $items->count() >= $paletaMax;
+
+                                // Serializar items para el modal
+                                $itemsJson = $items->map(fn($i) => [
+                                    'nombre' => $i->product->nombre ?? 'Producto',
+                                    'sku' => $i->product->sku ?? '',
+                                    'solicitada' => $i->cantidad_solicitada,
+                                    'despachada' => $i->cantidad_despachada,
+                                    'estado' => $i->estado_item,
+                                    'precio' => $i->precio_unitario,
+                                    'subtotal' => $i->subtotal,
+                                    'peso' => number_format(($i->product->peso ?? 0) / 1000, 3),
+                                    'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,
+                                    'barcode' => $i->product->barcode,
+                                    'box_barcode' => $i->product->box_barcode,
+                                ])->values()->toJson();
+                            @endphp
+
+                            <div class="paleta-box {{ $estClass }} {{ $llena ? 'paleta-llena' : '' }}"
+                                onclick="abrirPaleta({{ json_encode($nombrePaleta) }}, {{ $items->count() }}, {{ $totUds }}, {{ $despUds }}, {{ round($pesoKg,1) }}, {{ $pctP }}, {{ json_encode($fillColor) }}, {{ $itemsJson }})">
+                                @if($llena)
+                                    <span class="paleta-box-full-badge">LLENA</span>
+                                @endif
+                                <div class="paleta-box-icon">🪵</div>
+                                <div class="paleta-box-name">{{ $nombrePaleta }}</div>
+                                <div class="paleta-box-items">{{ $items->count() }}/{{ $paletaMax }} ítem{{ $items->count() > 1 ? 's' : '' }}</div>
+                                <div class="paleta-box-pct" style="color:{{ $pctColor }};">{{ $icon }} {{ $pctP }}%</div>
+                                <div class="paleta-box-bar">
+                                    <div class="paleta-box-fill" style="width:{{ $pctP }}%;background:{{ $fillColor }}"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Sin paleta --}}
+                    @if($sinPaleta->count())
+                        @php
+                            $spJson = $sinPaleta->map(fn($i) => [
+                                'nombre' => $i->product->nombre ?? 'Producto',
+                                'sku' => $i->product->sku ?? '',
+                                'solicitada' => $i->cantidad_solicitada,
+                                'despachada' => $i->cantidad_despachada,
+                                'estado' => $i->estado_item,
+                                'precio' => $i->precio_unitario,
+                                'subtotal' => $i->subtotal,
+                                'peso' => number_format(($i->product->peso ?? 0) / 1000, 3),
+                                'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,
+                                'barcode' => $i->product->barcode,
+                                'box_barcode' => $i->product->box_barcode,
+                            ])->values()->toJson();
+                        @endphp
+                        <div class="no-paleta-chip"
+                            onclick="abrirPaleta('Sin paleta', {{ $sinPaleta->count() }}, {{ $sinPaleta->sum('cantidad_solicitada') }}, {{ $sinPaleta->sum('cantidad_despachada') }}, 0, 0, '#94a3b8', {{ $spJson }})">
+                            <span>⚠️ Sin paleta asignada</span>
+                            <span style="font-weight:700;">{{ $sinPaleta->count() }} ítem{{ $sinPaleta->count() > 1 ? 's' : '' }} →</span>
+                        </div>
+                    @endif
+
+                @endif
+            </div>
+        </div>
+
+        {{-- Resumen financiero --}}
+        <div class="resumen-card">
+            <div class="sec-title">📊 Resumen</div>
+            <hr class="dv" style="margin-bottom:8px;">
+            <div class="resumen-row"><span>Productos</span><span class="resumen-val">{{ $order->details->count() }}</span></div>
+            <div class="resumen-row"><span>Subtotal</span><span class="resumen-val">S/ {{ number_format($order->subtotal,2) }}</span></div>
+            <div class="resumen-row"><span>IGV (18%)</span><span class="resumen-val">S/ {{ number_format($order->igv,2) }}</span></div>
+            <div class="resumen-total-row">
+                <span style="font-size:14px;font-weight:700;color:#0f172a;">Total</span>
+                <span style="font-size:18px;font-weight:700;color:#15803d;">S/ {{ number_format($order->total,2) }}</span>
+            </div>
+        </div>
+
+        {{-- Progreso --}}
+        <div class="resumen-card">
+            <div class="sec-title">📈 Progreso de despacho</div>
+            <div class="prog-resumen">
+                <div class="prog-label"><span>Completado</span><span style="font-weight:700;color:{{ $progColor }};">{{ $porcentaje }}%</span></div>
+                <div class="prog-bar"><div class="prog-fill" style="width:{{ $porcentaje }}%;background:{{ $progColor }};"></div></div>
+                <div style="font-size:10px;color:#94a3b8;margin-top:3px;">{{ $completados }} de {{ $totalItems }} productos</div>
+            </div>
+            <hr class="dv" style="margin:8px 0;">
             @php
-                $spJson = $sinPaleta->map(fn($i) => [
-                    'nombre'          => $i->product->nombre ?? 'Producto',
-                    'sku'             => $i->product->sku ?? '',
-                    'solicitada'      => $i->cantidad_solicitada,
-                    'despachada'      => $i->cantidad_despachada,
-                    'estado'          => $i->estado_item,
-                    'precio'          => $i->precio_unitario,
-                    'subtotal'        => $i->subtotal,
-                    'peso'            => number_format(($i->product->peso ?? 0) / 1000, 3),
-                    'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,  // ← NUEVO
-                    'barcode' => $i->product->barcode,
-                    'box_barcode' => $i->product->box_barcode,
-                ])->values()->toJson();
+                $parciales2 = $order->details->where('estado_item','PARCIAL')->count();
+                $incompletos2 = $order->details->where('estado_item','INCOMPLETO')->count();
             @endphp
-            <div class="no-paleta-chip"
-                onclick="abrirPaleta('Sin paleta', {{ $sinPaleta->count() }}, {{ $sinPaleta->sum('cantidad_solicitada') }}, {{ $sinPaleta->sum('cantidad_despachada') }}, 0, 0, '#94a3b8', {{ $spJson }})">
-                <span>⚠️ Sin paleta asignada</span>
-                <span style="font-weight:700;">{{ $sinPaleta->count() }} ítem{{ $sinPaleta->count() > 1 ? 's' : '' }} →</span>
+            <div class="legend">
+                <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#22c55e;"></span><span style="font-size:12px;color:#64748b;">Completo</span></div><span style="font-size:12px;font-weight:700;color:#15803d;">{{ $completados }}</span></div>
+                <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#f59e0b;"></span><span style="font-size:12px;color:#64748b;">Parcial</span></div><span style="font-size:12px;font-weight:700;color:#b45309;">{{ $parciales2 }}</span></div>
+                <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#ef4444;"></span><span style="font-size:12px;color:#64748b;">Incompleto</span></div><span style="font-size:12px;font-weight:700;color:#b91c1c;">{{ $incompletos2 }}</span></div>
             </div>
-            @endif
-
-            @endif
         </div>
-    </div>
 
-    {{-- Resumen financiero --}}
-    <div class="resumen-card">
-        <div class="sec-title">📊 Resumen</div>
-        <hr class="dv" style="margin-bottom:8px;">
-        <div class="resumen-row"><span>Productos</span><span class="resumen-val">{{ $order->details->count() }}</span></div>
-        <div class="resumen-row"><span>Subtotal</span><span class="resumen-val">S/ {{ number_format($order->subtotal,2) }}</span></div>
-        <div class="resumen-row"><span>IGV (18%)</span><span class="resumen-val">S/ {{ number_format($order->igv,2) }}</span></div>
-        <div class="resumen-total-row">
-            <span style="font-size:14px;font-weight:700;color:#0f172a;">Total</span>
-            <span style="font-size:18px;font-weight:700;color:#15803d;">S/ {{ number_format($order->total,2) }}</span>
+        {{-- Info orden --}}
+        <div class="resumen-card">
+            <div class="sec-title">ℹ️ Info de la orden</div>
+            <div class="resumen-row"><span>Fecha</span><span class="resumen-val">{{ \Carbon\Carbon::parse($order->fecha_pedido)->format('d M Y') }}</span></div>
+            <div class="resumen-row"><span>Tipo</span><span class="resumen-val">{{ $order->tipo_orden }}</span></div>
+            <div class="resumen-row"><span>Cliente</span><span class="resumen-val" style="font-size:11px;max-width:140px;text-align:right;">{{ $order->client?->razon_social }}</span></div>
+            <div class="resumen-row"><span>Estado</span><span style="font-size:11px;font-weight:700;color:{{ $estadoColor }};">{{ $order->estado }}</span></div>
         </div>
-    </div>
 
-    {{-- Progreso --}}
-    <div class="resumen-card">
-        <div class="sec-title">📈 Progreso de despacho</div>
-        <div class="prog-resumen">
-            <div class="prog-label"><span>Completado</span><span style="font-weight:700;color:{{ $progColor }};">{{ $porcentaje }}%</span></div>
-            <div class="prog-bar"><div class="prog-fill" style="width:{{ $porcentaje }}%;background:{{ $progColor }};"></div></div>
-            <div style="font-size:10px;color:#94a3b8;margin-top:3px;">{{ $completados }} de {{ $totalItems }} productos</div>
-        </div>
-        <hr class="dv" style="margin:8px 0;">
-        @php
-            $parciales2   = $order->details->where('estado_item','PARCIAL')->count();
-            $incompletos2 = $order->details->where('estado_item','INCOMPLETO')->count();
-        @endphp
-        <div class="legend">
-            <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#22c55e;"></span><span style="font-size:12px;color:#64748b;">Completo</span></div><span style="font-size:12px;font-weight:700;color:#15803d;">{{ $completados }}</span></div>
-            <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#f59e0b;"></span><span style="font-size:12px;color:#64748b;">Parcial</span></div><span style="font-size:12px;font-weight:700;color:#b45309;">{{ $parciales2 }}</span></div>
-            <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#ef4444;"></span><span style="font-size:12px;color:#64748b;">Incompleto</span></div><span style="font-size:12px;font-weight:700;color:#b91c1c;">{{ $incompletos2 }}</span></div>
-        </div>
-    </div>
-
-    {{-- Info orden --}}
-    <div class="resumen-card">
-        <div class="sec-title">ℹ️ Info de la orden</div>
-        <div class="resumen-row"><span>Fecha</span><span class="resumen-val">{{ \Carbon\Carbon::parse($order->fecha_pedido)->format('d M Y') }}</span></div>
-        <div class="resumen-row"><span>Tipo</span><span class="resumen-val">{{ $order->tipo_orden }}</span></div>
-        <div class="resumen-row"><span>Cliente</span><span class="resumen-val" style="font-size:11px;max-width:140px;text-align:right;">{{ $order->client?->razon_social }}</span></div>
-        <div class="resumen-row"><span>Estado</span><span style="font-size:11px;font-weight:700;color:{{ $estadoColor }};">{{ $order->estado }}</span></div>
-    </div>
-
-</div>{{-- /.right-col --}}
+    </div>{{-- /.right-col --}}
 </div>{{-- /.main-layout --}}
 </div>{{-- /.pg --}}
 
@@ -593,7 +611,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         <div class="pm-header">
             <div>
                 <div class="pm-title" id="pmTitle"></div>
-                <div class="pm-sub"  id="pmSub"></div>
+                <div class="pm-sub" id="pmSub"></div>
             </div>
             <button class="pm-close" onclick="document.getElementById('pmOverlay').classList.remove('open')">✕</button>
         </div>
@@ -634,6 +652,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         </div>
     </div>
 </div>
+
 <div class="et-overlay" id="etOverlay" onclick="cerrarEtiqueta(event)">
     <div class="et-modal" onclick="event.stopPropagation()">
         <div class="et-label" id="etLabel">
@@ -653,6 +672,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         </div>
     </div>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script>
 // ── Scanner ──────────────────────────────────────────────────────────────
@@ -663,7 +683,7 @@ scanner.addEventListener('keydown', function(e){
     let codigo = this.value.trim();
     if(!codigo) return;
     let card = document.querySelector(
-    '[data-barcode="' + codigo + '"], [data-box-barcode="' + codigo + '"]');
+        '[data-barcode="' + codigo + '"], [data-box-barcode="' + codigo + '"]');
     if(card){
         card.scrollIntoView({ behavior:'smooth', block:'center' });
         card.style.boxShadow = "0 0 0 3px #2563eb";
@@ -675,246 +695,182 @@ scanner.addEventListener('keydown', function(e){
         return;
     }
     fetch(`/api/producto/${codigo}`)
-    .then(res => res.json())
-    .then(producto => {
-        if(!producto){ alert('Producto no encontrado'); return; }
-        let select = document.querySelector('[name=product_id]');
-        select.value = producto.id;
-        document.querySelector('[name=precio_unitario]').value = producto.precio ?? 0;
-        document.querySelector('[name=cantidad_solicitada]').focus();
-    });
+        .then(res => res.json())
+        .then(producto => {
+            if(!producto){ alert('Producto no encontrado'); return; }
+            let select = document.querySelector('[name=product_id]');
+            select.value = producto.id;
+            document.querySelector('[name=precio_unitario]').value = producto.precio ?? 0;
+            document.querySelector('[name=cantidad_solicitada]').focus();
+        });
     this.value = '';
+});
+
+// ── Límite de ítems por paleta ─────────────────────────────────────────
+const paletaCounts = {!! $paletaCounts->toJson() !!};
+const PALETA_MAX = {{ $paletaMax }};
+
+document.querySelectorAll('form[data-detail-form]').forEach(form => {
+    form.addEventListener('submit', function (e) {
+        const paletaInput = form.querySelector('[name="paleta"]');
+        if (!paletaInput) return;
+
+        const nueva = paletaInput.value.trim().toUpperCase();
+        const original = (form.dataset.originalPaleta || '').trim().toUpperCase();
+
+        // Solo valida si está cambiando a una paleta distinta (o asignando una nueva)
+        if (nueva && nueva !== original) {
+            const countActual = paletaCounts[nueva] || 0;
+            if (countActual >= PALETA_MAX) {
+                e.preventDefault();
+                alert(`⚠️ La paleta ${nueva} ya tiene ${countActual} ítems (máximo ${PALETA_MAX}). No se pueden agregar más productos a esta paleta.`);
+            }
+        }
+    });
 });
 
 // ── Modal de paleta ──────────────────────────────────────────────────────
 function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, items) {
-    document.getElementById('pmTitle').textContent   = '🪵 ' + nombre;
-    document.getElementById('pmSub').textContent     = 'Detalle de contenido · ' + nItems + ' ítem' + (nItems !== 1 ? 's' : '');
-    document.getElementById('pmItems').textContent   = nItems;
-    document.getElementById('pmUds').textContent     = totUds;
-    document.getElementById('pmPeso').textContent    = pesoKg + ' kg';
-    document.getElementById('pmPct').textContent     = pct + '%';
-    document.getElementById('pmPct').style.color     = fillColor;
-    document.getElementById('pmProgFill').style.width      = pct + '%';
+    document.getElementById('pmTitle').textContent = '🪵 ' + nombre;
+    document.getElementById('pmSub').textContent = 'Detalle de contenido · ' + nItems + ' ítem' + (nItems !== 1 ? 's' : '');
+    document.getElementById('pmItems').textContent = nItems;
+    document.getElementById('pmUds').textContent = totUds;
+    document.getElementById('pmPeso').textContent = pesoKg + ' kg';
+    document.getElementById('pmPct').textContent = pct + '%';
+    document.getElementById('pmPct').style.color = fillColor;
+    document.getElementById('pmProgFill').style.width = pct + '%';
     document.getElementById('pmProgFill').style.background = fillColor;
     document.getElementById('pmProgSub').textContent = despUds + ' de ' + totUds + ' unidades despachadas';
 
     const estadoColors = {
-        'COMPLETO'  : { bg:'#dcfce7', color:'#15803d', dot:'#22c55e' },
-        'PARCIAL'   : { bg:'#fef3c7', color:'#b45309', dot:'#f59e0b' },
+        'COMPLETO' : { bg:'#dcfce7', color:'#15803d', dot:'#22c55e' },
+        'PARCIAL' : { bg:'#fef3c7', color:'#b45309', dot:'#f59e0b' },
         'INCOMPLETO': { bg:'#fee2e2', color:'#b91c1c', dot:'#ef4444' },
     };
 
     let html = '';
-    // DESPUÉS
-items.forEach(item => {
-    const ec = estadoColors[item.estado] ?? { bg:'#f1f5f9', color:'#64748b', dot:'#94a3b8' };
-    const itemPct  = item.solicitada > 0 ? Math.round((item.despachada / item.solicitada) * 100) : 0;
+    items.forEach(item => {
+        const ec = estadoColors[item.estado] ?? { bg:'#f1f5f9', color:'#64748b', dot:'#94a3b8' };
+        const itemPct = item.solicitada > 0 ? Math.round((item.despachada / item.solicitada) * 100) : 0;
 
-    // ── Cálculo de cajas ──
-    const cpc         = item.cantidad_por_caja > 0 ? item.cantidad_por_caja : 1;
-    const cajasSol    = Math.ceil(item.solicitada / cpc);
-    const cajasDesp   = Math.floor(item.despachada / cpc);
-    const sueltas     = item.despachada % cpc;
-    const cajasLabel  = cajasDesp + ' / ' + cajasSol + ' caja' + (cajasSol !== 1 ? 's' : '');
-    const sueltasHtml = sueltas > 0
-        ? `<span style="font-size:10px;color:#f59e0b;margin-left:4px;">+${sueltas} u. sueltas</span>`
-        : '';
+        // ── Cálculo de cajas ──
+        const cpc = item.cantidad_por_caja > 0 ? item.cantidad_por_caja : 1;
+        const cajasSol = Math.ceil(item.solicitada / cpc);
+        const cajasDesp = Math.floor(item.despachada / cpc);
+        const sueltas = item.despachada % cpc;
+        const cajasLabel = cajasDesp + ' / ' + cajasSol + ' caja' + (cajasSol !== 1 ? 's' : '');
+        const sueltasHtml = sueltas > 0
+            ? `<span style="font-size:10px;color:#f59e0b;margin-left:4px;">+${sueltas} u. sueltas</span>`
+            : '';
 
-    html += `
-    <div class="pm-item">
-        <div class="pm-item-dot" style="background:${ec.dot};"></div>
-        <div class="pm-item-name">
-            <div style="font-weight:600;">${item.nombre}</div>
-            <div style="font-size:10px;color:#94a3b8;">
-                ${item.sku ? 'SKU: '+item.sku+' · ' : ''}${item.peso} kg · S/ ${parseFloat(item.precio).toFixed(2)}
+        html += `
+        <div class="pm-item">
+            <div class="pm-item-dot" style="background:${ec.dot};"></div>
+            <div class="pm-item-name">
+                <div style="font-weight:600;">${item.nombre}</div>
+                <div style="font-size:10px;color:#94a3b8;">
+                    ${item.sku ? 'SKU: '+item.sku+' · ' : ''}${item.peso} kg · S/ ${parseFloat(item.precio).toFixed(2)}
+                </div>
+
+                {{-- Línea de cajas --}}
+                <div style="
+                    display:inline-flex;align-items:center;gap:4px;
+                    margin-top:3px;
+                    background:#eff6ff;border:1px solid #bfdbfe;
+                    border-radius:4px;padding:2px 7px;
+                    font-size:10px;font-weight:700;color:#1d4ed8;
+                ">
+                    🗃 ${cajasLabel}
+                </div>
+                ${sueltasHtml}
+
+                <div style="height:3px;background:#e5e7eb;border-radius:99px;margin-top:5px;overflow:hidden;">
+                    <div style="height:100%;width:${itemPct}%;background:${ec.dot};border-radius:99px;"></div>
+                </div>
             </div>
-
-            {{-- Línea de cajas --}}
-            <div style="
-                display:inline-flex;align-items:center;gap:4px;
-                margin-top:3px;
-                background:#eff6ff;border:1px solid #bfdbfe;
-                border-radius:4px;padding:2px 7px;
-                font-size:10px;font-weight:700;color:#1d4ed8;
-            ">
-                🗃 ${cajasLabel}
+            <div class="pm-item-right">
+                <div class="pm-item-qty">${item.despachada}/${item.solicitada}</div>
+                <span class="pm-item-badge" style="background:${ec.bg};color:${ec.color};">${item.estado}</span>
             </div>
-            ${sueltasHtml}
-
-            <div style="height:3px;background:#e5e7eb;border-radius:99px;margin-top:5px;overflow:hidden;">
-                <div style="height:100%;width:${itemPct}%;background:${ec.dot};border-radius:99px;"></div>
-            </div>
-        </div>
-        <div class="pm-item-right">
-            <div class="pm-item-qty">${item.despachada}/${item.solicitada}</div>
-            <span class="pm-item-badge" style="background:${ec.bg};color:${ec.color};">${item.estado}</span>
-        </div>
-    </div>`;
-});
+        </div>`;
+    });
 
     // Número de la paleta
-let numeroPaleta = nombre.replace(/\D/g,'');
+    let numeroPaleta = nombre.replace(/\D/g,'');
+    if(numeroPaleta === '')
+        numeroPaleta = '0';
+    numeroPaleta = numeroPaleta.padStart(4,'0');
 
-if(numeroPaleta === '')
-    numeroPaleta = '0';
+    // SSCC
+    let sscc = '50000014373324' + numeroPaleta;
 
-numeroPaleta = numeroPaleta.padStart(4,'0');
+    // Tabla logística
+    let tabla = `
+    <hr style="margin:18px 0">
+    <h4 style="margin-bottom:10px;">📋 Hoja logística</h4>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+            <tr style="background:#f1f5f9;">
+                <th style="padding:6px;border:1px solid #ddd;">DUM13</th>
+                <th style="padding:6px;border:1px solid #ddd;">DUM14</th>
+                <th style="padding:6px;border:1px solid #ddd;">DESCRIPCIÓN</th>
+                <th style="padding:6px;border:1px solid #ddd;">UXB</th>
+                <th style="padding:6px;border:1px solid #ddd;">BULTOS</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
 
-// SSCC
-let sscc = '50000014373324' + numeroPaleta;
-
-// Tabla logística
-let tabla = `
-<hr style="margin:18px 0">
-
-<h4 style="margin-bottom:10px;">
-📋 Hoja logística
-</h4>
-
-<table style="
-width:100%;
-border-collapse:collapse;
-font-size:11px;
-">
-
-<thead>
-
-<tr style="background:#f1f5f9;">
-
-<th style="padding:6px;border:1px solid #ddd;">DUM13</th>
-
-<th style="padding:6px;border:1px solid #ddd;">DUM14</th>
-
-<th style="padding:6px;border:1px solid #ddd;">DESCRIPCIÓN</th>
-
-<th style="padding:6px;border:1px solid #ddd;">UXB</th>
-
-<th style="padding:6px;border:1px solid #ddd;">BULTOS</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-`;
-
-items.forEach(item=>{
-
-    let bultos = Math.ceil(
-        item.despachada /
-        item.cantidad_por_caja
-    );
+    items.forEach(item=>{
+        let bultos = Math.ceil(item.despachada / item.cantidad_por_caja);
+        tabla += `
+        <tr>
+            <td style="border:1px solid #ddd;padding:5px;">${item.barcode}</td>
+            <td style="border:1px solid #ddd;padding:5px;">${item.box_barcode}</td>
+            <td style="border:1px solid #ddd;padding:5px;">${item.nombre}</td>
+            <td style="border:1px solid #ddd;padding:5px;text-align:center;">${item.cantidad_por_caja}</td>
+            <td style="border:1px solid #ddd;padding:5px;text-align:center;">${bultos}</td>
+        </tr>
+        `;
+    });
 
     tabla += `
-    <tr>
-
-        <td style="border:1px solid #ddd;padding:5px;">
-            ${item.barcode}
-        </td>
-
-        <td style="border:1px solid #ddd;padding:5px;">
-            ${item.box_barcode}
-        </td>
-
-        <td style="border:1px solid #ddd;padding:5px;">
-            ${item.nombre}
-        </td>
-
-        <td style="border:1px solid #ddd;padding:5px;text-align:center;">
-            ${item.cantidad_por_caja}
-        </td>
-
-        <td style="border:1px solid #ddd;padding:5px;text-align:center;">
-            ${bultos}
-        </td>
-
-    </tr>
+        </tbody>
+    </table>
+    <div style="margin-top:18px;text-align:center;">
+        <div style="font-size:13px;font-weight:bold;">SSCC</div>
+        <div style="font-size:20px;font-weight:bold;letter-spacing:2px;margin-top:6px;">${sscc}</div>
+        <div style="display:flex;justify-content:center;margin-top:15px;">
+            <svg id="barcode"></svg>
+        </div>
+    </div>
     `;
-});
+    tabla += `
+    <div style="margin-top:20px;text-align:center;">
+        <a href="/orders/{{ $order->id }}/pallet/${encodeURIComponent(nombre)}/pdf" target="_blank" class="btn btn-blue">
+            🖨 Generar Hoja Logística
+        </a>
+    </div>
+    `;
 
-tabla += `
+    document.getElementById('pmItemsList').innerHTML = html + tabla;
 
-</tbody>
-</table>
-
-<div style="margin-top:18px;text-align:center;">
-
-<div style="font-size:13px;font-weight:bold;">
-SSCC
-</div>
-
-<div style="
-font-size:20px;
-font-weight:bold;
-letter-spacing:2px;
-margin-top:6px;
-">
-${sscc}
-</div>
-
-<div style="
-display:flex;
-justify-content:center;
-margin-top:15px;
-">
-    <svg id="barcode"></svg>
-</div>
-
-</div>
-`;
-tabla += `
-<div style="margin-top:20px;text-align:center;">
-    <a
-        href="/orders/{{ $order->id }}/pallet/${encodeURIComponent(nombre)}/pdf"
-        target="_blank"
-        class="btn btn-blue">
-        🖨 Generar Hoja Logística
-    </a>
-</div>
-`;
-
-document.getElementById('pmItemsList').innerHTML =
-html + tabla;
-
-JsBarcode(
-    "#barcode",
-    sscc,
-    {
+    JsBarcode("#barcode", sscc, {
         format:"CODE128",
         width:2,
         height:60,
         displayValue:true
-    }
-);
+    });
 
-document.getElementById('pmItemsList').innerHTML =
-html + tabla;
-
-JsBarcode(
-    "#barcode",
-    sscc,
-    {
-        format: "CODE128",
-        width: 2,
-        height: 60,
-        displayValue: true
-    }
-);
-
-document.getElementById('pmOverlay').classList.add('open');
-
-} // ← ESTA LLAVE CIERRA abrirPaleta()
+    document.getElementById('pmOverlay').classList.add('open');
+}
 
 function cerrarPaleta(e) {
-
     if (e.target.id === 'pmOverlay') {
-
         document.getElementById('pmOverlay').classList.remove('open');
-
     }
-
 }
+
 function abrirEtiqueta(data) {
     document.getElementById('etNombre').textContent = data.nombre;
     document.getElementById('etCpc').textContent = data.cantidadPorCaja + ' unid. por caja';
@@ -929,14 +885,26 @@ function abrirEtiqueta(data) {
     document.getElementById('etUnidades').textContent =
         data.cantidadDespachada + (sueltas > 0 ? ' (' + sueltas + ' sueltas)' : '');
 
-    JsBarcode("#etBarcode", data.boxBarcode || '', {
-        format: "CODE128",
-        width: 2,
-        height: 60,
-        displayValue: true,
-        lineColor: "#000",
-        background: "#fff"
-    });
+    const barcodeEl = document.getElementById('etBarcode');
+    barcodeEl.innerHTML = '';
+
+    if (data.boxBarcode) {
+        try {
+            JsBarcode(barcodeEl, data.boxBarcode, {
+                format: "CODE128",
+                width: 2,
+                height: 60,
+                displayValue: true,
+                lineColor: "#000",
+                background: "#fff"
+            });
+        } catch (err) {
+            console.error('Código de caja inválido:', data.boxBarcode, err);
+            barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Código de caja no válido</div>';
+        }
+    } else {
+        barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Sin código de caja registrado</div>';
+    }
 
     document.getElementById('etOverlay').classList.add('open');
 }

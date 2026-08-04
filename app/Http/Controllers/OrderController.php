@@ -515,16 +515,38 @@ public function updateDetail(Request $request, OrderDetail $detail)
         'estado_item' => $estado,
         'subtotal' => $subtotal,
     ];
-
     // Solo tocar estos campos si vienen en el request
-    // (evita que el guardado rápido de cantidad/precio borre datos ya guardados)
-    foreach (['paleta', 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
-        if ($request->has($campo)) {
-            $updateData[$campo] = $request->input($campo);
+// (evita que el guardado rápido de cantidad/precio borre datos ya guardados)
+foreach (['paleta', 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
+    if ($request->has($campo)) {
+        $updateData[$campo] = $request->input($campo);
+    }
+}
+
+// 🔥 LÍMITE DE ÍTEMS POR PALETA (máx. 10)
+if (array_key_exists('paleta', $updateData)) {
+    $nuevaPaleta = strtoupper(trim((string) $updateData['paleta']));
+    $paletaActual = strtoupper(trim((string) $detail->paleta));
+
+    if ($nuevaPaleta !== '' && $nuevaPaleta !== $paletaActual) {
+        $countActual = $detail->order->details()
+            ->where('id', '!=', $detail->id)
+            ->whereRaw('UPPER(paleta) = ?', [$nuevaPaleta])
+            ->count();
+
+        if ($countActual >= 10) {
+            return back()->with(
+                'error',
+                "⚠️ La paleta {$nuevaPaleta} ya tiene {$countActual} ítems (máximo 10). No se pueden agregar más productos a esta paleta."
+            );
         }
     }
 
-    $detail->update($updateData);
+    $updateData['paleta'] = $nuevaPaleta;
+}
+
+
+$detail->update($updateData);
 
     // 🔄 ACTUALIZAR ORDEN
     $order = $detail->order;
