@@ -210,44 +210,47 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 
     html,
     body{
-
         width:90mm;
         height:70mm;
         margin:0;
         padding:0;
-        overflow:hidden;
-
     }
 
     body *{
         visibility:hidden;
     }
 
-    #etLabel,
-    #etLabel *{
+    #etOverlay,
+    #etOverlay *{
         visibility:visible;
     }
 
-    #etLabel{
+    #etOverlay{
 
-        position:absolute;
-        top:0;
-        left:0;
+        position:fixed;
+        inset:0;
+        background:white;
+        display:flex !important;
+        align-items:center;
+        justify-content:center;
 
+    }
+
+    .et-modal{
+
+        border:none;
+        box-shadow:none;
         width:90mm;
         height:70mm;
-
         padding:3mm;
 
     }
 
-    .et-actions,
-    .et-overlay,
-    .et-modal{
-
-        display:none !important;
-
+    .et-actions{
+        display:none;
     }
+
+}
 
 }
 </style>
