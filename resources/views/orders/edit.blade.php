@@ -202,11 +202,53 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .et-actions{margin-top:16px;display:flex;gap:8px;justify-content:center;}
 
 @media print{
-    body *{visibility:hidden;}
-    .et-label,.et-label *{visibility:visible;}
-    .et-label{position:absolute;top:0;left:0;width:100%;}
-    .et-overlay,.et-modal{position:static;box-shadow:none;border:none;background:none;padding:0;}
-    .et-actions{display:none;}
+
+    @page{
+        size:90mm 70mm;
+        margin:0;
+    }
+
+    html,
+    body{
+
+        width:90mm;
+        height:70mm;
+        margin:0;
+        padding:0;
+        overflow:hidden;
+
+    }
+
+    body *{
+        visibility:hidden;
+    }
+
+    #etLabel,
+    #etLabel *{
+        visibility:visible;
+    }
+
+    #etLabel{
+
+        position:absolute;
+        top:0;
+        left:0;
+
+        width:90mm;
+        height:70mm;
+
+        padding:3mm;
+
+    }
+
+    .et-actions,
+    .et-overlay,
+    .et-modal{
+
+        display:none !important;
+
+    }
+
 }
 </style>
 
