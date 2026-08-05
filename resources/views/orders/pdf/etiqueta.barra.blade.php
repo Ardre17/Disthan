@@ -3,27 +3,27 @@
 <head>
 <meta charset="UTF-8">
 <style>
-    * { box-sizing: border-box; }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
         font-family: DejaVu Sans, sans-serif;
         color: #000;
-        margin: 0;
-        padding: 6mm;
+        background: #fff;
+        width: 100%;
         text-align: center;
+        padding: 4mm;
     }
     .nombre {
         font-size: 13px;
         font-weight: bold;
         text-transform: uppercase;
         letter-spacing: .5px;
-        margin-bottom: 3px;
     }
     .cpc {
-        font-size: 10px;
-        margin-bottom: 8px;
+        font-size: 11px;
+        margin-top: 3px;
     }
     .barcode-wrap {
-        margin: 6px 0;
+        margin-top: 8px;
     }
     .barcode-wrap img {
         max-width: 100%;
@@ -31,18 +31,12 @@
     }
     .sin-codigo {
         font-size: 10px;
-        color: #000;
-        border: 1px dashed #000;
-        padding: 10px;
-        margin: 8px 0;
+        margin-top: 8px;
     }
     .info {
         margin-top: 8px;
-        font-size: 10px;
-        line-height: 1.6;
-    }
-    .info strong {
-        font-weight: bold;
+        font-size: 11px;
+        line-height: 1.7;
     }
 </style>
 </head>
@@ -60,10 +54,10 @@
     </div>
 
     <div class="info">
-        <div><strong>Lote:</strong> {{ $item->lote ?? '—' }}</div>
-        <div><strong>Fecha:</strong> {{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : '—' }}</div>
-        <div><strong>Cajas:</strong> {{ $cajas }}</div>
-        <div><strong>Unidades:</strong> {{ $item->cantidad_despachada }}@if($sueltas > 0) ({{ $sueltas }} sueltas)@endif</div>
+        <div>Lote: {{ $item->lote ?? '—' }}</div>
+        <div>Fecha: {{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : '—' }}</div>
+        <div>Cajas: {{ $cajas }}</div>
+        <div>Unidades: {{ $item->cantidad_despachada }}@if($sueltas > 0) ({{ $sueltas }} sueltas)@endif</div>
     </div>
 
 </body>

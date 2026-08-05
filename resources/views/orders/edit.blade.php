@@ -400,12 +400,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                             <hr class="dv">
                             <div><label class="flabel">Vencimiento</label>
                                 <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}"></div>
-                            <div class="field-row">
-                                <div><label class="flabel">Nivel</label>
-                                    <input type="number" name="nivel" class="finput" value="{{ $detail->nivel }}"></div>
-                                <div><label class="flabel">Ubicación</label>
-                                    <input type="text" name="ubicacion" class="finput" value="{{ $detail->ubicacion }}"></div>
-                            </div>
                         </div>
                         <div style="margin-top:7px;">
                             <label class="flabel">Paleta</label>
