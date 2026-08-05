@@ -12,7 +12,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
-    public function etiqueta(OrderDetail $item)
+   public function etiqueta(OrderDetail $item)
 {
     $item->load('product', 'order.client');
 
@@ -22,15 +22,27 @@ class OrderController extends Controller
     $cajas = floor($item->cantidad_despachada / $cpc);
     $sueltas = $item->cantidad_despachada % $cpc;
 
-    $boxBarcode = $item->product->box_barcode ?? '';
+    // ── Clientes que requieren código de PRODUCTO en vez de código de caja ──
+    $clientesConCodigoDeProducto = [
+        'HIPERMERCADOS TOTTUS ORIENTE SAC',
+        'HIPERMERCADOS TOTTUS S.A',
+    ];
+
+    $razonSocial = strtoupper(trim($item->order->client->razon_social ?? ''));
+    $usaCodigoDeProducto = in_array($razonSocial, $clientesConCodigoDeProducto, true);
+
+    $codigoParaEtiqueta = $usaCodigoDeProducto
+        ? ($item->product->barcode ?? '')
+        : ($item->product->box_barcode ?? '');
+
     $barcode = null;
 
-    if ($boxBarcode) {
-        $svg = Code128Generator::generateSvg($boxBarcode, 2, 60);
+    if ($codigoParaEtiqueta) {
+        $svg = Code128Generator::generateSvg($codigoParaEtiqueta, 2, 60);
         $barcode = 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
-    // 70mm x 90mm (vertical) → puntos (1mm = 2.83464567 pt)
+    // 90mm x 70mm (horizontal) → puntos (1mm = 2.83464567 pt)
     $width = 90 * 2.83464567;
     $height = 70 * 2.83464567;
 
@@ -40,8 +52,8 @@ class OrderController extends Controller
         'cajas' => $cajas,
         'sueltas' => $sueltas,
         'barcode' => $barcode,
-        'boxBarcode' => $boxBarcode,
-    ])->setPaper([0, 0, $width, $height], 'portrait');
+        'codigoMostrado' => $codigoParaEtiqueta,
+    ])->setPaper([0, 0, $width, $height], 'landscape');
 
     return $pdf->stream('etiqueta-' . $item->id . '.pdf');
 }
