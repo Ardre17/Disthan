@@ -34,14 +34,14 @@ class OrderController extends Controller
     $width = 90 * 2.83464567;
     $height = 70 * 2.83464567;
 
-    $pdf = Pdf::loadView('orders.pdf.etiqueta', [
-        'item' => $item,
-        'cantidadPorCaja' => $cpc,
-        'cajas' => $cajas,
-        'sueltas' => $sueltas,
-        'barcode' => $barcode,
-        'boxBarcode' => $boxBarcode,
-    ])->setPaper([0, 0, $width, $height], 'landscape');
+    $pdf = Pdf::loadView('orders.pdf.etiqueta-barra', [
+    'item' => $item,
+    'cantidadPorCaja' => $cpc,
+    'cajas' => $cajas,
+    'sueltas' => $sueltas,
+    'barcode' => $barcode,
+    'boxBarcode' => $boxBarcode,
+])->setPaper([0, 0, $width, $height], 'landscape');
 
     return $pdf->stream('etiqueta-' . $item->id . '.pdf');
 }
