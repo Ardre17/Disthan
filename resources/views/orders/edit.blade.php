@@ -420,7 +420,14 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                             detailId: {{ $detail->id }},
                             nombre: {{ Js::from($detail->product->nombre) }},
                             cantidadPorCaja: {{ (int) ($detail->product->cantidad_por_caja ?? 1) }},
-                            boxBarcode: {{ Js::from($detail->product->box_barcode ?? '') }},
+                            codigo: {{ Js::from(
+                                in_array(strtoupper(trim($order->client->razon_social ?? '')), [
+                                    'HIPERMERCADOS TOTTUS ORIENTE SAC',
+                                    'HIPERMERCADOS TOTTUS S.A',
+                                ], true)
+                                    ? ($detail->product->barcode ?? '')
+                                    : ($detail->product->box_barcode ?? '')
+                            ) }},
                             lote: {{ Js::from($detail->lote ?? '') }},
                             fecha: {{ Js::from($detail->fecha_vencimiento
                                 ? \Carbon\Carbon::parse($detail->fecha_vencimiento)->format('d/m/Y')
@@ -429,8 +436,8 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                                     : '')) }},
                             cantidadDespachada: {{ (float) $detail->cantidad_despachada }}
                         })">
-                        🏷️ Generar etiqueta
-                    </button>
+    🏷️ Generar etiqueta
+</button>
                     <form method="POST" action="{{ route('orders.details.destroy',$detail) }}"
                         onsubmit="return confirm('¿Eliminar {{ $detail->product->nombre }}?')">
                         @csrf @method('DELETE')
@@ -878,9 +885,11 @@ function abrirEtiqueta(data) {
     const barcodeEl = document.getElementById('etBarcode');
     barcodeEl.innerHTML = '';
 
-    if (data.boxBarcode) {
+    const codigo = (data.codigo || '').toString().trim();
+
+    if (codigo) {
         try {
-            JsBarcode(barcodeEl, data.boxBarcode, {
+            JsBarcode(barcodeEl, codigo, {
                 format: "CODE128",
                 width: 2,
                 height: 60,
@@ -889,24 +898,17 @@ function abrirEtiqueta(data) {
                 background: "#fff"
             });
         } catch (err) {
-            console.error('Código de caja inválido:', data.boxBarcode, err);
-            barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Código de caja no válido</div>';
+            console.error('Código inválido:', codigo, err);
+            barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Código no válido: ' + codigo + '</div>';
         }
     } else {
-        barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Sin código de caja registrado</div>';
+        barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Sin código registrado</div>';
     }
 
-    // Enlace al PDF de la etiqueta (90mm x 70mm), generado en el servidor
     const urlTemplate = document.querySelector('.et-actions').dataset.etiquetaUrlTemplate;
     document.getElementById('etPdfLink').href = urlTemplate.replace('__ID__', data.detailId);
 
     document.getElementById('etOverlay').classList.add('open');
-}
-
-function cerrarEtiqueta(e) {
-    if (e.target.id === 'etOverlay') {
-        document.getElementById('etOverlay').classList.remove('open');
-    }
 }
 </script>
 

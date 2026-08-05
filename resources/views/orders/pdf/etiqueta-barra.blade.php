@@ -65,13 +65,13 @@
     <div class="cpc">{{ $cantidadPorCaja }} unid. por caja</div>
 
     <div class="barcode-wrap">
-        @if($barcode)
-            <img src="{{ $barcode }}">
-            <div class="barcode-texto">{{ $boxBarcode }}</div>
-        @else
-            <div class="sin-codigo">Sin código de caja registrado</div>
-        @endif
-    </div>
+    @if($barcode)
+        <img src="{{ $barcode }}">
+        <div class="barcode-texto">{{ $codigoMostrado }}</div>
+    @else
+        <div class="sin-codigo">Sin código registrado</div>
+    @endif
+</div>
 
     <table class="info-table">
         <tr>
