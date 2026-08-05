@@ -4,27 +4,14 @@
 <meta charset="UTF-8">
 <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    html, body {
-    width: 100%;
-}
-body {
-    font-family: DejaVu Sans, sans-serif;
-    color: #000;
-    background: #fff;
-    text-align: center;
-    padding: 3mm;
-    box-sizing: border-box;
-}
-.barcode-wrap {
-    margin-top: 8px;
-    width: 100%;
-}
-.barcode-wrap img {
-    display: block;
-    margin: 0 auto;
-    max-width: 100%;
-    height: auto;
-}
+    body {
+        font-family: DejaVu Sans, sans-serif;
+        color: #000;
+        background: #fff;
+        width: 100%;
+        text-align: center;
+        padding: 4mm;
+    }
     .nombre {
         font-size: 13px;
         font-weight: bold;
@@ -35,7 +22,13 @@ body {
         font-size: 11px;
         margin-top: 3px;
     }
-    
+    .barcode-wrap {
+        margin-top: 8px;
+    }
+    .barcode-wrap img {
+        max-width: 90%;
+        height: auto;
+    }
     .barcode-texto {
         font-size: 11px;
         letter-spacing: 1px;
@@ -72,13 +65,13 @@ body {
     <div class="cpc">{{ $cantidadPorCaja }} unid. por caja</div>
 
     <div class="barcode-wrap">
-    @if($barcode)
-        <img src="{{ $barcode }}">
-        <div class="barcode-texto">{{ $codigoMostrado }}</div>
-    @else
-        <div class="sin-codigo">Sin código registrado</div>
-    @endif
-</div>
+        @if($barcode)
+            <img src="{{ $barcode }}">
+            <div class="barcode-texto">{{ $codigoMostrado }}</div>
+        @else
+            <div class="sin-codigo">Sin código de caja registrado</div>
+        @endif
+    </div>
 
     <table class="info-table">
         <tr>
