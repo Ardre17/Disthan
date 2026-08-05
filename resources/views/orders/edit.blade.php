@@ -200,59 +200,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .et-cpc{font-size:11px;}
 .et-info{margin-top:6px;font-size:11px;line-height:1.7;text-align:center;}
 .et-actions{margin-top:16px;display:flex;gap:8px;justify-content:center;}
-
-@media print{
-
-    @page{
-        size:90mm 70mm;
-        margin:0;
-    }
-
-    html,
-    body{
-        width:90mm;
-        height:70mm;
-        margin:0;
-        padding:0;
-    }
-
-    body *{
-        visibility:hidden;
-    }
-
-    #etOverlay,
-    #etOverlay *{
-        visibility:visible;
-    }
-
-    #etOverlay{
-
-        position:fixed;
-        inset:0;
-        background:white;
-        display:flex !important;
-        align-items:center;
-        justify-content:center;
-
-    }
-
-    .et-modal{
-
-        border:none;
-        box-shadow:none;
-        width:90mm;
-        height:70mm;
-        padding:3mm;
-
-    }
-
-    .et-actions{
-        display:none;
-    }
-
-}
-
-}
 </style>
 
 <div class="pg">
@@ -276,7 +223,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     $sinPaleta = $order->details->filter(fn($d) => empty($d->paleta));
 
     // ── Límite de ítems por paleta ──────────────────────────────────────
-    const_paleta_max: {}
     $paletaMax = 10;
     $paletaCounts = $paletas->map->count();
 @endphp
@@ -477,6 +423,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                     </form>
                     <button type="button" class="btn btn-gray" style="width:100%;margin-top:4px;"
                         onclick="abrirEtiqueta({
+                            detailId: {{ $detail->id }},
                             nombre: {{ Js::from($detail->product->nombre) }},
                             cantidadPorCaja: {{ (int) ($detail->product->cantidad_por_caja ?? 1) }},
                             boxBarcode: {{ Js::from($detail->product->box_barcode ?? '') }},
@@ -698,6 +645,9 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     </div>
 </div>
 
+{{-- ══════════════════════════════
+     MODAL ETIQUETA DE PRODUCTO
+══════════════════════════════ --}}
 <div class="et-overlay" id="etOverlay" onclick="cerrarEtiqueta(event)">
     <div class="et-modal" onclick="event.stopPropagation()">
         <div class="et-label" id="etLabel">
@@ -711,8 +661,8 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 <div>Unidades: <span id="etUnidades"></span></div>
             </div>
         </div>
-        <div class="et-actions">
-            <button type="button" class="btn btn-gray" onclick="window.print()">🖨 Imprimir</button>
+        <div class="et-actions" data-etiqueta-url-template="{{ route('orders.details.etiqueta', ['item' => '__ID__']) }}">
+            <a id="etPdfLink" href="#" target="_blank" class="btn btn-gray">🖨 Generar PDF</a>
             <button type="button" class="btn btn-gray" onclick="document.getElementById('etOverlay').classList.remove('open')">Cerrar</button>
         </div>
     </div>
@@ -916,6 +866,7 @@ function cerrarPaleta(e) {
     }
 }
 
+// ── Modal de etiqueta de producto ─────────────────────────────────────────
 function abrirEtiqueta(data) {
     document.getElementById('etNombre').textContent = data.nombre;
     document.getElementById('etCpc').textContent = data.cantidadPorCaja + ' unid. por caja';
@@ -950,6 +901,10 @@ function abrirEtiqueta(data) {
     } else {
         barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Sin código de caja registrado</div>';
     }
+
+    // Enlace al PDF de la etiqueta (90mm x 70mm), generado en el servidor
+    const urlTemplate = document.querySelector('.et-actions').dataset.etiquetaUrlTemplate;
+    document.getElementById('etPdfLink').href = urlTemplate.replace('__ID__', data.detailId);
 
     document.getElementById('etOverlay').classList.add('open');
 }

@@ -16,8 +16,32 @@ class OrderController extends Controller
 {
     $item->load('product', 'order.client');
 
-    $pdf = Pdf::loadView('orders.pdf.etiqueta', compact('item'))
-               ->setPaper([0, 0, 198.425, 198.425], 'portrait'); // 7cm x 7cm en puntos
+    $cpc = $item->product->cantidad_por_caja ?? 1;
+    $cpc = $cpc > 0 ? $cpc : 1;
+
+    $cajas = floor($item->cantidad_despachada / $cpc);
+    $sueltas = $item->cantidad_despachada % $cpc;
+
+    $boxBarcode = $item->product->box_barcode ?? '';
+    $barcode = null;
+
+    if ($boxBarcode) {
+        $svg = Code128Generator::generateSvg($boxBarcode, 2, 60);
+        $barcode = 'data:image/svg+xml;base64,' . base64_encode($svg);
+    }
+
+    // 90mm x 70mm → puntos (1mm = 2.83464567 pt)
+    $width = 90 * 2.83464567;
+    $height = 70 * 2.83464567;
+
+    $pdf = Pdf::loadView('orders.pdf.etiqueta', [
+        'item' => $item,
+        'cantidadPorCaja' => $cpc,
+        'cajas' => $cajas,
+        'sueltas' => $sueltas,
+        'barcode' => $barcode,
+        'boxBarcode' => $boxBarcode,
+    ])->setPaper([0, 0, $width, $height], 'landscape');
 
     return $pdf->stream('etiqueta-' . $item->id . '.pdf');
 }

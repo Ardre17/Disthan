@@ -45,6 +45,8 @@ Route::post('/exportacion/{order}/pallet', [ExportController::class, 'storePalle
     ->name('exportacion.pallet.store');
 
 Route::get('/order-details/{item}/etiqueta', [OrderController::class, 'etiqueta'])->name('orders.etiqueta');
+Route::get('/order-details/{item}/etiqueta', [App\Http\Controllers\OrderController::class, 'etiqueta'])
+    ->name('orders.details.etiqueta');
 
 Route::put('/order-details/{item}/lote', [OrderController::class, 'updateLote'])->name('orderDetails.updateLote');
 
