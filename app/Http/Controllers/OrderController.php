@@ -43,8 +43,8 @@ class OrderController extends Controller
     }
 
     // 90mm x 70mm (horizontal) → puntos (1mm = 2.83464567 pt)
-    $width = 95 * 2.83464567;
-    $height = 50 * 2.83464567;
+    $width = 60 * 2.83464567;
+    $height = 95 * 2.83464567;
 
     $pdf = Pdf::loadView('orders.pdf.etiqueta-barra', [
         'item' => $item,
