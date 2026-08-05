@@ -29,12 +29,17 @@
         max-width: 100%;
         height: auto;
     }
+    .barcode-texto {
+        font-size: 11px;
+        letter-spacing: 1px;
+        margin-top: 3px;
+    }
     .sin-codigo {
         font-size: 10px;
         margin-top: 8px;
     }
     .info {
-        margin-top: 8px;
+        margin-top: 10px;
         font-size: 11px;
         line-height: 1.7;
     }
@@ -48,6 +53,7 @@
     <div class="barcode-wrap">
         @if($barcode)
             <img src="{{ $barcode }}">
+            <div class="barcode-texto">{{ $boxBarcode }}</div>
         @else
             <div class="sin-codigo">Sin código de caja registrado</div>
         @endif

@@ -30,18 +30,18 @@ class OrderController extends Controller
         $barcode = 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
-    // 90mm x 70mm → puntos (1mm = 2.83464567 pt)
-    $width = 90 * 2.83464567;
-    $height = 70 * 2.83464567;
+    // 70mm x 90mm (vertical) → puntos (1mm = 2.83464567 pt)
+    $width = 70 * 2.83464567;
+    $height = 90 * 2.83464567;
 
     $pdf = Pdf::loadView('orders.pdf.etiqueta-barra', [
-    'item' => $item,
-    'cantidadPorCaja' => $cpc,
-    'cajas' => $cajas,
-    'sueltas' => $sueltas,
-    'barcode' => $barcode,
-    'boxBarcode' => $boxBarcode,
-])->setPaper([0, 0, $width, $height], 'landscape');
+        'item' => $item,
+        'cantidadPorCaja' => $cpc,
+        'cajas' => $cajas,
+        'sueltas' => $sueltas,
+        'barcode' => $barcode,
+        'boxBarcode' => $boxBarcode,
+    ])->setPaper([0, 0, $width, $height], 'portrait');
 
     return $pdf->stream('etiqueta-' . $item->id . '.pdf');
 }
