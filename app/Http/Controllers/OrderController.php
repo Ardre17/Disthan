@@ -38,7 +38,7 @@ class OrderController extends Controller
     $barcode = null;
 
     if ($codigoParaEtiqueta) {
-        $svg = Code128Generator::generateSvg($codigoParaEtiqueta, 2, 30);
+        $svg = Code128Generator::generateSvg($codigoParaEtiqueta, 2, 120);
         $barcode = 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
