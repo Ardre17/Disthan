@@ -433,8 +433,6 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
                                     class="btn-xs btn-save"
                                     id="btn-save-{{ $item->id }}"
                                     style="display:none;">💾 Guardar</button>
-                            <a href="{{ route('orders.etiqueta',$item) }}" target="_blank"
-                               class="btn-xs" style="background:#e0e7ff;color:#4338ca;border:1px solid #c7d2fe;text-decoration:none;">🏷️ Etiqueta</a>
                                <form method="POST"
                                   action="{{ route('orders.details.destroy',$item) }}"
                                   onsubmit="return confirm('¿Eliminar {{ addslashes($item->product->nombre) }}?')"

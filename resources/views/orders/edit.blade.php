@@ -1,1176 +1,915 @@
 @extends('layouts.app')
 
-
 @section('content')
 
-
 <style>
-
 *{box-sizing:border-box;}
-
-
-/* ── ERP Shell ── */
-
-.erp-bar{background:#1e3a5f;padding:0 1.25rem;height:40px;display:flex;align-items:center;justify-content:space-between;margin:-20px -20px 0;}
-
-.erp-bar-title{color:#7eb8f7;font-size:13px;font-weight:600;letter-spacing:.05em;text-transform:uppercase;}
-
-.erp-breadcrumb{font-size:11px;color:#5a8abf;}
-
-.erp-user{font-size:11px;color:#7eb8f7;background:#152d4d;padding:3px 10px;border-radius:4px;}
-
-.pg{padding:1rem;background:#e8ecf0;min-height:100vh;}
-
-
-/* ── Header ── */
-
-.order-header{background:#fff;border:1px solid #c9d4e0;border-top:4px solid #1e3a5f;border-radius:4px;padding:.85rem 1.1rem;margin-bottom:.85rem;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:10px;}
-
-.order-id{font-size:16px;font-weight:700;color:#1e3a5f;}
-
-.order-sub{font-size:11px;color:#64748b;margin-top:2px;}
-
-.status-chip{display:inline-flex;align-items:center;gap:4px;padding:4px 12px;border-radius:3px;font-size:11px;font-weight:700;letter-spacing:.05em;}
-
-
-/* ── KPIs ── */
-
-.kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:.85rem;}
-
+.pg{padding:1.25rem;background:#f1f5f9;min-height:100vh;}
+.top-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:1.1rem;flex-wrap:wrap;gap:10px;}
+.hdr-left h1{font-size:20px;font-weight:700;color:#0f172a;display:flex;align-items:center;gap:8px;}
+.hdr-left p{font-size:12px;color:#94a3b8;margin-top:2px;}
+.hdr-right{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+.badge-estado{padding:5px 14px;border-radius:99px;font-size:12px;font-weight:700;color:#fff;}
+.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:1.1rem;}
 @media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr);}}
+.kpi{background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:.8rem 1rem;display:flex;align-items:center;gap:10px;}
+.kpi-icon{width:34px;height:34px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;flex-shrink:0;}
+.kpi-label{font-size:10px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.kpi-val{font-size:18px;font-weight:700;color:#1e293b;line-height:1.1;}
+.main-layout{display:grid;grid-template-columns:1fr 290px;gap:16px;}
+@media(max-width:900px){.main-layout{grid-template-columns:1fr;}}
+.left-col{display:flex;flex-direction:column;gap:14px;}
+.right-col{display:flex;flex-direction:column;gap:12px;}
+.scanner-card{background:#0f172a;border-radius:12px;padding:1rem 1.25rem;display:flex;align-items:center;gap:12px;}
+.scanner-label{font-size:12px;color:#94a3b8;font-weight:600;margin-bottom:4px;}
+.scanner-input{width:100%;padding:10px 14px;font-size:16px;border-radius:8px;border:none;background:#1e293b;color:#f8fafc;outline:none;letter-spacing:1px;}
+.scanner-input::placeholder{color:#475569;}
+.scanner-input:focus{box-shadow:0 0 0 2px #2563eb;}
+@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.3;}}
+.section-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1.1rem 1.25rem;}
+.sec-title{font-size:13px;font-weight:600;color:#1e293b;margin-bottom:.85rem;display:flex;align-items:center;gap:7px;}
+.import-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.file-label{display:inline-flex;align-items:center;gap:6px;padding:7px 12px;border:1px dashed #e2e8f0;border-radius:8px;font-size:12px;color:#64748b;cursor:pointer;background:#f8fafc;flex:1;transition:border-color .15s;}
+.file-label:hover{border-color:#2563eb;color:#2563eb;}
+.add-grid{display:grid;grid-template-columns:2fr 1fr 1fr auto;gap:8px;align-items:end;}
+@media(max-width:600px){.add-grid{grid-template-columns:1fr 1fr;}}
+.flabel{font-size:10px;font-weight:600;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:3px;}
+.finput{padding:8px 10px;border:1px solid #e2e8f0;border-radius:8px;font-size:12px;color:#1e293b;background:#fff;outline:none;width:100%;transition:border-color .15s;}
+.finput:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;}
+.prod-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1rem;display:flex;flex-direction:column;gap:.65rem;border-left:4px solid;transition:transform .15s;}
+.prod-card:hover{transform:translateY(-2px);}
+.prod-top{display:flex;justify-content:space-between;align-items:flex-start;}
+.prod-name{font-size:13px;font-weight:700;color:#0f172a;}
+.prod-sku{font-size:10px;color:#94a3b8;margin-top:1px;}
+.prod-badge{font-size:10px;padding:2px 8px;border-radius:99px;font-weight:700;white-space:nowrap;}
+.bc{background:#dcfce7;color:#15803d;}
+.bp{background:#fef3c7;color:#b45309;}
+.bi{background:#fee2e2;color:#b91c1c;}
+.info-strip{display:grid;grid-template-columns:1fr 1fr;gap:5px;background:#f8fafc;border-radius:8px;padding:7px 9px;}
+.info-item{font-size:11px;color:#64748b;display:flex;align-items:center;gap:4px;}
+.info-val{font-weight:600;color:#374151;}
+.prog-mini{width:100%;height:5px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
+.prog-mini-fill{height:100%;border-radius:99px;}
+.fields-box{background:#f8fafc;border-radius:8px;padding:9px 10px;display:flex;flex-direction:column;gap:7px;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+.paleta-input{width:100%;padding:10px 14px;font-size:17px;border:2px solid #2563eb;border-radius:9px;text-align:center;font-weight:700;letter-spacing:3px;outline:none;background:#fff;transition:box-shadow .15s;}
+.paleta-input:focus{box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+.subtotal-row{display:flex;justify-content:space-between;align-items:center;}
+.subtotal-val{font-size:14px;font-weight:700;color:#0f172a;}
+.btn-row-prod{display:grid;grid-template-columns:1fr auto;gap:7px;}
+hr.dv{border:none;border-top:1px solid #f1f5f9;}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:600;text-decoration:none;cursor:pointer;border:none;transition:opacity .15s;}
+.btn:hover{opacity:.85;}
+.btn-green{background:#16a34a;color:#fff;}
+.btn-blue{background:#2563eb;color:#fff;}
+.btn-gray{background:#f1f5f9;color:#475569;border:1px solid #e2e8f0;}
+.btn-red{background:#dc2626;color:#fff;}
+.resumen-card{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:1.1rem;}
+.resumen-row{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#64748b;padding:5px 0;border-bottom:1px solid #f1f5f9;}
+.resumen-row:last-child{border:none;}
+.resumen-val{font-weight:600;color:#1e293b;}
+.resumen-total-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;margin-top:4px;}
+.prog-resumen{padding:10px;background:#f8fafc;border-radius:9px;}
+.prog-label{display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:4px;}
+.prog-bar{width:100%;height:7px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
+.prog-fill{height:100%;border-radius:99px;}
+.legend{display:flex;flex-direction:column;gap:5px;margin-top:4px;}
+.leg-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;}
+.leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:5px;display:inline-block;}
 
-.kpi{background:#fff;border:1px solid #c9d4e0;border-radius:4px;padding:.7rem .9rem;border-left:4px solid;}
+/* ══════════════════════════════
+   MAPA DE PALETAS
+══════════════════════════════ */
+.paleta-map-card {
+    background:#fff; border:1px solid #e2e8f0;
+    border-radius:12px; overflow:hidden;
+}
+.paleta-map-header {
+    background:#0f172a; padding:10px 14px;
+    display:flex; align-items:center; justify-content:space-between;
+}
+.paleta-map-title {
+    font-size:12px; font-weight:700; color:#f8fafc;
+    display:flex; align-items:center; gap:7px;
+}
+.paleta-map-body { padding:12px; }
 
-.kpi-label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:3px;}
-
-.kpi-val{font-size:19px;font-weight:700;line-height:1;color:#1e293b;}
-
-.kpi-sub{font-size:10px;color:#94a3b8;margin-top:2px;}
-
-
-/* ── Layout ── */
-
-.layout{display:grid;grid-template-columns:1fr 290px;gap:10px;}
-
-@media(max-width:900px){.layout{grid-template-columns:1fr;}}
-
-.left-col{display:flex;flex-direction:column;gap:10px;}
-
-
-/* ── Panel ── */
-
-.panel{background:#fff;border:1px solid #c9d4e0;border-radius:4px;}
-
-.panel-header{background:#f1f5f9;border-bottom:1px solid #c9d4e0;padding:.6rem 1rem;display:flex;align-items:center;justify-content:space-between;}
-
-.panel-title{font-size:12px;font-weight:700;color:#1e3a5f;text-transform:uppercase;letter-spacing:.06em;display:flex;align-items:center;gap:6px;}
-
-.panel-body{padding:.9rem 1rem;}
-
-
-/* ── Scanner ── */
-
-.scanner-erp{
-
-background:#0f172a;
-
-border-radius:4px;
-
-padding:.45rem .7rem;
-
-display:flex;
-
-align-items:center;
-
-gap:8px;
-
-border:1px solid #334155;
-
-width:100%;
-
-overflow:hidden;
-
+.paleta-map-grid {
+    display:grid;
+    grid-template-columns:repeat(auto-fill, minmax(110px,1fr));
+    gap:8px;
 }
 
-.scan-led{width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:blink 1.4s infinite;}
+/* Cada caja de paleta en el mapa */
+.paleta-box {
+    border-radius:10px; border:2px solid transparent;
+    padding:10px 8px; text-align:center;
+    cursor:pointer; transition:transform .15s, box-shadow .15s;
+    position:relative; user-select:none;
+}
+.paleta-box:hover {
+    transform:translateY(-3px);
+    box-shadow:0 6px 18px rgba(0,0,0,.12);
+}
+.paleta-box.estado-completo { background:#dcfce7; border-color:#86efac; }
+.paleta-box.estado-parcial { background:#fef3c7; border-color:#fde68a; }
+.paleta-box.estado-incompleto{ background:#fee2e2; border-color:#fca5a5; }
+.paleta-box.estado-vacia { background:#f8fafc; border-color:#e2e8f0; }
 
-@keyframes blink{0%,100%{opacity:1;}50%{opacity:.2;}}
+.paleta-box-icon { font-size:22px; margin-bottom:4px; }
+.paleta-box-name { font-size:12px; font-weight:800; color:#0f172a; }
+.paleta-box-items { font-size:10px; color:#64748b; margin-top:2px; }
+.paleta-box-pct { font-size:11px; font-weight:700; margin-top:3px; }
+.paleta-box-bar { height:4px; border-radius:99px; background:#e5e7eb; overflow:hidden; margin-top:5px; }
+.paleta-box-fill { height:100%; border-radius:99px; }
 
-.scan-input{
-
-flex:1;
-
-min-width:0;
-
-padding:6px 10px;
-
-border-radius:4px;
-
-border:1px solid #334155;
-
-background:#1e293b;
-
-color:#fff;
-
-font-size:13px;
-
-outline:none;
-
-font-family:'Courier New', monospace;
-
-letter-spacing:1px;
-
+/* Aviso de paleta llena */
+.paleta-box.paleta-llena { opacity:.85; }
+.paleta-box-full-badge {
+    position:absolute; top:6px; right:6px;
+    background:#dc2626; color:#fff; font-size:9px; font-weight:800;
+    padding:1px 6px; border-radius:99px;
 }
 
-.scan-input:focus{border-color:#3b82f6;}
-
-.scan-input::placeholder{color:#334155;font-size:12px;letter-spacing:0;font-family:'Segoe UI',sans-serif;}
-
-
-/* ── Form agregar producto ── */
-
-.add-grid{
-
-display:grid;
-
-grid-template-columns:2fr 1fr 1fr auto;
-
-gap:7px;
-
-align-items:end;
-
+/* Sin paleta chip */
+.no-paleta-chip {
+    display:flex; align-items:center; justify-content:space-between;
+    background:#fff8f0; border:1px dashed #fed7aa;
+    border-radius:8px; padding:7px 10px; font-size:12px;
+    color:#92400e; margin-top:8px; cursor:pointer;
+    transition:background .15s;
 }
+.no-paleta-chip:hover { background:#fef3e2; }
 
-@media(max-width:900px){
-
-.add-grid{grid-template-columns:1fr 1fr;gap:8px;}
-
-.add-grid > div:first-child{grid-column:1 / -1;}
-
-.add-grid > button{grid-column:1 / -1;width:100%;justify-content:center;}
-
+/* ══════════════════════════════
+   MODAL DE DETALLE
+══════════════════════════════ */
+.pm-overlay {
+    display:none; position:fixed; inset:0;
+    background:rgba(0,0,0,.45); z-index:1000;
+    align-items:center; justify-content:center; padding:16px;
 }
-
-@media(max-width:480px){
-
-.add-grid{grid-template-columns:1fr;gap:8px;}
-
-.add-grid > div:first-child,
-
-.add-grid > button{grid-column:1 / -1;}
-
+.pm-overlay.open { display:flex; }
+.pm-modal {
+    background:#fff; border-radius:14px;
+    width:480px; max-width:100%; max-height:90vh;
+    overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,.2);
+    animation:mIn .16s ease;
 }
-
-
-.flabel{font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;display:block;margin-bottom:3px;}
-
-.finput{padding:7px 9px;border:1px solid #c9d4e0;border-radius:3px;font-size:12px;color:#1e293b;background:#fff;outline:none;width:100%;transition:border-color .15s;}
-
-.finput:focus{border-color:#1e3a5f;box-shadow:0 0 0 2px rgba(30,58,95,.1);}
-
-
-/* ── Tabla ERP ── */
-
-.erp-table{width:100%;border-collapse:collapse;font-size:12px;}
-
-.erp-table th{background:#f1f5f9;color:#475569;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.06em;padding:7px 10px;border-bottom:2px solid #c9d4e0;text-align:left;white-space:nowrap;}
-
-.erp-table td{padding:7px 10px;border-bottom:1px solid #f1f5f9;color:#1e293b;vertical-align:middle;}
-
-.erp-table tbody tr:hover td{background:#f8fafc;}
-
-.erp-table .num-input{padding:5px 7px;border:1px solid #c9d4e0;border-radius:3px;font-size:12px;width:75px;text-align:center;background:#fff;outline:none;}
-
-.erp-table .num-input:focus{border-color:#1e3a5f;}
-
-.erp-table .num-input:disabled{background:#f8fafc;color:#94a3b8;border-color:#e2e8f0;}
-
-.state-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:4px;}
-
-.mini-bar{width:60px;height:5px;background:#e5e7eb;border-radius:99px;overflow:hidden;display:inline-block;vertical-align:middle;}
-
-.mini-fill{height:100%;border-radius:99px;}
-
-
-/* ── Scroll hint solo en móvil ── */
-
-.scroll-hint-mobile{
-
-display:none;
-
-font-size:10px;color:#94a3b8;
-
-padding:4px 10px 0;text-align:right;
-
+@keyframes mIn{from{transform:scale(.95);opacity:0}to{transform:scale(1);opacity:1}}
+.pm-header {
+    padding:14px 18px; display:flex; align-items:center;
+    justify-content:space-between; border-bottom:1px solid #f1f5f9;
+    position:sticky; top:0; background:#fff; z-index:1;
 }
+.pm-title { font-size:15px; font-weight:700; color:#0f172a; }
+.pm-sub { font-size:11px; color:#94a3b8; margin-top:2px; }
+.pm-body { padding:16px 18px; }
+.pm-close { background:none; border:none; font-size:20px; cursor:pointer; color:#94a3b8; padding:2px 6px; }
 
-@media(max-width:768px){
-
-.scroll-hint-mobile{display:block;}
-
-.erp-table{min-width:580px;}
-
-.erp-table td,.erp-table th{padding:6px 7px;font-size:11px;}
-
-.erp-table th:nth-child(3),
-
-.erp-table td:nth-child(3),
-
-.erp-table th:nth-child(8),
-
-.erp-table td:nth-child(8){display:none;}
-
-.erp-table .num-input{width:60px;font-size:11px;padding:4px 5px;}
-
-.btn-xs{padding:4px 6px;font-size:10px;}
-
-#btnCamara{display:flex !important;}
-
+.pm-kpis { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-bottom:14px; }
+.pm-kpi {
+    background:#f8fafc; border-radius:9px; padding:8px 10px;
+    text-align:center; border:1px solid #e2e8f0;
 }
+.pm-kpi-label { font-size:10px; color:#94a3b8; font-weight:600; text-transform:uppercase; }
+.pm-kpi-val { font-size:17px; font-weight:700; color:#1e293b; margin-top:2px; }
 
-@media(max-width:480px){
+.pm-prog-wrap { background:#f8fafc; border-radius:9px; padding:10px 12px; margin-bottom:14px; }
+.pm-prog-hdr { display:flex; justify-content:space-between; font-size:11px; color:#64748b; margin-bottom:5px; }
+.pm-prog-bar { height:8px; background:#e5e7eb; border-radius:99px; overflow:hidden; }
+.pm-prog-fill { height:100%; border-radius:99px; }
 
-.erp-table th:nth-child(6),
-
-.erp-table td:nth-child(6){display:none;}
-
-.erp-table{min-width:420px;}
-
-.erp-breadcrumb{display:none;}
-
-.order-sub{font-size:10px;}
-
-.kpis{grid-template-columns:repeat(2,1fr);}
-
+.pm-item {
+    display:flex; align-items:center; gap:10px;
+    padding:9px 0; border-bottom:1px solid #f1f5f9;
 }
+.pm-item:last-child { border-bottom:none; }
+.pm-item-dot { width:9px; height:9px; border-radius:50%; flex-shrink:0; }
+.pm-item-name { flex:1; font-size:12px; font-weight:500; color:#374151; }
+.pm-item-right{ display:flex; align-items:center; gap:8px; flex-shrink:0; }
+.pm-item-qty { font-size:12px; font-weight:700; color:#0f172a; }
+.pm-item-badge{ font-size:10px; font-weight:700; padding:2px 7px; border-radius:99px; }
 
-
-/* ── Botones ── */
-
-.btn-xs{display:inline-flex;align-items:center;gap:3px;padding:5px 9px;border-radius:3px;font-size:11px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;white-space:nowrap;}
-
-.btn-xs:hover{opacity:.85;}
-
-.btn-edit{background:#fef3c7;color:#b45309;border:1px solid #fde68a;}
-
-.btn-save{background:#dbeafe;color:#1d4ed8;border:1px solid #bfdbfe;}
-
-.btn-del{background:#fee2e2;color:#b91c1c;border:1px solid #fecaca;}
-
-.btn-primary{background:#1e3a5f;color:#fff;padding:7px 14px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer;border:none;display:inline-flex;align-items:center;gap:5px;transition:opacity .15s;}
-
-.btn-primary:hover{opacity:.9;}
-
-.btn-green{background:#16a34a;color:#fff;padding:7px 14px;border-radius:3px;font-size:12px;font-weight:600;cursor:pointer;border:none;transition:opacity .15s;}
-
-.btn-green:hover{opacity:.9;}
-
-
-/* ── Summary ── */
-
-.summary-table{width:100%;font-size:12px;border-collapse:collapse;}
-
-.summary-table tr td{padding:5px 6px;border-bottom:1px solid #f1f5f9;color:#475569;}
-
-.summary-table tr td:last-child{text-align:right;font-weight:600;color:#1e293b;}
-
-.summary-table .total-row td{border-top:2px solid #c9d4e0;font-size:14px;font-weight:700;color:#1e3a5f;padding-top:8px;}
-
-.status-row{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:3px 0;color:#64748b;}
-
-.alert-ok{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:3px;padding:7px 10px;font-size:12px;color:#15803d;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
-
-.alert-warn{background:#fef3c7;border:1px solid #fde68a;border-radius:3px;padding:7px 10px;font-size:12px;color:#b45309;margin-bottom:8px;display:flex;align-items:center;gap:6px;}
-
-hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
-
-
-/* ── Modal cámara ── */
-
-@keyframes scanAnim{
-
-0% { top:0; }
-
-50% { top:calc(100% - 2px); }
-
-100%{ top:0; }
-
-}
-
+.et-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:1001;align-items:center;justify-content:center;padding:16px;}
+.et-overlay.open{display:flex;}
+.et-modal{background:#fff;border:1px solid #000;padding:22px 18px;width:300px;max-width:100%;text-align:center;}
+.et-label{display:flex;flex-direction:column;align-items:center;gap:6px;color:#000;}
+.et-nombre{font-size:14px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;}
+.et-cpc{font-size:11px;}
+.et-info{margin-top:6px;font-size:11px;line-height:1.7;text-align:center;}
+.et-actions{margin-top:16px;display:flex;gap:8px;justify-content:center;}
 </style>
-
-
-{{-- ── ERP Top Bar ── --}}
-
-<div class="erp-bar">
-
-<div class="erp-bar-title">DISTHAN · Sistema ERP</div>
-
-<div style="display:flex;align-items:center;gap:12px;">
-
-<span class="erp-breadcrumb">Ventas › Órdenes › Pedido Local</span>
-
-<span class="erp-user">👤 {{ auth()->user()->name ?? 'Operador' }}</span>
-
-</div>
-
-</div>
-
 
 <div class="pg">
 
-
-@if(session('success'))
-
-<div class="alert-ok" style="margin-bottom:.85rem;">✅ {{ session('success') }}</div>
-
-@endif
-
-
+{{-- ── Header ── --}}
 @php
+    $estadoColor = $order->estado === 'COMPLETO' ? '#15803d'
+        : ($order->estado === 'PARCIAL' ? '#b45309' : '#b91c1c');
+    $totalItems = $order->details->count();
+    $completados = $order->details->where('estado_item','COMPLETO')->count();
+    $faltantes = $totalItems - $completados;
+    $porcentaje = $totalItems > 0 ? round(($completados / $totalItems) * 100) : 0;
+    $progColor = $porcentaje === 100 ? '#22c55e' : ($porcentaje > 40 ? '#f59e0b' : '#ef4444');
 
-$totalItems = $order->details->count();
+    // ── Preparar datos de paletas para el mapa ──────────────────────────
+    $paletas = $order->details
+        ->filter(fn($d) => !empty($d->paleta))
+        ->groupBy('paleta')
+        ->sortKeys();
 
-$completados = $order->details->filter(fn($i) => $i->cantidad_despachada >= $i->cantidad_solicitada && $i->cantidad_solicitada > 0)->count();
+    $sinPaleta = $order->details->filter(fn($d) => empty($d->paleta));
 
-$parciales = $order->details->filter(fn($i) => $i->cantidad_despachada > 0 && $i->cantidad_despachada < $i->cantidad_solicitada)->count();
-
-$pendientes = $order->details->filter(fn($i) => $i->cantidad_despachada == 0)->count();
-
-$estadoColor = $order->estado === 'COMPLETO' ? '#15803d' : ($order->estado === 'PARCIAL' ? '#b45309' : '#b91c1c');
-
-$estadoBg = $order->estado === 'COMPLETO' ? '#dcfce7' : ($order->estado === 'PARCIAL' ? '#fef3c7' : '#fee2e2');
-
+    // ── Límite de ítems por paleta ──────────────────────────────────────
+    $paletaMax = 10;
+    $paletaCounts = $paletas->map->count();
 @endphp
 
-
-{{-- ── Order Header ── --}}
-
-<div class="order-header">
-
-<div>
-
-<div class="order-id">🏪 Pedido Local — {{ $order->numero_orden }}</div>
-
-<div class="order-sub">
-
-Cliente: {{ $order->client->razon_social ?? '—' }}
-
-&nbsp;·&nbsp; Fecha: {{ \Carbon\Carbon::parse($order->fecha_pedido ?? now())->format('d M Y') }}
-
-&nbsp;·&nbsp; Tipo: LOCAL
-
+<div class="top-hdr">
+    <div class="hdr-left">
+        <h1>📋 {{ $order->numero_orden }}</h1>
+        <p>{{ $order->client?->razon_social }}</p>
+    </div>
+    <div class="hdr-right">
+        <span class="badge-estado" style="background:{{ $estadoColor }};">{{ $order->estado }}</span>
+        <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="btn btn-green">📄 Ver PDF</a>
+        <a href="{{ route('orders.pdf',$order) }}" class="btn btn-blue">⬇ Descargar</a>
+    </div>
 </div>
-
-</div>
-
-<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-
-<span class="status-chip" style="background:{{ $estadoBg }};color:{{ $estadoColor }};">
-
-{{ $order->estado }}
-
-</span>
-
-<a href="{{ route('orders.pdf',$order) }}" target="_blank" class="btn-green">📄 PDF</a>
-
-</div>
-
-</div>
-
 
 {{-- ── KPIs ── --}}
-
 <div class="kpis">
-
-<div class="kpi" style="border-left-color:#1e3a5f;">
-
-<div class="kpi-label">Productos</div>
-
-<div class="kpi-val">{{ $totalItems }}</div>
-
-<div class="kpi-sub">líneas de pedido</div>
-
+    <div class="kpi">
+        <div class="kpi-icon" style="background:#eff6ff;color:#2563eb;">🗂</div>
+        <div><div class="kpi-label">Productos</div><div class="kpi-val">{{ $totalItems }}</div></div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icon" style="background:#dcfce7;color:#15803d;">✅</div>
+        <div><div class="kpi-label">Completados</div><div class="kpi-val" style="color:#15803d;">{{ $completados }}</div></div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icon" style="background:#fee2e2;color:#b91c1c;">⚠️</div>
+        <div><div class="kpi-label">Faltantes</div><div class="kpi-val" style="color:#b91c1c;">{{ $faltantes }}</div></div>
+    </div>
+    <div class="kpi">
+        <div class="kpi-icon" style="background:#dcfce7;color:#15803d;">💰</div>
+        <div><div class="kpi-label">Total</div><div class="kpi-val" style="font-size:14px;color:#15803d;">S/ {{ number_format($order->total,2) }}</div></div>
+    </div>
 </div>
-
-<div class="kpi" style="border-left-color:#22c55e;">
-
-<div class="kpi-label">Completos</div>
-
-<div class="kpi-val" style="color:#15803d;">{{ $completados }}</div>
-
-<div class="kpi-sub">ítems OK</div>
-
-</div>
-
-<div class="kpi" style="border-left-color:#ef4444;">
-
-<div class="kpi-label">Pendientes</div>
-
-<div class="kpi-val" style="color:#b91c1c;">{{ $pendientes }}</div>
-
-<div class="kpi-sub">sin despachar</div>
-
-</div>
-
-<div class="kpi" style="border-left-color:#2563eb;">
-
-<div class="kpi-label">Subtotal</div>
-
-<div class="kpi-val" style="font-size:14px;color:#2563eb;">S/ {{ number_format($order->subtotal,2) }}</div>
-
-<div class="kpi-sub">sin IGV</div>
-
-</div>
-
-<div class="kpi" style="border-left-color:#1e3a5f;background:#f0f7ff;">
-
-<div class="kpi-label">Total</div>
-
-<div class="kpi-val" style="font-size:14px;color:#1e3a5f;">S/ {{ number_format($order->total,2) }}</div>
-
-<div class="kpi-sub">con IGV 18%</div>
-
-</div>
-
-</div>
-
 
 {{-- ── Layout ── --}}
+<div class="main-layout">
+    <div class="left-col">
 
-<div class="layout">
+        {{-- Scanner --}}
+        <div class="scanner-card">
+            <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 1.5s infinite;"></div>
+            <div style="flex:1;">
+                <div class="scanner-label">📡 Escanear código de barras</div>
+                <input type="text" id="scanner" class="scanner-input" placeholder="Escanea o escribe el código...">
+            </div>
+            <div style="font-size:10px;color:#475569;text-align:right;white-space:nowrap;">Enter para<br>confirmar</div>
+        </div>
 
+        {{-- Importar CSV --}}
+        <div class="section-card">
+            <div class="sec-title">📄 Importar pedido CSV</div>
+            <form action="{{ route('orders.import',$order) }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="import-row">
+                    <label class="file-label">
+                        📎 Seleccionar archivo .csv
+                        <input type="file" name="archivo" accept=".csv" required style="display:none;">
+                    </label>
+                    <button type="submit" class="btn btn-green">Importar</button>
+                </div>
+            </form>
+        </div>
 
-{{-- ── Columna izquierda ── --}}
+        {{-- Agregar producto --}}
+        <div class="section-card">
+            <div class="sec-title">➕ Agregar producto</div>
+            <form method="POST" action="{{ route('orders.addProduct',$order) }}">
+                @csrf
+                <div class="add-grid">
+                    <div>
+                        <label class="flabel">Producto</label>
+                        <select name="product_id" class="finput" required>
+                            <option value="">Seleccionar producto</option>
+                            @foreach($products as $product)
+                                <option value="{{ $product->id }}">{{ $product->nombre }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div>
+                        <label class="flabel">Cantidad</label>
+                        <input type="number" name="cantidad_solicitada" class="finput" placeholder="0" required>
+                    </div>
+                    <div>
+                        <label class="flabel">Precio</label>
+                        <input type="number" step="0.01" name="precio_unitario" class="finput" placeholder="0.00" required>
+                    </div>
+                    <button type="submit" class="btn btn-red" style="align-self:end;">Agregar</button>
+                </div>
+            </form>
+        </div>
 
-<div class="left-col">
+        {{-- Productos --}}
+        <div class="products-grid">
+            @foreach($order->details as $detail)
+                @php
+                    $s = $detail->estado_item;
+                    $bc = $s === 'COMPLETO' ? '#22c55e' : ($s === 'PARCIAL' ? '#f59e0b' : '#ef4444');
+                    $sc = $s === 'COMPLETO' ? '#15803d' : ($s === 'PARCIAL' ? '#b45309' : '#b91c1c');
+                    $bg = $s === 'COMPLETO' ? '#dcfce7' : ($s === 'PARCIAL' ? '#fef3c7' : '#fee2e2');
+                    $badgeCls = $s === 'COMPLETO' ? 'bc' : ($s === 'PARCIAL' ? 'bp' : 'bi');
+                    $pct = $detail->cantidad_solicitada > 0
+                        ? round(($detail->cantidad_despachada / $detail->cantidad_solicitada) * 100)
+                        : 0;
+                @endphp
 
+                <div class="prod-card"
+                    id="producto-{{ $detail->product->barcode }}"
+                    data-barcode="{{ $detail->product->barcode }}"
+                    data-box-barcode="{{ $detail->product->box_barcode }}">
+                    <div class="prod-top">
+                        <div>
+                            <div class="prod-name">📦 {{ $detail->product->nombre }}</div>
+                            <div class="prod-sku">SKU: {{ $detail->product->sku }}</div>
+                        </div>
+                        <span class="prod-badge {{ $badgeCls }}">{{ $s }}</span>
+                    </div>
+                    @php
+                        $cpc = $detail->product->cantidad_por_caja ?? 1;
+                        $cajasDesp = $cpc > 0 ? floor($detail->cantidad_despachada / $cpc) : 0;
+                        $cajasSol = $cpc > 0 ? ceil($detail->cantidad_solicitada / $cpc) : 0;
+                        $unidSueltas = $cpc > 0 ? ($detail->cantidad_despachada % $cpc) : 0;
+                    @endphp
+                    <div class="info-strip" style="grid-template-columns:1fr 1fr;">
+                        <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
+                        <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
 
-{{-- ── Scanner ── --}}
+                        {{-- Cajas solicitadas --}}
+                        <div class="info-item" style="grid-column:1/-1;">
+                            🗃 Cajas solicitadas:
+                            <span class="info-val" style="color:#2563eb;">
+                                {{ $cajasSol }} caja{{ $cajasSol !== 1 ? 's' : '' }}
+                            </span>
+                            <span style="font-size:10px;color:#94a3b8;margin-left:3px;">
+                                ({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)
+                            </span>
+                        </div>
 
-<div class="scanner-erp">
+                        {{-- Cajas despachadas --}}
+                        <div class="info-item" style="grid-column:1/-1;">
+                            ✅ Cajas despachadas:
+                            <span class="info-val" style="color:{{ $bc }};">
+                                {{ $cajasDesp }} caja{{ $cajasDesp !== 1 ? 's' : '' }}
+                            </span>
+                            @if($unidSueltas > 0)
+                                <span style="font-size:10px;color:#f59e0b;margin-left:3px;">
+                                    + {{ $unidSueltas }} u. sueltas
+                                </span>
+                            @endif
+                        </div>
 
-<div class="scan-led"></div>
-
-<input type="text" id="scanner" class="scan-input"
-
-placeholder="Escanea o escribe código de barras">
-
-<span style="font-size:10px;color:#475569;white-space:nowrap;flex-shrink:0;">⏎ Enter</span>
-
-<button type="button" id="btnCamara" onclick="abrirCamara()"
-
-style="display:none;background:#1e3a5f;border:1px solid #334155;color:#7eb8f7;border-radius:4px;padding:6px 10px;cursor:pointer;font-size:13px;white-space:nowrap;flex-shrink:0;">
-
-📷 Cámara
-
+                        {{-- Barra de progreso --}}
+                        <div class="info-item" style="grid-column:1/-1;gap:6px;">
+                            <span style="font-size:10px;color:#94a3b8;white-space:nowrap;">Despacho:</span>
+                            <div class="prog-mini" style="flex:1;">
+                                <div class="prog-mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div>
+                            </div>
+                            <span style="font-size:10px;font-weight:700;color:{{ $sc }};margin-left:2px;">{{ $pct }}%</span>
+                        </div>
+                    </div>
+                    <form method="POST" action="{{ route('orders.updateDetail',$detail) }}"
+                        data-detail-form
+                        data-original-paleta="{{ $detail->paleta }}">
+                        @csrf @method('PUT')
+                        <div class="fields-box">
+                            <div class="field-row">
+                                <div><label class="flabel">Solicitado</label>
+                                    <input type="number" step="0.01" name="cantidad_solicitada" class="finput" value="{{ $detail->cantidad_solicitada }}"></div>
+                                <div><label class="flabel">Despachado</label>
+                                    <input type="number" step="0.01" name="cantidad_despachada" id="despachado-{{ $detail->product->barcode }}" class="finput" value="{{ $detail->cantidad_despachada }}"></div>
+                            </div>
+                            <div><label class="flabel">Precio</label>
+                                <input type="number" step="0.01" name="precio_unitario" class="finput" value="{{ $detail->precio_unitario }}"></div>
+                            <hr class="dv">
+                            <div><label class="flabel">Vencimiento</label>
+                                <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}"></div>
+                        </div>
+                        <div style="margin-top:7px;">
+                            <label class="flabel">Paleta</label>
+                            <input type="text" name="paleta" class="paleta-input"
+                                value="{{ $detail->paleta }}" placeholder="P01"
+                                oninput="this.value=this.value.toUpperCase()">
+                        </div>
+                        <div class="subtotal-row" style="margin-top:7px;">
+                            <span style="font-size:11px;color:#64748b;">Subtotal</span>
+                            <span class="subtotal-val">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</span>
+                        </div>
+                        <div class="btn-row-prod" style="margin-top:7px;">
+                            <button type="submit" class="btn btn-blue" style="width:100%;">💾 Guardar</button>
+                        </div>
+                    </form>
+                    <button type="button" class="btn btn-gray" style="width:100%;margin-top:4px;"
+                        onclick="abrirEtiqueta({
+                            detailId: {{ $detail->id }},
+                            nombre: {{ Js::from($detail->product->nombre) }},
+                            cantidadPorCaja: {{ (int) ($detail->product->cantidad_por_caja ?? 1) }},
+                            codigo: {{ Js::from(
+                                in_array(strtoupper(trim($order->client->razon_social ?? '')), [
+                                    'HIPERMERCADOS TOTTUS ORIENTE SAC',
+                                    'HIPERMERCADOS TOTTUS S.A',
+                                ], true)
+                                    ? ($detail->product->barcode ?? '')
+                                    : ($detail->product->box_barcode ?? '')
+                            ) }},
+                            lote: {{ Js::from($detail->lote ?? '') }},
+                            fecha: {{ Js::from($detail->fecha_vencimiento
+                                ? \Carbon\Carbon::parse($detail->fecha_vencimiento)->format('d/m/Y')
+                                : ($detail->product->fecha_vencimiento
+                                    ? \Carbon\Carbon::parse($detail->product->fecha_vencimiento)->format('d/m/Y')
+                                    : '')) }},
+                            cantidadDespachada: {{ (float) $detail->cantidad_despachada }}
+                        })">
+    🏷️ Generar etiqueta
 </button>
+                    <form method="POST" action="{{ route('orders.details.destroy',$detail) }}"
+                        onsubmit="return confirm('¿Eliminar {{ $detail->product->nombre }}?')">
+                        @csrf @method('DELETE')
+                        <button type="submit" class="btn btn-red" style="width:100%;margin-top:4px;">🗑 Eliminar</button>
+                    </form>
+                </div>
+            @endforeach
+        </div>
 
+    </div>{{-- /.left-col --}}
+
+    {{-- ── Right col ── --}}
+    <div class="right-col">
+
+        {{-- ══════════════════════════════════════════
+             MAPA DE PALETAS
+        ══════════════════════════════════════════ --}}
+        <div class="paleta-map-card">
+            <div class="paleta-map-header">
+                <div class="paleta-map-title">
+                    🪵 Mapa de paletas
+                    <span style="background:#1e293b;color:#94a3b8;font-size:10px;padding:2px 8px;border-radius:99px;">
+                        {{ $paletas->count() }} paleta{{ $paletas->count() !== 1 ? 's' : '' }}
+                    </span>
+                </div>
+                <span style="font-size:10px;color:#475569;">Clic para ver detalle</span>
+            </div>
+
+            <div class="paleta-map-body">
+
+                @if($paletas->isEmpty() && $sinPaleta->isEmpty())
+                    <div style="text-align:center;padding:24px 0;color:#94a3b8;font-size:12px;">
+                        <div style="font-size:28px;margin-bottom:6px;">🪵</div>
+                        Sin paletas asignadas aún
+                    </div>
+                @else
+
+                    <div class="paleta-map-grid">
+                        @foreach($paletas as $nombrePaleta => $items)
+                            @php
+                                $totUds = $items->sum('cantidad_solicitada');
+                                $despUds = $items->sum('cantidad_despachada');
+                                $pesoKg = $items->sum(fn($i) => ($i->product->peso ?? 0) * $i->cantidad_solicitada / 1000);
+                                $pctP = $totUds > 0 ? round(($despUds / $totUds) * 100) : 0;
+                                $todoC = $items->every(fn($i) => $i->estado_item === 'COMPLETO');
+                                $algunP = $items->contains(fn($i) => $i->estado_item === 'PARCIAL');
+                                $estClass = $todoC ? 'estado-completo' : ($algunP ? 'estado-parcial' : 'estado-incompleto');
+                                $pctColor = $todoC ? '#15803d' : ($algunP ? '#b45309' : '#b91c1c');
+                                $fillColor= $todoC ? '#22c55e' : ($algunP ? '#f59e0b' : '#ef4444');
+                                $icon = $todoC ? '✅' : ($algunP ? '⏳' : '⚠️');
+                                $llena = $items->count() >= $paletaMax;
+
+                                // Serializar items para el modal
+                                $itemsJson = $items->map(fn($i) => [
+                                    'nombre' => $i->product->nombre ?? 'Producto',
+                                    'sku' => $i->product->sku ?? '',
+                                    'solicitada' => $i->cantidad_solicitada,
+                                    'despachada' => $i->cantidad_despachada,
+                                    'estado' => $i->estado_item,
+                                    'precio' => $i->precio_unitario,
+                                    'subtotal' => $i->subtotal,
+                                    'peso' => number_format(($i->product->peso ?? 0) / 1000, 3),
+                                    'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,
+                                    'barcode' => $i->product->barcode,
+                                    'box_barcode' => $i->product->box_barcode,
+                                ])->values()->toJson();
+                            @endphp
+
+                            <div class="paleta-box {{ $estClass }} {{ $llena ? 'paleta-llena' : '' }}"
+                                onclick="abrirPaleta({{ json_encode($nombrePaleta) }}, {{ $items->count() }}, {{ $totUds }}, {{ $despUds }}, {{ round($pesoKg,1) }}, {{ $pctP }}, {{ json_encode($fillColor) }}, {{ $itemsJson }})">
+                                @if($llena)
+                                    <span class="paleta-box-full-badge">LLENA</span>
+                                @endif
+                                <div class="paleta-box-icon">🪵</div>
+                                <div class="paleta-box-name">{{ $nombrePaleta }}</div>
+                                <div class="paleta-box-items">{{ $items->count() }}/{{ $paletaMax }} ítem{{ $items->count() > 1 ? 's' : '' }}</div>
+                                <div class="paleta-box-pct" style="color:{{ $pctColor }};">{{ $icon }} {{ $pctP }}%</div>
+                                <div class="paleta-box-bar">
+                                    <div class="paleta-box-fill" style="width:{{ $pctP }}%;background:{{ $fillColor }}"></div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+
+                    {{-- Sin paleta --}}
+                    @if($sinPaleta->count())
+                        @php
+                            $spJson = $sinPaleta->map(fn($i) => [
+                                'nombre' => $i->product->nombre ?? 'Producto',
+                                'sku' => $i->product->sku ?? '',
+                                'solicitada' => $i->cantidad_solicitada,
+                                'despachada' => $i->cantidad_despachada,
+                                'estado' => $i->estado_item,
+                                'precio' => $i->precio_unitario,
+                                'subtotal' => $i->subtotal,
+                                'peso' => number_format(($i->product->peso ?? 0) / 1000, 3),
+                                'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,
+                                'barcode' => $i->product->barcode,
+                                'box_barcode' => $i->product->box_barcode,
+                            ])->values()->toJson();
+                        @endphp
+                        <div class="no-paleta-chip"
+                            onclick="abrirPaleta('Sin paleta', {{ $sinPaleta->count() }}, {{ $sinPaleta->sum('cantidad_solicitada') }}, {{ $sinPaleta->sum('cantidad_despachada') }}, 0, 0, '#94a3b8', {{ $spJson }})">
+                            <span>⚠️ Sin paleta asignada</span>
+                            <span style="font-weight:700;">{{ $sinPaleta->count() }} ítem{{ $sinPaleta->count() > 1 ? 's' : '' }} →</span>
+                        </div>
+                    @endif
+
+                @endif
+            </div>
+        </div>
+
+        {{-- Resumen financiero --}}
+        <div class="resumen-card">
+            <div class="sec-title">📊 Resumen</div>
+            <hr class="dv" style="margin-bottom:8px;">
+            <div class="resumen-row"><span>Productos</span><span class="resumen-val">{{ $order->details->count() }}</span></div>
+            <div class="resumen-row"><span>Subtotal</span><span class="resumen-val">S/ {{ number_format($order->subtotal,2) }}</span></div>
+            <div class="resumen-row"><span>IGV (18%)</span><span class="resumen-val">S/ {{ number_format($order->igv,2) }}</span></div>
+            <div class="resumen-total-row">
+                <span style="font-size:14px;font-weight:700;color:#0f172a;">Total</span>
+                <span style="font-size:18px;font-weight:700;color:#15803d;">S/ {{ number_format($order->total,2) }}</span>
+            </div>
+        </div>
+
+        {{-- Progreso --}}
+        <div class="resumen-card">
+            <div class="sec-title">📈 Progreso de despacho</div>
+            <div class="prog-resumen">
+                <div class="prog-label"><span>Completado</span><span style="font-weight:700;color:{{ $progColor }};">{{ $porcentaje }}%</span></div>
+                <div class="prog-bar"><div class="prog-fill" style="width:{{ $porcentaje }}%;background:{{ $progColor }};"></div></div>
+                <div style="font-size:10px;color:#94a3b8;margin-top:3px;">{{ $completados }} de {{ $totalItems }} productos</div>
+            </div>
+            <hr class="dv" style="margin:8px 0;">
+            @php
+                $parciales2 = $order->details->where('estado_item','PARCIAL')->count();
+                $incompletos2 = $order->details->where('estado_item','INCOMPLETO')->count();
+            @endphp
+            <div class="legend">
+                <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#22c55e;"></span><span style="font-size:12px;color:#64748b;">Completo</span></div><span style="font-size:12px;font-weight:700;color:#15803d;">{{ $completados }}</span></div>
+                <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#f59e0b;"></span><span style="font-size:12px;color:#64748b;">Parcial</span></div><span style="font-size:12px;font-weight:700;color:#b45309;">{{ $parciales2 }}</span></div>
+                <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#ef4444;"></span><span style="font-size:12px;color:#64748b;">Incompleto</span></div><span style="font-size:12px;font-weight:700;color:#b91c1c;">{{ $incompletos2 }}</span></div>
+            </div>
+        </div>
+
+        {{-- Info orden --}}
+        <div class="resumen-card">
+            <div class="sec-title">ℹ️ Info de la orden</div>
+            <div class="resumen-row"><span>Fecha</span><span class="resumen-val">{{ \Carbon\Carbon::parse($order->fecha_pedido)->format('d M Y') }}</span></div>
+            <div class="resumen-row"><span>Tipo</span><span class="resumen-val">{{ $order->tipo_orden }}</span></div>
+            <div class="resumen-row"><span>Cliente</span><span class="resumen-val" style="font-size:11px;max-width:140px;text-align:right;">{{ $order->client?->razon_social }}</span></div>
+            <div class="resumen-row"><span>Estado</span><span style="font-size:11px;font-weight:700;color:{{ $estadoColor }};">{{ $order->estado }}</span></div>
+        </div>
+
+    </div>{{-- /.right-col --}}
+</div>{{-- /.main-layout --}}
+</div>{{-- /.pg --}}
+
+{{-- ══════════════════════════════
+     MODAL DETALLE DE PALETA
+══════════════════════════════ --}}
+<div class="pm-overlay" id="pmOverlay" onclick="cerrarPaleta(event)">
+    <div class="pm-modal">
+        <div class="pm-header">
+            <div>
+                <div class="pm-title" id="pmTitle"></div>
+                <div class="pm-sub" id="pmSub"></div>
+            </div>
+            <button class="pm-close" onclick="document.getElementById('pmOverlay').classList.remove('open')">✕</button>
+        </div>
+        <div class="pm-body">
+
+            {{-- Mini KPIs --}}
+            <div class="pm-kpis">
+                <div class="pm-kpi">
+                    <div class="pm-kpi-label">Ítems</div>
+                    <div class="pm-kpi-val" id="pmItems"></div>
+                </div>
+                <div class="pm-kpi">
+                    <div class="pm-kpi-label">Unidades</div>
+                    <div class="pm-kpi-val" id="pmUds"></div>
+                </div>
+                <div class="pm-kpi">
+                    <div class="pm-kpi-label">Peso total</div>
+                    <div class="pm-kpi-val" id="pmPeso"></div>
+                </div>
+            </div>
+
+            {{-- Progreso --}}
+            <div class="pm-prog-wrap">
+                <div class="pm-prog-hdr">
+                    <span>Progreso de despacho</span>
+                    <span id="pmPct" style="font-weight:700;"></span>
+                </div>
+                <div class="pm-prog-bar">
+                    <div class="pm-prog-fill" id="pmProgFill"></div>
+                </div>
+                <div style="font-size:10px;color:#94a3b8;margin-top:3px;" id="pmProgSub"></div>
+            </div>
+
+            {{-- Lista de productos --}}
+            <div style="font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.05em;margin-bottom:8px;">Productos en esta paleta</div>
+            <div id="pmItemsList"></div>
+
+        </div>
+    </div>
 </div>
 
-
-{{-- ── Agregar producto ── --}}
-
-<div class="panel">
-
-<div class="panel-header">
-
-<div class="panel-title">➕ Agregar línea de producto</div>
-
+{{-- ══════════════════════════════
+     MODAL ETIQUETA DE PRODUCTO
+══════════════════════════════ --}}
+<div class="et-overlay" id="etOverlay" onclick="cerrarEtiqueta(event)">
+    <div class="et-modal" onclick="event.stopPropagation()">
+        <div class="et-label" id="etLabel">
+            <div class="et-nombre" id="etNombre"></div>
+            <div class="et-cpc" id="etCpc"></div>
+            <svg id="etBarcode"></svg>
+            <div class="et-info">
+                <div>Lote: <span id="etLote"></span></div>
+                <div>Fecha: <span id="etFecha"></span></div>
+                <div>Cajas: <span id="etCajas"></span></div>
+                <div>Unidades: <span id="etUnidades"></span></div>
+            </div>
+        </div>
+        <div class="et-actions" data-etiqueta-url-template="{{ route('orders.details.etiqueta', ['item' => '__ID__']) }}">
+            <a id="etPdfLink" href="#" target="_blank" class="btn btn-gray">🖨 Generar PDF</a>
+            <button type="button" class="btn btn-gray" onclick="document.getElementById('etOverlay').classList.remove('open')">Cerrar</button>
+        </div>
+    </div>
 </div>
 
-<div class="panel-body">
-
-<form method="POST" action="{{ route('orders.addProduct',$order) }}">
-
-@csrf
-
-<div class="add-grid">
-
-<div>
-
-<label class="flabel">Producto</label>
-
-<select name="product_id" class="finput" required>
-
-<option value="">Seleccionar producto</option>
-
-@foreach($products as $p)
-
-<option value="{{ $p->id }}">{{ $p->nombre }} (Stock: {{ $p->stock }})</option>
-
-@endforeach
-
-</select>
-
-</div>
-
-<div>
-
-<label class="flabel">Cantidad</label>
-
-<input type="number" name="cantidad_solicitada" class="finput" placeholder="0" required>
-
-</div>
-
-<div>
-
-<label class="flabel">Precio unit.</label>
-
-<input type="number" step="0.01" name="precio_unitario" class="finput" placeholder="0.00" required>
-
-</div>
-
-<button type="submit" class="btn-primary" style="align-self:end;">+ Agregar</button>
-
-</div>
-
-</form>
-
-</div>
-
-</div>
-
-
-{{-- ── Tabla ERP de productos ── --}}
-
-<div class="panel">
-
-<div class="panel-header">
-
-<div class="panel-title">📦 Líneas del pedido</div>
-
-<span style="font-size:10px;color:#94a3b8;">{{ $totalItems }} registro(s)</span>
-
-</div>
-
-
-<div class="scroll-hint-mobile">← desliza horizontalmente →</div>
-
-
-<div style="overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;">
-
-<table class="erp-table">
-
-<thead>
-
-<tr>
-
-<th>Est.</th>
-
-<th>Producto</th>
-
-<th>SKU</th>
-
-<th style="text-align:center;">Solicitado</th>
-
-<th style="text-align:center;">Despachado</th>
-
-<th style="text-align:center;">Precio</th>
-
-<th style="text-align:right;">Subtotal</th>
-
-<th style="text-align:center;">Prog.</th>
-
-<th>Acciones</th>
-
-</tr>
-
-</thead>
-
-<tbody>
-
-
-@foreach($order->details as $item)
-
-@php
-
-$pct = $item->cantidad_solicitada > 0
-
-? ($item->cantidad_despachada / $item->cantidad_solicitada) * 100 : 0;
-
-$lc = $pct >= 100 ? '#22c55e' : ($pct > 0 ? '#f59e0b' : '#ef4444');
-
-$montoColor = $pct >= 100 ? '#15803d' : ($pct > 0 ? '#b45309' : '#b91c1c');
-
-@endphp
-
-
-{{-- ✅ FIX: form FUERA del tr, referenciado con form="form-X" en los inputs --}}
-
-<form method="POST"
-
-action="{{ route('orders.updateDetail',$item) }}"
-
-id="form-{{ $item->id }}"
-
-style="display:none;">
-
-@csrf @method('PUT')
-
-<input type="hidden" name="cantidad_solicitada" id="hid-sol-{{ $item->id }}" value="{{ $item->cantidad_solicitada }}">
-
-<input type="hidden" name="cantidad_despachada" id="hid-des-{{ $item->id }}" value="{{ $item->cantidad_despachada }}">
-
-<input type="hidden" name="precio_unitario" id="hid-pre-{{ $item->id }}" value="{{ $item->precio_unitario }}">
-
-</form>
-
-
-<tr id="row-{{ $item->id }}">
-
-<td><span class="state-dot" style="background:{{ $lc }};"></span></td>
-
-<td style="font-weight:600;color:#0f172a;">{{ $item->product->nombre }}</td>
-
-<td style="color:#94a3b8;font-size:11px;">{{ $item->product->sku ?? '—' }}</td>
-
-<td style="text-align:center;">
-
-<input type="number" step="0.01"
-
-class="num-input" id="sol-{{ $item->id }}"
-
-value="{{ $item->cantidad_solicitada }}"
-
-disabled
-
-oninput="syncHidden({{ $item->id }})">
-
-</td>
-
-<td style="text-align:center;">
-
-<input type="number" step="0.01"
-
-class="num-input" id="des-{{ $item->id }}"
-
-value="{{ $item->cantidad_despachada }}"
-
-disabled
-
-oninput="syncHidden({{ $item->id }})">
-
-</td>
-
-<td style="text-align:center;">
-
-<input type="number" step="0.01"
-
-class="num-input" id="pre-{{ $item->id }}"
-
-value="{{ $item->precio_unitario }}"
-
-disabled
-
-oninput="syncHidden({{ $item->id }})">
-
-</td>
-
-<td style="text-align:right;font-weight:700;color:{{ $montoColor }};">
-
-S/ {{ number_format($item->subtotal ?? ($item->cantidad_despachada * $item->precio_unitario),2) }}
-
-</td>
-
-<td style="text-align:center;">
-
-<div class="mini-bar">
-
-<div class="mini-fill" style="width:{{ min($pct,100) }}%;background:{{ $lc }};"></div>
-
-</div>
-
-<div style="font-size:10px;font-weight:700;color:{{ $lc }};">{{ number_format($pct,0) }}%</div>
-
-</td>
-
-<td>
-
-<div style="display:flex;gap:4px;flex-wrap:wrap;">
-
-<button type="button" class="btn-xs btn-edit"
-
-onclick="editar({{ $item->id }})">✏️ Editar</button>
-
-<button type="submit" form="form-{{ $item->id }}"
-
-class="btn-xs btn-save"
-
-id="btn-save-{{ $item->id }}"
-
-style="display:none;">💾 Guardar</button>
-
-<form method="POST"
-
-action="{{ route('orders.details.destroy',$item) }}"
-
-onsubmit="return confirm('¿Eliminar {{ addslashes($item->product->nombre) }}?')"
-
-style="display:inline;">
-
-@csrf @method('DELETE')
-
-<button type="submit" class="btn-xs btn-del">🗑</button>
-
-</form>
-
-</div>
-
-</td>
-
-</tr>
-
-
-@endforeach
-
-
-</tbody>
-
-</table>
-
-</div>
-
-</div>
-
-
-</div>{{-- fin left-col --}}
-
-
-{{-- ── Columna derecha: Resumen ── --}}
-
-<div>
-
-<div class="panel" style="position:sticky;top:10px;">
-
-<div class="panel-header">
-
-<div class="panel-title">📊 Resumen del pedido</div>
-
-</div>
-
-<div class="panel-body">
-
-
-@if($completados === $totalItems && $totalItems > 0)
-
-<div class="alert-ok">✅ Todos los ítems completos</div>
-
-@else
-
-<div class="alert-warn">⏳ {{ $completados }} de {{ $totalItems }} ítems completos</div>
-
-@endif
-
-
-<table class="summary-table">
-
-<tr><td>Nº Orden</td><td>{{ $order->numero_orden }}</td></tr>
-
-<tr><td>Tipo</td><td>LOCAL</td></tr>
-
-<tr><td>Fecha</td><td>{{ \Carbon\Carbon::parse($order->fecha_pedido ?? now())->format('d M Y') }}</td></tr>
-
-<tr><td>Cliente</td><td style="font-size:11px;">{{ $order->client->razon_social ?? '—' }}</td></tr>
-
-<tr><td>Productos</td><td>{{ $totalItems }}</td></tr>
-
-</table>
-
-
-<hr class="dv">
-
-
-<table class="summary-table">
-
-<tr><td>Subtotal</td><td>S/ {{ number_format($order->subtotal,2) }}</td></tr>
-
-<tr><td>IGV (18%)</td><td>S/ {{ number_format($order->igv,2) }}</td></tr>
-
-<tr class="total-row"><td>TOTAL</td><td>S/ {{ number_format($order->total,2) }}</td></tr>
-
-</table>
-
-
-<hr class="dv">
-
-
-<div style="font-size:10px;font-weight:700;color:#475569;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px;">Estado de ítems</div>
-
-<div class="status-row"><span>🟢 Completo</span><span style="font-weight:700;color:#15803d;">{{ $completados }}</span></div>
-
-<div class="status-row"><span>🟡 Parcial</span><span style="font-weight:700;color:#b45309;">{{ $parciales }}</span></div>
-
-<div class="status-row"><span>🔴 Pendiente</span><span style="font-weight:700;color:#b91c1c;">{{ $pendientes }}</span></div>
-
-
-<hr class="dv">
-
-
-<a href="{{ route('orders.pdf',$order) }}" target="_blank"
-
-class="btn-green"
-
-style="display:block;text-align:center;text-decoration:none;padding:9px;margin-bottom:6px;">
-
-📄 Ver / Descargar PDF
-
-</a>
-
-</div>
-
-</div>
-
-</div>
-
-
-</div>{{-- fin layout --}}
-
-
-{{-- ── Modal cámara ── --}}
-
-<div id="modalCamara" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:1rem;">
-
-<div style="background:#0f172a;border:1px solid #334155;border-radius:8px;width:100%;max-width:420px;overflow:hidden;">
-
-<div style="background:#1e293b;padding:.75rem 1rem;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #334155;">
-
-<div style="display:flex;align-items:center;gap:8px;">
-
-<div class="scan-led"></div>
-
-<span style="color:#7eb8f7;font-size:13px;font-weight:600;">Escáner de cámara</span>
-
-</div>
-
-<button onclick="cerrarCamara()" style="background:none;border:none;color:#94a3b8;font-size:20px;cursor:pointer;line-height:1;padding:2px 6px;">✕</button>
-
-</div>
-
-<div style="position:relative;background:#000;">
-
-<video id="videoEscan" style="width:100%;display:block;max-height:300px;object-fit:cover;" autoplay playsinline muted></video>
-
-<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
-
-<div style="width:220px;height:110px;border:2px solid #22c55e;border-radius:6px;box-shadow:0 0 0 9999px rgba(0,0,0,.45);position:relative;">
-
-<span style="position:absolute;top:-2px;left:-2px;width:18px;height:18px;border-top:3px solid #22c55e;border-left:3px solid #22c55e;border-radius:3px 0 0 0;"></span>
-
-<span style="position:absolute;top:-2px;right:-2px;width:18px;height:18px;border-top:3px solid #22c55e;border-right:3px solid #22c55e;border-radius:0 3px 0 0;"></span>
-
-<span style="position:absolute;bottom:-2px;left:-2px;width:18px;height:18px;border-bottom:3px solid #22c55e;border-left:3px solid #22c55e;border-radius:0 0 0 3px;"></span>
-
-<span style="position:absolute;bottom:-2px;right:-2px;width:18px;height:18px;border-bottom:3px solid #22c55e;border-right:3px solid #22c55e;border-radius:0 0 3px 0;"></span>
-
-<div style="position:absolute;left:0;right:0;height:2px;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:scanAnim 2s ease-in-out infinite;top:0;"></div>
-
-</div>
-
-</div>
-
-</div>
-
-<div style="padding:.75rem 1rem;border-top:1px solid #334155;">
-
-<div id="scanResultado" style="font-size:12px;color:#94a3b8;text-align:center;min-height:24px;">
-
-Apunta la cámara al código de barras
-
-</div>
-
-<select id="selectCamara" style="display:none;width:100%;margin-top:8px;padding:6px 8px;background:#1e293b;border:1px solid #334155;color:#c8daf0;border-radius:4px;font-size:12px;"></select>
-
-</div>
-
-</div>
-
-</div>
-
-
-</div>{{-- fin pg --}}
-
-
-{{-- ZXing CDN --}}
-
-<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
-
-
+<script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script>
-
-/* ============================================================
-
-ÚNICA definición de todas las funciones — sin duplicados
-
-============================================================ */
-
-
-/* ── Sync inputs visibles → hidden del form ── */
-
-function syncHidden(id) {
-
-var sol = document.getElementById('sol-' + id);
-
-var des = document.getElementById('des-' + id);
-
-var pre = document.getElementById('pre-' + id);
-
-if(sol) document.getElementById('hid-sol-' + id).value = sol.value;
-
-if(des) document.getElementById('hid-des-' + id).value = des.value;
-
-if(pre) document.getElementById('hid-pre-' + id).value = pre.value;
-
-}
-
-
-/* ── Editar fila ── */
-
-function editar(id) {
-
-document.getElementById('sol-' + id).disabled = false;
-
-document.getElementById('des-' + id).disabled = false;
-
-document.getElementById('pre-' + id).disabled = false;
-
-document.getElementById('btn-save-' + id).style.display = 'inline-flex';
-
-var des = document.getElementById('des-' + id);
-
-des.focus();
-
-des.select();
-
-}
-
-
-/* ── Scanner (teclado / lector físico) ── */
-
-document.getElementById('scanner').addEventListener('keypress', function(e) {
-
-if (e.key !== 'Enter') return;
-
-e.preventDefault();
-
-var codigo = this.value.trim();
-
-if (!codigo) return;
-
-
-fetch('/buscar-producto/' + codigo)
-
-.then(function(res){ return res.json(); })
-
-.then(function(data) {
-
-if (!data) { alert('❌ Producto no encontrado'); return; }
-
-var sel = document.querySelector('select[name="product_id"]');
-
-if (sel) {
-
-for (var o of sel.options) {
-
-if (o.value == data.id) { sel.value = data.id; break; }
-
-}
-
-}
-
-var precioInput = document.querySelector('input[name="precio_unitario"]');
-
-if (precioInput && data.precio) precioInput.value = data.precio;
-
-var cantInput = document.querySelector('input[name="cantidad_solicitada"]');
-
-if (cantInput) { cantInput.focus(); cantInput.select(); }
-
-})
-
-.catch(function() {
-
-console.warn('Error buscando producto');
-
+// ── Scanner ──────────────────────────────────────────────────────────────
+let scanner = document.getElementById('scanner');
+scanner.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter') return;
+    e.preventDefault();
+    let codigo = this.value.trim();
+    if(!codigo) return;
+    let card = document.querySelector(
+        '[data-barcode="' + codigo + '"], [data-box-barcode="' + codigo + '"]');
+    if(card){
+        card.scrollIntoView({ behavior:'smooth', block:'center' });
+        card.style.boxShadow = "0 0 0 3px #2563eb";
+        setTimeout(() => { card.style.boxShadow = ""; }, 1500);
+        let barcode = card.dataset.barcode;
+        let input = document.getElementById('despachado-' + barcode);
+        if(input){ input.focus(); input.select(); }
+        this.value = '';
+        return;
+    }
+    fetch(`/api/producto/${codigo}`)
+        .then(res => res.json())
+        .then(producto => {
+            if(!producto){ alert('Producto no encontrado'); return; }
+            let select = document.querySelector('[name=product_id]');
+            select.value = producto.id;
+            document.querySelector('[name=precio_unitario]').value = producto.precio ?? 0;
+            document.querySelector('[name=cantidad_solicitada]').focus();
+        });
+    this.value = '';
 });
 
+// ── Límite de ítems por paleta ─────────────────────────────────────────
+const paletaCounts = {!! $paletaCounts->toJson() !!};
+const PALETA_MAX = {{ $paletaMax }};
 
-this.value = '';
+document.querySelectorAll('form[data-detail-form]').forEach(form => {
+    form.addEventListener('submit', function (e) {
+        const paletaInput = form.querySelector('[name="paleta"]');
+        if (!paletaInput) return;
 
+        const nueva = paletaInput.value.trim().toUpperCase();
+        const original = (form.dataset.originalPaleta || '').trim().toUpperCase();
+
+        // Solo valida si está cambiando a una paleta distinta (o asignando una nueva)
+        if (nueva && nueva !== original) {
+            const countActual = paletaCounts[nueva] || 0;
+            if (countActual >= PALETA_MAX) {
+                e.preventDefault();
+                alert(`⚠️ La paleta ${nueva} ya tiene ${countActual} ítems (máximo ${PALETA_MAX}). No se pueden agregar más productos a esta paleta.`);
+            }
+        }
+    });
 });
 
+// ── Modal de paleta ──────────────────────────────────────────────────────
+function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, items) {
+    document.getElementById('pmTitle').textContent = '🪵 ' + nombre;
+    document.getElementById('pmSub').textContent = 'Detalle de contenido · ' + nItems + ' ítem' + (nItems !== 1 ? 's' : '');
+    document.getElementById('pmItems').textContent = nItems;
+    document.getElementById('pmUds').textContent = totUds;
+    document.getElementById('pmPeso').textContent = pesoKg + ' kg';
+    document.getElementById('pmPct').textContent = pct + '%';
+    document.getElementById('pmPct').style.color = fillColor;
+    document.getElementById('pmProgFill').style.width = pct + '%';
+    document.getElementById('pmProgFill').style.background = fillColor;
+    document.getElementById('pmProgSub').textContent = despUds + ' de ' + totUds + ' unidades despachadas';
 
-/* ── Cámara ZXing ── */
+    const estadoColors = {
+        'COMPLETO' : { bg:'#dcfce7', color:'#15803d', dot:'#22c55e' },
+        'PARCIAL' : { bg:'#fef3c7', color:'#b45309', dot:'#f59e0b' },
+        'INCOMPLETO': { bg:'#fee2e2', color:'#b91c1c', dot:'#ef4444' },
+    };
 
-var codeReader = null;
+    let html = '';
+    items.forEach(item => {
+        const ec = estadoColors[item.estado] ?? { bg:'#f1f5f9', color:'#64748b', dot:'#94a3b8' };
+        const itemPct = item.solicitada > 0 ? Math.round((item.despachada / item.solicitada) * 100) : 0;
 
-var streamActual = null;
+        // ── Cálculo de cajas ──
+        const cpc = item.cantidad_por_caja > 0 ? item.cantidad_por_caja : 1;
+        const cajasSol = Math.ceil(item.solicitada / cpc);
+        const cajasDesp = Math.floor(item.despachada / cpc);
+        const sueltas = item.despachada % cpc;
+        const cajasLabel = cajasDesp + ' / ' + cajasSol + ' caja' + (cajasSol !== 1 ? 's' : '');
+        const sueltasHtml = sueltas > 0
+            ? `<span style="font-size:10px;color:#f59e0b;margin-left:4px;">+${sueltas} u. sueltas</span>`
+            : '';
 
+        html += `
+        <div class="pm-item">
+            <div class="pm-item-dot" style="background:${ec.dot};"></div>
+            <div class="pm-item-name">
+                <div style="font-weight:600;">${item.nombre}</div>
+                <div style="font-size:10px;color:#94a3b8;">
+                    ${item.sku ? 'SKU: '+item.sku+' · ' : ''}${item.peso} kg · S/ ${parseFloat(item.precio).toFixed(2)}
+                </div>
 
-function abrirCamara() {
+                {{-- Línea de cajas --}}
+                <div style="
+                    display:inline-flex;align-items:center;gap:4px;
+                    margin-top:3px;
+                    background:#eff6ff;border:1px solid #bfdbfe;
+                    border-radius:4px;padding:2px 7px;
+                    font-size:10px;font-weight:700;color:#1d4ed8;
+                ">
+                    🗃 ${cajasLabel}
+                </div>
+                ${sueltasHtml}
 
-document.getElementById('modalCamara').style.display = 'flex';
+                <div style="height:3px;background:#e5e7eb;border-radius:99px;margin-top:5px;overflow:hidden;">
+                    <div style="height:100%;width:${itemPct}%;background:${ec.dot};border-radius:99px;"></div>
+                </div>
+            </div>
+            <div class="pm-item-right">
+                <div class="pm-item-qty">${item.despachada}/${item.solicitada}</div>
+                <span class="pm-item-badge" style="background:${ec.bg};color:${ec.color};">${item.estado}</span>
+            </div>
+        </div>`;
+    });
 
-iniciarEscaneo();
+    // Número de la paleta
+    let numeroPaleta = nombre.replace(/\D/g,'');
+    if(numeroPaleta === '')
+        numeroPaleta = '0';
+    numeroPaleta = numeroPaleta.padStart(4,'0');
 
+    // SSCC
+    let sscc = '50000014373324' + numeroPaleta;
+
+    // Tabla logística
+    let tabla = `
+    <hr style="margin:18px 0">
+    <h4 style="margin-bottom:10px;">📋 Hoja logística</h4>
+    <table style="width:100%;border-collapse:collapse;font-size:11px;">
+        <thead>
+            <tr style="background:#f1f5f9;">
+                <th style="padding:6px;border:1px solid #ddd;">DUM13</th>
+                <th style="padding:6px;border:1px solid #ddd;">DUM14</th>
+                <th style="padding:6px;border:1px solid #ddd;">DESCRIPCIÓN</th>
+                <th style="padding:6px;border:1px solid #ddd;">UXB</th>
+                <th style="padding:6px;border:1px solid #ddd;">BULTOS</th>
+            </tr>
+        </thead>
+        <tbody>
+    `;
+
+    items.forEach(item=>{
+        let bultos = Math.ceil(item.despachada / item.cantidad_por_caja);
+        tabla += `
+        <tr>
+            <td style="border:1px solid #ddd;padding:5px;">${item.barcode}</td>
+            <td style="border:1px solid #ddd;padding:5px;">${item.box_barcode}</td>
+            <td style="border:1px solid #ddd;padding:5px;">${item.nombre}</td>
+            <td style="border:1px solid #ddd;padding:5px;text-align:center;">${item.cantidad_por_caja}</td>
+            <td style="border:1px solid #ddd;padding:5px;text-align:center;">${bultos}</td>
+        </tr>
+        `;
+    });
+
+    tabla += `
+        </tbody>
+    </table>
+    <div style="margin-top:18px;text-align:center;">
+        <div style="font-size:13px;font-weight:bold;">SSCC</div>
+        <div style="font-size:20px;font-weight:bold;letter-spacing:2px;margin-top:6px;">${sscc}</div>
+        <div style="display:flex;justify-content:center;margin-top:15px;">
+            <svg id="barcode"></svg>
+        </div>
+    </div>
+    `;
+    tabla += `
+    <div style="margin-top:20px;text-align:center;">
+        <a href="/orders/{{ $order->id }}/pallet/${encodeURIComponent(nombre)}/pdf" target="_blank" class="btn btn-blue">
+            🖨 Generar Hoja Logística
+        </a>
+    </div>
+    `;
+
+    document.getElementById('pmItemsList').innerHTML = html + tabla;
+
+    JsBarcode("#barcode", sscc, {
+        format:"CODE128",
+        width:2,
+        height:60,
+        displayValue:true
+    });
+
+    document.getElementById('pmOverlay').classList.add('open');
 }
 
-
-function cerrarCamara() {
-
-document.getElementById('modalCamara').style.display = 'none';
-
-detenerStream();
-
+function cerrarPaleta(e) {
+    if (e.target.id === 'pmOverlay') {
+        document.getElementById('pmOverlay').classList.remove('open');
+    }
 }
 
+// ── Modal de etiqueta de producto ─────────────────────────────────────────
+function abrirEtiqueta(data) {
+    document.getElementById('etNombre').textContent = data.nombre;
+    document.getElementById('etCpc').textContent = data.cantidadPorCaja + ' unid. por caja';
 
-function detenerStream() {
+    const cpc = data.cantidadPorCaja > 0 ? data.cantidadPorCaja : 1;
+    const cajas = Math.floor(data.cantidadDespachada / cpc);
+    const sueltas = data.cantidadDespachada % cpc;
 
-if (codeReader) { codeReader.reset(); codeReader = null; }
+    document.getElementById('etLote').textContent = data.lote || '—';
+    document.getElementById('etFecha').textContent = data.fecha || '—';
+    document.getElementById('etCajas').textContent = cajas;
+    document.getElementById('etUnidades').textContent =
+        data.cantidadDespachada + (sueltas > 0 ? ' (' + sueltas + ' sueltas)' : '');
 
-if (streamActual) { streamActual.getTracks().forEach(function(t){ t.stop(); }); streamActual = null; }
+    const barcodeEl = document.getElementById('etBarcode');
+    barcodeEl.innerHTML = '';
 
-var video = document.getElementById('videoEscan');
+    const codigo = (data.codigo || '').toString().trim();
 
-if (video) video.srcObject = null;
+    if (codigo) {
+        try {
+            JsBarcode(barcodeEl, codigo, {
+                format: "CODE128",
+                width: 2,
+                height: 60,
+                displayValue: true,
+                lineColor: "#000",
+                background: "#fff"
+            });
+        } catch (err) {
+            console.error('Código inválido:', codigo, err);
+            barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Código no válido: ' + codigo + '</div>';
+        }
+    } else {
+        barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Sin código registrado</div>';
+    }
 
+    const urlTemplate = document.querySelector('.et-actions').dataset.etiquetaUrlTemplate;
+    document.getElementById('etPdfLink').href = urlTemplate.replace('__ID__', data.detailId);
+
+    document.getElementById('etOverlay').classList.add('open');
 }
-
-
-function iniciarEscaneo() {
-
-var resultado = document.getElementById('scanResultado');
-
-var selectCam = document.getElementById('selectCamara');
-
-
-if (typeof ZXing === 'undefined') {
-
-resultado.innerHTML = '<span style="color:#ef4444;">Error: librería no cargada</span>';
-
-return;
-
-}
-
-
-codeReader = new ZXing.BrowserMultiFormatReader();
-
-resultado.textContent = 'Iniciando cámara...';
-
-
-codeReader.listVideoInputDevices().then(function(devices) {
-
-if (!devices || devices.length === 0) {
-
-resultado.innerHTML = '<span style="color:#ef4444;">No se encontró cámara</span>';
-
-return;
-
-}
-
-if (devices.length > 1) {
-
-selectCam.style.display = 'block';
-
-selectCam.innerHTML = '';
-
-devices.forEach(function(d, i) {
-
-var opt = document.createElement('option');
-
-opt.value = d.deviceId;
-
-opt.textContent = d.label || ('Cámara ' + (i + 1));
-
-if (d.label && d.label.toLowerCase().includes('back')) opt.selected = true;
-
-selectCam.appendChild(opt);
-
-});
-
-selectCam.onchange = function() {
-
-codeReader.reset();
-
-empezarConDispositivo(this.value);
-
-};
-
-empezarConDispositivo(selectCam.value);
-
-} else {
-
-empezarConDispositivo(devices[0].deviceId);
-
-}
-
-}).catch(function(err) {
-
-resultado.innerHTML = '<span style="color:#ef4444;">Sin permiso de cámara</span>';
-
-console.error(err);
-
-});
-
-}
-
-
-function empezarConDispositivo(deviceId) {
-
-var video = document.getElementById('videoEscan');
-
-var resultado = document.getElementById('scanResultado');
-
-resultado.textContent = 'Apunta la cámara al código de barras';
-
-
-codeReader.decodeFromVideoDevice(deviceId, video, function(result, err) {
-
-if (result) {
-
-var codigo = result.getText();
-
-resultado.innerHTML = '✅ <strong style="color:#22c55e;">' + codigo + '</strong>';
-
-if (navigator.vibrate) navigator.vibrate(120);
-
-cerrarCamara();
-
-
-var inputScanner = document.getElementById('scanner');
-
-inputScanner.value = codigo;
-
-inputScanner.dispatchEvent(new KeyboardEvent('keypress', {
-
-key:'Enter', code:'Enter', keyCode:13, which:13, bubbles:true
-
-}));
-
-}
-
-if (err && !(err instanceof ZXing.NotFoundException)) {
-
-console.warn(err);
-
-}
-
-});
-
-}
-
-
-/* Cerrar modal al tocar fuera */
-
-document.getElementById('modalCamara').addEventListener('click', function(e) {
-
-if (e.target === this) cerrarCamara();
-
-});
-
 </script>
 
-
 @endsection
-
