@@ -19,18 +19,19 @@ class OrderController extends Controller
         'order.client',
     ]);
 
+    $width  = 90 * 2.83464567;
+    $height = 70 * 2.83464567;
+
     $pdf = Pdf::loadView('orders.pdf.etiqueta', [
         'item' => $item,
     ]);
 
-    // 90 mm x 70 mm
-    $width  = 90 * 2.83464567;
-    $height = 70 * 2.83464567;
-
-    $pdf->setPaper(
-        [0, 0, $width, $height],
-        'landscape'
-    );
+    $pdf->setPaper([
+        0,
+        0,
+        $width,
+        $height
+    ]);
 
     return $pdf->stream(
         'etiqueta-local-' . $item->id . '.pdf'
