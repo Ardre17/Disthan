@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 
 <style>
+<style>
 
 @page {
     size: 90mm 70mm;
@@ -27,13 +28,24 @@ body {
     font-size: 8px;
     color: #000;
     line-height: 1.25;
+    overflow: hidden;
 }
 
 /* CONTENEDOR PRINCIPAL */
 .etiqueta {
     width: 100%;
+    max-width: 100%;
     border: 1px solid #000;
     padding: 5px;
+    overflow: hidden;
+}
+
+/* TODAS LAS TABLAS */
+table {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
 }
 
 /* CABECERA */
@@ -44,35 +56,46 @@ body {
     margin-bottom: 5px;
 }
 
-.cabecera table {
-    width: 100%;
-    border-collapse: collapse;
+.cabecera td {
+    vertical-align: middle;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 
 .empresa {
+    width: 55%;
     font-size: 9px;
     font-weight: bold;
 }
 
 .orden {
+    width: 45%;
     text-align: right;
-    font-size: 7px;
+    font-size: 6.5px;
     font-weight: bold;
+    white-space: normal;
+    word-break: break-word;
 }
 
 /* PRODUCTO */
 .producto {
+    width: 100%;
     text-align: center;
     font-size: 11px;
     font-weight: bold;
     line-height: 1.2;
     margin-bottom: 2px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
+/* SKU */
 .sku {
+    width: 100%;
     text-align: center;
     font-size: 7px;
     margin-bottom: 5px;
+    word-wrap: break-word;
 }
 
 /* CANTIDAD */
@@ -99,13 +122,16 @@ body {
 /* INFORMACIÓN */
 .info {
     width: 100%;
-    border-collapse: collapse;
+    table-layout: fixed;
 }
 
 .info td {
     border-bottom: 0.5px solid #999;
     padding: 3px 2px;
     vertical-align: middle;
+    overflow: hidden;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .info tr:last-child td {
@@ -113,16 +139,18 @@ body {
 }
 
 .info .label {
-    width: 32%;
+    width: 28%;
     font-weight: bold;
     font-size: 7px;
 }
 
 .info .valor {
-    width: 68%;
-    font-size: 8px;
+    width: 72%;
+    font-size: 7.5px;
     font-weight: bold;
     text-align: right;
+    word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 /* VENCIMIENTO */
@@ -138,6 +166,8 @@ body {
     text-align: center;
     font-size: 6px;
 }
+
+</style>
 
 </style>
 </head>
