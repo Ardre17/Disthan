@@ -1,163 +1,216 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-    <meta charset="UTF-8">
 
-    <style>
-        @page {
-            size: 90mm 70mm;
-            margin: 3mm;
-        }
+<meta charset="UTF-8">
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+<style>
 
-        html,
-        body {
-            width: 100%;
-            height: 100%;
-        }
+@page {
+    size: 100mm 70mm;
+    margin: 2mm;
+}
 
-        body {
-            font-family: DejaVu Sans, sans-serif;
-            font-size: 7px;
-            color: #000;
-        }
+* {
+    box-sizing: border-box;
+}
 
-        .etiqueta {
-            width: 100%;
-            border: 1px solid #000;
-            padding: 5px;
-        }
+html,
+body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
 
-        /* CABECERA */
+body {
+    font-family: DejaVu Sans, sans-serif;
+    font-size: 7px;
+    color: #000;
+}
 
-        .cabecera {
-            width: 100%;
-            border-bottom: 1px solid #000;
-            padding-bottom: 4px;
-            margin-bottom: 5px;
-        }
+/* =====================================================
+   ETIQUETA
+   ===================================================== */
 
-        .cabecera table {
-            width: 100%;
-            border-collapse: collapse;
-        }
+.etiqueta {
+    width: 100%;
+    border: 1px solid #000;
+    padding: 3px;
+}
 
-        .empresa {
-            font-size: 9px;
-            font-weight: bold;
-        }
 
-        .orden {
-            text-align: right;
-            font-size: 7px;
-            font-weight: bold;
-        }
+/* =====================================================
+   CABECERA
+   ===================================================== */
 
-        /* CLIENTE */
+.cabecera {
+    width: 100%;
+    border-bottom: 1px solid #000;
+    padding-bottom: 3px;
+    margin-bottom: 4px;
+}
 
-        .cliente-label {
-            font-size: 6px;
-            font-weight: bold;
-            margin-bottom: 2px;
-        }
+.cabecera table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+}
 
-        .cliente {
-            font-size: 8px;
-            font-weight: bold;
-            margin-bottom: 5px;
-            word-break: break-word;
-        }
+.cabecera td {
+    padding: 0;
+    border: none;
+}
 
-        /* BULT0 */
+.empresa {
+    width: 60%;
+    font-size: 8px;
+    font-weight: bold;
+    text-align: left;
+}
 
-        .bulto-box {
-            border: 1px solid #000;
-            text-align: center;
-            padding: 5px;
-            margin-bottom: 6px;
-        }
+.orden {
+    width: 40%;
+    text-align: right;
+    font-size: 6px;
+    font-weight: bold;
+    white-space: nowrap;
+}
 
-        .bulto-nombre {
-            font-size: 18px;
-            font-weight: bold;
-            line-height: 1;
-        }
 
-        .bulto-total {
-            font-size: 7px;
-            margin-top: 3px;
-        }
+/* =====================================================
+   CLIENTE
+   ===================================================== */
 
-        /* PRODUCTOS */
+.cliente-label {
+    font-size: 5.5px;
+    font-weight: bold;
+    margin-bottom: 1px;
+}
 
-        .productos {
-            width: 100%;
-            border-collapse: collapse;
-            table-layout: fixed;
-        }
+.cliente {
+    width: 100%;
+    font-size: 7px;
+    font-weight: bold;
+    margin-bottom: 4px;
+    word-break: break-word;
+}
 
-        .productos th {
-            border-bottom: 1px solid #000;
-            padding: 3px 2px;
-            font-size: 6px;
-            text-align: left;
-        }
 
-        .productos td {
-            border-bottom: 0.5px solid #999;
-            padding: 3px 2px;
-            vertical-align: middle;
-            word-break: break-word;
-        }
+/* =====================================================
+   BULTO
+   ===================================================== */
 
-        .productos .producto {
-            width: 78%;
-            font-weight: bold;
-        }
+.bulto-box {
+    width: 100%;
+    border: 1px solid #000;
+    text-align: center;
+    padding: 4px;
+    margin-bottom: 4px;
+}
 
-        .productos .cantidad {
-            width: 22%;
-            text-align: right;
-            font-weight: bold;
-        }
+.bulto-nombre {
+    font-size: 16px;
+    font-weight: bold;
+    line-height: 1;
+}
 
-        /* RESUMEN */
+.bulto-total {
+    font-size: 6px;
+    margin-top: 2px;
+}
 
-        .resumen {
-            margin-top: 6px;
-            width: 100%;
-            border-collapse: collapse;
-        }
 
-        .resumen td {
-            padding: 3px 2px;
-            border-top: 1px solid #000;
-        }
+/* =====================================================
+   PRODUCTOS
+   ===================================================== */
 
-        .resumen .label {
-            font-weight: bold;
-        }
+.productos {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+}
 
-        .resumen .valor {
-            text-align: right;
-            font-weight: bold;
-        }
+.productos th,
+.productos td {
+    padding: 2px 3px;
+    line-height: 1.05;
+}
 
-        /* PIE */
+.productos th {
+    border-bottom: 1px solid #000;
+    font-size: 5.5px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
 
-        .pie {
-            margin-top: 5px;
-            padding-top: 3px;
-            border-top: 1px solid #000;
-            text-align: center;
-            font-size: 6px;
-        }
-    </style>
+.productos td {
+    border-bottom: 0.5px solid #777;
+    font-size: 6.5px;
+    vertical-align: middle;
+}
+
+.productos .producto {
+    width: 76%;
+    text-align: left;
+    font-weight: bold;
+    white-space: normal;
+    overflow-wrap: break-word;
+    word-break: break-word;
+}
+
+.productos .cantidad {
+    width: 24%;
+    text-align: right;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   RESUMEN
+   ===================================================== */
+
+.resumen {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    margin-top: 4px;
+}
+
+.resumen td {
+    padding: 2px 3px;
+    border-top: 1px solid #000;
+    font-size: 6.5px;
+}
+
+.resumen .label {
+    width: 70%;
+    font-weight: bold;
+}
+
+.resumen .valor {
+    width: 30%;
+    text-align: right;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+
+/* =====================================================
+   PIE
+   ===================================================== */
+
+.pie {
+    margin-top: 3px;
+    padding-top: 2px;
+    border-top: 1px solid #000;
+    text-align: center;
+    font-size: 5px;
+}
+
+</style>
+
 </head>
 
 <body>
@@ -171,11 +224,13 @@
     $totalBultos = $order->bultos->count();
 
     /*
-     * Intentamos obtener el número desde:
+     * Obtener número del bulto.
+     *
+     * Ejemplo:
      * Bulto 1
      * Bulto 2
-     * etc.
      */
+
     $numeroBulto = null;
 
     if (preg_match('/(\d+)/', $bulto->nombre, $matches)) {
@@ -188,13 +243,20 @@
 
 @endphp
 
+
 <div class="etiqueta">
 
-    {{-- CABECERA --}}
+
+    {{-- =================================================
+         CABECERA
+         ================================================= --}}
+
     <div class="cabecera">
 
         <table>
+
             <tr>
+
                 <td class="empresa">
                     VALLE FERTIL SAC
                 </td>
@@ -202,13 +264,17 @@
                 <td class="orden">
                     ORDEN #{{ $order->numero_orden }}
                 </td>
+
             </tr>
+
         </table>
 
     </div>
 
 
-    {{-- CLIENTE --}}
+    {{-- =================================================
+         CLIENTE
+         ================================================= --}}
 
     <div class="cliente-label">
         CLIENTE
@@ -219,7 +285,9 @@
     </div>
 
 
-    {{-- IDENTIFICACIÓN DEL BULTO --}}
+    {{-- =================================================
+         IDENTIFICACIÓN DEL BULTO
+         ================================================= --}}
 
     <div class="bulto-box">
 
@@ -234,12 +302,16 @@
     </div>
 
 
-    {{-- PRODUCTOS --}}
+    {{-- =================================================
+         PRODUCTOS
+         ================================================= --}}
 
     <table class="productos">
 
         <thead>
+
             <tr>
+
                 <th class="producto">
                     PRODUCTO
                 </th>
@@ -247,7 +319,9 @@
                 <th class="cantidad">
                     CANT.
                 </th>
+
             </tr>
+
         </thead>
 
         <tbody>
@@ -269,9 +343,11 @@
             @empty
 
                 <tr>
+
                     <td colspan="2" style="text-align:center;">
                         Sin productos
                     </td>
+
                 </tr>
 
             @endforelse
@@ -281,11 +357,14 @@
     </table>
 
 
-    {{-- RESUMEN --}}
+    {{-- =================================================
+         RESUMEN
+         ================================================= --}}
 
     <table class="resumen">
 
         <tr>
+
             <td class="label">
                 TOTAL UNIDADES
             </td>
@@ -293,9 +372,11 @@
             <td class="valor">
                 {{ number_format($totalUnidades, 0) }}
             </td>
+
         </tr>
 
         <tr>
+
             <td class="label">
                 PESO
             </td>
@@ -303,18 +384,23 @@
             <td class="valor">
                 {{ number_format($bulto->peso_total ?? 0, 3) }} kg
             </td>
+
         </tr>
 
     </table>
 
 
-    {{-- PIE --}}
+    {{-- =================================================
+         PIE
+         ================================================= --}}
 
     <div class="pie">
         Orden {{ $order->numero_orden }}
     </div>
 
+
 </div>
 
 </body>
+
 </html>

@@ -57,7 +57,7 @@ class OrderController extends Controller
         compact('bulto')
     );
 
-    $width  = 90 * 2.83464567;
+    $width  = 100 * 2.83464567;
     $height = 70 * 2.83464567;
 
     $pdf->setPaper([
