@@ -38,7 +38,7 @@ class OrderController extends Controller
     $barcode = null;
 
     if ($codigoParaEtiqueta) {
-        $svg = Code128Generator::generateSvg($codigoParaEtiqueta, 1, 61);
+        $svg = Code128Generator::generateSvg($codigoParaEtiqueta, 1.2, 61);
         $barcode = 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
@@ -553,7 +553,7 @@ public function updateDetail(Request $request, OrderDetail $detail)
     ];
     // Solo tocar estos campos si vienen en el request
 // (evita que el guardado rápido de cantidad/precio borre datos ya guardados)
-foreach (['paleta', 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
+foreach (['paleta', 'lote, 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
     if ($request->has($campo)) {
         $updateData[$campo] = $request->input($campo);
     }
