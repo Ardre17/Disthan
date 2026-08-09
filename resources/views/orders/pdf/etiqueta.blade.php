@@ -8,7 +8,7 @@
 
 @page {
     size: 90mm 70mm;
-    margin: 3mm;
+    margin: 1mm;
 }
 
 * {
