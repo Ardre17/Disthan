@@ -248,7 +248,27 @@ body {
     text-align: center;
     font-size: 5px;
 }
+.total-box {
+    width: 100%;
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    text-align: center;
+    padding: 3px 0;
+    margin-top: 4px;
+}
 
+.total-label {
+    font-size: 6px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.total-numero {
+    font-size: 14px;
+    font-weight: bold;
+    line-height: 1.1;
+    text-align: center;
+}
 </style>
 
 </head>
@@ -401,20 +421,17 @@ body {
          RESUMEN
          ================================================= --}}
 
-    <table class="resumen">
+   <div class="total-box">
 
-        <tr>
+    <div class="total-label">
+        TOTAL UNIDADES
+    </div>
 
-            <td class="label">
-                TOTAL UNIDADES
-            </td>
+    <div class="total-numero">
+        {{ number_format($totalUnidades, 0) }}
+    </div>
 
-            <td class="valor">
-                {{ number_format($totalUnidades, 0) }}
-            </td>
-
-        </tr>
-        </table>
+</div>
 
 <div class="peso-box">
 
