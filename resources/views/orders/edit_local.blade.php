@@ -426,7 +426,7 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
                         <div style="font-size:10px;font-weight:700;color:{{ $lc }};">{{ number_format($pct,0) }}%</div>
                     </td>
                     <td>
-                        <a href="{{ route('orders.etiqueta', $detail) }}"
+                        <a href="{{ route('orders.etiqueta', $item) }}"
    target="_blank"
    class="btn-xs"
    style="
