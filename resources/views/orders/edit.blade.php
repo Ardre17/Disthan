@@ -399,7 +399,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                                 <input type="number" step="0.01" name="precio_unitario" class="finput" value="{{ $detail->precio_unitario }}"></div>
                             <hr class="dv">
                             <div><label>Lote</label>
-                            <input type="text" name="lote" value="{{ $item->lote }}" disabled></div>
+                            <input type="text" name="lote" value="{{ $detail->lote }}" disabled></div>
                             <div><label class="flabel">Vencimiento</label>
                                 <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}"></div>
                         </div>
