@@ -35,6 +35,9 @@ use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
 
+Route::get('/order-details/{item}/etiqueta-local',[OrderController::class, 'etiquetaLocal'])
+    ->name('orders.etiqueta.local');
+
 Route::get('/orders/{order}/pallet/{paleta}/pdf',[OrderController::class,'palletPdf'])
     ->name('orders.pallet.pdf');
 

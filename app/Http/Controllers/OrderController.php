@@ -12,6 +12,30 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
+    public function etiquetaLocal(OrderDetail $item)
+{
+    $item->load([
+        'product',
+        'order.client',
+    ]);
+
+    $pdf = Pdf::loadView('orders.pdf.etiqueta', [
+        'item' => $item,
+    ]);
+
+    // 90 mm x 70 mm
+    $width  = 90 * 2.83464567;
+    $height = 70 * 2.83464567;
+
+    $pdf->setPaper(
+        [0, 0, $width, $height],
+        'landscape'
+    );
+
+    return $pdf->stream(
+        'etiqueta-local-' . $item->id . '.pdf'
+    );
+}
    public function etiqueta(OrderDetail $item)
 {
     $item->load('product', 'order.client');

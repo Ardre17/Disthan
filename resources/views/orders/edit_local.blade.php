@@ -426,18 +426,18 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
                         <div style="font-size:10px;font-weight:700;color:{{ $lc }};">{{ number_format($pct,0) }}%</div>
                     </td>
                     <td>
-                        <a href="{{ route('orders.etiqueta', $item) }}"
-   target="_blank"
-   class="btn-xs"
-   style="
-       background:#e0e7ff;
-       color:#4338ca;
-       border:1px solid #c7d2fe;
-       text-decoration:none;
-   ">
-    🏷️ Etiqueta
-</a>
-                        <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                        <a href="{{ route('orders.etiqueta.local', $item) }}"
+                        target="_blank"
+                        class="btn-xs"
+                        style="
+                            background:#e0e7ff;
+                            color:#4338ca;
+                            border:1px solid #c7d2fe;
+                            text-decoration:none;
+                        ">
+                            🏷️ Etiqueta
+                        </a>
+                                                <div style="display:flex;gap:4px;flex-wrap:wrap;">
                             <button type="button" class="btn-xs btn-edit"
                                     onclick="editar({{ $item->id }})">✏️ Editar</button>
                             <button type="submit" form="form-{{ $item->id }}"
