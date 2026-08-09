@@ -120,11 +120,37 @@ table {
 }
 
 /* INFORMACIÓN */
+
 .info {
     width: 100%;
-    table-layout: fixed;
+    border-collapse: collapse;
+    margin-top: 4px;
 }
 
+.info .campo {
+    text-align: center;
+    padding: 2px 0;
+    border-bottom: 0.5px solid #e2e8f0;
+}
+
+.info .label {
+    font-size: 6px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    font-weight: 700;
+    text-align: center;
+}
+
+.info .valor {
+    font-size: 8px;
+    font-weight: 700;
+    color: #0f172a;
+    text-align: center;
+    width: 100%;
+    word-break: break-word;
+    overflow-wrap: break-word;
+}
 .info td {
     border-bottom: 0.5px solid #999;
     padding: 3px 2px;
@@ -136,23 +162,6 @@ table {
 
 .info tr:last-child td {
     border-bottom: none;
-}
-
-.info .label {
-    width: 25%;
-    font-weight: bold;
-    font-size: 7px;
-}
-
-.info .valor {
-    width: 75%;
-    font-size: 7px;
-    font-weight: bold;
-    text-align: right;
-    white-space: normal;
-    word-break: break-word;
-    overflow-wrap: break-word;
-    padding-right: 2px;
 }
 
 /* VENCIMIENTO */
@@ -275,67 +284,54 @@ table {
 
 
     {{-- INFORMACIÓN --}}
-    <table class="info">
+   <table class="info">
 
-        <tr>
+    <tr>
+        <td colspan="2" class="campo">
 
-            <td class="label">
+            <div class="label">
                 CLIENTE
-            </td>
+            </div>
 
-            <td class="valor">
+            <div class="valor cliente-valor">
                 {{ $cliente }}
-            </td>
+            </div>
 
-        </tr>
+        </td>
+    </tr>
 
+    <tr>
+        <td colspan="2" class="campo">
 
-        <tr>
-
-            <td class="label">
+            <div class="label">
                 LOTE
-            </td>
+            </div>
 
-            <td class="valor">
+            <div class="valor">
                 {{ $lote }}
-            </td>
+            </div>
 
-        </tr>
+        </td>
+    </tr>
 
+    <tr>
+        <td colspan="2" class="campo">
 
-        <tr>
-
-            <td class="label">
+            <div class="label">
                 VENCIMIENTO
-            </td>
+            </div>
 
-            <td class="valor vencimiento">
-
+            <div class="valor vencimiento">
                 {{ $fv
                     ? \Carbon\Carbon::parse($fv)->format('d/m/Y')
                     : '—'
                 }}
+            </div>
 
-            </td>
+        </td>
+    </tr>
 
-        </tr>
-
-
-        <tr>
-
-            <td class="label">
-                PESO APROX.
-            </td>
-
-            <td class="valor">
-
-                {{ number_format($peso, 3) }} kg
-
-            </td>
-
-        </tr>
-
-    </table>
+</table>
 
 
     {{-- PIE --}}

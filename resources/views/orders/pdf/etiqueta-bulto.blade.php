@@ -98,10 +98,13 @@ body {
 
 .cliente {
     width: 100%;
-    font-size: 7px;
+    font-size: 8px;
     font-weight: bold;
-    margin-bottom: 4px;
+    margin-bottom: 5px;
+    text-align: center;
+    line-height: 1.15;
     word-break: break-word;
+    overflow-wrap: break-word;
 }
 
 
@@ -175,21 +178,22 @@ body {
 }
 
 .productos th {
-    border-bottom: 1px solid #000;
-    font-size: 5.5px;
+    text-align: center;
+    font-size: 6px;
     font-weight: bold;
     text-transform: uppercase;
 }
 
 .productos td {
-    border-bottom: 0.5px solid #777;
-    font-size: 6.5px;
-    vertical-align: middle;
+    text-align: center;
+    padding: 2px 3px;
+    font-size: 7px;
+    line-height: 1.1;
 }
 
 .productos .producto {
-    width: 70%;
-    text-align: left;
+    width: 75%;
+    text-align: center;
     font-weight: bold;
     white-space: normal;
     overflow: hidden;
@@ -197,12 +201,11 @@ body {
 }
 
 .productos .cantidad {
-    width: 30%;
-    text-align: right;
+    width: 25%;
+    text-align: center;
     font-weight: bold;
     white-space: nowrap;
 }
-
 
 /* =====================================================
    RESUMEN
