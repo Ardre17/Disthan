@@ -161,11 +161,7 @@
 </head>
 
 <body>
-@php
-    $listaBultos = isset($bultos)
-        ? $bultos
-        : collect([$bulto]);
-@endphp
+
 @php
 
     $order = $bulto->order;
@@ -192,27 +188,6 @@
 
 @endphp
 
-@foreach($listaBultos as $bulto)
-
-    @php
-
-        $order = $bulto->order;
-
-        $cliente = $order->client?->razon_social ?? '—';
-
-        $totalBultos = $order->bultos->count();
-
-        $numeroBulto = null;
-
-        if (preg_match('/(\d+)/', $bulto->nombre, $matches)) {
-            $numeroBulto = (int) $matches[1];
-        }
-
-        $numeroBulto = $numeroBulto ?? $bulto->id;
-
-        $totalUnidades = $bulto->detalles->sum('cantidad');
-
-    @endphp
 <div class="etiqueta">
 
     {{-- CABECERA --}}
