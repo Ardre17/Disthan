@@ -2,9 +2,9 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
+
 <style>
 
-/* Etiqueta rectangular 9cm x 7cm */
 @page {
     size: 90mm 70mm;
     margin: 3mm;
@@ -16,213 +16,302 @@
     padding: 0;
 }
 
-html, body {
+html,
+body {
     width: 100%;
+    height: 100%;
 }
 
 body {
     font-family: DejaVu Sans, sans-serif;
-    font-size: 7px;
-    color: #0f172a;
-    line-height: 1.3;
-}
-
-.box {
-    border: 1px solid #1e3a5f;
-    border-radius: 3px;
-    padding: 4px 7px;
-    /* sin height fija: deja que el contenido defina el alto real
-       y evita que DomPDF genere una segunda página en blanco */
-}
-
-/* Header */
-.head {
-    background: #1e3a5f;
-    color: #fff;
-    padding: 3px 6px;
-    border-radius: 2px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 4px;
-}
-.head-name {
-    font-size: 9px;
-    font-weight: 900;
-    letter-spacing: .5px;
-}
-.head-doc {
-    font-size: 6px;
-    font-weight: 700;
-    color: #93c5fd;
-}
-
-/* Cuerpo: 2 columnas para aprovechar el ancho del rectángulo */
-.cuerpo {
-    display: flex;
-    gap: 8px;
-}
-.col-izq {
-    width: 46%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-.col-der {
-    width: 54%;
-}
-
-/* Producto */
-.producto {
     font-size: 8px;
-    font-weight: 800;
-    color: #1e3a5f;
-    margin-bottom: 2px;
+    color: #000;
     line-height: 1.25;
-    text-align: center;
-    width: 100%;
 }
 
-/* SKU */
+/* CONTENEDOR PRINCIPAL */
+.etiqueta {
+    width: 100%;
+    border: 1px solid #000;
+    padding: 5px;
+}
+
+/* CABECERA */
+.cabecera {
+    width: 100%;
+    border-bottom: 1px solid #000;
+    padding-bottom: 4px;
+    margin-bottom: 5px;
+}
+
+.cabecera table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.empresa {
+    font-size: 9px;
+    font-weight: bold;
+}
+
+.orden {
+    text-align: right;
+    font-size: 7px;
+    font-weight: bold;
+}
+
+/* PRODUCTO */
+.producto {
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+    line-height: 1.2;
+    margin-bottom: 2px;
+}
+
 .sku {
-    font-size: 6px;
-    color: #94a3b8;
-    margin-bottom: 4px;
     text-align: center;
-    width: 100%;
+    font-size: 7px;
+    margin-bottom: 5px;
 }
 
-/* Cantidad */
-.cant-box {
-    background: #f0f7ff;
-    border: 1px solid #bfdbfe;
-    border-radius: 2px;
+/* CANTIDAD */
+.cantidad-box {
+    width: 100%;
+    border: 1px solid #000;
     text-align: center;
-    padding: 4px 0;
-    width: 90%;
-    margin-top: 4px;
+    padding: 5px 0;
+    margin-bottom: 6px;
 }
-.cant-num {
-    font-size: 18px;
-    font-weight: 900;
-    color: #1e3a5f;
+
+.cantidad {
+    font-size: 22px;
+    font-weight: bold;
     line-height: 1;
 }
-.cant-lbl {
-    font-size: 6px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    margin-top: 1px;
-}
 
-/* Filas de datos */
-.row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    border-bottom: 0.5px solid #e2e8f0;
-    padding: 2px 0;
-}
-.row:last-child { border-bottom: none; }
-.lbl {
-    font-size: 6px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    font-weight: 700;
-}
-.val {
+.cantidad-label {
     font-size: 7px;
-    font-weight: 700;
-    color: #0f172a;
-    text-align: right;
-    max-width: 65%;
-    word-break: break-word;
+    margin-top: 2px;
+    text-transform: uppercase;
 }
 
-/* Vencimiento */
-.venc-ok   { color: #166534; }
-.venc-prox { color: #92400e; }
-.venc-venc { color: #b91c1c; }
+/* INFORMACIÓN */
+.info {
+    width: 100%;
+    border-collapse: collapse;
+}
 
-/* Footer */
-.foot {
-    margin-top: 4px;
+.info td {
+    border-bottom: 0.5px solid #999;
+    padding: 3px 2px;
+    vertical-align: middle;
+}
+
+.info tr:last-child td {
+    border-bottom: none;
+}
+
+.info .label {
+    width: 32%;
+    font-weight: bold;
+    font-size: 7px;
+}
+
+.info .valor {
+    width: 68%;
+    font-size: 8px;
+    font-weight: bold;
+    text-align: right;
+}
+
+/* VENCIMIENTO */
+.vencimiento {
+    font-size: 9px !important;
+}
+
+/* PIE */
+.pie {
+    border-top: 1px solid #000;
+    margin-top: 5px;
     padding-top: 3px;
-    border-top: 0.5px solid #e2e8f0;
-    font-size: 5.5px;
-    color: #94a3b8;
     text-align: center;
+    font-size: 6px;
 }
 
 </style>
 </head>
+
 <body>
 
 @php
-    $ahora   = \Carbon\Carbon::now('America/Lima');
+
+    $ahora = \Carbon\Carbon::now('America/Lima');
+
     $cliente = $item->order->client?->razon_social ?? '—';
-    $peso    = ($item->product->peso ?? 0) * $item->cantidad_despachada / 1000;
 
-    $lote = $item->lote ?? $item->product->lote ?? '—';
-    $fv   = $item->fecha_vencimiento ?? $item->product->fecha_vencimiento;
+    $producto = $item->product->nombre ?? '—';
 
-    $vencClass = '';
-    $diasVenc  = null;
-    if ($fv) {
-        $diasVenc = (int) round($ahora->diffInDays(\Carbon\Carbon::parse($fv), false));
-        if ($diasVenc < 0)       $vencClass = 'venc-venc';
-        elseif ($diasVenc <= 30) $vencClass = 'venc-prox';
-        else                     $vencClass = 'venc-ok';
-    }
+    $sku = $item->product->sku ?? '—';
+
+    $cantidad = $item->cantidad_despachada ?? 0;
+
+    $peso = (
+        ($item->product->peso ?? 0) *
+        $cantidad
+    ) / 1000;
+
+    /*
+    |--------------------------------------------------------------------------
+    | LOTE
+    |--------------------------------------------------------------------------
+    */
+
+    $lote = $item->lote
+        ?? $item->product->lote
+        ?? '—';
+
+    /*
+    |--------------------------------------------------------------------------
+    | FECHA DE VENCIMIENTO
+    |--------------------------------------------------------------------------
+    */
+
+    $fv = $item->fecha_vencimiento
+        ?? $item->product->fecha_vencimiento;
+
 @endphp
 
-<div class="box">
 
-    <div class="head">
-        <span class="head-name">Valle Fertil SAC</span>
-        <span class="head-doc">#{{ $item->order->numero_orden }}</span>
+<div class="etiqueta">
+
+    {{-- CABECERA --}}
+    <div class="cabecera">
+
+        <table>
+
+            <tr>
+
+                <td class="empresa">
+                    VALLE FERTIL SAC
+                </td>
+
+                <td class="orden">
+                    ORDEN #{{ $item->order->numero_orden }}
+                </td>
+
+            </tr>
+
+        </table>
+
     </div>
 
-    <div class="cuerpo">
-        <div class="col-izq">
-            <div class="producto">{{ $item->product->nombre }}</div>
-            @if($item->product->sku)
-            <div class="sku">SKU: {{ $item->product->sku }}</div>
-            @endif
 
-            <div class="cant-box">
-                <div class="cant-num">{{ number_format($item->cantidad_despachada, 0) }}</div>
-                <div class="cant-lbl">unidades</div>
-            </div>
-        </div>
+    {{-- PRODUCTO --}}
+    <div class="producto">
 
-        <div class="col-der">
-            <div class="row">
-                <span class="lbl">Cliente</span>
-                <span class="val">{{ $cliente }}</span>
-            </div>
-            <div class="row">
-                <span class="lbl">Lote</span>
-                <span class="val">{{ $lote }}</span>
-            </div>
-            <div class="row">
-                <span class="lbl">Vence</span>
-                <span class="val {{ $vencClass }}">
-                    {{ $fv ? \Carbon\Carbon::parse($fv)->format('d/m/Y') : '—' }}
-                </span>
-            </div>
-            <div class="row">
-                <span class="lbl">Peso aprox.</span>
-                <span class="val">{{ number_format($peso, 3) }} kg</span>
-            </div>
-        </div>
+        {{ $producto }}
+
     </div>
 
-    <div class="foot">
-        Generado {{ $ahora->format('d/m/Y H:i') }} · Peso referencial
+
+    {{-- SKU --}}
+    <div class="sku">
+
+        SKU:
+        <strong>{{ $sku }}</strong>
+
+    </div>
+
+
+    {{-- CANTIDAD --}}
+    <div class="cantidad-box">
+
+        <div class="cantidad">
+
+            {{ number_format($cantidad, 0) }}
+
+        </div>
+
+        <div class="cantidad-label">
+
+            UNIDADES
+
+        </div>
+
+    </div>
+
+
+    {{-- INFORMACIÓN --}}
+    <table class="info">
+
+        <tr>
+
+            <td class="label">
+                CLIENTE
+            </td>
+
+            <td class="valor">
+                {{ $cliente }}
+            </td>
+
+        </tr>
+
+
+        <tr>
+
+            <td class="label">
+                LOTE
+            </td>
+
+            <td class="valor">
+                {{ $lote }}
+            </td>
+
+        </tr>
+
+
+        <tr>
+
+            <td class="label">
+                VENCIMIENTO
+            </td>
+
+            <td class="valor vencimiento">
+
+                {{ $fv
+                    ? \Carbon\Carbon::parse($fv)->format('d/m/Y')
+                    : '—'
+                }}
+
+            </td>
+
+        </tr>
+
+
+        <tr>
+
+            <td class="label">
+                PESO APROX.
+            </td>
+
+            <td class="valor">
+
+                {{ number_format($peso, 3) }} kg
+
+            </td>
+
+        </tr>
+
+    </table>
+
+
+    {{-- PIE --}}
+    <div class="pie">
+
+        Generado:
+        {{ $ahora->format('d/m/Y H:i') }}
+
     </div>
 
 </div>
