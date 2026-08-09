@@ -35,6 +35,12 @@ use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
 
+Route::get('/bultos/{bulto}/etiqueta',[OrderController::class, 'etiquetaBulto'])
+    ->name('orders.bulto.etiqueta');
+
+Route::get('/bultos/{bulto}/etiqueta',[OrderController::class, 'etiquetaBulto'])
+    ->name('orders.bulto.etiqueta');
+
 Route::get('/order-details/{item}/etiqueta-local',[OrderController::class, 'etiquetaLocal'])
     ->name('orders.etiqueta.local');
 

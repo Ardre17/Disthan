@@ -12,6 +12,65 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class OrderController extends Controller
 {
+    public function etiquetasBultos(Order $order)
+{
+    $order->load([
+        'client',
+        'bultos.detalles.product',
+    ]);
+
+    $bultos = $order->bultos;
+
+    if ($bultos->isEmpty()) {
+        return back()->with('error', 'La orden no tiene bultos creados.');
+    }
+
+    $pdf = Pdf::loadView(
+        'orders.pdf.etiqueta-bulto',
+        compact('bultos')
+    );
+
+    $width  = 90 * 2.83464567;
+    $height = 70 * 2.83464567;
+
+    $pdf->setPaper([
+        0,
+        0,
+        $width,
+        $height
+    ]);
+
+    return $pdf->stream(
+        'etiquetas-bultos-' . $order->id . '.pdf'
+    );
+}
+    public function etiquetaBulto(\App\Models\Bulto $bulto)
+{
+    $bulto->load([
+        'order.client',
+        'order.bultos',
+        'detalles.product',
+    ]);
+
+    $pdf = Pdf::loadView(
+        'orders.pdf.etiqueta-bulto',
+        compact('bulto')
+    );
+
+    $width  = 90 * 2.83464567;
+    $height = 70 * 2.83464567;
+
+    $pdf->setPaper([
+        0,
+        0,
+        $width,
+        $height
+    ]);
+
+    return $pdf->stream(
+        'etiqueta-bulto-' . $bulto->id . '.pdf'
+    );
+}
     public function etiquetaLocal(OrderDetail $item)
 {
     $item->load([

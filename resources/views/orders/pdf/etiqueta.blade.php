@@ -139,18 +139,20 @@ table {
 }
 
 .info .label {
-    width: 28%;
+    width: 25%;
     font-weight: bold;
     font-size: 7px;
 }
 
 .info .valor {
-    width: 72%;
-    font-size: 7.5px;
+    width: 75%;
+    font-size: 7px;
     font-weight: bold;
     text-align: right;
+    white-space: normal;
     word-break: break-word;
     overflow-wrap: break-word;
+    padding-right: 2px;
 }
 
 /* VENCIMIENTO */

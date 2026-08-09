@@ -311,13 +311,49 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 
         {{-- Botón crear bulto --}}
         <div class="crear-bulto-row">
-            <form method="POST" action="{{ route('bultos.crear',$order) }}">
-                @csrf
-                <button type="submit" class="btn btn-blue">📦 + Crear nuevo bulto</button>
-            </form>
-            <span style="font-size:11px;color:#94a3b8;">Peso total: <strong style="color:#1d4ed8;">{{ number_format($pesoTotal,2) }} kg</strong></span>
-        </div>
 
+    {{-- Crear nuevo bulto --}}
+    <form method="POST" action="{{ route('bultos.crear',$order) }}">
+        @csrf
+
+        <button type="submit" class="btn btn-blue">
+            📦 + Crear nuevo bulto
+        </button>
+    </form>
+
+
+    {{-- Imprimir todas las etiquetas --}}
+    @if($order->bultos->count() > 0)
+
+        <a
+            href="{{ route('orders.bultos.etiquetas', $order) }}"
+            target="_blank"
+            class="btn"
+            style="
+                background:#111827;
+                color:#fff;
+                text-decoration:none;
+                display:inline-flex;
+                align-items:center;
+                gap:5px;
+            "
+        >
+            🖨️ Imprimir todas
+        </a>
+
+    @endif
+
+
+    {{-- Peso total --}}
+    <span style="font-size:11px;color:#94a3b8;">
+        Peso total:
+
+        <strong style="color:#1d4ed8;">
+            {{ number_format($pesoTotal,2) }} kg
+        </strong>
+    </span>
+
+</div>
         <div class="bultos-grid">
 
             @foreach($order->bultos as $bulto)
@@ -327,12 +363,42 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
             @endphp
             <div class="bulto-card">
                 <div class="bulto-hdr">
-                    <div class="bulto-name">📦 {{ $bulto->nombre }}</div>
-                    <div class="peso-badge {{ $isHeavy ? 'heavy' : '' }}">
-                        ⚖ {{ number_format($pesoB,2) }} kg
-                        {{ $isHeavy ? '⚠' : '' }}
-                    </div>
-                </div>
+
+    <div class="bulto-name">
+        📦 {{ $bulto->nombre }}
+    </div>
+
+    <div style="display:flex;align-items:center;gap:6px;">
+
+        <div class="peso-badge {{ $isHeavy ? 'heavy' : '' }}">
+            ⚖ {{ number_format($pesoB,2) }} kg
+            {{ $isHeavy ? '⚠' : '' }}
+        </div>
+
+        <a
+            href="{{ route('orders.bulto.etiqueta', $bulto) }}"
+            target="_blank"
+            title="Imprimir etiqueta del bulto"
+            style="
+                display:inline-flex;
+                align-items:center;
+                justify-content:center;
+                width:30px;
+                height:30px;
+                border:1px solid #cbd5e1;
+                border-radius:7px;
+                background:#fff;
+                color:#1d4ed8;
+                text-decoration:none;
+                font-size:15px;
+            "
+        >
+            🏷️
+        </a>
+
+    </div>
+
+</div>
                 <div style="font-size:10px;color:#94a3b8;">
                     {{ $bulto->detalles->count() }} producto(s)
                 </div>
