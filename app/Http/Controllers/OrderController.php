@@ -553,7 +553,7 @@ public function updateDetail(Request $request, OrderDetail $detail)
     ];
     // Solo tocar estos campos si vienen en el request
 // (evita que el guardado rápido de cantidad/precio borre datos ya guardados)
-foreach (['paleta', 'lote, 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
+foreach (['paleta', 'lote', 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
     if ($request->has($campo)) {
         $updateData[$campo] = $request->input($campo);
     }
