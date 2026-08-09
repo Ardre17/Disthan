@@ -51,10 +51,18 @@ body {
     margin-bottom: 4px;
 }
 
-.cabecera table {
+.cabecera table,
+.productos,
+.resumen {
     width: 100%;
-    border-collapse: collapse;
-    table-layout: fixed;
+    max-width: 100%;
+}
+
+.cabecera td,
+.productos th,
+.productos td,
+.resumen td {
+    overflow: hidden;
 }
 
 .cabecera td {
@@ -100,7 +108,6 @@ body {
 /* =====================================================
    BULTO
    ===================================================== */
-
 .bulto-box {
     width: 100%;
     border: 1px solid #000;
@@ -109,6 +116,17 @@ body {
     margin-bottom: 4px;
 }
 
+.bulto-numero {
+    font-size: 24px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.bulto-texto {
+    font-size: 7px;
+    font-weight: bold;
+    margin-top: 2px;
+}
 .bulto-nombre {
     font-size: 16px;
     font-weight: bold;
@@ -119,7 +137,26 @@ body {
     font-size: 6px;
     margin-top: 2px;
 }
+.peso-box {
+    width: 100%;
+    border-top: 1px solid #000;
+    border-bottom: 1px solid #000;
+    text-align: center;
+    padding: 3px 0;
+    margin-top: 4px;
+}
 
+.peso-numero {
+    font-size: 18px;
+    font-weight: bold;
+    line-height: 1;
+}
+
+.peso-unidad {
+    font-size: 6px;
+    font-weight: bold;
+    margin-top: 1px;
+}
 
 /* =====================================================
    PRODUCTOS
@@ -151,16 +188,16 @@ body {
 }
 
 .productos .producto {
-    width: 76%;
+    width: 70%;
     text-align: left;
     font-weight: bold;
     white-space: normal;
-    overflow-wrap: break-word;
-    word-break: break-word;
+    overflow: hidden;
+    word-wrap: break-word;
 }
 
 .productos .cantidad {
-    width: 24%;
+    width: 30%;
     text-align: right;
     font-weight: bold;
     white-space: nowrap;
@@ -374,20 +411,21 @@ body {
             </td>
 
         </tr>
+        </table>
 
-        <tr>
+<div class="peso-box">
 
-            <td class="label">
-                PESO
-            </td>
+    <div class="peso-numero">
+        {{ number_format($bulto->peso_total ?? 0, 3) }}
+    </div>
 
-            <td class="valor">
-                {{ number_format($bulto->peso_total ?? 0, 3) }} kg
-            </td>
+    <div class="peso-unidad">
+        kg
+    </div>
 
-        </tr>
+</div>
 
-    </table>
+          
 
 
     {{-- =================================================
