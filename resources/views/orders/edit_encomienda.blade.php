@@ -296,29 +296,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                            value="{{ $item->cantidad_despachada }}" style="width:65px;text-align:center;">
                     <input type="number" step="0.01" name="precio_unitario" class="finput"
                            value="{{ $item->precio_unitario }}" style="width:75px;" placeholder="Precio">
-                    <button
-        type="submit"
-        class="btn btn-blue"
-        style="flex:1;">
-        💾 Guardar
-    </button>
-
-    <a
-        href="{{ route('orders.etiqueta', $item) }}"
-        target="_blank"
-        class="btn"
-        style="
-            flex:1;
-            background:#e0e7ff;
-            color:#4338ca;
-            border:1px solid #c7d2fe;
-            text-decoration:none;
-            display:flex;
-            align-items:center;
-            justify-content:center;
-        ">
-        🏷️ Etiqueta
-    </a>
+                    <button type="submit" class="btn btn-blue">💾</button>
                 </div>
             </form>
         </div>
