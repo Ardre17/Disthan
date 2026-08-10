@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 
 <style>
-<style>
 
 @page {
     size: 90mm 70mm;
@@ -38,6 +37,7 @@ body {
     border: 1px solid #000;
     padding: 5px;
     overflow: hidden;
+    text-align: center;
 }
 
 /* TODAS LAS TABLAS */
@@ -66,6 +66,7 @@ table {
     width: 55%;
     font-size: 9px;
     font-weight: bold;
+    text-align: left;
 }
 
 .orden {
@@ -151,6 +152,13 @@ table {
     word-break: break-word;
     overflow-wrap: break-word;
 }
+
+/* CLIENTE (más grande que el resto de campos) */
+.cliente-valor {
+    font-size: 12px !important;
+    font-weight: 800 !important;
+}
+
 .info td {
     border-bottom: 0.5px solid #999;
     padding: 3px 2px;
@@ -166,19 +174,9 @@ table {
 
 /* VENCIMIENTO */
 .vencimiento {
-    font-size: 9px !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
 }
-
-/* PIE */
-.pie {
-    border-top: 1px solid #000;
-    margin-top: 5px;
-    padding-top: 3px;
-    text-align: center;
-    font-size: 6px;
-}
-
-</style>
 
 </style>
 </head>
@@ -186,8 +184,6 @@ table {
 <body>
 
 @php
-
-    $ahora = \Carbon\Carbon::now('America/Lima');
 
     $cliente = $item->order->client?->razon_social ?? '—';
 
@@ -332,15 +328,6 @@ table {
     </tr>
 
 </table>
-
-
-    {{-- PIE --}}
-    <div class="pie">
-
-        Generado:
-        {{ $ahora->format('d/m/Y H:i') }}
-
-    </div>
 
 </div>
 
