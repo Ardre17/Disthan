@@ -155,7 +155,7 @@ table {
 
 /* CLIENTE (más grande que el resto de campos) */
 .cliente-valor {
-    font-size: 12px !important;
+    font-size: 16px !important;
     font-weight: 800 !important;
 }
 
@@ -296,36 +296,7 @@ table {
         </td>
     </tr>
 
-    <tr>
-        <td colspan="2" class="campo">
 
-            <div class="label">
-                LOTE
-            </div>
-
-            <div class="valor">
-                {{ $lote }}
-            </div>
-
-        </td>
-    </tr>
-
-    <tr>
-        <td colspan="2" class="campo">
-
-            <div class="label">
-                VENCIMIENTO
-            </div>
-
-            <div class="valor vencimiento">
-                {{ $fv
-                    ? \Carbon\Carbon::parse($fv)->format('d/m/Y')
-                    : '—'
-                }}
-            </div>
-
-        </td>
-    </tr>
 
 </table>
 
