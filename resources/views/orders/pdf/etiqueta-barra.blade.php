@@ -23,23 +23,17 @@
         margin-top: 3px;
     }
     .barcode-wrap {
-    margin-top: 8px;
-    margin-bottom: 10px;
-    width: 100%;
-    text-align: center;
-}
-.barcode-wrap img {
-    display: block;
-    width: 85%;
-    height: auto;
-    margin: 0 auto;
-}
-.barcode-texto {
-    font-size: 11px;
-    letter-spacing: 1px;
-    margin-top: 8px;
-    clear: both;
-}
+        margin-top: 8px;
+    }
+    .barcode-wrap img {
+        max-width: 90%;
+        height: auto;
+    }
+    .barcode-texto {
+        font-size: 11px;
+        letter-spacing: 1px;
+        margin-top: 3px;
+    }
     .sin-codigo {
         font-size: 10px;
         margin-top: 8px;
