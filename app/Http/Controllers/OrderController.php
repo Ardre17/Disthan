@@ -127,7 +127,7 @@ public function etiqueta(OrderDetail $item)
     if ($codigoParaEtiqueta) {
         if ($usaCodigoDeProducto) {
             // Tottus usa EAN/JAN-13 según su software de etiquetado
-            $svg = Ean13Generator::generateSvgMm($codigoParaEtiqueta, 0.38, 30);
+            $svg = Ean13Generator::generateSvgMm($codigoParaEtiqueta, 0.38, 23);
         } else {
             $svg = Code128Generator::generateSvg($codigoParaEtiqueta, 1.5, 60);
         }
