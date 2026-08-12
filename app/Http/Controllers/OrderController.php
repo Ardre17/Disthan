@@ -9,6 +9,8 @@ use App\Models\Product;
 use App\Models\OrderDetail;
 use App\Services\Barcode\Code128Generator;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\Barcode\Ean13Generator;
+
 
 class OrderController extends Controller
 {
@@ -96,7 +98,8 @@ class OrderController extends Controller
         'etiqueta-local-' . $item->id . '.pdf'
     );
 }
-   public function etiqueta(OrderDetail $item)
+
+public function etiqueta(OrderDetail $item)
 {
     $item->load('product', 'order.client');
 
@@ -122,7 +125,12 @@ class OrderController extends Controller
     $barcode = null;
 
     if ($codigoParaEtiqueta) {
-        $svg = Code128Generator::generateSvg($codigoParaEtiqueta, 1.4, 61);
+        if ($usaCodigoDeProducto) {
+            // Tottus usa EAN/JAN-13 según su software de etiquetado
+            $svg = Ean13Generator::generateSvgMm($codigoParaEtiqueta, 0.38, 22.9);
+        } else {
+            $svg = Code128Generator::generateSvg($codigoParaEtiqueta, 1.4, 61);
+        }
         $barcode = 'data:image/svg+xml;base64,' . base64_encode($svg);
     }
 
