@@ -236,6 +236,21 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         <span class="badge-estado" style="background:{{ $estadoColor }};">{{ $order->estado }}</span>
         <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="btn btn-green">📄 Ver PDF</a>
         <a href="{{ route('orders.pdf',$order) }}" class="btn btn-blue">⬇ Descargar</a>
+        <button
+    type="button"
+    class="btn"
+    onclick="abrirResumenOrden()"
+    style="
+        background:#111827;
+        color:#fff;
+        border:1px solid #111827;
+        display:inline-flex;
+        align-items:center;
+        gap:5px;
+        cursor:pointer;
+    ">
+    📋 Ver orden
+</button>
     </div>
 </div>
 
@@ -920,5 +935,264 @@ function abrirEtiqueta(data) {
     document.getElementById('etOverlay').classList.add('open');
 }
 </script>
+{{-- =========================================================
+     MODAL RESUMEN DE ORDEN
+========================================================= --}}
 
+<div id="modalResumenOrden"
+     style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.55);
+        z-index:9999;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+     ">
+
+    <div style="
+        background:#fff;
+        width:min(1000px, 95vw);
+        max-height:90vh;
+        border-radius:10px;
+        box-shadow:0 20px 50px rgba(0,0,0,.25);
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+    ">
+
+        {{-- CABECERA --}}
+        <div style="
+            padding:15px 18px;
+            border-bottom:1px solid #e5e7eb;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        ">
+
+            <div>
+                <div style="
+                    font-size:17px;
+                    font-weight:800;
+                    color:#111827;
+                ">
+                    📋 Resumen de orden
+                </div>
+
+                <div style="
+                    font-size:12px;
+                    color:#6b7280;
+                    margin-top:3px;
+                ">
+                    Orden #{{ $order->numero_orden }}
+                </div>
+            </div>
+
+            <button
+                type="button"
+                onclick="cerrarResumenOrden()"
+                style="
+                    border:0;
+                    background:#f3f4f6;
+                    width:32px;
+                    height:32px;
+                    border-radius:6px;
+                    font-size:18px;
+                    cursor:pointer;
+                ">
+                ×
+            </button>
+
+        </div>
+
+
+        {{-- TABLA --}}
+        <div style="
+            overflow:auto;
+            padding:15px;
+        ">
+
+            <table style="
+                width:100%;
+                border-collapse:collapse;
+                font-size:12px;
+            ">
+
+                <thead>
+
+                    <tr style="
+                        background:#f3f4f6;
+                        color:#374151;
+                    ">
+
+                        <th style="padding:9px;text-align:left;">
+                            Código
+                        </th>
+
+                        <th style="padding:9px;text-align:left;">
+                            Descripción
+                        </th>
+
+                        <th style="padding:9px;text-align:center;">
+                            Solicitado
+                        </th>
+
+                        <th style="padding:9px;text-align:center;">
+                            Despachado
+                        </th>
+
+                        <th style="padding:9px;text-align:center;">
+                            Estado
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach($order->details as $detalle)
+
+                        @php
+                            $solicitado = (float) ($detalle->cantidad_solicitada ?? 0);
+                            $despachado = (float) ($detalle->cantidad_despachada ?? 0);
+
+                            if ($despachado >= $solicitado && $solicitado > 0) {
+                                $estado = 'ARMADO';
+                                $estadoColor = '#166534';
+                                $estadoBg = '#dcfce7';
+                            } elseif ($despachado > 0) {
+                                $estado = 'PARCIAL';
+                                $estadoColor = '#92400e';
+                                $estadoBg = '#fef3c7';
+                            } else {
+                                $estado = 'NO ARMADO';
+                                $estadoColor = '#991b1b';
+                                $estadoBg = '#fee2e2';
+                            }
+                        @endphp
+
+                        <tr style="border-bottom:1px solid #e5e7eb;">
+
+                            {{-- CÓDIGO --}}
+                            <td style="
+                                padding:9px;
+                                font-family:monospace;
+                                font-weight:700;
+                            ">
+                                {{ $detalle->product->sku
+                                    ?? $detalle->product->barcode
+                                    ?? '—' }}
+                            </td>
+
+                            {{-- DESCRIPCIÓN --}}
+                            <td style="
+                                padding:9px;
+                                font-weight:600;
+                            ">
+                                {{ $detalle->product->nombre ?? 'Producto' }}
+                            </td>
+
+                            {{-- SOLICITADO --}}
+                            <td style="
+                                padding:9px;
+                                text-align:center;
+                                font-family:monospace;
+                            ">
+                                {{ number_format($solicitado, 0) }}
+                            </td>
+
+                            {{-- DESPACHADO --}}
+                            <td style="
+                                padding:9px;
+                                text-align:center;
+                                font-family:monospace;
+                                font-weight:700;
+                            ">
+                                {{ number_format($despachado, 0) }}
+                            </td>
+
+                            {{-- ESTADO --}}
+                            <td style="
+                                padding:9px;
+                                text-align:center;
+                            ">
+
+                                <span style="
+                                    display:inline-block;
+                                    padding:4px 8px;
+                                    border-radius:999px;
+                                    background:{{ $estadoBg }};
+                                    color:{{ $estadoColor }};
+                                    font-size:10px;
+                                    font-weight:800;
+                                ">
+                                    {{ $estado }}
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    @endforeach
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {{-- PIE --}}
+        <div style="
+            padding:10px 15px;
+            border-top:1px solid #e5e7eb;
+            text-align:right;
+        ">
+
+            <button
+                type="button"
+                onclick="cerrarResumenOrden()"
+                style="
+                    padding:7px 14px;
+                    border:1px solid #d1d5db;
+                    background:#fff;
+                    border-radius:6px;
+                    cursor:pointer;
+                ">
+                Cerrar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+function abrirResumenOrden() {
+    const modal = document.getElementById('modalResumenOrden');
+
+    modal.style.display = 'flex';
+
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarResumenOrden() {
+    const modal = document.getElementById('modalResumenOrden');
+
+    modal.style.display = 'none';
+
+    document.body.style.overflow = '';
+}
+
+// Cerrar haciendo clic fuera de la ventana
+document.getElementById('modalResumenOrden')?.addEventListener('click', function(e) {
+
+    if (e.target === this) {
+        cerrarResumenOrden();
+    }
+
+});
+</script>
 @endsection
