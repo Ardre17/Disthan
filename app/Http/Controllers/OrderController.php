@@ -449,7 +449,64 @@ public function pdfEncomienda(Order $order)
         'Producto agregado'
     );
 }
+public function stockPedidos()
+{
+    $detalles = OrderDetail::with('product')
+        ->whereHas('order', function ($query) {
+            $query->where('estado', '!=', 'COMPLETO');
+        })
+        ->get();
 
+    $productos = $detalles
+        ->groupBy('product_id')
+        ->map(function ($items) {
+
+            $producto = $items->first()->product;
+
+            $solicitado = $items->sum(function ($item) {
+                return (float) $item->cantidad_solicitada;
+            });
+
+            $despachado = $items->sum(function ($item) {
+                return (float) $item->cantidad_despachada;
+            });
+
+            $pendiente = max(0, $solicitado - $despachado);
+
+            $stock = (float) ($producto->stock ?? 0);
+
+            $faltante = max(0, $pendiente - $stock);
+
+            if ($pendiente <= 0) {
+                $estado = 'SIN PENDIENTE';
+            } elseif ($stock >= $pendiente) {
+                $estado = 'STOCK SUFICIENTE';
+            } elseif ($stock > 0) {
+                $estado = 'STOCK PARCIAL';
+            } else {
+                $estado = 'SOLICITAR PRODUCCIÓN';
+            }
+
+            return [
+                'id'          => $producto->id,
+                'codigo'      => $producto->sku ?? $producto->barcode ?? '—',
+                'nombre'      => $producto->nombre,
+                'solicitado'  => $solicitado,
+                'despachado'  => $despachado,
+                'pendiente'   => $pendiente,
+                'stock'       => $stock,
+                'faltante'    => $faltante,
+                'estado'      => $estado,
+            ];
+        })
+        ->filter(function ($producto) {
+            return $producto['pendiente'] > 0;
+        })
+        ->sortByDesc('faltante')
+        ->values();
+
+    return response()->json($productos);
+}
     public function index(Request $request)
 {
     $query = Order::with('client')

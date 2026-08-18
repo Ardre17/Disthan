@@ -35,6 +35,9 @@ use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
 
+Route::get('/orders/stock-pedidos', [OrderController::class, 'stockPedidos'])
+    ->name('orders.stockPedidos');
+    
 Route::get(
     '/orders/{order}/bultos/etiquetas',
     [OrderController::class, 'etiquetasBultos']

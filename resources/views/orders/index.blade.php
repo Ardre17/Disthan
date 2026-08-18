@@ -118,8 +118,39 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
 
 {{-- ── Header ── --}}
 <div class="hdr">
-   <div class="hdr-title">📋 Órdenes</div>
-   <a href="{{ route('orders.create') }}" class="btn-new">+ Nueva orden</a>
+
+    <div class="hdr-title">
+        📋 Órdenes
+    </div>
+
+    <div style="display:flex;gap:8px;align-items:center;">
+
+        <button
+            type="button"
+            onclick="abrirStockPedidos()"
+            style="
+                background:#eff6ff;
+                color:#1d4ed8;
+                border:1px solid #bfdbfe;
+                padding:9px 14px;
+                border-radius:9px;
+                font-size:13px;
+                font-weight:600;
+                cursor:pointer;
+                display:inline-flex;
+                align-items:center;
+                gap:5px;
+            "
+        >
+            📦 Stock de pedidos
+        </button>
+
+        <a href="{{ route('orders.create') }}" class="btn-new">
+            + Nueva orden
+        </a>
+
+    </div>
+
 </div>
 
 
@@ -245,6 +276,475 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
 
 </div>
 
+{{-- =========================================================
+     MODAL STOCK DE PEDIDOS
+========================================================= --}}
 
+<div id="modalStockPedidos"
+     style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(15,23,42,.60);
+        z-index:9999;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+     ">
+
+    <div style="
+        background:#fff;
+        width:min(1100px,96vw);
+        max-height:90vh;
+        border-radius:14px;
+        box-shadow:0 25px 60px rgba(0,0,0,.30);
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+    ">
+
+        {{-- CABECERA --}}
+
+        <div style="
+            padding:16px 20px;
+            border-bottom:1px solid #e5e7eb;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        ">
+
+            <div>
+
+                <div style="
+                    font-size:18px;
+                    font-weight:800;
+                    color:#1e293b;
+                ">
+                    📦 Stock de productos en pedidos
+                </div>
+
+                <div style="
+                    font-size:12px;
+                    color:#94a3b8;
+                    margin-top:3px;
+                ">
+                    Solo productos pendientes de órdenes abiertas
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                onclick="cerrarStockPedidos()"
+                style="
+                    width:32px;
+                    height:32px;
+                    border:none;
+                    border-radius:7px;
+                    background:#f1f5f9;
+                    color:#475569;
+                    font-size:20px;
+                    cursor:pointer;
+                "
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        {{-- RESUMEN --}}
+
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(3,1fr);
+            gap:10px;
+            padding:15px 20px;
+            background:#f8fafc;
+            border-bottom:1px solid #e5e7eb;
+        ">
+
+            <div style="
+                background:#fff;
+                border:1px solid #e2e8f0;
+                border-radius:9px;
+                padding:10px;
+                text-align:center;
+            ">
+
+                <div style="font-size:10px;color:#94a3b8;font-weight:700;">
+                    PRODUCTOS
+                </div>
+
+                <div id="stockTotalProductos"
+                     style="font-size:20px;font-weight:800;color:#1e293b;">
+                    0
+                </div>
+
+            </div>
+
+
+            <div style="
+                background:#fff;
+                border:1px solid #e2e8f0;
+                border-radius:9px;
+                padding:10px;
+                text-align:center;
+            ">
+
+                <div style="font-size:10px;color:#94a3b8;font-weight:700;">
+                    STOCK INSUFICIENTE
+                </div>
+
+                <div id="stockInsuficiente"
+                     style="font-size:20px;font-weight:800;color:#dc2626;">
+                    0
+                </div>
+
+            </div>
+
+
+            <div style="
+                background:#fff;
+                border:1px solid #e2e8f0;
+                border-radius:9px;
+                padding:10px;
+                text-align:center;
+            ">
+
+                <div style="font-size:10px;color:#94a3b8;font-weight:700;">
+                    A PRODUCIR
+                </div>
+
+                <div id="stockProducir"
+                     style="font-size:20px;font-weight:800;color:#ea580c;">
+                    0
+                </div>
+
+            </div>
+
+        </div>
+
+
+        {{-- TABLA --}}
+
+        <div style="
+            overflow:auto;
+            padding:15px 20px;
+        ">
+
+            <table style="
+                width:100%;
+                border-collapse:collapse;
+                font-size:12px;
+            ">
+
+                <thead>
+
+                    <tr style="
+                        background:#f8fafc;
+                        border-bottom:1px solid #e2e8f0;
+                    ">
+
+                        <th style="padding:10px;text-align:left;">
+                            Código
+                        </th>
+
+                        <th style="padding:10px;text-align:left;">
+                            Producto
+                        </th>
+
+                        <th style="padding:10px;text-align:center;">
+                            Pendiente
+                        </th>
+
+                        <th style="padding:10px;text-align:center;">
+                            Stock
+                        </th>
+
+                        <th style="padding:10px;text-align:center;">
+                            Faltante
+                        </th>
+
+                        <th style="padding:10px;text-align:center;">
+                            Estado
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="tablaStockPedidos">
+
+                    <tr>
+                        <td
+                            colspan="6"
+                            style="
+                                padding:30px;
+                                text-align:center;
+                                color:#94a3b8;
+                            "
+                        >
+                            Presiona para cargar información...
+                        </td>
+                    </tr>
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {{-- PIE --}}
+
+        <div style="
+            padding:10px 20px;
+            border-top:1px solid #e5e7eb;
+            text-align:right;
+        ">
+
+            <button
+                type="button"
+                onclick="cerrarStockPedidos()"
+                style="
+                    padding:8px 15px;
+                    border:1px solid #cbd5e1;
+                    background:#fff;
+                    color:#475569;
+                    border-radius:7px;
+                    cursor:pointer;
+                "
+            >
+                Cerrar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+<script>
+
+function abrirStockPedidos()
+{
+    const modal = document.getElementById('modalStockPedidos');
+
+    modal.style.display = 'flex';
+
+    document.body.style.overflow = 'hidden';
+
+    cargarStockPedidos();
+}
+
+
+function cerrarStockPedidos()
+{
+    const modal = document.getElementById('modalStockPedidos');
+
+    modal.style.display = 'none';
+
+    document.body.style.overflow = '';
+}
+
+
+async function cargarStockPedidos()
+{
+    const tabla = document.getElementById('tablaStockPedidos');
+
+    tabla.innerHTML = `
+        <tr>
+            <td colspan="6"
+                style="
+                    padding:30px;
+                    text-align:center;
+                    color:#64748b;
+                ">
+                ⏳ Calculando stock...
+            </td>
+        </tr>
+    `;
+
+    try {
+
+        const response = await fetch(
+            "{{ route('orders.stockPedidos') }}"
+        );
+
+        if (!response.ok) {
+            throw new Error('Error al consultar stock');
+        }
+
+        const productos = await response.json();
+
+
+        document.getElementById('stockTotalProductos').textContent =
+            productos.length;
+
+
+        const insuficientes = productos.filter(producto =>
+            producto.stock < producto.pendiente
+        ).length;
+
+
+        const producir = productos.reduce(
+            (total, producto) => total + Number(producto.faltante),
+            0
+        );
+
+
+        document.getElementById('stockInsuficiente').textContent =
+            insuficientes;
+
+
+        document.getElementById('stockProducir').textContent =
+            Number(producir).toLocaleString();
+
+
+        if (productos.length === 0) {
+
+            tabla.innerHTML = `
+                <tr>
+                    <td colspan="6"
+                        style="
+                            padding:35px;
+                            text-align:center;
+                            color:#15803d;
+                            font-weight:700;
+                        ">
+                        ✅ No hay productos pendientes en las órdenes.
+                    </td>
+                </tr>
+            `;
+
+            return;
+        }
+
+
+        tabla.innerHTML = productos.map(producto => {
+
+            let estadoColor = '#15803d';
+            let estadoBg = '#dcfce7';
+            let icono = '✅';
+
+            if (producto.estado === 'STOCK PARCIAL') {
+
+                estadoColor = '#b45309';
+                estadoBg = '#fef3c7';
+                icono = '🟡';
+
+            } else if (producto.estado === 'SOLICITAR PRODUCCIÓN') {
+
+                estadoColor = '#b91c1c';
+                estadoBg = '#fee2e2';
+                icono = '🏭';
+
+            }
+
+
+            return `
+                <tr style="border-bottom:1px solid #f1f5f9;">
+
+                    <td style="
+                        padding:10px;
+                        font-family:monospace;
+                        font-weight:700;
+                    ">
+                        ${producto.codigo}
+                    </td>
+
+                    <td style="
+                        padding:10px;
+                        font-weight:600;
+                    ">
+                        ${producto.nombre}
+                    </td>
+
+                    <td style="
+                        padding:10px;
+                        text-align:center;
+                        font-family:monospace;
+                        font-weight:700;
+                    ">
+                        ${Number(producto.pendiente).toLocaleString()}
+                    </td>
+
+                    <td style="
+                        padding:10px;
+                        text-align:center;
+                        font-family:monospace;
+                        font-weight:700;
+                    ">
+                        ${Number(producto.stock).toLocaleString()}
+                    </td>
+
+                    <td style="
+                        padding:10px;
+                        text-align:center;
+                        font-family:monospace;
+                        font-weight:800;
+                        color:${producto.faltante > 0 ? '#dc2626' : '#15803d'};
+                    ">
+                        ${Number(producto.faltante).toLocaleString()}
+                    </td>
+
+                    <td style="
+                        padding:10px;
+                        text-align:center;
+                    ">
+
+                        <span style="
+                            display:inline-flex;
+                            align-items:center;
+                            gap:4px;
+                            padding:5px 9px;
+                            border-radius:999px;
+                            background:${estadoBg};
+                            color:${estadoColor};
+                            font-size:10px;
+                            font-weight:800;
+                            white-space:nowrap;
+                        ">
+                            ${icono} ${producto.estado}
+                        </span>
+
+                    </td>
+
+                </tr>
+            `;
+
+        }).join('');
+
+
+    } catch (error) {
+
+        console.error(error);
+
+        tabla.innerHTML = `
+            <tr>
+                <td colspan="6"
+                    style="
+                        padding:30px;
+                        text-align:center;
+                        color:#dc2626;
+                    ">
+                    ❌ No se pudo cargar el stock.
+                </td>
+            </tr>
+        `;
+    }
+}
+
+
+document.getElementById('modalStockPedidos')
+    ?.addEventListener('click', function(event) {
+
+        if (event.target === this) {
+            cerrarStockPedidos();
+        }
+
+    });
+
+</script>
 @endsection
 
