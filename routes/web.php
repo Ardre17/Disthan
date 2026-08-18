@@ -35,6 +35,11 @@ use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
 
+Route::post(
+    '/exportacion/{order}/cajas-objetivo',
+    [ExportController::class, 'actualizarCajasObjetivo']
+)->name('exportacion.cajasObjetivo');
+
 Route::get('/orders/stock-pedidos', [OrderController::class, 'stockPedidos'])
     ->name('orders.stockPedidos');
     

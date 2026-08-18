@@ -209,6 +209,206 @@
             <div class="sec-hdr-title">➕ Agregar línea de producto</div>
         </div>
         <div class="sec-body">
+            {{-- =========================================================
+     OBJETIVO DE CAJAS DE LA EXPORTACIÓN
+========================================================= --}}
+
+@php
+    $totalCajasAsignadas = $order->pallets
+        ->flatMap(fn($pallet) => $pallet->detalles)
+        ->sum('cantidad');
+
+    $objetivoCajas = (int) ($order->cajas_objetivo ?? 0);
+
+    $avanceCajas = $objetivoCajas > 0
+        ? min(100, round(($totalCajasAsignadas / $objetivoCajas) * 100))
+        : 0;
+
+    $cajasFaltantes = max(
+        0,
+        $objetivoCajas - $totalCajasAsignadas
+    );
+
+    $avanceColor = $avanceCajas >= 100
+        ? 'var(--erp-ok)'
+        : ($avanceCajas > 0 ? '#f59e0b' : '#94a3b8');
+@endphp
+
+<div style="
+    background:#f8fafc;
+    border:1px solid var(--erp-border);
+    border-radius:4px;
+    padding:12px;
+    margin-bottom:12px;
+">
+
+    <div style="
+        display:flex;
+        justify-content:space-between;
+        align-items:center;
+        gap:15px;
+        flex-wrap:wrap;
+    ">
+
+        <div>
+
+            <div style="
+                font-size:10px;
+                color:var(--erp-ink-muted);
+                text-transform:uppercase;
+                font-weight:700;
+                letter-spacing:.05em;
+            ">
+                📦 Objetivo de exportación
+            </div>
+
+            <div style="
+                font-size:22px;
+                font-weight:900;
+                font-family:var(--font-mono);
+                color:#1e3a5f;
+                margin-top:2px;
+            ">
+                {{ number_format($totalCajasAsignadas) }}
+                /
+                {{ $objetivoCajas > 0 ? number_format($objetivoCajas) : '—' }}
+                <span style="
+                    font-size:11px;
+                    font-family:var(--font-ui);
+                    color:#64748b;
+                    font-weight:600;
+                ">
+                    cajas
+                </span>
+            </div>
+
+        </div>
+
+
+        {{-- FORMULARIO OBJETIVO --}}
+
+        <form
+            action="{{ route('exportacion.cajasObjetivo', $order) }}"
+            method="POST"
+            style="
+                display:flex;
+                align-items:end;
+                gap:6px;
+            "
+        >
+
+            @csrf
+
+            <div>
+
+                <label class="flabel">
+                    Cajas objetivo
+                </label>
+
+                <input
+                    type="number"
+                    name="cajas_objetivo"
+                    min="1"
+                    required
+                    value="{{ $order->cajas_objetivo }}"
+                    class="finput"
+                    style="width:130px;"
+                    placeholder="1000"
+                >
+
+            </div>
+
+            <button
+                type="submit"
+                class="btn-primary"
+                style="background:#7c3aed;"
+            >
+                💾 Definir
+            </button>
+
+        </form>
+
+    </div>
+
+
+    {{-- BARRA GLOBAL --}}
+
+    <div style="margin-top:12px;">
+
+        <div style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            font-size:10px;
+            color:var(--erp-ink-muted);
+            margin-bottom:4px;
+        ">
+
+            <span>
+                Avance de asignación
+            </span>
+
+            <span style="
+                font-weight:800;
+                color:{{ $avanceColor }};
+            ">
+                {{ $avanceCajas }}%
+            </span>
+
+        </div>
+
+        <div style="
+            height:9px;
+            background:#e5e7eb;
+            border-radius:99px;
+            overflow:hidden;
+        ">
+
+            <div style="
+                height:100%;
+                width:{{ $avanceCajas }}%;
+                background:{{ $avanceColor }};
+                border-radius:99px;
+                transition:width .3s;
+            "></div>
+
+        </div>
+
+        <div style="
+            margin-top:5px;
+            font-size:10px;
+            color:#64748b;
+        ">
+
+            @if($objetivoCajas > 0)
+
+                @if($cajasFaltantes > 0)
+
+                    Faltan
+                    <strong>
+                        {{ number_format($cajasFaltantes) }}
+                    </strong>
+                    cajas por asignar.
+
+                @else
+
+                    <strong style="color:var(--erp-ok);">
+                        ✅ Objetivo de cajas completado.
+                    </strong>
+
+                @endif
+
+            @else
+
+                Define primero la cantidad total de cajas de esta exportación.
+
+            @endif
+
+        </div>
+
+    </div>
+
+</div>
             <form method="POST" action="{{ route('orders.addProduct', $order) }}">
             @csrf
             <div class="field-grid">
@@ -658,7 +858,7 @@
             <tbody>
             @foreach($order->details as $detalle)
             @php
-                $enPallets = $detalle->cantidad_en_pallets ?? 0;
+                $enPallets = $detalle->palletDetails->sum('cantidad');
                 $pendiente = $detalle->cantidad_solicitada - $enPallets;
                 $peso      = ($detalle->product->peso ?? 0) * $detalle->cantidad_solicitada;
                 $pct2      = $detalle->cantidad_solicitada > 0
