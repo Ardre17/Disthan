@@ -1631,21 +1631,11 @@ function renderPaleta3D()
         .forEach(el => el.remove());
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | Dimensiones visuales de la paleta
-    |--------------------------------------------------------------------------
-    */
-
     const palletWidth = 520;
     const palletDepth = 330;
 
+    const gap = 4;
 
-    /*
-    |--------------------------------------------------------------------------
-    | Crear cada producto
-    |--------------------------------------------------------------------------
-    */
 
     p3dData.forEach((item, index) => {
 
@@ -1666,29 +1656,65 @@ function renderPaleta3D()
 
         /*
         |--------------------------------------------------------------------------
-        | Configuración inicial
+        | CONFIGURACIÓN INICIAL
         |--------------------------------------------------------------------------
         */
 
         if (item.p3d === undefined) {
 
-            const col =
+            /*
+             * Intentamos una distribución razonable
+             * automáticamente.
+             *
+             * 8 cajas → 2 x 1 x 4
+             * 12 cajas → 3 x 1 x 4
+             * 16 cajas → 4 x 1 x 4
+             */
+
+            let columnas = 1;
+
+            if (cajas >= 16) {
+                columnas = 4;
+            } else if (cajas >= 9) {
+                columnas = 3;
+            } else if (cajas >= 4) {
+                columnas = 2;
+            }
+
+            const niveles =
+                Math.ceil(
+                    cajas / columnas
+                );
+
+
+            const colInicial =
                 index % 3;
 
-            const row =
+            const filaInicial =
                 Math.floor(index / 3);
+
 
             item.p3d = {
 
-                x: 30 + (col * 160),
+                x:
+                    25 +
+                    (colInicial * 165),
 
-                y: 30 + (row * 95),
+                y:
+                    25 +
+                    (filaInicial * 100),
 
                 width: 75,
 
                 depth: 55,
 
                 height: 18,
+
+                columnas: columnas,
+
+                filas: 1,
+
+                niveles: niveles,
 
                 rotation: 0
 
@@ -1703,7 +1729,65 @@ function renderPaleta3D()
 
         /*
         |--------------------------------------------------------------------------
-        | Grupo
+        | Seguridad
+        |--------------------------------------------------------------------------
+        */
+
+        config.columnas =
+            Math.max(
+                1,
+                Number(config.columnas || 1)
+            );
+
+        config.filas =
+            Math.max(
+                1,
+                Number(config.filas || 1)
+            );
+
+        config.niveles =
+            Math.max(
+                1,
+                Number(config.niveles || 1)
+            );
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Dimensiones totales del grupo
+        |--------------------------------------------------------------------------
+        */
+
+        const groupWidth =
+            (
+                config.columnas *
+                config.width
+            ) +
+            (
+                (config.columnas - 1) *
+                gap
+            );
+
+
+        const groupDepth =
+            (
+                config.filas *
+                config.depth
+            ) +
+            (
+                (config.filas - 1) *
+                gap
+            );
+
+
+        const groupHeight =
+            config.niveles *
+            config.height;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | GRUPO
         |--------------------------------------------------------------------------
         */
 
@@ -1724,10 +1808,10 @@ function renderPaleta3D()
             config.y + 'px';
 
         group.style.width =
-            config.width + 'px';
+            groupWidth + 'px';
 
         group.style.height =
-            config.depth + 'px';
+            groupDepth + 'px';
 
 
         group.style.transform =
@@ -1736,7 +1820,7 @@ function renderPaleta3D()
 
         /*
         |--------------------------------------------------------------------------
-        | Colores
+        | COLORES
         |--------------------------------------------------------------------------
         */
 
@@ -1758,147 +1842,198 @@ function renderPaleta3D()
 
 
         const color =
-            colores[index % colores.length];
+            colores[
+                index % colores.length
+            ];
 
 
         /*
         |--------------------------------------------------------------------------
-        | Número de cajas visibles
+        | CREAR LAS CAJAS
         |--------------------------------------------------------------------------
-        |
-        | No dibujamos cientos de divs.
-        | Representamos las cajas como una pila.
-        |
         */
 
-        const cajasVisibles =
-            Math.min(cajas, 12);
+        let cajaActual = 0;
 
 
         for (
-            let c = 0;
-            c < cajasVisibles;
-            c++
+            let nivel = 0;
+            nivel < config.niveles;
+            nivel++
         ) {
 
-            const caja =
-                document.createElement('div');
+            for (
+                let fila = 0;
+                fila < config.filas;
+                fila++
+            ) {
 
-            caja.className =
-                'p3d-box';
+                for (
+                    let columna = 0;
+                    columna < config.columnas;
+                    columna++
+                ) {
 
+                    /*
+                     * No crear más cajas
+                     * de las realmente existentes.
+                     */
 
-            /*
-            |--------------------------------------------------------------------------
-            | Posición vertical
-            |--------------------------------------------------------------------------
-            */
-
-            const z =
-                c * config.height;
-
-
-            caja.style.width =
-                config.width + 'px';
-
-            caja.style.height =
-                config.depth + 'px';
-
-
-            caja.style.transform =
-                `translateZ(${z}px)`;
+                    if (
+                        cajaActual >= cajas
+                    ) {
+                        break;
+                    }
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Cara frontal
-            |--------------------------------------------------------------------------
-            */
+                    const caja =
+                        document.createElement('div');
 
-            const front =
-                document.createElement('div');
-
-            front.className =
-                'p3d-box-front';
-
-            front.style.background =
-                color[0];
-
-            front.style.borderColor =
-                color[1];
-
-            front.style.color =
-                color[2];
-
-            front.textContent =
-                item.nombre;
+                    caja.className =
+                        'p3d-box';
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Cara superior
-            |--------------------------------------------------------------------------
-            */
+                    /*
+                    |--------------------------------------------------------------------------
+                    | POSICIÓN
+                    |--------------------------------------------------------------------------
+                    */
 
-            const top =
-                document.createElement('div');
-
-            top.className =
-                'p3d-box-top';
-
-            top.style.width =
-                config.width + 'px';
-
-            top.style.height =
-                config.depth + 'px';
-
-            top.style.background =
-                color[0];
-
-            top.style.borderColor =
-                color[1];
+                    const posX =
+                        columna *
+                        (
+                            config.width +
+                            gap
+                        );
 
 
-            /*
-            |--------------------------------------------------------------------------
-            | Cara lateral
-            |--------------------------------------------------------------------------
-            */
-
-            const side =
-                document.createElement('div');
-
-            side.className =
-                'p3d-box-side';
-
-            side.style.width =
-                config.depth + 'px';
-
-            side.style.height =
-                config.depth + 'px';
-
-            side.style.background =
-                color[1];
-
-            side.style.borderColor =
-                color[1];
+                    const posY =
+                        fila *
+                        (
+                            config.depth +
+                            gap
+                        );
 
 
-            caja.appendChild(front);
-
-            caja.appendChild(top);
-
-            caja.appendChild(side);
+                    const posZ =
+                        nivel *
+                        config.height;
 
 
-            group.appendChild(caja);
+                    caja.style.width =
+                        config.width + 'px';
+
+                    caja.style.height =
+                        config.depth + 'px';
+
+
+                    caja.style.transform =
+                        `
+                        translate3d(
+                            ${posX}px,
+                            ${posY}px,
+                            ${posZ}px
+                        )
+                        `;
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | FRENTE
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const front =
+                        document.createElement('div');
+
+                    front.className =
+                        'p3d-box-front';
+
+                    front.style.background =
+                        color[0];
+
+                    front.style.borderColor =
+                        color[1];
+
+                    front.style.color =
+                        color[2];
+
+                    front.textContent =
+                        item.nombre;
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | PARTE SUPERIOR
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const top =
+                        document.createElement('div');
+
+                    top.className =
+                        'p3d-box-top';
+
+                    top.style.width =
+                        config.width + 'px';
+
+                    top.style.height =
+                        config.depth + 'px';
+
+                    top.style.background =
+                        color[0];
+
+                    top.style.borderColor =
+                        color[1];
+
+
+                    /*
+                    |--------------------------------------------------------------------------
+                    | LATERAL
+                    |--------------------------------------------------------------------------
+                    */
+
+                    const side =
+                        document.createElement('div');
+
+                    side.className =
+                        'p3d-box-side';
+
+                    side.style.width =
+                        config.depth + 'px';
+
+                    side.style.height =
+                        config.depth + 'px';
+
+                    side.style.background =
+                        color[1];
+
+                    side.style.borderColor =
+                        color[1];
+
+
+                    caja.appendChild(front);
+
+                    caja.appendChild(top);
+
+                    caja.appendChild(side);
+
+
+                    group.appendChild(caja);
+
+
+                    cajaActual++;
+
+                }
+
+            }
 
         }
 
 
         /*
         |--------------------------------------------------------------------------
-        | Arrastrar producto
+        | ARRASTRAR TODO EL GRUPO
         |--------------------------------------------------------------------------
         */
 
@@ -1930,10 +2065,14 @@ function configurarDragProducto(group, index)
         {
             event.stopPropagation();
 
-            seleccionarProducto3D(index);
+
+            seleccionarProducto3D(
+                index
+            );
 
 
             dragging = true;
+
 
             group.classList.add(
                 'dragging'
@@ -1956,6 +2095,7 @@ function configurarDragProducto(group, index)
 
             document.body.style.userSelect =
                 'none';
+
         }
     );
 
@@ -1964,36 +2104,41 @@ function configurarDragProducto(group, index)
         'mousemove',
         function(event)
         {
+
             if (!dragging) {
                 return;
             }
 
 
+            const config =
+                p3dData[index].p3d;
+
+
             const dx =
-                event.clientX - startX;
+                event.clientX -
+                startX;
+
 
             const dy =
-                event.clientY - startY;
+                event.clientY -
+                startY;
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | Movimiento visual
-            |--------------------------------------------------------------------------
-            */
 
             let nuevoX =
-                originalX + dx / (p3dZoom / 100);
+                originalX +
+                (
+                    dx /
+                    (p3dZoom / 100)
+                );
+
 
             let nuevoY =
-                originalY + dy / (p3dZoom / 100);
+                originalY +
+                (
+                    dy /
+                    (p3dZoom / 100)
+                );
 
-
-            /*
-            |--------------------------------------------------------------------------
-            | Límites de la paleta
-            |--------------------------------------------------------------------------
-            */
 
             const palletWidth =
                 520;
@@ -2002,18 +2147,50 @@ function configurarDragProducto(group, index)
                 330;
 
 
-            const width =
-                p3dData[index].p3d.width;
+            const gap =
+                4;
 
-            const depth =
-                p3dData[index].p3d.depth;
 
+            /*
+            |--------------------------------------------------------------------------
+            | Tamaño real del grupo
+            |--------------------------------------------------------------------------
+            */
+
+            const groupWidth =
+                (
+                    config.columnas *
+                    config.width
+                ) +
+                (
+                    (config.columnas - 1) *
+                    gap
+                );
+
+
+            const groupDepth =
+                (
+                    config.filas *
+                    config.depth
+                ) +
+                (
+                    (config.filas - 1) *
+                    gap
+                );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Limitar a la paleta
+            |--------------------------------------------------------------------------
+            */
 
             nuevoX =
                 Math.max(
                     0,
                     Math.min(
-                        palletWidth - width,
+                        palletWidth -
+                        groupWidth,
                         nuevoX
                     )
                 );
@@ -2023,16 +2200,17 @@ function configurarDragProducto(group, index)
                 Math.max(
                     0,
                     Math.min(
-                        palletDepth - depth,
+                        palletDepth -
+                        groupDepth,
                         nuevoY
                     )
                 );
 
 
-            p3dData[index].p3d.x =
+            config.x =
                 nuevoX;
 
-            p3dData[index].p3d.y =
+            config.y =
                 nuevoY;
 
 
@@ -2058,12 +2236,14 @@ function configurarDragProducto(group, index)
         'mouseup',
         function()
         {
+
             if (!dragging) {
                 return;
             }
 
 
             dragging = false;
+
 
             group.classList.remove(
                 'dragging'
@@ -2075,6 +2255,7 @@ function configurarDragProducto(group, index)
 
         }
     );
+
 }
 function seleccionarProducto3D(index)
 {
@@ -2132,10 +2313,16 @@ function actualizarEditor3D()
             'p3dEditor'
         );
 
-if (!editor) {
-    console.error('No existe el elemento #p3dEditor');
-    return;
-}
+
+    if (!editor) {
+        console.error(
+            'No existe #p3dEditor'
+        );
+
+        return;
+    }
+
+
     if (
         p3dSelected === null ||
         !p3dData[p3dSelected]
@@ -2151,8 +2338,35 @@ if (!editor) {
     const item =
         p3dData[p3dSelected];
 
+
     const config =
         item.p3d;
+
+
+    const cpc =
+        Number(item.cantidad_por_caja) > 0
+            ? Number(item.cantidad_por_caja)
+            : 1;
+
+
+    const cajas =
+        Math.max(
+            1,
+            Math.ceil(
+                Number(item.despachada || 0) /
+                cpc
+            )
+        );
+
+
+    const capacidad =
+        config.columnas *
+        config.filas *
+        config.niveles;
+
+
+    const correcto =
+        capacidad >= cajas;
 
 
     editor.innerHTML = `
@@ -2161,15 +2375,147 @@ if (!editor) {
 
             <div class="p3d-edit-title">
 
-                ⚙️ Ajustar ${item.nombre}
+                ⚙️ AJUSTAR ${item.nombre}
 
             </div>
 
 
+            <div
+                style="
+                    font-size:10px;
+                    color:#64748b;
+                    margin-bottom:10px;
+                "
+            >
+
+                📦 ${cajas} cajas reales
+
+            </div>
+
+
+            <!-- COLUMNAS -->
+
             <div class="p3d-edit-row">
 
                 <label>
-                    Ancho
+                    Columnas
+                </label>
+
+                <strong>
+                    ${config.columnas}
+                </strong>
+
+                <input
+                    type="range"
+                    min="1"
+                    max="6"
+                    value="${config.columnas}"
+                    oninput="
+                        editarP3D(
+                            'columnas',
+                            this.value
+                        )
+                    "
+                >
+
+            </div>
+
+
+            <!-- FILAS -->
+
+            <div class="p3d-edit-row">
+
+                <label>
+                    Filas
+                </label>
+
+                <strong>
+                    ${config.filas}
+                </strong>
+
+                <input
+                    type="range"
+                    min="1"
+                    max="6"
+                    value="${config.filas}"
+                    oninput="
+                        editarP3D(
+                            'filas',
+                            this.value
+                        )
+                    "
+                >
+
+            </div>
+
+
+            <!-- NIVELES -->
+
+            <div class="p3d-edit-row">
+
+                <label>
+                    Niveles
+                </label>
+
+                <strong>
+                    ${config.niveles}
+                </strong>
+
+                <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value="${config.niveles}"
+                    oninput="
+                        editarP3D(
+                            'niveles',
+                            this.value
+                        )
+                    "
+                >
+
+            </div>
+
+
+            <div
+                style="
+                    margin:8px 0;
+                    padding:6px;
+                    background:${correcto ? '#dcfce7' : '#fee2e2'};
+                    color:${correcto ? '#166534' : '#b91c1c'};
+                    border-radius:6px;
+                    font-size:9px;
+                    text-align:center;
+                    font-weight:700;
+                "
+            >
+
+                ${config.columnas}
+                ×
+                ${config.filas}
+                ×
+                ${config.niveles}
+
+                =
+                ${capacidad}
+
+                posiciones
+
+                ${
+                    correcto
+                        ? '🟢'
+                        : '🔴'
+                }
+
+            </div>
+
+
+            <!-- ANCHO -->
+
+            <div class="p3d-edit-row">
+
+                <label>
+                    Ancho caja
                 </label>
 
                 <strong>
@@ -2179,18 +2525,25 @@ if (!editor) {
                 <input
                     type="range"
                     min="40"
-                    max="180"
+                    max="140"
                     value="${config.width}"
-                    oninput="editarP3D('width',this.value)"
+                    oninput="
+                        editarP3D(
+                            'width',
+                            this.value
+                        )
+                    "
                 >
 
             </div>
 
 
+            <!-- PROFUNDIDAD -->
+
             <div class="p3d-edit-row">
 
                 <label>
-                    Profundidad
+                    Profundidad caja
                 </label>
 
                 <strong>
@@ -2200,18 +2553,25 @@ if (!editor) {
                 <input
                     type="range"
                     min="35"
-                    max="150"
+                    max="120"
                     value="${config.depth}"
-                    oninput="editarP3D('depth',this.value)"
+                    oninput="
+                        editarP3D(
+                            'depth',
+                            this.value
+                        )
+                    "
                 >
 
             </div>
 
 
+            <!-- ALTURA -->
+
             <div class="p3d-edit-row">
 
                 <label>
-                    Altura entre cajas
+                    Altura caja
                 </label>
 
                 <strong>
@@ -2223,11 +2583,18 @@ if (!editor) {
                     min="8"
                     max="40"
                     value="${config.height}"
-                    oninput="editarP3D('height',this.value)"
+                    oninput="
+                        editarP3D(
+                            'height',
+                            this.value
+                        )
+                    "
                 >
 
             </div>
 
+
+            <!-- ROTACIÓN -->
 
             <div class="p3d-edit-row">
 
@@ -2244,7 +2611,12 @@ if (!editor) {
                     min="-45"
                     max="45"
                     value="${config.rotation}"
-                    oninput="editarP3D('rotation',this.value)"
+                    oninput="
+                        editarP3D(
+                            'rotation',
+                            this.value
+                        )
+                    "
                 >
 
             </div>
@@ -2260,6 +2632,7 @@ if (!editor) {
                     border-radius:6px;
                 "
             ></div>
+
 
         </div>
 
@@ -2283,17 +2656,19 @@ function editarP3D(propiedad, valor)
     const item =
         p3dData[p3dSelected];
 
-    const config =
-        item.p3d;
+
+    if (!item.p3d) {
+        return;
+    }
 
 
-    config[propiedad] =
+    item.p3d[propiedad] =
         Number(valor);
 
 
     /*
     |--------------------------------------------------------------------------
-    | Volvemos a dibujar solamente el visor
+    | Redibujar
     |--------------------------------------------------------------------------
     */
 
@@ -2301,7 +2676,9 @@ function editarP3D(propiedad, valor)
 
 
     /*
-    | Mantener seleccionado
+    |--------------------------------------------------------------------------
+    | Volver a seleccionar
+    |--------------------------------------------------------------------------
     */
 
     seleccionarProducto3D(
@@ -2335,11 +2712,43 @@ function actualizarEstadoPosicion(index)
         330;
 
 
+    const gap =
+        4;
+
+
+    const groupWidth =
+        (
+            config.columnas *
+            config.width
+        ) +
+        (
+            (config.columnas - 1) *
+            gap
+        );
+
+
+    const groupDepth =
+        (
+            config.filas *
+            config.depth
+        ) +
+        (
+            (config.filas - 1) *
+            gap
+        );
+
+
     const dentro =
         config.x >= 0 &&
         config.y >= 0 &&
-        config.x + config.width <= palletWidth &&
-        config.y + config.depth <= palletDepth;
+
+        config.x +
+        groupWidth <=
+        palletWidth &&
+
+        config.y +
+        groupDepth <=
+        palletDepth;
 
 
     if (dentro) {
@@ -2365,6 +2774,7 @@ function actualizarEstadoPosicion(index)
             '#b91c1c';
 
     }
+
 }
 /**
  * Transformación de la cámara
