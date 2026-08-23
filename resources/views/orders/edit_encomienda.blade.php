@@ -426,9 +426,35 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                     @csrf
                     <select name="product_id" class="finput" style="font-size:11px;margin-bottom:4px;" required>
                         <option value="">+ Agregar producto</option>
-                        @foreach($order->details as $d)
-                            <option value="{{ $d->product->id }}">{{ $d->product->nombre }}</option>
-                        @endforeach
+                     @foreach($order->details as $d)
+
+    @php
+        $cantidadEnBultos = 0;
+
+        foreach($order->bultos as $bultoDisponible) {
+            foreach($bultoDisponible->detalles as $detalleBulto) {
+
+                if($detalleBulto->product_id == $d->product_id) {
+                    $cantidadEnBultos += $detalleBulto->cantidad;
+                }
+
+            }
+        }
+
+        $pendienteProducto =
+            $d->cantidad_solicitada - $cantidadEnBultos;
+    @endphp
+
+    @if($pendienteProducto > 0)
+
+        <option value="{{ $d->product->id }}">
+            {{ $d->product->nombre }}
+            — faltan {{ number_format($pendienteProducto, 0) }}
+        </option>
+
+    @endif
+
+@endforeach
                     </select>
                     <div style="display:flex;gap:5px;">
                         <input type="number" name="cantidad" class="finput" placeholder="Cant." style="flex:1;" required>
