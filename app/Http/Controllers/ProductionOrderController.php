@@ -179,21 +179,147 @@ public function create()
     );
 }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProductionOrder $production_order)
-    {
-        //
-    }
+    public function ver(ProductionOrder $production_order)
+{
+    $production_order->load([
+        'product',
+        'rawMaterial',
+        'user',
+    ]);
 
-    /**
-     * Update the specified resource in storage.
+    return response()->json([
+        'id' => $production_order->id,
+        'number' => $production_order->number,
+        'product' => $production_order->product?->nombre ?? '—',
+        'raw_material' => $production_order->rawMaterial?->name ?? '—',
+        'produced_quantity' => (float) $production_order->produced_quantity,
+        'consumed_quantity' => (float) $production_order->consumed_quantity,
+        'observation' => $production_order->observation ?? '—',
+        'status' => $production_order->status,
+        'user' => $production_order->user?->name ?? '—',
+        'date' => $production_order->created_at
+            ? $production_order->created_at->format('d/m/Y H:i')
+            : '—',
+    ]);
+}
+
+
+public function edit(ProductionOrder $production_order)
+{
+    $production_order->load([
+        'product',
+        'rawMaterial',
+    ]);
+
+    return response()->json([
+        'id' => $production_order->id,
+        'number' => $production_order->number,
+        'product_id' => $production_order->product_id,
+        'raw_material_id' => $production_order->raw_material_id,
+        'produced_quantity' => (float) $production_order->produced_quantity,
+        'consumed_quantity' => (float) $production_order->consumed_quantity,
+        'observation' => $production_order->observation ?? '',
+        'status' => $production_order->status,
+        'product' => $production_order->product?->nombre ?? '—',
+        'raw_material' => $production_order->rawMaterial?->name ?? '—',
+    ]);
+}
+
+
+public function update(
+    Request $request,
+    ProductionOrder $production_order
+) {
+    $request->validate([
+        'produced_quantity' => 'required|numeric|min:0.01',
+        'consumed_quantity' => 'required|numeric|min:0.01',
+        'observation' => 'nullable|string|max:1000',
+    ]);
+
+    /*
+     * Si la producción ya está finalizada,
+     * primero revertimos su efecto anterior.
      */
-    public function update(Request $request, ProductionOrder $production_order)
-    {
-        //
-    }
+    DB::transaction(function () use ($request, $production_order) {
+
+        $material = $production_order->rawMaterial;
+        $producto = $production_order->product;
+
+        if ($production_order->status === 'FINALIZADA') {
+
+            // Devolver la materia prima que consumió la OP anterior
+            $material->stock += $production_order->consumed_quantity;
+
+            if ($material->stock <= 0) {
+                $material->status = 'AGOTADO';
+            } elseif ($material->stock <= $material->minimum_stock) {
+                $material->status = 'STOCK_BAJO';
+            } else {
+                $material->status = 'DISPONIBLE';
+            }
+
+            $material->save();
+
+            // Retirar del stock el producto terminado anterior
+            $producto->stock -= $production_order->produced_quantity;
+
+            if ($producto->stock < 0) {
+                $producto->stock = 0;
+            }
+
+            $producto->save();
+        }
+
+        /*
+         * Actualizamos las cantidades.
+         */
+        $production_order->produced_quantity =
+            $request->produced_quantity;
+
+        $production_order->consumed_quantity =
+            $request->consumed_quantity;
+
+        $production_order->observation =
+            $request->observation;
+
+        /*
+         * Si estaba finalizada, aplicamos nuevamente
+         * el efecto de la producción con los nuevos valores.
+         */
+        if ($production_order->status === 'FINALIZADA') {
+
+            if ($material->stock < $request->consumed_quantity) {
+
+                throw new \Exception(
+                    'No hay suficiente materia prima para aplicar la modificación.'
+                );
+            }
+
+            $material->stock -= $request->consumed_quantity;
+
+            if ($material->stock <= 0) {
+                $material->status = 'AGOTADO';
+            } elseif ($material->stock <= $material->minimum_stock) {
+                $material->status = 'STOCK_BAJO';
+            } else {
+                $material->status = 'DISPONIBLE';
+            }
+
+            $material->save();
+
+            $producto->stock += $request->produced_quantity;
+
+            $producto->save();
+        }
+
+        $production_order->save();
+    });
+
+    return back()->with(
+        'success',
+        'La orden de producción fue actualizada correctamente.'
+    );
+}
 
     /**
      * Remove the specified resource from storage.

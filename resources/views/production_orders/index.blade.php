@@ -655,6 +655,7 @@
 
             <div
                 class="produccion-data"
+                data-id="{{ $orden->id }}"
                 data-number="{{ $orden->number }}"
                 data-quantity="{{ number_format($orden->produced_quantity, 2) }}"
                 data-status="{{ $orden->status }}"
@@ -829,6 +830,43 @@ function mostrarProducciones(productId)
                 ">
                     ${texto}
                 </span>
+            <td style="
+    padding:9px;
+    text-align:center;
+    white-space:nowrap;
+">
+
+    <button
+        type="button"
+        onclick="verProduccion(${dato.dataset.id})"
+        style="
+            border:1px solid #cbd5e1;
+            background:#fff;
+            color:#475569;
+            border-radius:5px;
+            padding:5px 8px;
+            cursor:pointer;
+            font-size:11px;
+        "
+    >
+        👁️ Ver
+    </button>
+
+    <button
+        type="button"
+        onclick="editarProduccion(${dato.dataset.id})"
+        style="
+            border:1px solid #bfdbfe;
+            background:#eff6ff;
+            color:#1d4ed8;
+            border-radius:5px;
+            padding:5px 8px;
+            cursor:pointer;
+            font-size:11px;
+        "
+    >
+        ✏️ Editar
+    </button>
 
             </td>
 
@@ -862,6 +900,133 @@ document.getElementById('modalProducciones')
 
         if (event.target === this) {
             cerrarProducciones();
+        }
+
+    });
+    async function verProduccion(id)
+{
+    try {
+
+        const response = await fetch(
+            `/production-orders/${id}/ver`
+        );
+
+        if (!response.ok) {
+            throw new Error('No se pudo obtener la producción.');
+        }
+
+        const data = await response.json();
+
+        alert(
+            `ORDEN: ${data.number}\n\n` +
+            `Producto: ${data.product}\n` +
+            `Materia prima: ${data.raw_material}\n` +
+            `Cantidad producida: ${data.produced_quantity}\n` +
+            `Materia prima consumida: ${data.consumed_quantity}\n` +
+            `Estado: ${data.status}\n` +
+            `Usuario: ${data.user}\n` +
+            `Fecha: ${data.date}\n\n` +
+            `Observación: ${data.observation}`
+        );
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert('No se pudo cargar la información de la producción.');
+    }
+}
+
+
+async function editarProduccion(id)
+{
+    try {
+
+        const response = await fetch(
+            `/production-orders/${id}/edit`
+        );
+
+        if (!response.ok) {
+            throw new Error('No se pudo obtener la producción.');
+        }
+
+        const data = await response.json();
+
+        document.getElementById('editarNumeroOP').textContent =
+            data.number;
+
+        document.getElementById('editarCantidadProducida').value =
+            data.produced_quantity;
+
+        document.getElementById('editarCantidadConsumida').value =
+            data.consumed_quantity;
+
+        document.getElementById('editarObservacion').value =
+            data.observation === '—'
+                ? ''
+                : data.observation;
+
+        const form = document.getElementById(
+            'formEditarProduccion'
+        );
+
+        form.action =
+            `/production-orders/${id}`;
+
+
+        const advertencia = document.getElementById(
+            'advertenciaEditarProduccion'
+        );
+
+        if (data.status === 'FINALIZADA') {
+
+            advertencia.style.display = 'block';
+
+            advertencia.innerHTML =
+                '⚠️ Esta producción ya está finalizada. ' +
+                'Al guardar, Disthan ajustará automáticamente ' +
+                'el inventario de materia prima y producto terminado.';
+
+        } else {
+
+            advertencia.style.display = 'none';
+
+            advertencia.innerHTML = '';
+
+        }
+
+
+        document.getElementById(
+            'modalEditarProduccion'
+        ).style.display = 'flex';
+
+        document.body.style.overflow = 'hidden';
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(
+            'No se pudo cargar la producción para editar.'
+        );
+    }
+}
+
+function cerrarEditarProduccion()
+{
+    document.getElementById(
+        'modalEditarProduccion'
+    ).style.display = 'none';
+
+    document.body.style.overflow = '';
+}
+
+
+document.getElementById('modalEditarProduccion')
+    ?.addEventListener('click', function(event) {
+
+        if (event.target === this) {
+            cerrarEditarProduccion();
         }
 
     });
@@ -986,7 +1151,9 @@ document.getElementById('modalProducciones')
                         <th style="padding:9px;text-align:center;">
                             Estado
                         </th>
-
+                        <th style="padding:9px;text-align:center;">
+                            Acciones
+                        </th>
                     </tr>
 
                 </thead>
@@ -1027,5 +1194,166 @@ document.getElementById('modalProducciones')
     </div>
 
 </div>
+<div
+    id="modalEditarProduccion"
+    style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(15,23,42,.60);
+        z-index:10000;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    "
+>
+    <div style="
+        background:#fff;
+        width:min(500px,95vw);
+        border-radius:8px;
+        box-shadow:0 20px 50px rgba(0,0,0,.25);
+        overflow:hidden;
+    ">
 
+        <div style="
+            padding:15px 18px;
+            border-bottom:1px solid #e2e8f0;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        ">
+            <div>
+                <div style="font-size:16px;font-weight:800;">
+                    ✏️ Editar producción
+                </div>
+
+                <div
+                    id="editarNumeroOP"
+                    style="
+                        font-size:11px;
+                        color:#94a3b8;
+                        margin-top:2px;
+                    "
+                ></div>
+            </div>
+
+            <button
+                type="button"
+                onclick="cerrarEditarProduccion()"
+                style="
+                    border:0;
+                    background:#f1f5f9;
+                    width:32px;
+                    height:32px;
+                    border-radius:5px;
+                    font-size:18px;
+                    cursor:pointer;
+                "
+            >
+                ×
+            </button>
+        </div>
+
+        <form
+            id="formEditarProduccion"
+            method="POST"
+            style="padding:18px;"
+        >
+
+            @csrf
+            @method('PUT')
+
+            <div style="margin-bottom:10px;">
+                <label class="flabel">
+                    Cantidad producida
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    name="produced_quantity"
+                    id="editarCantidadProducida"
+                    class="finput"
+                    required
+                >
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label class="flabel">
+                    Materia prima consumida
+                </label>
+
+                <input
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    name="consumed_quantity"
+                    id="editarCantidadConsumida"
+                    class="finput"
+                    required
+                >
+            </div>
+
+            <div style="margin-bottom:10px;">
+                <label class="flabel">
+                    Observación
+                </label>
+
+                <textarea
+                    name="observation"
+                    id="editarObservacion"
+                    class="finput"
+                    rows="3"
+                ></textarea>
+            </div>
+
+            <div
+                id="advertenciaEditarProduccion"
+                style="
+                    display:none;
+                    background:#fff7ed;
+                    border:1px solid #fed7aa;
+                    color:#9a3412;
+                    padding:9px;
+                    border-radius:5px;
+                    font-size:11px;
+                    margin-bottom:10px;
+                "
+            >
+            </div>
+
+            <div style="
+                display:flex;
+                justify-content:flex-end;
+                gap:7px;
+            ">
+
+                <button
+                    type="button"
+                    onclick="cerrarEditarProduccion()"
+                    style="
+                        padding:8px 14px;
+                        border:1px solid #cbd5e1;
+                        background:#fff;
+                        border-radius:5px;
+                        cursor:pointer;
+                    "
+                >
+                    Cancelar
+                </button>
+
+                <button
+                    type="submit"
+                    class="btn-new"
+                >
+                    💾 Guardar cambios
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+</div>
 @endsection

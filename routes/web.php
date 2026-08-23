@@ -35,6 +35,21 @@ use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
 
+Route::get(
+    '/production-orders/{production_order}/ver',
+    [ProductionOrderController::class, 'ver']
+)->name('production-orders.ver');
+
+Route::get(
+    '/production-orders/{production_order}/edit',
+    [ProductionOrderController::class, 'edit']
+)->name('production-orders.edit');
+
+Route::put(
+    '/production-orders/{production_order}',
+    [ProductionOrderController::class, 'update']
+)->name('production-orders.update');
+
 Route::post(
     '/exportacion/{order}/cajas-objetivo',
     [ExportController::class, 'actualizarCajasObjetivo']
