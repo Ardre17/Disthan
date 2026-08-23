@@ -200,6 +200,313 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .et-cpc{font-size:11px;}
 .et-info{margin-top:6px;font-size:11px;line-height:1.7;text-align:center;}
 .et-actions{margin-top:16px;display:flex;gap:8px;justify-content:center;}
+/* =========================================================
+   VISOR 3D DE PALETA
+========================================================= */
+
+.p3d-overlay {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(2,6,23,.72);
+    z-index:3000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.p3d-overlay.open {
+    display:flex;
+}
+
+.p3d-modal {
+    width:min(1100px,96vw);
+    height:min(760px,92vh);
+    background:#f8fafc;
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 25px 80px rgba(0,0,0,.35);
+    display:flex;
+    flex-direction:column;
+}
+
+.p3d-header {
+    background:#0f172a;
+    color:#fff;
+    padding:13px 18px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.p3d-title {
+    font-size:16px;
+    font-weight:800;
+}
+
+.p3d-subtitle {
+    font-size:10px;
+    color:#94a3b8;
+    margin-top:2px;
+}
+
+.p3d-close {
+    border:0;
+    background:#1e293b;
+    color:#fff;
+    width:34px;
+    height:34px;
+    border-radius:7px;
+    cursor:pointer;
+    font-size:18px;
+}
+
+.p3d-body {
+    flex:1;
+    display:grid;
+    grid-template-columns:1fr 270px;
+    min-height:0;
+}
+
+@media(max-width:800px) {
+    .p3d-body {
+        grid-template-columns:1fr;
+    }
+
+    .p3d-panel {
+        max-height:240px;
+    }
+}
+
+/* Área donde gira la paleta */
+
+.p3d-stage {
+    position:relative;
+    overflow:hidden;
+    background:
+        radial-gradient(circle at center,#ffffff 0,#f1f5f9 55%,#e2e8f0 100%);
+    cursor:grab;
+    perspective:1000px;
+}
+
+.p3d-stage.dragging {
+    cursor:grabbing;
+}
+
+/* Contenedor 3D */
+
+.p3d-world {
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:600px;
+    height:500px;
+    transform-style:preserve-3d;
+    transform:
+        translate(-50%,-50%)
+        rotateX(58deg)
+        rotateZ(-28deg)
+        scale(.85);
+    transition:transform .08s linear;
+}
+
+/* Base de la paleta */
+
+.p3d-pallet {
+    position:absolute;
+    left:50%;
+    top:50%;
+    width:520px;
+    height:330px;
+    transform:
+        translate(-50%,-50%)
+        translateZ(0);
+    transform-style:preserve-3d;
+}
+
+.p3d-pallet-top {
+    position:absolute;
+    inset:0;
+    background:
+        repeating-linear-gradient(
+            90deg,
+            #b9824b 0,
+            #b9824b 22px,
+            #9f6c3e 23px,
+            #9f6c3e 27px
+        );
+    border:4px solid #704214;
+    border-radius:5px;
+    box-shadow:
+        0 15px 0 #704214,
+        0 20px 25px rgba(0,0,0,.25);
+}
+
+/* Patas de la paleta */
+
+.p3d-pallet-leg {
+    position:absolute;
+    width:55px;
+    height:35px;
+    background:#704214;
+    bottom:-45px;
+    border-radius:2px;
+}
+
+.p3d-pallet-leg.l1 {
+    left:35px;
+}
+
+.p3d-pallet-leg.l2 {
+    left:50%;
+    transform:translateX(-50%);
+}
+
+.p3d-pallet-leg.l3 {
+    right:35px;
+}
+
+/* Grupo de producto */
+
+.p3d-product-group {
+    position:absolute;
+    transform-style:preserve-3d;
+    cursor:pointer;
+    transition:
+        filter .15s,
+        transform .15s;
+}
+
+.p3d-product-group:hover {
+    filter:brightness(1.08);
+}
+
+/* Caja individual */
+
+.p3d-box {
+    position:absolute;
+    background:#dbeafe;
+    border:2px solid #2563eb;
+    border-radius:3px;
+    box-shadow:
+        3px 4px 0 rgba(15,23,42,.18),
+        0 3px 8px rgba(0,0,0,.12);
+    transform-style:preserve-3d;
+}
+
+.p3d-box-front {
+    position:absolute;
+    inset:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:4px;
+    font-size:9px;
+    font-weight:800;
+    color:#1e3a8a;
+    overflow:hidden;
+}
+
+.p3d-box-side {
+    position:absolute;
+    right:-8px;
+    top:4px;
+    width:8px;
+    height:100%;
+    background:#93c5fd;
+    transform-origin:left center;
+    transform:skewY(-45deg);
+}
+
+.p3d-box-top {
+    position:absolute;
+    left:4px;
+    top:-8px;
+    width:100%;
+    height:8px;
+    background:#bfdbfe;
+    transform-origin:left bottom;
+    transform:skewX(-45deg);
+}
+
+/* Panel lateral */
+
+.p3d-panel {
+    background:#fff;
+    border-left:1px solid #e2e8f0;
+    overflow-y:auto;
+    padding:15px;
+}
+
+.p3d-panel-title {
+    font-size:12px;
+    font-weight:800;
+    color:#334155;
+    margin-bottom:10px;
+}
+
+.p3d-product-row {
+    border:1px solid #e2e8f0;
+    border-radius:8px;
+    padding:9px;
+    margin-bottom:7px;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.p3d-product-row:hover,
+.p3d-product-row.selected {
+    border-color:#2563eb;
+    background:#eff6ff;
+}
+
+.p3d-product-name {
+    font-size:11px;
+    font-weight:700;
+    color:#1e293b;
+}
+
+.p3d-product-meta {
+    font-size:10px;
+    color:#64748b;
+    margin-top:3px;
+}
+
+.p3d-controls {
+    margin-top:14px;
+    border-top:1px solid #e2e8f0;
+    padding-top:12px;
+}
+
+.p3d-control-row {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-size:10px;
+    color:#64748b;
+    margin-bottom:7px;
+}
+
+.p3d-control-row strong {
+    color:#1e293b;
+}
+
+.p3d-range {
+    width:100%;
+}
+
+.p3d-help {
+    margin-top:12px;
+    padding:8px;
+    background:#f8fafc;
+    border:1px dashed #cbd5e1;
+    border-radius:6px;
+    font-size:9px;
+    color:#64748b;
+    line-height:1.5;
+}
 </style>
 
 <div class="pg">
@@ -692,7 +999,164 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         </div>
     </div>
 </div>
+{{-- =========================================================
+     VISOR 3D DE PALETA
+========================================================= --}}
 
+<div
+    class="p3d-overlay"
+    id="p3dOverlay"
+    onclick="cerrarPaleta3D(event)"
+>
+
+    <div
+        class="p3d-modal"
+        onclick="event.stopPropagation()"
+    >
+
+        {{-- CABECERA --}}
+
+        <div class="p3d-header">
+
+            <div>
+
+                <div
+                    class="p3d-title"
+                    id="p3dTitle"
+                >
+                    🧊 Paleta
+                </div>
+
+                <div
+                    class="p3d-subtitle"
+                    id="p3dSubtitle"
+                >
+                    Vista 3D
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                class="p3d-close"
+                onclick="cerrarPaleta3D()"
+            >
+                ✕
+            </button>
+
+        </div>
+
+
+        {{-- CUERPO --}}
+
+        <div class="p3d-body">
+
+
+            {{-- ESCENARIO --}}
+
+            <div
+                class="p3d-stage"
+                id="p3dStage"
+            >
+
+                <div
+                    class="p3d-world"
+                    id="p3dWorld"
+                >
+
+                    <div
+                        class="p3d-pallet"
+                        id="p3dPallet"
+                    >
+
+                        <div class="p3d-pallet-top"></div>
+
+                        <div class="p3d-pallet-leg l1"></div>
+                        <div class="p3d-pallet-leg l2"></div>
+                        <div class="p3d-pallet-leg l3"></div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            {{-- PANEL --}}
+
+            <div class="p3d-panel">
+
+                <div class="p3d-panel-title">
+                    📦 Productos de la paleta
+                </div>
+
+                <div id="p3dProducts"></div>
+
+
+                <div class="p3d-controls">
+
+                    <div class="p3d-control-row">
+                        <span>Zoom</span>
+                        <strong id="p3dZoomValue">85%</strong>
+                    </div>
+
+                    <input
+                        type="range"
+                        id="p3dZoom"
+                        class="p3d-range"
+                        min="55"
+                        max="125"
+                        value="85"
+                    >
+
+
+                    <div class="p3d-control-row" style="margin-top:12px;">
+                        <span>Rotación horizontal</span>
+                        <strong id="p3dRotYValue">-28°</strong>
+                    </div>
+
+                    <input
+                        type="range"
+                        id="p3dRotY"
+                        class="p3d-range"
+                        min="-180"
+                        max="180"
+                        value="-28"
+                    >
+
+
+                    <div class="p3d-control-row" style="margin-top:12px;">
+                        <span>Inclinación</span>
+                        <strong id="p3dRotXValue">58°</strong>
+                    </div>
+
+                    <input
+                        type="range"
+                        id="p3dRotX"
+                        class="p3d-range"
+                        min="25"
+                        max="75"
+                        value="58"
+                    >
+
+
+                    <div class="p3d-help">
+
+                        🖱️ Arrastra la paleta para girarla.<br>
+                        🔍 Usa Zoom para acercar o alejar.<br>
+                        📦 Selecciona un producto para resaltarlo.
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
 <script>
 // ── Scanner ──────────────────────────────────────────────────────────────
@@ -866,12 +1330,40 @@ function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, it
     </div>
     `;
     tabla += `
-    <div style="margin-top:20px;text-align:center;">
-        <a href="/orders/{{ $order->id }}/pallet/${encodeURIComponent(nombre)}/pdf" target="_blank" class="btn btn-blue">
-            🖨 Generar Hoja Logística
-        </a>
-    </div>
-    `;
+<div style="
+    margin-top:20px;
+    display:flex;
+    flex-direction:column;
+    gap:7px;
+">
+
+    <a
+        href="/orders/{{ $order->id }}/pallet/${encodeURIComponent(nombre)}/pdf"
+        target="_blank"
+        class="btn btn-blue"
+        style="width:100%;"
+    >
+        🖨 Generar Hoja Logística
+    </a>
+
+    <button
+        type="button"
+        class="btn"
+        style="
+            width:100%;
+            background:#111827;
+            color:#fff;
+        "
+        onclick='abrirPaleta3D(
+            ${JSON.stringify(nombre)},
+            ${JSON.stringify(items)}
+        )'
+    >
+        🧊 Ver paleta en 3D
+    </button>
+
+</div>
+`;
 
     document.getElementById('pmItemsList').innerHTML = html + tabla;
 
@@ -890,7 +1382,588 @@ function cerrarPaleta(e) {
         document.getElementById('pmOverlay').classList.remove('open');
     }
 }
+// =========================================================
+// VISOR 3D DE PALETA
+// =========================================================
 
+let p3dData = [];
+let p3dSelected = null;
+
+let p3dZoom = 85;
+let p3dRotX = 58;
+let p3dRotY = -28;
+
+let p3dDragging = false;
+let p3dStartX = 0;
+let p3dStartY = 0;
+
+
+/**
+ * Abrir visor 3D
+ */
+function abrirPaleta3D(nombre, items)
+{
+    p3dData = items || [];
+    p3dSelected = null;
+
+    document.getElementById('p3dTitle').textContent =
+        '🧊 Paleta ' + nombre;
+
+    document.getElementById('p3dSubtitle').textContent =
+        p3dData.length +
+        ' ítem' +
+        (p3dData.length !== 1 ? 's' : '') +
+        ' · máximo {{ $paletaMax }} productos';
+
+
+    document.getElementById('p3dOverlay')
+        .classList.add('open');
+
+
+    document.body.style.overflow = 'hidden';
+
+
+    p3dZoom = 85;
+    p3dRotX = 58;
+    p3dRotY = -28;
+
+
+    document.getElementById('p3dZoom').value = p3dZoom;
+    document.getElementById('p3dRotX').value = p3dRotX;
+    document.getElementById('p3dRotY').value = p3dRotY;
+
+
+    renderPaleta3D();
+
+    renderP3dProducts();
+
+    actualizarP3dTransform();
+}
+
+
+/**
+ * Cerrar
+ */
+function cerrarPaleta3D(event)
+{
+    if (
+        event &&
+        event.target &&
+        event.target.id !== 'p3dOverlay'
+    ) {
+        return;
+    }
+
+    document.getElementById('p3dOverlay')
+        .classList.remove('open');
+
+    document.body.style.overflow = '';
+}
+
+
+/**
+ * Renderizar productos
+ */
+function renderP3dProducts()
+{
+    const contenedor =
+        document.getElementById('p3dProducts');
+
+    contenedor.innerHTML = '';
+
+    p3dData.forEach((item, index) => {
+
+        const cpc =
+            Number(item.cantidad_por_caja) > 0
+                ? Number(item.cantidad_por_caja)
+                : 1;
+
+        const unidades =
+            Number(item.despachada || 0);
+
+        const cajas =
+            Math.ceil(unidades / cpc);
+
+        const row =
+            document.createElement('div');
+
+        row.className =
+            'p3d-product-row';
+
+        row.dataset.index = index;
+
+        row.innerHTML = `
+
+            <div class="p3d-product-name">
+                📦 ${item.nombre}
+            </div>
+
+            <div class="p3d-product-meta">
+                ${cajas} cajas ·
+                ${unidades} unidades
+            </div>
+
+            <div class="p3d-product-meta">
+                ${item.sku ? 'SKU: ' + item.sku : ''}
+            </div>
+
+        `;
+
+        row.addEventListener('click', function() {
+
+            seleccionarProducto3D(index);
+
+        });
+
+        contenedor.appendChild(row);
+
+    });
+}
+
+
+/**
+ * Crear representación 3D
+ */
+function renderPaleta3D()
+{
+    const pallet =
+        document.getElementById('p3dPallet');
+
+    /*
+     * Eliminamos grupos anteriores
+     */
+    pallet
+        .querySelectorAll('.p3d-product-group')
+        .forEach(el => el.remove());
+
+
+    /*
+     * Área visual de la paleta:
+     *
+     * 520 x 330
+     *
+     * No son centímetros reales todavía.
+     * Son coordenadas visuales.
+     */
+
+    const palletWidth = 520;
+    const palletDepth = 330;
+
+
+    /*
+     * Distribución inicial.
+     *
+     * Cada producto obtiene una zona.
+     * Después podremos hacerla completamente manual.
+     */
+
+    const maxColumns = 3;
+
+    p3dData.forEach((item, index) => {
+
+        const cpc =
+            Number(item.cantidad_por_caja) > 0
+                ? Number(item.cantidad_por_caja)
+                : 1;
+
+        const unidades =
+            Number(item.despachada || 0);
+
+        const cajas =
+            Math.max(
+                1,
+                Math.ceil(unidades / cpc)
+            );
+
+
+        /*
+         * Tamaño visual inicial.
+         *
+         * No representa centímetros reales.
+         */
+        const boxWidth = 70;
+        const boxDepth = 55;
+        const boxHeight = 18;
+
+
+        const group =
+            document.createElement('div');
+
+        group.className =
+            'p3d-product-group';
+
+        group.dataset.index = index;
+
+
+        /*
+         * Posición inicial.
+         *
+         * Distribuimos productos por zonas.
+         */
+        const col =
+            index % maxColumns;
+
+        const row =
+            Math.floor(index / maxColumns);
+
+
+        const posX =
+            35 + col * 165;
+
+        const posY =
+            35 + row * 95;
+
+
+        group.style.left =
+            posX + 'px';
+
+        group.style.top =
+            posY + 'px';
+
+        group.style.width =
+            boxWidth + 'px';
+
+        group.style.height =
+            boxDepth + 'px';
+
+
+        /*
+         * Cada caja del mismo producto
+         * se apila visualmente.
+         */
+        const cajasVisibles =
+            Math.min(cajas, 8);
+
+
+        for(
+            let c = 0;
+            c < cajasVisibles;
+            c++
+        ){
+
+            const caja =
+                document.createElement('div');
+
+            caja.className =
+                'p3d-box';
+
+
+            /*
+             * Apilado.
+             */
+            const z =
+                c * boxHeight;
+
+
+            caja.style.width =
+                boxWidth + 'px';
+
+            caja.style.height =
+                boxDepth + 'px';
+
+            caja.style.transform =
+                `translateZ(${z}px)`;
+
+
+            /*
+             * Colores diferentes
+             * por producto.
+             */
+            const colores = [
+                ['#dbeafe','#2563eb','#1e3a8a'],
+                ['#dcfce7','#16a34a','#166534'],
+                ['#fef3c7','#f59e0b','#92400e'],
+                ['#fce7f3','#db2777','#9d174d'],
+                ['#ede9fe','#7c3aed','#5b21b6'],
+                ['#cffafe','#0891b2','#155e75'],
+            ];
+
+            const color =
+                colores[index % colores.length];
+
+
+            caja.style.background =
+                color[0];
+
+            caja.style.borderColor =
+                color[1];
+
+
+            caja.innerHTML = `
+
+                <div
+                    class="p3d-box-front"
+                    style="color:${color[2]}"
+                >
+                    ${item.nombre}
+                </div>
+
+                <div
+                    class="p3d-box-side"
+                    style="background:${color[1]}"
+                ></div>
+
+                <div
+                    class="p3d-box-top"
+                    style="background:${color[0]}"
+                ></div>
+
+            `;
+
+
+            group.appendChild(caja);
+
+        }
+
+
+        /*
+         * Información al hacer clic.
+         */
+        group.addEventListener(
+            'click',
+            function(event) {
+
+                event.stopPropagation();
+
+                seleccionarProducto3D(index);
+
+            }
+        );
+
+
+        pallet.appendChild(group);
+
+    });
+}
+
+
+/**
+ * Seleccionar producto
+ */
+function seleccionarProducto3D(index)
+{
+    p3dSelected = index;
+
+
+    document
+        .querySelectorAll('.p3d-product-row')
+        .forEach(row => {
+
+            row.classList.toggle(
+                'selected',
+                Number(row.dataset.index) === index
+            );
+
+        });
+
+
+    document
+        .querySelectorAll('.p3d-product-group')
+        .forEach(group => {
+
+            const seleccionado =
+                Number(group.dataset.index) === index;
+
+            group.style.filter =
+                seleccionado
+                    ? 'brightness(1.15) drop-shadow(0 0 10px rgba(37,99,235,.65))'
+                    : '';
+
+        });
+
+}
+
+
+/**
+ * Transformación de la cámara
+ */
+function actualizarP3dTransform()
+{
+    const world =
+        document.getElementById('p3dWorld');
+
+    world.style.transform = `
+        translate(-50%,-50%)
+        rotateX(${p3dRotX}deg)
+        rotateZ(${p3dRotY}deg)
+        scale(${p3dZoom / 100})
+    `;
+
+
+    document.getElementById(
+        'p3dZoomValue'
+    ).textContent =
+        p3dZoom + '%';
+
+
+    document.getElementById(
+        'p3dRotXValue'
+    ).textContent =
+        p3dRotX + '°';
+
+
+    document.getElementById(
+        'p3dRotYValue'
+    ).textContent =
+        p3dRotY + '°';
+}
+
+
+/**
+ * Controles
+ */
+document.getElementById('p3dZoom')
+    ?.addEventListener('input', function() {
+
+        p3dZoom =
+            Number(this.value);
+
+        actualizarP3dTransform();
+
+    });
+
+
+document.getElementById('p3dRotX')
+    ?.addEventListener('input', function() {
+
+        p3dRotX =
+            Number(this.value);
+
+        actualizarP3dTransform();
+
+    });
+
+
+document.getElementById('p3dRotY')
+    ?.addEventListener('input', function() {
+
+        p3dRotY =
+            Number(this.value);
+
+        actualizarP3dTransform();
+
+    });
+
+
+/**
+ * Arrastrar para girar
+ */
+const p3dStage =
+    document.getElementById('p3dStage');
+
+
+p3dStage?.addEventListener(
+    'mousedown',
+    function(event) {
+
+        if (
+            event.target.closest(
+                '.p3d-product-group'
+            )
+        ) {
+            return;
+        }
+
+        p3dDragging = true;
+
+        p3dStartX =
+            event.clientX;
+
+        p3dStartY =
+            event.clientY;
+
+        p3dStage.classList.add(
+            'dragging'
+        );
+
+    }
+);
+
+
+window.addEventListener(
+    'mousemove',
+    function(event) {
+
+        if (!p3dDragging) {
+            return;
+        }
+
+        const dx =
+            event.clientX - p3dStartX;
+
+        const dy =
+            event.clientY - p3dStartY;
+
+
+        p3dRotY +=
+            dx * .5;
+
+        p3dRotX -=
+            dy * .3;
+
+
+        p3dRotX =
+            Math.max(
+                25,
+                Math.min(75,p3dRotX)
+            );
+
+
+        p3dStartX =
+            event.clientX;
+
+        p3dStartY =
+            event.clientY;
+
+
+        document.getElementById(
+            'p3dRotX'
+        ).value = p3dRotX;
+
+
+        document.getElementById(
+            'p3dRotY'
+        ).value = p3dRotY;
+
+
+        actualizarP3dTransform();
+
+    }
+);
+
+
+window.addEventListener(
+    'mouseup',
+    function() {
+
+        p3dDragging = false;
+
+        p3dStage?.classList.remove(
+            'dragging'
+        );
+
+    }
+);
+
+
+/**
+ * ESC para cerrar
+ */
+document.addEventListener(
+    'keydown',
+    function(event) {
+
+        if(
+            event.key === 'Escape' &&
+            document
+                .getElementById('p3dOverlay')
+                ?.classList.contains('open')
+        ) {
+            cerrarPaleta3D();
+        }
+
+    }
+);
 // ── Modal de etiqueta de producto ─────────────────────────────────────────
 function abrirEtiqueta(data) {
     document.getElementById('etNombre').textContent = data.nombre;
