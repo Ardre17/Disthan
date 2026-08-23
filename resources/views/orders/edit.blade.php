@@ -367,68 +367,170 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     right:35px;
 }
 
-/* Grupo de producto */
+/* =========================================================
+   GRUPOS Y CAJAS 3D
+========================================================= */
 
 .p3d-product-group {
     position:absolute;
     transform-style:preserve-3d;
-    cursor:pointer;
-    transition:
-        filter .15s,
-        transform .15s;
+    cursor:grab;
+    user-select:none;
+    transition:filter .15s;
+}
+
+.p3d-product-group.dragging {
+    cursor:grabbing;
 }
 
 .p3d-product-group:hover {
-    filter:brightness(1.08);
+    filter:brightness(1.05);
 }
 
-/* Caja individual */
+/* Caja */
 
 .p3d-box {
     position:absolute;
-    background:#dbeafe;
-    border:2px solid #2563eb;
-    border-radius:3px;
-    box-shadow:
-        3px 4px 0 rgba(15,23,42,.18),
-        0 3px 8px rgba(0,0,0,.12);
     transform-style:preserve-3d;
 }
+
+/*
+|--------------------------------------------------------------------------
+| CARA FRONTAL
+|--------------------------------------------------------------------------
+*/
 
 .p3d-box-front {
     position:absolute;
     inset:0;
+
     display:flex;
     align-items:center;
     justify-content:center;
+
     text-align:center;
-    padding:4px;
+
+    padding:5px;
+
     font-size:9px;
     font-weight:800;
-    color:#1e3a8a;
+
+    border:2px solid;
+
+    border-radius:3px;
+
     overflow:hidden;
+
+    backface-visibility:hidden;
 }
 
-.p3d-box-side {
-    position:absolute;
-    right:-8px;
-    top:4px;
-    width:8px;
-    height:100%;
-    background:#93c5fd;
-    transform-origin:left center;
-    transform:skewY(-45deg);
-}
+/*
+|--------------------------------------------------------------------------
+| PARTE SUPERIOR
+|--------------------------------------------------------------------------
+*/
 
 .p3d-box-top {
     position:absolute;
-    left:4px;
-    top:-8px;
+
+    left:0;
+    top:0;
+
+    transform-origin:bottom left;
+
+    border:2px solid;
+
+    border-radius:3px 3px 0 0;
+
+    transform:
+        rotateX(90deg);
+
+    transform-style:preserve-3d;
+}
+
+/*
+|--------------------------------------------------------------------------
+| LATERAL DERECHA
+|--------------------------------------------------------------------------
+*/
+
+.p3d-box-side {
+    position:absolute;
+
+    right:0;
+    top:0;
+
+    transform-origin:right center;
+
+    border:2px solid;
+
+    border-radius:0 3px 3px 0;
+
+    transform:
+        rotateY(90deg);
+
+    transform-style:preserve-3d;
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| PANEL DE EDICIÓN
+|--------------------------------------------------------------------------
+*/
+
+.p3d-edit-box {
+    margin-top:10px;
+
+    padding:10px;
+
+    background:#f8fafc;
+
+    border:1px solid #dbe3ee;
+
+    border-radius:8px;
+}
+
+.p3d-edit-title {
+    font-size:10px;
+
+    font-weight:800;
+
+    color:#334155;
+
+    margin-bottom:8px;
+
+    text-transform:uppercase;
+}
+
+.p3d-edit-row {
+    display:grid;
+
+    grid-template-columns:1fr auto;
+
+    gap:7px;
+
+    align-items:center;
+
+    margin-bottom:7px;
+}
+
+.p3d-edit-row label {
+    font-size:10px;
+
+    color:#64748b;
+}
+
+.p3d-edit-row strong {
+    font-size:10px;
+
+    color:#0f172a;
+}
+
+.p3d-edit-row input[type="range"] {
+    grid-column:1 / -1;
+
     width:100%;
-    height:8px;
-    background:#bfdbfe;
-    transform-origin:left bottom;
-    transform:skewX(-45deg);
 }
 
 /* Panel lateral */
@@ -1519,45 +1621,31 @@ function renderP3dProducts()
 
     });
 }
-
-
-/**
- * Crear representación 3D
- */
 function renderPaleta3D()
 {
     const pallet =
         document.getElementById('p3dPallet');
 
-    /*
-     * Eliminamos grupos anteriores
-     */
     pallet
         .querySelectorAll('.p3d-product-group')
         .forEach(el => el.remove());
 
 
     /*
-     * Área visual de la paleta:
-     *
-     * 520 x 330
-     *
-     * No son centímetros reales todavía.
-     * Son coordenadas visuales.
-     */
+    |--------------------------------------------------------------------------
+    | Dimensiones visuales de la paleta
+    |--------------------------------------------------------------------------
+    */
 
     const palletWidth = 520;
     const palletDepth = 330;
 
 
     /*
-     * Distribución inicial.
-     *
-     * Cada producto obtiene una zona.
-     * Después podremos hacerla completamente manual.
-     */
-
-    const maxColumns = 3;
+    |--------------------------------------------------------------------------
+    | Crear cada producto
+    |--------------------------------------------------------------------------
+    */
 
     p3dData.forEach((item, index) => {
 
@@ -1577,14 +1665,47 @@ function renderPaleta3D()
 
 
         /*
-         * Tamaño visual inicial.
-         *
-         * No representa centímetros reales.
-         */
-        const boxWidth = 70;
-        const boxDepth = 55;
-        const boxHeight = 18;
+        |--------------------------------------------------------------------------
+        | Configuración inicial
+        |--------------------------------------------------------------------------
+        */
 
+        if (item.p3d === undefined) {
+
+            const col =
+                index % 3;
+
+            const row =
+                Math.floor(index / 3);
+
+            item.p3d = {
+
+                x: 30 + (col * 160),
+
+                y: 30 + (row * 95),
+
+                width: 75,
+
+                depth: 55,
+
+                height: 18,
+
+                rotation: 0
+
+            };
+
+        }
+
+
+        const config =
+            item.p3d;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Grupo
+        |--------------------------------------------------------------------------
+        */
 
         const group =
             document.createElement('div');
@@ -1592,54 +1713,73 @@ function renderPaleta3D()
         group.className =
             'p3d-product-group';
 
-        group.dataset.index = index;
-
-
-        /*
-         * Posición inicial.
-         *
-         * Distribuimos productos por zonas.
-         */
-        const col =
-            index % maxColumns;
-
-        const row =
-            Math.floor(index / maxColumns);
-
-
-        const posX =
-            35 + col * 165;
-
-        const posY =
-            35 + row * 95;
+        group.dataset.index =
+            index;
 
 
         group.style.left =
-            posX + 'px';
+            config.x + 'px';
 
         group.style.top =
-            posY + 'px';
+            config.y + 'px';
 
         group.style.width =
-            boxWidth + 'px';
+            config.width + 'px';
 
         group.style.height =
-            boxDepth + 'px';
+            config.depth + 'px';
+
+
+        group.style.transform =
+            `rotateZ(${config.rotation}deg)`;
 
 
         /*
-         * Cada caja del mismo producto
-         * se apila visualmente.
-         */
+        |--------------------------------------------------------------------------
+        | Colores
+        |--------------------------------------------------------------------------
+        */
+
+        const colores = [
+
+            ['#dbeafe','#2563eb','#1e3a8a'],
+
+            ['#dcfce7','#16a34a','#166534'],
+
+            ['#fef3c7','#f59e0b','#92400e'],
+
+            ['#fce7f3','#db2777','#9d174d'],
+
+            ['#ede9fe','#7c3aed','#5b21b6'],
+
+            ['#cffafe','#0891b2','#155e75']
+
+        ];
+
+
+        const color =
+            colores[index % colores.length];
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | Número de cajas visibles
+        |--------------------------------------------------------------------------
+        |
+        | No dibujamos cientos de divs.
+        | Representamos las cajas como una pila.
+        |
+        */
+
         const cajasVisibles =
-            Math.min(cajas, 8);
+            Math.min(cajas, 12);
 
 
-        for(
+        for (
             let c = 0;
             c < cajasVisibles;
             c++
-        ){
+        ) {
 
             const caja =
                 document.createElement('div');
@@ -1649,66 +1789,106 @@ function renderPaleta3D()
 
 
             /*
-             * Apilado.
-             */
+            |--------------------------------------------------------------------------
+            | Posición vertical
+            |--------------------------------------------------------------------------
+            */
+
             const z =
-                c * boxHeight;
+                c * config.height;
 
 
             caja.style.width =
-                boxWidth + 'px';
+                config.width + 'px';
 
             caja.style.height =
-                boxDepth + 'px';
+                config.depth + 'px';
+
 
             caja.style.transform =
                 `translateZ(${z}px)`;
 
 
             /*
-             * Colores diferentes
-             * por producto.
-             */
-            const colores = [
-                ['#dbeafe','#2563eb','#1e3a8a'],
-                ['#dcfce7','#16a34a','#166534'],
-                ['#fef3c7','#f59e0b','#92400e'],
-                ['#fce7f3','#db2777','#9d174d'],
-                ['#ede9fe','#7c3aed','#5b21b6'],
-                ['#cffafe','#0891b2','#155e75'],
-            ];
+            |--------------------------------------------------------------------------
+            | Cara frontal
+            |--------------------------------------------------------------------------
+            */
 
-            const color =
-                colores[index % colores.length];
+            const front =
+                document.createElement('div');
 
+            front.className =
+                'p3d-box-front';
 
-            caja.style.background =
+            front.style.background =
                 color[0];
 
-            caja.style.borderColor =
+            front.style.borderColor =
+                color[1];
+
+            front.style.color =
+                color[2];
+
+            front.textContent =
+                item.nombre;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Cara superior
+            |--------------------------------------------------------------------------
+            */
+
+            const top =
+                document.createElement('div');
+
+            top.className =
+                'p3d-box-top';
+
+            top.style.width =
+                config.width + 'px';
+
+            top.style.height =
+                config.depth + 'px';
+
+            top.style.background =
+                color[0];
+
+            top.style.borderColor =
                 color[1];
 
 
-            caja.innerHTML = `
+            /*
+            |--------------------------------------------------------------------------
+            | Cara lateral
+            |--------------------------------------------------------------------------
+            */
 
-                <div
-                    class="p3d-box-front"
-                    style="color:${color[2]}"
-                >
-                    ${item.nombre}
-                </div>
+            const side =
+                document.createElement('div');
 
-                <div
-                    class="p3d-box-side"
-                    style="background:${color[1]}"
-                ></div>
+            side.className =
+                'p3d-box-side';
 
-                <div
-                    class="p3d-box-top"
-                    style="background:${color[0]}"
-                ></div>
+            side.style.width =
+                config.depth + 'px';
 
-            `;
+            side.style.height =
+                config.depth + 'px';
+
+            side.style.background =
+                color[1];
+
+            side.style.borderColor =
+                color[1];
+
+
+            caja.appendChild(front);
+
+            caja.appendChild(top);
+
+            caja.appendChild(side);
 
 
             group.appendChild(caja);
@@ -1717,33 +1897,195 @@ function renderPaleta3D()
 
 
         /*
-         * Información al hacer clic.
-         */
-        group.addEventListener(
-            'click',
-            function(event) {
+        |--------------------------------------------------------------------------
+        | Arrastrar producto
+        |--------------------------------------------------------------------------
+        */
 
-                event.stopPropagation();
-
-                seleccionarProducto3D(index);
-
-            }
+        configurarDragProducto(
+            group,
+            index
         );
 
 
         pallet.appendChild(group);
 
     });
+
 }
+function configurarDragProducto(group, index)
+{
+    let dragging = false;
+
+    let startX = 0;
+    let startY = 0;
+
+    let originalX = 0;
+    let originalY = 0;
 
 
-/**
- * Seleccionar producto
- */
+    group.addEventListener(
+        'mousedown',
+        function(event)
+        {
+            event.stopPropagation();
+
+            seleccionarProducto3D(index);
+
+
+            dragging = true;
+
+            group.classList.add(
+                'dragging'
+            );
+
+
+            startX =
+                event.clientX;
+
+            startY =
+                event.clientY;
+
+
+            originalX =
+                p3dData[index].p3d.x;
+
+            originalY =
+                p3dData[index].p3d.y;
+
+
+            document.body.style.userSelect =
+                'none';
+        }
+    );
+
+
+    window.addEventListener(
+        'mousemove',
+        function(event)
+        {
+            if (!dragging) {
+                return;
+            }
+
+
+            const dx =
+                event.clientX - startX;
+
+            const dy =
+                event.clientY - startY;
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Movimiento visual
+            |--------------------------------------------------------------------------
+            */
+
+            let nuevoX =
+                originalX + dx / (p3dZoom / 100);
+
+            let nuevoY =
+                originalY + dy / (p3dZoom / 100);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | Límites de la paleta
+            |--------------------------------------------------------------------------
+            */
+
+            const palletWidth =
+                520;
+
+            const palletDepth =
+                330;
+
+
+            const width =
+                p3dData[index].p3d.width;
+
+            const depth =
+                p3dData[index].p3d.depth;
+
+
+            nuevoX =
+                Math.max(
+                    0,
+                    Math.min(
+                        palletWidth - width,
+                        nuevoX
+                    )
+                );
+
+
+            nuevoY =
+                Math.max(
+                    0,
+                    Math.min(
+                        palletDepth - depth,
+                        nuevoY
+                    )
+                );
+
+
+            p3dData[index].p3d.x =
+                nuevoX;
+
+            p3dData[index].p3d.y =
+                nuevoY;
+
+
+            group.style.left =
+                nuevoX + 'px';
+
+            group.style.top =
+                nuevoY + 'px';
+
+
+            actualizarEstadoPosicion(
+                index
+            );
+
+
+            actualizarEditor3D();
+
+        }
+    );
+
+
+    window.addEventListener(
+        'mouseup',
+        function()
+        {
+            if (!dragging) {
+                return;
+            }
+
+
+            dragging = false;
+
+            group.classList.remove(
+                'dragging'
+            );
+
+
+            document.body.style.userSelect =
+                '';
+
+        }
+    );
+}
 function seleccionarProducto3D(index)
 {
     p3dSelected = index;
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Resaltar producto
+    |--------------------------------------------------------------------------
+    */
 
     document
         .querySelectorAll('.p3d-product-row')
@@ -1764,16 +2106,263 @@ function seleccionarProducto3D(index)
             const seleccionado =
                 Number(group.dataset.index) === index;
 
+
             group.style.filter =
                 seleccionado
-                    ? 'brightness(1.15) drop-shadow(0 0 10px rgba(37,99,235,.65))'
+
+                    ? 'brightness(1.12) drop-shadow(0 0 12px rgba(37,99,235,.65))'
+
                     : '';
 
         });
 
+
+    /*
+    |--------------------------------------------------------------------------
+    | Mostrar editor
+    |--------------------------------------------------------------------------
+    */
+
+    actualizarEditor3D();
 }
+function actualizarEditor3D()
+{
+    const editor =
+        document.getElementById(
+            'p3dEditor'
+        );
 
 
+    if (
+        p3dSelected === null ||
+        !p3dData[p3dSelected]
+    ) {
+
+        editor.innerHTML = '';
+
+        return;
+
+    }
+
+
+    const item =
+        p3dData[p3dSelected];
+
+    const config =
+        item.p3d;
+
+
+    editor.innerHTML = `
+
+        <div class="p3d-edit-box">
+
+            <div class="p3d-edit-title">
+
+                ⚙️ Ajustar ${item.nombre}
+
+            </div>
+
+
+            <div class="p3d-edit-row">
+
+                <label>
+                    Ancho
+                </label>
+
+                <strong>
+                    ${Math.round(config.width)} px
+                </strong>
+
+                <input
+                    type="range"
+                    min="40"
+                    max="180"
+                    value="${config.width}"
+                    oninput="editarP3D('width',this.value)"
+                >
+
+            </div>
+
+
+            <div class="p3d-edit-row">
+
+                <label>
+                    Profundidad
+                </label>
+
+                <strong>
+                    ${Math.round(config.depth)} px
+                </strong>
+
+                <input
+                    type="range"
+                    min="35"
+                    max="150"
+                    value="${config.depth}"
+                    oninput="editarP3D('depth',this.value)"
+                >
+
+            </div>
+
+
+            <div class="p3d-edit-row">
+
+                <label>
+                    Altura entre cajas
+                </label>
+
+                <strong>
+                    ${Math.round(config.height)} px
+                </strong>
+
+                <input
+                    type="range"
+                    min="8"
+                    max="40"
+                    value="${config.height}"
+                    oninput="editarP3D('height',this.value)"
+                >
+
+            </div>
+
+
+            <div class="p3d-edit-row">
+
+                <label>
+                    Rotación
+                </label>
+
+                <strong>
+                    ${Math.round(config.rotation)}°
+                </strong>
+
+                <input
+                    type="range"
+                    min="-45"
+                    max="45"
+                    value="${config.rotation}"
+                    oninput="editarP3D('rotation',this.value)"
+                >
+
+            </div>
+
+
+            <div
+                id="p3dPositionStatus"
+                style="
+                    margin-top:8px;
+                    font-size:9px;
+                    text-align:center;
+                    padding:5px;
+                    border-radius:6px;
+                "
+            ></div>
+
+        </div>
+
+    `;
+
+
+    actualizarEstadoPosicion(
+        p3dSelected
+    );
+}
+function editarP3D(propiedad, valor)
+{
+    if (
+        p3dSelected === null ||
+        !p3dData[p3dSelected]
+    ) {
+        return;
+    }
+
+
+    const item =
+        p3dData[p3dSelected];
+
+    const config =
+        item.p3d;
+
+
+    config[propiedad] =
+        Number(valor);
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Volvemos a dibujar solamente el visor
+    |--------------------------------------------------------------------------
+    */
+
+    renderPaleta3D();
+
+
+    /*
+    | Mantener seleccionado
+    */
+
+    seleccionarProducto3D(
+        p3dSelected
+    );
+}
+function actualizarEstadoPosicion(index)
+{
+    const status =
+        document.getElementById(
+            'p3dPositionStatus'
+        );
+
+
+    if (
+        !status ||
+        !p3dData[index]
+    ) {
+        return;
+    }
+
+
+    const config =
+        p3dData[index];
+
+
+    const palletWidth =
+        520;
+
+    const palletDepth =
+        330;
+
+
+    const dentro =
+        config.x >= 0 &&
+        config.y >= 0 &&
+        config.x + config.width <= palletWidth &&
+        config.y + config.depth <= palletDepth;
+
+
+    if (dentro) {
+
+        status.textContent =
+            '🟢 Producto dentro de la paleta';
+
+        status.style.background =
+            '#dcfce7';
+
+        status.style.color =
+            '#15803d';
+
+    } else {
+
+        status.textContent =
+            '🔴 Producto fuera de la paleta';
+
+        status.style.background =
+            '#fee2e2';
+
+        status.style.color =
+            '#b91c1c';
+
+    }
+}
 /**
  * Transformación de la cámara
  */
