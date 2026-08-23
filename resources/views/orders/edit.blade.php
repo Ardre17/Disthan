@@ -2534,7 +2534,6 @@ window.addEventListener(
     }
 );
 
-
 /**
  * ESC para cerrar
  */
