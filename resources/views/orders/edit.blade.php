@@ -1194,7 +1194,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 
                 <div id="p3dProducts"></div>
 
-
+                <div id="p3dEditor"></div>
                 <div class="p3d-controls">
 
                     <div class="p3d-control-row">
@@ -2132,7 +2132,10 @@ function actualizarEditor3D()
             'p3dEditor'
         );
 
-
+if (!editor) {
+    console.error('No existe el elemento #p3dEditor');
+    return;
+}
     if (
         p3dSelected === null ||
         !p3dData[p3dSelected]
