@@ -25,9 +25,69 @@ class ProductionOrderController extends Controller
     ->latest()
     ->get();
 
+    /*
+    |--------------------------------------------------------------------------
+    | Agrupar producción por producto
+    |--------------------------------------------------------------------------
+    */
+
+    $productosProduccion = $orders
+        ->groupBy('product_id')
+        ->map(function ($producciones) {
+
+            $primera = $producciones->first();
+
+            $producto = $primera->product;
+
+            $totalProducido = $producciones->sum(function ($orden) {
+                return (float) ($orden->produced_quantity ?? 0);
+            });
+
+            $finalizadas = $producciones->filter(function ($orden) {
+                return strtoupper($orden->status) === 'FINALIZADA';
+            });
+
+            $enProduccion = $producciones->filter(function ($orden) {
+                return strtoupper($orden->status) === 'EN_PRODUCCION';
+            });
+
+            $ultimaProduccion = $producciones->sortByDesc('created_at')->first();
+
+            return (object) [
+                'product_id' => $producto?->id,
+
+                'producto' => $producto,
+
+                'total_producido' => $totalProducido,
+
+                'cantidad_ordenes' => $producciones->count(),
+
+                'finalizadas' => $finalizadas->count(),
+
+                'en_produccion' => $enProduccion->count(),
+
+                'ultima' => $ultimaProduccion,
+
+                'ordenes' => $producciones->values(),
+
+                'raw_materials' => $producciones
+                    ->map(fn ($orden) => $orden->rawMaterial)
+                    ->filter()
+                    ->unique('id')
+                    ->values(),
+            ];
+        })
+        ->sortBy(function ($producto) {
+            return strtolower($producto->producto?->nombre ?? '');
+        })
+        ->values();
+
     return view(
         'production_orders.index',
-        compact('orders')
+        compact(
+            'orders',
+            'productosProduccion'
+        )
     );
 }
 

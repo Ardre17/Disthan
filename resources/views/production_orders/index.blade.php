@@ -224,7 +224,7 @@
 
 <div class="erp-bar">
     <div class="erp-bar-left">
-        <div class="erp-logo">JOYBER PERÚ</div>
+        <div class="erp-logo">DISTAN ERP</div>
         <div class="erp-sep"></div>
         <div class="erp-module">Órdenes de Producción</div>
     </div>
@@ -347,119 +347,355 @@
 
 {{-- ── Cards ── --}}
 <div class="catalog" id="catalogGrid">
+@forelse($productosProduccion as $grupo)
 
-@forelse($orders as $order)
-@php
-    $statusUp = strtoupper($order->status);
+    @php
 
-    $statusKey = 'pending';
-    if (in_array($statusUp, ['EN_PROCESO','EN PROCESO','PROCESO','IN_PROGRESS'])) {
-        $statusKey = 'progress';
-    } elseif (in_array($statusUp, ['COMPLETADO','COMPLETADA','DONE','COMPLETO'])) {
-        $statusKey = 'done';
-    } elseif (in_array($statusUp, ['CANCELADO','CANCELLED'])) {
-        $statusKey = 'cancelled';
-    }
+        $producto = $grupo->producto;
 
-    $cardClass = [
-        'pending'   => 'st-pending',
-        'progress'  => 'st-progress',
-        'done'      => 'st-done',
-        'cancelled' => 'st-cancelled',
-    ][$statusKey];
+        $ultima = $grupo->ultima;
 
-    $badgeClass = [
-        'pending'   => 'sb-pending',
-        'progress'  => 'sb-progress',
-        'done'      => 'sb-done',
-        'cancelled' => 'sb-cancelled',
-    ][$statusKey];
+        /*
+         * Para el buscador
+         */
+        $textoBusqueda = strtolower(
+            ($producto->nombre ?? '') . ' ' .
+            ($producto->sku ?? '') . ' ' .
+            ($producto->barcode ?? '')
+        );
 
-    $badgeLabel = [
-        'pending'   => '⏳ Pendiente',
-        'progress'  => '⚙️ En proceso',
-        'done'      => '✅ Completado',
-        'cancelled' => '✕ Cancelado',
-    ][$statusKey];
-@endphp
+        /*
+         * Estados disponibles del grupo
+         */
+        $tienePendiente = $grupo->ordenes->contains(function ($orden) {
+            return strtoupper($orden->status) === 'PENDIENTE';
+        });
 
-<div class="prod-card {{ $cardClass }}"
-     data-q="{{ strtolower($order->number . ' ' . ($order->product->nombre ?? '') . ' ' . ($order->rawMaterial->name ?? '')) }}"
-     data-status="{{ $statusKey }}">
+        $tieneProceso = $grupo->en_produccion > 0;
 
-    <div class="prod-card-hdr">
-        <div>
-            <div class="prod-num">{{ $order->number }}</div>
-        </div>
-        <span class="status-badge {{ $badgeClass }}">{{ $badgeLabel }}</span>
-    </div>
+        $tieneCompletado = $grupo->finalizadas > 0;
 
-    <div class="prod-card-body">
+        /*
+         * Estado principal del producto
+         */
+        if ($tieneProceso) {
 
-        <div class="info-row">
-            <span>Producto</span>
-            <span class="info-val">{{ $order->product->nombre ?? '—' }}</span>
-        </div>
+            $statusKey = 'progress';
 
-        <div class="info-row">
-            <span>Materia prima</span>
-            <span class="info-val">{{ $order->rawMaterial->name ?? '—' }}</span>
-        </div>
+        } elseif ($tieneCompletado) {
 
-        @if(isset($order->quantity))
-        <div class="info-row">
-            <span>Cantidad</span>
-            <span class="info-val" style="font-family:'Consolas',monospace;font-weight:700;">
-                {{ number_format($order->quantity, 2) }}
-            </span>
-        </div>
-        @endif
+            $statusKey = 'done';
 
-        @if(isset($order->created_at))
-        <div class="info-row">
-            <span>Fecha</span>
-            <span class="info-val">
-                {{ \Carbon\Carbon::parse($order->created_at)->format('d M Y') }}
-            </span>
-        </div>
-        @endif
+        } else {
 
-        <div style="margin-top:6px;display:flex;gap:5px;flex-wrap:wrap;">
-            @if($order->rawMaterial)
-            <span class="mat-tag">
-                🧪 {{ $order->rawMaterial->name }}
-                @if($order->rawMaterial->unit)
-                    · {{ $order->rawMaterial->unit }}
+            $statusKey = 'pending';
+        }
+
+        $cardClass = [
+            'pending'  => 'st-pending',
+            'progress' => 'st-progress',
+            'done'     => 'st-done',
+        ][$statusKey];
+
+        $badgeClass = [
+            'pending'  => 'sb-pending',
+            'progress' => 'sb-progress',
+            'done'     => 'sb-done',
+        ][$statusKey];
+
+        $badgeLabel = [
+            'pending'  => '⏳ Pendiente',
+            'progress' => '⚙️ En producción',
+            'done'     => '✅ Producción realizada',
+        ][$statusKey];
+
+    @endphp
+
+
+    <div
+        class="prod-card {{ $cardClass }}"
+        data-q="{{ $textoBusqueda }}"
+        data-status="{{ $statusKey }}"
+    >
+
+        {{-- CABECERA --}}
+
+        <div class="prod-card-hdr">
+
+            <div>
+
+                <div style="
+                    font-size:14px;
+                    font-weight:800;
+                    color:var(--erp-ink);
+                ">
+                    {{ $producto->nombre ?? 'Producto' }}
+                </div>
+
+                @if($producto?->sku)
+
+                    <div style="
+                        margin-top:2px;
+                        font-size:10px;
+                        color:#94a3b8;
+                        font-family:var(--font-mono);
+                    ">
+                        SKU: {{ $producto->sku }}
+                    </div>
+
                 @endif
+
+            </div>
+
+            <span class="status-badge {{ $badgeClass }}">
+                {{ $badgeLabel }}
             </span>
+
+        </div>
+
+
+        {{-- CUERPO --}}
+
+        <div class="prod-card-body">
+
+
+            {{-- PRODUCCIÓN TOTAL --}}
+
+            <div style="
+                background:#f8fafc;
+                border:1px solid #e2e8f0;
+                border-radius:4px;
+                padding:12px;
+                margin-bottom:8px;
+                text-align:center;
+            ">
+
+                <div style="
+                    font-size:10px;
+                    color:var(--erp-ink-muted);
+                    text-transform:uppercase;
+                    letter-spacing:.05em;
+                    font-weight:700;
+                ">
+                    Producción acumulada
+                </div>
+
+                <div style="
+                    font-size:24px;
+                    line-height:1.2;
+                    font-weight:900;
+                    color:var(--erp-ink);
+                    font-family:var(--font-mono);
+                    margin-top:3px;
+                ">
+                    {{ number_format($grupo->total_producido, 2) }}
+                </div>
+
+                <div style="
+                    font-size:10px;
+                    color:#94a3b8;
+                ">
+                    unidades
+                </div>
+
+            </div>
+
+
+            {{-- INFORMACIÓN --}}
+
+            <div class="info-row">
+
+                <span>Órdenes de producción</span>
+
+                <span class="info-val">
+                    {{ $grupo->cantidad_ordenes }}
+                </span>
+
+            </div>
+
+
+            <div class="info-row">
+
+                <span>Finalizadas</span>
+
+                <span class="info-val" style="color:var(--erp-ok);">
+
+                    {{ $grupo->finalizadas }}
+
+                </span>
+
+            </div>
+
+
+            @if($grupo->en_produccion > 0)
+
+                <div class="info-row">
+
+                    <span>En producción</span>
+
+                    <span class="info-val" style="color:var(--erp-accent);">
+
+                        {{ $grupo->en_produccion }}
+
+                    </span>
+
+                </div>
+
             @endif
+
+
+            {{-- ÚLTIMA PRODUCCIÓN --}}
+
+            @if($ultima)
+
+                <div style="
+                    margin-top:8px;
+                    padding:8px;
+                    background:#f9fafb;
+                    border:1px dashed #dbe2ea;
+                    border-radius:3px;
+                    font-size:10px;
+                    color:#64748b;
+                ">
+
+                    <div style="
+                        font-weight:700;
+                        color:#475569;
+                        margin-bottom:3px;
+                    ">
+                        Última producción
+                    </div>
+
+                    <div style="
+                        display:flex;
+                        justify-content:space-between;
+                        gap:8px;
+                    ">
+
+                        <span style="
+                            font-family:var(--font-mono);
+                            font-weight:700;
+                        ">
+                            {{ $ultima->number }}
+                        </span>
+
+                        <span style="font-weight:700;">
+
+                            {{ number_format($ultima->produced_quantity, 2) }}
+                            unidades
+
+                        </span>
+
+                    </div>
+
+                </div>
+
+            @endif
+
+
+            {{-- MATERIAS PRIMAS --}}
+
+            @if($grupo->raw_materials->count())
+
+                <div style="
+                    margin-top:8px;
+                    display:flex;
+                    gap:5px;
+                    flex-wrap:wrap;
+                ">
+
+                    @foreach($grupo->raw_materials as $material)
+
+                        <span class="mat-tag">
+
+                            🧪 {{ $material->name }}
+
+                            @if($material->unit)
+                                · {{ $material->unit }}
+                            @endif
+
+                        </span>
+
+                    @endforeach
+
+                </div>
+
+            @endif
+
+        </div>
+
+
+        {{-- FOOTER --}}
+
+        <div class="prod-card-footer">
+
+            <button
+                type="button"
+                class="btn-open"
+                onclick="mostrarProducciones({{ $grupo->product_id }})"
+            >
+                📂 Ver producciones
+            </button>
+
         </div>
 
     </div>
 
-    <div class="prod-card-footer">
-        <a href="{{ route('production-orders.show', $order) }}" class="btn-open">
-            📂 Abrir orden
-        </a>
+
+    {{-- =====================================================
+         DATOS OCULTOS DE LAS PRODUCCIONES
+    ====================================================== --}}
+
+    <div
+        id="producciones-{{ $grupo->product_id }}"
+        style="display:none;"
+    >
+
+        @foreach($grupo->ordenes as $orden)
+
+            <div
+                class="produccion-data"
+                data-number="{{ $orden->number }}"
+                data-quantity="{{ number_format($orden->produced_quantity, 2) }}"
+                data-status="{{ $orden->status }}"
+                data-date="{{ $orden->created_at
+                    ? $orden->created_at->format('d/m/Y H:i')
+                    : '—'
+                }}"
+                data-material="{{ $orden->rawMaterial->name ?? '—' }}"
+            ></div>
+
+        @endforeach
+
     </div>
 
-</div>
 
 @empty
 
-<div class="empty-state">
-    <div style="font-size:36px;margin-bottom:8px;">🏭</div>
-    <h3>No existen órdenes de producción</h3>
-    <p style="font-size:12px;margin:.5rem 0 1rem;">
-        Comienza creando tu primera orden de producción.
-    </p>
-    <a href="{{ route('production-orders.create') }}" class="btn-new">
-        ➕ Nueva producción
-    </a>
-</div>
+    <div class="empty-state">
+
+        <div style="font-size:36px;margin-bottom:8px;">
+            🏭
+        </div>
+
+        <h3>
+            No existen órdenes de producción
+        </h3>
+
+        <p style="font-size:12px;margin:.5rem 0 1rem;">
+            Comienza creando tu primera orden de producción.
+        </p>
+
+        <a
+            href="{{ route('production-orders.create') }}"
+            class="btn-new"
+        >
+            ➕ Nueva producción
+        </a>
+
+    </div>
 
 @endforelse
-
 </div>
 
 </div>
@@ -483,6 +719,313 @@ function filtrarOrdenes() {
     var cnt = document.getElementById('countVisible');
     if (cnt) cnt.textContent = visible;
 }
+function mostrarProducciones(productId)
+{
+    const contenedor = document.getElementById(
+        'producciones-' + productId
+    );
+
+    if (!contenedor) {
+        return;
+    }
+
+    const datos = contenedor.querySelectorAll(
+        '.produccion-data'
+    );
+
+    const tabla = document.getElementById(
+        'tablaProducciones'
+    );
+
+    const nombreProducto = contenedor
+        .closest('.prod-card')
+        ?.querySelector('.prod-card-hdr div div')
+        ?.textContent
+        ?.trim() ?? 'Producto';
+
+    document.getElementById(
+        'modalProductoNombre'
+    ).textContent = nombreProducto;
+
+
+    tabla.innerHTML = '';
+
+
+    datos.forEach(function (dato) {
+
+        const estado = dato.dataset.status.toUpperCase();
+
+        let color = '#64748b';
+        let fondo = '#f1f5f9';
+        let texto = estado;
+
+        if (estado === 'FINALIZADA') {
+
+            color = '#166534';
+            fondo = '#dcfce7';
+            texto = '✅ Finalizada';
+
+        } else if (estado === 'EN_PRODUCCION') {
+
+            color = '#1d4ed8';
+            fondo = '#dbeafe';
+            texto = '⚙️ En producción';
+
+        }
+
+
+        const fila = document.createElement('tr');
+
+        fila.style.borderBottom =
+            '1px solid #f1f5f9';
+
+
+        fila.innerHTML = `
+
+            <td style="
+                padding:9px;
+                font-family:monospace;
+                font-weight:700;
+            ">
+                ${dato.dataset.number}
+            </td>
+
+            <td style="
+                padding:9px;
+                text-align:center;
+                font-family:monospace;
+                font-weight:700;
+            ">
+                ${dato.dataset.quantity}
+            </td>
+
+            <td style="
+                padding:9px;
+            ">
+                ${dato.dataset.material}
+            </td>
+
+            <td style="
+                padding:9px;
+                text-align:center;
+                color:#64748b;
+            ">
+                ${dato.dataset.date}
+            </td>
+
+            <td style="
+                padding:9px;
+                text-align:center;
+            ">
+
+                <span style="
+                    display:inline-block;
+                    padding:4px 8px;
+                    border-radius:4px;
+                    background:${fondo};
+                    color:${color};
+                    font-size:10px;
+                    font-weight:700;
+                ">
+                    ${texto}
+                </span>
+
+            </td>
+
+        `;
+
+        tabla.appendChild(fila);
+
+    });
+
+
+    document.getElementById(
+        'modalProducciones'
+    ).style.display = 'flex';
+
+    document.body.style.overflow = 'hidden';
+}
+
+
+function cerrarProducciones()
+{
+    document.getElementById(
+        'modalProducciones'
+    ).style.display = 'none';
+
+    document.body.style.overflow = '';
+}
+
+
+document.getElementById('modalProducciones')
+    ?.addEventListener('click', function(event) {
+
+        if (event.target === this) {
+            cerrarProducciones();
+        }
+
+    });
 </script>
+{{-- =========================================================
+     MODAL HISTORIAL DE PRODUCCIÓN
+========================================================= --}}
+
+<div
+    id="modalProducciones"
+    style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(15,23,42,.60);
+        z-index:9999;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    "
+>
+
+    <div style="
+        background:#fff;
+        width:min(850px,95vw);
+        max-height:90vh;
+        border-radius:8px;
+        box-shadow:0 20px 50px rgba(0,0,0,.25);
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+    ">
+
+
+        {{-- CABECERA --}}
+
+        <div style="
+            padding:15px 18px;
+            border-bottom:1px solid #e2e8f0;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        ">
+
+            <div>
+
+                <div
+                    id="modalProductoNombre"
+                    style="
+                        font-size:16px;
+                        font-weight:800;
+                    "
+                >
+                    Producciones
+                </div>
+
+                <div style="
+                    font-size:11px;
+                    color:#94a3b8;
+                    margin-top:2px;
+                ">
+                    Historial de producción del producto
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                onclick="cerrarProducciones()"
+                style="
+                    border:0;
+                    background:#f1f5f9;
+                    width:32px;
+                    height:32px;
+                    border-radius:5px;
+                    font-size:18px;
+                    cursor:pointer;
+                "
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        {{-- TABLA --}}
+
+        <div style="
+            padding:15px;
+            overflow:auto;
+        ">
+
+            <table style="
+                width:100%;
+                border-collapse:collapse;
+                font-size:12px;
+            ">
+
+                <thead>
+
+                    <tr style="
+                        background:#f8fafc;
+                        border-bottom:1px solid #dbe2ea;
+                    ">
+
+                        <th style="padding:9px;text-align:left;">
+                            Orden
+                        </th>
+
+                        <th style="padding:9px;text-align:center;">
+                            Cantidad producida
+                        </th>
+
+                        <th style="padding:9px;text-align:left;">
+                            Materia prima
+                        </th>
+
+                        <th style="padding:9px;text-align:center;">
+                            Fecha
+                        </th>
+
+                        <th style="padding:9px;text-align:center;">
+                            Estado
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody id="tablaProducciones">
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {{-- PIE --}}
+
+        <div style="
+            padding:10px 15px;
+            border-top:1px solid #e2e8f0;
+            text-align:right;
+        ">
+
+            <button
+                type="button"
+                onclick="cerrarProducciones()"
+                style="
+                    padding:7px 14px;
+                    border:1px solid #cbd5e1;
+                    background:#fff;
+                    border-radius:5px;
+                    cursor:pointer;
+                "
+            >
+                Cerrar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
 
 @endsection
