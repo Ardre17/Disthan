@@ -386,10 +386,73 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .p3d-product-group:hover {
     filter:brightness(1.05);
 }
+/* =========================================================
+   CAJAS 3D REALES
+========================================================= */
+
 .p3d-box {
     position:absolute;
     transform-style:preserve-3d;
     transform-origin:center center;
+}
+
+/* CARAS COMUNES */
+
+.p3d-box-face {
+    position:absolute;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    box-sizing:border-box;
+
+    border:1.5px solid rgba(0,0,0,.35);
+    backface-visibility:hidden;
+
+    overflow:hidden;
+
+    font-size:8px;
+    font-weight:800;
+
+    text-align:center;
+
+    user-select:none;
+}
+
+/* FRENTE */
+
+.p3d-box-front {
+    transform-style:preserve-3d;
+}
+
+/* PARTE TRASERA */
+
+.p3d-box-back {
+    transform-style:preserve-3d;
+}
+
+/* DERECHA */
+
+.p3d-box-right {
+    transform-style:preserve-3d;
+}
+
+/* IZQUIERDA */
+
+.p3d-box-left {
+    transform-style:preserve-3d;
+}
+
+/* ARRIBA */
+
+.p3d-box-top {
+    transform-style:preserve-3d;
+}
+
+/* ABAJO */
+
+.p3d-box-bottom {
+    transform-style:preserve-3d;
 }
 
 .p3d-face {
@@ -1587,29 +1650,7 @@ function renderP3dProducts()
         const row =
             document.createElement('div');
 
-        row.className =
-            'p3d-product-row';
-
-        row.draggable = restantes > 0;
-
-        row.dataset.index = index;
-
-        if (restantes <= 0) {
-            row.style.opacity = '.55';
-            row.style.cursor = 'not-allowed';
-        }
-
-        row.innerHTML = `
-
-            <div class="p3d-product-name">
-                📦 ${item.nombre}
-            </div>
-
-            <div class="p3d-product-meta">
-                ${colocadas} / ${totalCajas} cajas
-            </div>
-
-            <div class="p3d-product-meta">
+      .oduct-meta">
                 Restantes:
                 <strong
                     style="

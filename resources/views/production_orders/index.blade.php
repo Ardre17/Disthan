@@ -903,38 +903,10 @@ document.getElementById('modalProducciones')
         }
 
     });
-    async function verProduccion(id)
+    function verProduccion(id)
 {
-    try {
-
-        const response = await fetch(
-            `/production-orders/${id}/ver`
-        );
-
-        if (!response.ok) {
-            throw new Error('No se pudo obtener la producción.');
-        }
-
-        const data = await response.json();
-
-        alert(
-            `ORDEN: ${data.number}\n\n` +
-            `Producto: ${data.product}\n` +
-            `Materia prima: ${data.raw_material}\n` +
-            `Cantidad producida: ${data.produced_quantity}\n` +
-            `Materia prima consumida: ${data.consumed_quantity}\n` +
-            `Estado: ${data.status}\n` +
-            `Usuario: ${data.user}\n` +
-            `Fecha: ${data.date}\n\n` +
-            `Observación: ${data.observation}`
-        );
-
-    } catch (error) {
-
-        console.error(error);
-
-        alert('No se pudo cargar la información de la producción.');
-    }
+    window.location.href =
+        `/production-orders/${id}`;
 }
 
 
