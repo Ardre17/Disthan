@@ -70,6 +70,10 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .nuevo-bulto-btn{border:2px dashed #e2e8f0;border-radius:12px;display:flex;align-items:center;justify-content:center;min-height:100px;cursor:pointer;transition:border-color .2s;background:transparent;width:100%;color:#94a3b8;font-size:12px;flex-direction:column;gap:4px;}
 .nuevo-bulto-btn:hover{border-color:#2563eb;color:#2563eb;}
 .crear-bulto-row{display:flex;align-items:center;gap:8px;margin-bottom:.75rem;}
+#btnCamara,
+#cameraScanner {
+    display: none;
+}
 </style>
 
 <div class="pg">
@@ -198,6 +202,19 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     <input type="text" id="scanner" class="scanner-input"
            placeholder="📡 Escanea un producto para ver su estado en la orden...">
     <span style="font-size:10px;color:#475569;white-space:nowrap;">Enter para<br>confirmar</span>
+    <button
+    type="button"
+    id="btnCamara"
+    class="btn"
+    style="
+        background:#2563eb;
+        color:white;
+        white-space:nowrap;
+        min-height:38px;
+    "
+>
+    📷 Cámara
+</button>
 </div>
 
 {{-- ── Layout 2 columnas ── --}}
@@ -570,5 +587,53 @@ function confirmarCierre(){
     const lista = faltantes.map(f => `• ${f.nombre} (faltan ${f.falta})`).join('\n');
     return confirm('⚠️ Productos sin embalaje completo:\n\n' + lista + '\n\n¿Cerrar encomienda de todas formas?');
 }
+/*
+|--------------------------------------------------------------------------
+| ACTIVAR ESCÁNER DE CÁMARA SOLO EN DISPOSITIVOS PEQUEÑOS
+|--------------------------------------------------------------------------
+*/
+
+function esDispositivoPequeno()
+{
+    return window.innerWidth <= 768;
+}
+
+
+function configurarCamaraMovil()
+{
+    const btn =
+        document.getElementById('btnCamara');
+
+    const camera =
+        document.getElementById('cameraScanner');
+
+    if(!btn || !camera){
+        return;
+    }
+
+    if(esDispositivoPequeno()){
+
+        btn.style.display =
+            'inline-flex';
+
+    }else{
+
+        btn.style.display =
+            'none';
+
+        camera.style.display =
+            'none';
+
+    }
+}
+
+
+configurarCamaraMovil();
+
+
+window.addEventListener(
+    'resize',
+    configurarCamaraMovil
+);
 </script>
 @endsection
