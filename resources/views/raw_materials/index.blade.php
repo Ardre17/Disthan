@@ -517,7 +517,7 @@
     </div>
 
 </div>
-
+@endif
 @empty
 
 <div class="empty-state">
