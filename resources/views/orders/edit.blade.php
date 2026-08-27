@@ -1610,6 +1610,10 @@ function renderP3dProducts()
     const contenedor =
         document.getElementById('p3dProducts');
 
+    if (!contenedor) {
+        return;
+    }
+
     contenedor.innerHTML = '';
 
     p3dData.forEach((item, index) => {
@@ -1627,10 +1631,14 @@ function renderP3dProducts()
 
         const colocadas =
             p3dBlocks
-                .filter(block => block.productIndex === index)
+                .filter(
+                    block =>
+                        block.productIndex === index
+                )
                 .reduce(
                     (total, block) =>
-                        total + Number(block.cantidad),
+                        total +
+                        Number(block.cantidad),
                     0
                 );
 
@@ -1642,91 +1650,107 @@ function renderP3dProducts()
 
         const porcentaje =
             totalCajas > 0
-                ? Math.round(
-                    (colocadas / totalCajas) * 100
+                ? Math.min(
+                    100,
+                    Math.round(
+                        (colocadas / totalCajas) * 100
+                    )
                 )
                 : 0;
 
-        const row = document.createElement('div');
+        const row =
+            document.createElement('div');
 
-row.className = 'p3d-product-row';
+        row.className =
+            'p3d-product-row';
 
-row.draggable = restantes > 0;
+        row.draggable =
+            restantes > 0;
 
-row.innerHTML = `
-    <div class="p3d-product-name">
-        📦 ${item.nombre}
-    </div>
+        row.innerHTML = `
+            <div class="p3d-product-name">
+                📦 ${item.nombre}
+            </div>
 
-    <div class="p3d-product-meta">
-        ${item.sku ? 'SKU: ' + item.sku + '<br>' : ''}
-        Total: <strong>${totalCajas}</strong> cajas
-    </div>
+            <div class="p3d-product-meta">
+                Cajas totales:
+                <strong>
+                    ${totalCajas}
+                </strong>
+            </div>
 
-    <div class="p3d-product-meta">
-        Restantes:
-        <strong
-            style="
-                color:${restantes > 0
-                    ? '#2563eb'
-                    : '#15803d'};
-            "
-        >
-            ${restantes}
-        </strong>
-    </div>
+            <div class="p3d-product-meta">
+                Colocadas:
+                <strong>
+                    ${colocadas}
+                </strong>
+            </div>
 
-    <div
-        style="
-            width:100%;
-            height:5px;
-            background:#e5e7eb;
-            border-radius:99px;
-            overflow:hidden;
-            margin-top:6px;
-        "
-    >
-        <div
-            style="
-                width:${porcentaje}%;
-                height:100%;
-                background:${porcentaje >= 100
-                    ? '#22c55e'
-                    : '#2563eb'};
-                border-radius:99px;
-            "
-        ></div>
-    </div>
-
-    ${
-        restantes <= 0
-            ? `
-                <div
+            <div class="p3d-product-meta">
+                Restantes:
+                <strong
                     style="
-                        font-size:9px;
-                        color:#15803d;
-                        font-weight:700;
-                        margin-top:5px;
+                        color:${restantes > 0
+                            ? '#2563eb'
+                            : '#15803d'};
                     "
                 >
-                    ✅ COMPLETO
-                </div>
-            `
-            : `
+                    ${restantes}
+                </strong>
+            </div>
+
+            <div
+                style="
+                    width:100%;
+                    height:5px;
+                    background:#e5e7eb;
+                    border-radius:99px;
+                    overflow:hidden;
+                    margin-top:6px;
+                "
+            >
                 <div
                     style="
-                        font-size:9px;
-                        color:#64748b;
-                        margin-top:5px;
+                        width:${porcentaje}%;
+                        height:100%;
+                        background:${porcentaje >= 100
+                            ? '#22c55e'
+                            : '#2563eb'};
+                        border-radius:99px;
                     "
-                >
-                    🖱️ Arrastra hacia la paleta
-                </div>
-            `
-    }
-`;     
+                ></div>
+            </div>
+
+            ${
+                restantes <= 0
+                    ? `
+                        <div
+                            style="
+                                font-size:9px;
+                                color:#15803d;
+                                font-weight:700;
+                                margin-top:5px;
+                            "
+                        >
+                            ✅ COMPLETO
+                        </div>
+                    `
+                    : `
+                        <div
+                            style="
+                                font-size:9px;
+                                color:#64748b;
+                                margin-top:5px;
+                            "
+                        >
+                            🖱️ Arrastra hacia la paleta
+                        </div>
+                    `
+            }
+        `;
+
         /*
-         * DRAG DESDE EL PANEL
+         * ARRRASTRAR PRODUCTO
          */
         row.addEventListener(
             'dragstart',
@@ -1739,10 +1763,15 @@ row.innerHTML = `
 
                 event.dataTransfer.setData(
                     'text/plain',
-                    index
+                    String(index)
                 );
 
-                row.classList.add('selected');
+                event.dataTransfer.effectAllowed =
+                    'copy';
+
+                row.classList.add(
+                    'selected'
+                );
             }
         );
 
@@ -1750,7 +1779,9 @@ row.innerHTML = `
             'dragend',
             function()
             {
-                row.classList.remove('selected');
+                row.classList.remove(
+                    'selected'
+                );
             }
         );
 
@@ -1761,15 +1792,16 @@ row.innerHTML = `
             'click',
             function()
             {
-                seleccionarProducto3D(index);
+                seleccionarProducto3D(
+                    index
+                );
             }
         );
 
         contenedor.appendChild(row);
     });
 }
-
-
+    
 /**
  * =========================================================
  * PALETA COMO ZONA DE DROP
