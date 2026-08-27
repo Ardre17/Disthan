@@ -486,6 +486,7 @@
         </div>
     @endif
 
+    @endif
             </div>
             <div style="font-size:24px;opacity:.3;">📦</div>
         </div>
@@ -517,7 +518,6 @@
     </div>
 
 </div>
-@endif
 @empty
 
 <div class="empty-state">
