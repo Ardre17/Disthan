@@ -1647,72 +1647,84 @@ function renderP3dProducts()
                 )
                 : 0;
 
-        const row =
-            document.createElement('div');
+        const row = document.createElement('div');
 
-      .oduct-meta">
-                Restantes:
-                <strong
-                    style="
-                        color:${restantes > 0
-                            ? '#2563eb'
-                            : '#15803d'};
-                    "
-                >
-                    ${restantes}
-                </strong>
-            </div>
+row.className = 'p3d-product-row';
 
-            <div
-                style="
-                    width:100%;
-                    height:5px;
-                    background:#e5e7eb;
-                    border-radius:99px;
-                    overflow:hidden;
-                    margin-top:6px;
-                "
-            >
+row.draggable = restantes > 0;
+
+row.innerHTML = `
+    <div class="p3d-product-name">
+        📦 ${item.nombre}
+    </div>
+
+    <div class="p3d-product-meta">
+        ${item.sku ? 'SKU: ' + item.sku + '<br>' : ''}
+        Total: <strong>${totalCajas}</strong> cajas
+    </div>
+
+    <div class="p3d-product-meta">
+        Restantes:
+        <strong
+            style="
+                color:${restantes > 0
+                    ? '#2563eb'
+                    : '#15803d'};
+            "
+        >
+            ${restantes}
+        </strong>
+    </div>
+
+    <div
+        style="
+            width:100%;
+            height:5px;
+            background:#e5e7eb;
+            border-radius:99px;
+            overflow:hidden;
+            margin-top:6px;
+        "
+    >
+        <div
+            style="
+                width:${porcentaje}%;
+                height:100%;
+                background:${porcentaje >= 100
+                    ? '#22c55e'
+                    : '#2563eb'};
+                border-radius:99px;
+            "
+        ></div>
+    </div>
+
+    ${
+        restantes <= 0
+            ? `
                 <div
                     style="
-                        width:${porcentaje}%;
-                        height:100%;
-                        background:${porcentaje >= 100
-                            ? '#22c55e'
-                            : '#2563eb'};
-                        border-radius:99px;
+                        font-size:9px;
+                        color:#15803d;
+                        font-weight:700;
+                        margin-top:5px;
                     "
-                ></div>
-            </div>
-
-            ${
-                restantes <= 0
-                    ? `
-                        <div
-                            style="
-                                font-size:9px;
-                                color:#15803d;
-                                font-weight:700;
-                                margin-top:5px;
-                            "
-                        >
-                            ✅ COMPLETO
-                        </div>
-                    `
-                    : `
-                        <div
-                            style="
-                                font-size:9px;
-                                color:#64748b;
-                                margin-top:5px;
-                            "
-                        >
-                            🖱️ Arrastra hacia la paleta
-                        </div>
-                    `
-            }
-        `;
-
+                >
+                    ✅ COMPLETO
+                </div>
+            `
+            : `
+                <div
+                    style="
+                        font-size:9px;
+                        color:#64748b;
+                        margin-top:5px;
+                    "
+                >
+                    🖱️ Arrastra hacia la paleta
+                </div>
+            `
+    }
+`;     
         /*
          * DRAG DESDE EL PANEL
          */

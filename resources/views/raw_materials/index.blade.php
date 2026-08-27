@@ -447,6 +447,45 @@
                     {{ $material->stock }}
                 </div>
                 <div class="stock-unit">{{ $material->unit }} disponibles</div>
+                @if($material->cantidad_por_caja > 0)
+
+    @php
+        $stock = (int) $material->stock;
+        $porCaja = (int) $material->cantidad_por_caja;
+
+        $cajas = intdiv($stock, $porCaja);
+        $sueltas = $stock % $porCaja;
+    @endphp
+
+    <div style="
+        margin-top:6px;
+        font-size:11px;
+        color:#475569;
+        font-weight:600;
+    ">
+        📦 {{ number_format($cajas) }} cajas
+    </div>
+
+    <div style="
+        font-size:10px;
+        color:#64748b;
+        margin-top:2px;
+    ">
+        {{ number_format($porCaja) }}
+        {{ $material->unit }} por caja
+    </div>
+
+    @if($sueltas > 0)
+        <div style="
+            font-size:10px;
+            color:#64748b;
+            margin-top:2px;
+        ">
+            + {{ number_format($sueltas) }}
+            {{ $material->unit }} sueltas
+        </div>
+    @endif
+
             </div>
             <div style="font-size:24px;opacity:.3;">📦</div>
         </div>

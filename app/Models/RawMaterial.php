@@ -22,6 +22,8 @@ class RawMaterial extends Model
 
         'unit',
 
+        'cantidad_por_caja',
+
         'stock',
 
         'minimum_stock',
