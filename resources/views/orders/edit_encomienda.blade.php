@@ -74,6 +74,12 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 #cameraScanner {
     display: none;
 }
+
+@media (max-width: 768px) {
+    #btnCamara {
+        display: inline-flex;
+    }
+}
 </style>
 
 <div class="pg">
@@ -519,6 +525,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 @endif
 
 </div>
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
 let scanner = document.getElementById('scanner');
 if(scanner){
@@ -548,20 +555,6 @@ if(scanner){
 
         this.value = '';
     });
-
-    // ✅ CORREGIDO: solo devuelve el foco si el usuario NO está
-    // interactuando con ningún input, select o button de la página
-    const TAGS_INTERACTIVOS = ['INPUT', 'SELECT', 'TEXTAREA', 'BUTTON'];
-
-    setInterval(() => {
-        const activo = document.activeElement;
-        const esScannerMismo = activo === scanner;
-        const esInteractivo  = TAGS_INTERACTIVOS.includes(activo.tagName);
-
-        if(!esScannerMismo && !esInteractivo){
-            scanner.focus();
-        }
-    }, 1000);
 }
 
 function confirmarCierre(){
@@ -593,12 +586,6 @@ function confirmarCierre(){
 |--------------------------------------------------------------------------
 */
 
-function esDispositivoPequeno()
-{
-    return window.innerWidth <= 768;
-}
-
-
 function configurarCamaraMovil()
 {
     const btn =
@@ -627,13 +614,5 @@ function configurarCamaraMovil()
     }
 }
 
-
-configurarCamaraMovil();
-
-
-window.addEventListener(
-    'resize',
-    configurarCamaraMovil
-);
 </script>
 @endsection

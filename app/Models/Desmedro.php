@@ -35,7 +35,7 @@ class Desmedro extends Model
 {
     $ultimo = static::orderByDesc('id')->first();
 
-    $siguiente = $ultimo ? $ultimo->id + 1 : 1;
+    $siguiente = $ultimo ? $ultimo->id + 1 : 704;
 
     return 'DSM-' . str_pad($siguiente, 6, '0', STR_PAD_LEFT);
 }
