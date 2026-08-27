@@ -278,20 +278,7 @@
                         <div class="info-row"><span>Color</span><span class="info-val">{{ $raw_material->color ?? '—' }}</span></div>
                         <div class="info-row"><span>Stock mínimo</span><span class="info-val">{{ $raw_material->minimum_stock }}</span></div>
                         <div class="form-group">
-    <label>Cantidad por Caja</label>
 
-    <input
-        type="number"
-        name="cantidad_por_caja"
-        min="1"
-        value="{{ old('cantidad_por_caja', $material->cantidad_por_caja ?? '') }}"
-        placeholder="Ej: 20"
-    >
-
-    <small style="color:#64748b;">
-        Cantidad de unidades que contiene una caja.
-    </small>
-</div>
                     </div>
                 </div>
 

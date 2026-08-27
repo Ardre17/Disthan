@@ -2779,6 +2779,7 @@ function actualizarEditor3D()
                             this.value
                         )
                     "
+                    >
             </div>
 
             <div
@@ -2905,7 +2906,24 @@ function actualizarEditor3D()
                 🔄 Rotación:
                 ${Math.round(block.rotation)}°
             </div>
-
+            <button
+    type="button"
+    onclick="eliminarBloque3D()"
+    style="
+        width:100%;
+        margin-top:10px;
+        padding:8px;
+        border:1px solid #fecaca;
+        background:#fef2f2;
+        color:#b91c1c;
+        border-radius:6px;
+        font-size:10px;
+        font-weight:700;
+        cursor:pointer;
+    "
+>
+    🗑️ Eliminar este bloque
+</button>
             <div
                 id="p3dPositionStatus"
                 style="
@@ -2991,7 +3009,47 @@ function editarBloque3D(
 
     renderP3dProducts();
 }
+/**
+ * =========================================================
+ * ELIMINAR BLOQUE
+ * =========================================================
+ */
+function eliminarBloque3D()
+{
+    if (
+        p3dSelected === null ||
+        !p3dBlocks[p3dSelected]
+    ) {
+        return;
+    }
 
+    const block =
+        p3dBlocks[p3dSelected];
+
+    const item =
+        p3dData[block.productIndex];
+
+    const confirmar =
+        confirm(
+            `¿Eliminar el bloque de "${item.nombre}"?\n\n` +
+            `Se devolverán ${block.cantidad} cajas a las cajas restantes.`
+        );
+
+    if (!confirmar) {
+        return;
+    }
+
+    p3dBlocks.splice(
+        p3dSelected,
+        1
+    );
+
+    p3dSelected = null;
+
+    renderPaleta3D();
+    renderP3dProducts();
+    actualizarEditor3D();
+}
 
 /**
  * =========================================================
