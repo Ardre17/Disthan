@@ -215,11 +215,63 @@ opacity:1;
         </div>
         <span class="prod-item-badge {{ $badgeCls }}">{{ $badgeLbl }}</span>
     </div>
-    <div class="prod-item-meta">
-        <span>Solicitado: <strong style="color:#f1f5f9;">{{ $item->cantidad_solicitada }}</strong></span>
-        <span>Despachado: <strong id="despachado-{{ $item->id }}" style="color:{{ $lc }};">{{ $item->cantidad_despachada }}</strong></span>
-        <span style="font-weight:700;color:{{ $lc }};" id="pct-{{ $item->id }}">{{ number_format($pct2,0) }}%</span>
-    </div>
+    @php
+    $porCaja = (int) ($item->product->cantidad_por_caja ?? 0);
+
+    $cajasSolicitadas = $porCaja > 0
+        ? intdiv((int) $item->cantidad_solicitada, $porCaja)
+        : 0;
+
+    $sueltasSolicitadas = $porCaja > 0
+        ? ((int) $item->cantidad_solicitada % $porCaja)
+        : 0;
+
+    $cajasDespachadas = $porCaja > 0
+        ? intdiv((int) $item->cantidad_despachada, $porCaja)
+        : 0;
+
+    $sueltasDespachadas = $porCaja > 0
+        ? ((int) $item->cantidad_despachada % $porCaja)
+        : 0;
+@endphp
+
+<div class="prod-item-meta" style="flex-wrap:wrap;gap:6px;">
+    <span>
+        Solicitado:
+        <strong style="color:#f1f5f9;">{{ $item->cantidad_solicitada }}</strong>
+        @if($porCaja > 0)
+            <small style="color:#94a3b8;">
+                · <span id="cajas-solicitadas-{{ $item->id }}">{{ $cajasSolicitadas }}</span>
+                caja<span id="cajas-solicitadas-plural-{{ $item->id }}">{{ $cajasSolicitadas != 1 ? 's' : '' }}</span>
+                <span id="sueltas-solicitadas-wrap-{{ $item->id }}">
+                    @if($sueltasSolicitadas > 0)
+                        + {{ $sueltasSolicitadas }} suelta{{ $sueltasSolicitadas != 1 ? 's' : '' }}
+                    @endif
+                </span>
+            </small>
+        @endif
+    </span>
+
+    <span>
+        Despachado:
+        <strong id="despachado-{{ $item->id }}" style="color:{{ $lc }};">{{ $item->cantidad_despachada }}</strong>
+        @if($porCaja > 0)
+            <small style="color:#94a3b8;">
+                · <span id="cajas-despachadas-{{ $item->id }}">{{ $cajasDespachadas }}</span>
+                caja<span id="cajas-despachadas-plural-{{ $item->id }}">{{ $cajasDespachadas != 1 ? 's' : '' }}</span>
+                <span id="sueltas-despachadas-wrap-{{ $item->id }}">
+                    @if($sueltasDespachadas > 0)
+                        + {{ $sueltasDespachadas }} suelta{{ $sueltasDespachadas != 1 ? 's' : '' }}
+                    @endif
+                </span>
+            </small>
+        @endif
+    </span>
+
+    <span style="font-weight:700;color:{{ $lc }};" id="pct-{{ $item->id }}">
+        {{ number_format($pct2,0) }}%
+    </span>
+</div>
     <div class="prod-mini-bar">
         <div class="prod-mini-fill" id="bar-{{ $item->id }}" style="width:{{ $pct2 }}%;background:{{ $lc }};"></div>
     </div>
@@ -495,6 +547,28 @@ if(item.product.advertencias){
 }
 
 // Update mini bar en lista
+function actualizarCajasUI(item){
+    const porCaja = parseInt(item.product?.cantidad_por_caja || 0, 10);
+    if(!porCaja || porCaja <= 0) return;
+
+    const cantidad = Math.max(0, Math.floor(parseFloat(item.cantidad_despachada) || 0));
+    const cajas = Math.floor(cantidad / porCaja);
+    const sueltas = cantidad % porCaja;
+
+    const cajasEl = document.getElementById('cajas-despachadas-' + item.id);
+    if(cajasEl) cajasEl.textContent = cajas;
+
+    const pluralEl = document.getElementById('cajas-despachadas-plural-' + item.id);
+    if(pluralEl) pluralEl.textContent = cajas !== 1 ? 's' : '';
+
+    const sueltasWrap = document.getElementById('sueltas-despachadas-wrap-' + item.id);
+    if(sueltasWrap){
+        sueltasWrap.textContent = sueltas > 0
+            ? `+ ${sueltas} suelta${sueltas !== 1 ? 's' : ''}`
+            : '';
+    }
+}
+
 function actualizarItemUI(item){
     const pct = item.cantidad_solicitada > 0
         ? (item.cantidad_despachada / item.cantidad_solicitada) * 100 : 0;
@@ -505,6 +579,8 @@ function actualizarItemUI(item){
 
     const span = document.getElementById('despachado-' + item.id);
     if(span){ span.textContent = item.cantidad_despachada; span.style.color = color; }
+
+    actualizarCajasUI(item);
 
     const pctEl = document.getElementById('pct-' + item.id);
     if(pctEl){ pctEl.textContent = Math.round(pct) + '%'; pctEl.style.color = color; }

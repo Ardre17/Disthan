@@ -526,6 +526,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 
 </div>
 <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
 <script>
 let scanner = document.getElementById('scanner');
 if(scanner){
@@ -613,6 +614,128 @@ function configurarCamaraMovil()
 
     }
 }
+let lectorCamara = null;
 
+const btnCamara = document.getElementById('btnCamara');
+const cameraScanner = document.getElementById('cameraScanner');
+const cerrarCamara = document.getElementById('cerrarCamara');
+
+if (btnCamara) {
+
+    btnCamara.addEventListener('click', async function () {
+
+        cameraScanner.style.display = 'block';
+
+        btnCamara.disabled = true;
+
+        lectorCamara = new Html5Qrcode('reader');
+
+        try {
+
+            await lectorCamara.start(
+                {
+                    facingMode: 'environment'
+                },
+                {
+                    fps: 10,
+                    qrbox: {
+                        width: 280,
+                        height: 120
+                    }
+                },
+                function (codigo) {
+
+                    codigo = codigo.trim();
+
+                    if (!codigo) {
+                        return;
+                    }
+
+                    /*
+                     * Colocamos el código detectado
+                     * en el mismo campo del scanner.
+                     */
+                    scanner.value = codigo;
+
+                    cerrarLectorCamara();
+
+                    /*
+                     * Ejecutamos exactamente el mismo
+                     * proceso que utiliza el lector físico.
+                     */
+                    scanner.dispatchEvent(
+                        new KeyboardEvent('keydown', {
+                            key: 'Enter',
+                            code: 'Enter',
+                            bubbles: true
+                        })
+                    );
+
+                },
+                function () {
+                    // Ignorar errores normales de lectura
+                }
+            );
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                'No se pudo acceder a la cámara. ' +
+                'Verifica que hayas permitido el acceso.'
+            );
+
+            cerrarLectorCamara();
+        }
+
+    });
+
+}
+
+
+if (cerrarCamara) {
+
+    cerrarCamara.addEventListener(
+        'click',
+        function () {
+
+            cerrarLectorCamara();
+
+        }
+    );
+
+}
+
+
+async function cerrarLectorCamara()
+{
+    if (lectorCamara) {
+
+        try {
+
+            await lectorCamara.stop();
+
+        } catch (error) {
+
+            console.log(
+                'La cámara ya estaba detenida.'
+            );
+
+        }
+
+        try {
+
+            await lectorCamara.clear();
+
+        } catch (error) {}
+
+        lectorCamara = null;
+    }
+
+    cameraScanner.style.display = 'none';
+
+    btnCamara.disabled = false;
+}
 </script>
 @endsection
