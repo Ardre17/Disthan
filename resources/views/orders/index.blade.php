@@ -203,8 +203,40 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
        <div class="meta-item">📅 <span class="meta-val">{{ \Carbon\Carbon::parse($order->fecha_pedido)->format('d M Y') }}</span></div>
        <div class="meta-item">💰 <span>S/ <span class="meta-val" style="color:{{ $montoColor }};">{{ number_format($order->total,2) }}</span></span></div>
        <div class="meta-item">🗂 <span>Items: <span class="meta-val">{{ $totalItems }}</span></span></div>
-   </div>
+       <div class="meta-item">📋<span>Orden interna:</span><span class="meta-val">{{ $order->order_interna ?: '—' }}</span>
 
+</div>
+   </div>
+@if($order->observaciones)
+
+    <div
+        style="
+            margin-top:8px;
+            padding:7px 9px;
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            border-radius:6px;
+            font-size:11px;
+            color:#475569;
+        "
+    >
+
+        <div
+            style="
+                font-size:10px;
+                font-weight:700;
+                color:#64748b;
+                margin-bottom:3px;
+            "
+        >
+            📝 OBSERVACIONES
+        </div>
+
+        {{ $order->observaciones }}
+
+    </div>
+
+@endif
 
    <hr class="div">
 

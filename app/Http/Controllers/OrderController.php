@@ -595,38 +595,49 @@ public function stockPedidos()
     public function store(Request $request)
     {
         $request->validate([
+
             'client_id' => 'required',
+
             'tipo_orden' => 'required',
-            'fecha_pedido' => 'required'
+
+            'fecha_pedido' => 'required',
+
+            'order_interna' => 'nullable|string|max:255',
+
         ]);
 
         $lastOrder = Order::max('id') + 1;
 
         $order = Order::create([
 
-            'numero_orden' => 'ORD-'.str_pad(
-                $lastOrder,
-                6,
-                '0',
-                STR_PAD_LEFT
-            ),
+    'numero_orden' => 'ORD-'.str_pad(
+        $lastOrder,
+        6,
+        '0',
+        STR_PAD_LEFT
+    ),
 
-            'client_id' => $request->client_id,
+    'client_id' => $request->client_id,
 
-            'tipo_orden' => $request->tipo_orden,
+    'tipo_orden' => $request->tipo_orden,
 
-            'fecha_pedido' => $request->fecha_pedido,
+    'fecha_pedido' => $request->fecha_pedido,
 
-            'fecha_entrega' => $request->fecha_entrega,
+    'fecha_entrega' => $request->fecha_entrega,
 
-            'estado' => 'INCOMPLETO',
+    'order_interna' => $request->order_interna,
 
-            'observaciones' => $request->observaciones,
+    'estado' => 'INCOMPLETO',
 
-            'subtotal' => 0,
-            'igv' => 0,
-            'total' => 0
-        ]);
+    'observaciones' => $request->observaciones,
+
+    'subtotal' => 0,
+
+    'igv' => 0,
+
+    'total' => 0
+
+]);
 
         return redirect()
             ->route('orders.edit', $order)

@@ -244,7 +244,25 @@
                                        class="finput">
                                 <span class="field-hint">Opcional — si aplica</span>
                             </div>
+                            <div class="field">
 
+    <label class="flabel">
+        Orden interna
+    </label>
+
+    <input
+        type="text"
+        name="order_interna"
+        class="finput"
+        value="{{ old('order_interna') }}"
+        placeholder="Ej: PROV-001 o número provisional"
+    >
+
+    <span class="field-hint">
+        Opcional — número provisional mientras se genera la guía
+    </span>
+
+</div>
                         </div>
                     </div>
                 </div>
