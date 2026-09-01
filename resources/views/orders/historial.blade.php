@@ -320,183 +320,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     $chartTipoData   = json_encode($tipoData->values()->toArray());
 @endphp
 
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
-<script>
-const modalDocumentos =
-    document.getElementById('modalDocumentos');
-
-const formDocumentos =
-    document.getElementById('formDocumentos');
-
-const inputFactura =
-    document.getElementById('inputFactura');
-
-const inputGuia =
-    document.getElementById('inputGuia');
-
-const modalNumeroOrden =
-    document.getElementById('modalNumeroOrden');
-
-
-document
-    .querySelectorAll('.btn-asociar-documentos')
-    .forEach(function (boton) {
-
-        boton.addEventListener(
-            'click',
-            function () {
-
-                const id =
-                    this.dataset.id;
-
-                const numero =
-                    this.dataset.numero;
-
-                const factura =
-                    this.dataset.factura || '';
-
-                const guia =
-                    this.dataset.guia || '';
-
-
-                modalNumeroOrden.textContent =
-                    'Orden: ' + numero;
-
-
-                inputFactura.value =
-                    factura;
-
-
-                inputGuia.value =
-                    guia;
-
-
-                formDocumentos.action =
-                    '/orders/' +
-                    id +
-                    '/documentos';
-
-
-                modalDocumentos.style.display =
-                    'flex';
-
-            }
-        );
-
-    });
-
-
-function cerrarModalDocumentos()
-{
-    modalDocumentos.style.display =
-        'none';
-}
-
-
-document
-    .getElementById('cerrarModalDocumentos')
-    .addEventListener(
-        'click',
-        cerrarModalDocumentos
-    );
-
-
-document
-    .getElementById('cancelarModalDocumentos')
-    .addEventListener(
-        'click',
-        cerrarModalDocumentos
-    );
-
-
-modalDocumentos.addEventListener(
-    'click',
-    function (event) {
-
-        if (
-            event.target ===
-            modalDocumentos
-        ) {
-            cerrarModalDocumentos();
-        }
-
-    }
-);
-
-var meses      = {!! $chartMeses !!};
-var montos     = {!! $chartMontos !!};
-var cantOrd    = {!! $chartCantOrd !!};
-var tipoLabels = {!! $chartTipoLabels !!};
-var tipoData   = {!! $chartTipoData !!};
-var tipoColors = ['#2563eb','#8b5cf6','#0ea5e9','#f59e0b','#22c55e'];
-
-new Chart(document.getElementById('chartMes'), {
-    type: 'bar',
-    data: {
-        labels: meses,
-        datasets: [
-            {
-                label: 'Facturado S/',
-                data: montos,
-                backgroundColor: '#22c55e',
-                borderRadius: 5,
-                borderSkipped: false,
-                yAxisID: 'y'
-            },
-            {
-                label: 'N Ordenes',
-                data: cantOrd,
-                type: 'line',
-                borderColor: '#86efac',
-                backgroundColor: 'rgba(134,239,172,.15)',
-                borderWidth: 2,
-                pointBackgroundColor: '#86efac',
-                pointRadius: 4,
-                tension: .4,
-                yAxisID: 'y2'
-            }
-        ]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-            x:  { grid: { display: false }, ticks: { font: { size: 10 } } },
-            y:  { position: 'left',  grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, callback: function(v){ return 'S/'+v.toLocaleString(); } } },
-            y2: { position: 'right', grid: { display: false },   ticks: { font: { size: 10 } } }
-        }
-    }
-});
-
-new Chart(document.getElementById('chartTipo'), {
-    type: 'doughnut',
-    data: {
-        labels: tipoLabels,
-        datasets: [{
-            data: tipoData,
-            backgroundColor: tipoColors,
-            borderWidth: 2,
-            borderColor: '#fff'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        cutout: '62%'
-    }
-});
-
-var legTipo = document.getElementById('legTipo');
-tipoLabels.forEach(function(l, i) {
-    var span = document.createElement('span');
-    span.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:11px;color:#64748b;';
-    span.innerHTML = '<span style="width:8px;height:8px;border-radius:2px;background:'+tipoColors[i]+';display:inline-block;"></span>'+l;
-    legTipo.appendChild(span);
-});
-</script>
-
 <div
     id="modalDocumentos"
     style="
@@ -669,5 +492,185 @@ tipoLabels.forEach(function(l, i) {
     </div>
 
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script>
+const modalDocumentos =
+    document.getElementById('modalDocumentos');
+
+const formDocumentos =
+    document.getElementById('formDocumentos');
+
+const inputFactura =
+    document.getElementById('inputFactura');
+
+const inputGuia =
+    document.getElementById('inputGuia');
+
+const modalNumeroOrden =
+    document.getElementById('modalNumeroOrden');
+
+
+document
+    .querySelectorAll('.btn-asociar-documentos')
+    .forEach(function (boton) {
+
+        boton.addEventListener(
+            'click',
+            function () {
+
+                const id =
+                    this.dataset.id;
+
+                const numero =
+                    this.dataset.numero;
+
+                const factura =
+                    this.dataset.factura || '';
+
+                const guia =
+                    this.dataset.guia || '';
+
+
+                if (modalNumeroOrden) {
+                    modalNumeroOrden.textContent =
+                        'Orden: ' + numero;
+}
+
+
+                inputFactura.value =
+                    factura;
+
+
+                inputGuia.value =
+                    guia;
+
+
+                formDocumentos.action =
+                    '/orders/' +
+                    id +
+                    '/documentos';
+
+
+                modalDocumentos.style.display =
+                    'flex';
+
+            }
+        );
+
+    });
+
+
+function cerrarModalDocumentos()
+{
+    modalDocumentos.style.display =
+        'none';
+}
+
+
+document
+    .getElementById('cerrarModalDocumentos')
+    .addEventListener(
+        'click',
+        cerrarModalDocumentos
+    );
+
+
+document
+    .getElementById('cancelarModalDocumentos')
+    .addEventListener(
+        'click',
+        cerrarModalDocumentos
+    );
+
+
+modalDocumentos.addEventListener(
+    'click',
+    function (event) {
+
+        if (
+            event.target ===
+            modalDocumentos
+        ) {
+            cerrarModalDocumentos();
+        }
+
+    }
+);
+
+var meses      = {!! $chartMeses !!};
+var montos     = {!! $chartMontos !!};
+var cantOrd    = {!! $chartCantOrd !!};
+var tipoLabels = {!! $chartTipoLabels !!};
+var tipoData   = {!! $chartTipoData !!};
+var tipoColors = ['#2563eb','#8b5cf6','#0ea5e9','#f59e0b','#22c55e'];
+
+new Chart(document.getElementById('chartMes'), {
+    type: 'bar',
+    data: {
+        labels: meses,
+        datasets: [
+            {
+                label: 'Facturado S/',
+                data: montos,
+                backgroundColor: '#22c55e',
+                borderRadius: 5,
+                borderSkipped: false,
+                yAxisID: 'y'
+            },
+            {
+                label: 'N Ordenes',
+                data: cantOrd,
+                type: 'line',
+                borderColor: '#86efac',
+                backgroundColor: 'rgba(134,239,172,.15)',
+                borderWidth: 2,
+                pointBackgroundColor: '#86efac',
+                pointRadius: 4,
+                tension: .4,
+                yAxisID: 'y2'
+            }
+        ]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x:  { grid: { display: false }, ticks: { font: { size: 10 } } },
+            y:  { position: 'left',  grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 }, callback: function(v){ return 'S/'+v.toLocaleString(); } } },
+            y2: { position: 'right', grid: { display: false },   ticks: { font: { size: 10 } } }
+        }
+    }
+});
+
+new Chart(document.getElementById('chartTipo'), {
+    type: 'doughnut',
+    data: {
+        labels: tipoLabels,
+        datasets: [{
+            data: tipoData,
+            backgroundColor: tipoColors,
+            borderWidth: 2,
+            borderColor: '#fff'
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        cutout: '62%'
+    }
+});
+
+var legTipo = document.getElementById('legTipo');
+tipoLabels.forEach(function(l, i) {
+    var span = document.createElement('span');
+    span.style.cssText = 'display:flex;align-items:center;gap:4px;font-size:11px;color:#64748b;';
+    span.innerHTML = '<span style="width:8px;height:8px;border-radius:2px;background:'+tipoColors[i]+';display:inline-block;"></span>'+l;
+    legTipo.appendChild(span);
+});
+</script>
+
 
 @endsection
