@@ -592,79 +592,61 @@ public function stockPedidos()
         );
     }
 
-   public function store(Request $request)
-{
-    $request->validate([
+    public function store(Request $request)
+    {
+        $request->validate([
 
-        'client_id' => 'required',
+            'client_id' => 'required',
 
-        'tipo_orden' => 'required',
+            'tipo_orden' => 'required',
 
-        'fecha_pedido' => 'required',
+            'fecha_pedido' => 'required',
 
-        'order_interna' => 'nullable|string|max:255',
+            'order_interna' => 'nullable|string|max:255',
 
-    ]);
+        ]);
 
+        $lastOrder = Order::max('id') + 1;
 
-    $lastOrder = Order::max('id') + 1;
+        $order = Order::create([
 
+    'numero_orden' => 'ORD-'.str_pad(
+        $lastOrder,
+        6,
+        '0',
+        STR_PAD_LEFT
+    ),
 
-    $order = Order::create([
+    'client_id' => $request->client_id,
 
-        'numero_orden' => 'ORD-'.str_pad(
-            $lastOrder,
-            6,
-            '0',
-            STR_PAD_LEFT
-        ),
+    'tipo_orden' => $request->tipo_orden,
 
+    'fecha_pedido' => $request->fecha_pedido,
 
-        'client_id' => $request->client_id,
+    'fecha_entrega' => $request->fecha_entrega,
 
+    'order_interna' => $request->order_interna,
 
-        'tipo_orden' => $request->tipo_orden,
+    'estado' => 'INCOMPLETO',
 
+    'observaciones' => $request->observaciones,
 
-        'fecha_pedido' => $request->fecha_pedido,
+    'subtotal' => 0,
 
+    'igv' => 0,
 
-        'fecha_entrega' => $request->fecha_entrega,
+    'total' => 0
 
+]);
 
-        /*
-        |--------------------------------------------------------------------------
-        | ORDEN INTERNA
-        |--------------------------------------------------------------------------
-        */
+        return redirect()
+            ->route('orders.edit', $order)
+            ->with(
+                'success',
+                'Orden creada correctamente'
+            );
+    }
 
-        'order_interna' => $request->order_interna,
-
-
-        'estado' => 'INCOMPLETO',
-
-
-        'observaciones' => $request->observaciones,
-
-
-        'subtotal' => 0,
-
-
-        'igv' => 0,
-
-
-        'total' => 0
-
-    ]);
-
-
-    return redirect()
-        ->route('orders.edit', $order)
-        ->with(
-            'success',
-            'Orden creada correctamente'
-        );
-}
     public function show(Order $order)
     {
         //
