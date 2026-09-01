@@ -11,13 +11,17 @@ class Order extends Model
         'numero_orden',
 
         'factura_asociada',
+
         'guia_asociada',
+
+        'order_interna',
 
         'client_id',
 
         'tipo_orden',
 
         'fecha_pedido',
+
         'fecha_entrega',
 
         'estado',
@@ -25,7 +29,9 @@ class Order extends Model
         'observaciones',
 
         'subtotal',
+
         'igv',
+
         'total'
     ];
 
@@ -35,16 +41,21 @@ class Order extends Model
         return $this->belongsTo(Client::class);
     }
 
+
     public function details()
     {
         return $this->hasMany(OrderDetail::class);
     }
+
+
     public function bultos()
-{
-    return $this->hasMany(\App\Models\Bulto::class);
-}
-public function pallets()
-{
-    return $this->hasMany(Pallet::class);
-}
+    {
+        return $this->hasMany(\App\Models\Bulto::class);
+    }
+
+
+    public function pallets()
+    {
+        return $this->hasMany(Pallet::class);
+    }
 }
