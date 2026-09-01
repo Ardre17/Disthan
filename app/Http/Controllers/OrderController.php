@@ -14,6 +14,38 @@ use App\Services\Barcode\Ean13Generator;
 
 class OrderController extends Controller
 {
+public function actualizarDocumentos(
+    Request $request,
+    Order $order
+) {
+    $data = $request->validate([
+        'factura_asociada' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
+
+        'guia_asociada' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
+    ]);
+
+    $order->update([
+        'factura_asociada' =>
+            $data['factura_asociada'] ?: null,
+
+        'guia_asociada' =>
+            $data['guia_asociada'] ?: null,
+    ]);
+
+    return back()->with(
+        'success',
+        'Factura y guía asociadas correctamente.'
+    );
+}
+
     public function etiquetasBultos(Order $order)
 {
     $order->load([

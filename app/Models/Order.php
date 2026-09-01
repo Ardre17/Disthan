@@ -10,6 +10,9 @@ class Order extends Model
 
         'numero_orden',
 
+        'factura_asociada',
+        'guia_asociada',
+
         'client_id',
 
         'tipo_orden',
@@ -25,6 +28,7 @@ class Order extends Model
         'igv',
         'total'
     ];
+
 
     public function client()
     {

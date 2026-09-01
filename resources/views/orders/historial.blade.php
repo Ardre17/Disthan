@@ -238,6 +238,19 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         <div class="meta-item">📅 <span class="meta-val">{{ \Carbon\Carbon::parse($order->fecha_pedido)->format('d M Y') }}</span></div>
         <div class="meta-item">💰 <span class="meta-val" style="color:#15803d;">S/ {{ number_format($order->total,2) }}</span></div>
         <div class="meta-item">🗂 Items: <span class="meta-val">{{ $totalItems }}</span></div>
+        <div class="meta-item">
+    🧾 Factura:
+    <span class="meta-val">
+        {{ $order->factura_asociada ?: 'Pendiente' }}
+    </span>
+</div>
+
+<div class="meta-item">
+    🚚 Guía:
+    <span class="meta-val">
+        {{ $order->guia_asociada ?: 'Pendiente' }}
+    </span>
+</div>
     </div>
 
     <hr class="dv">
@@ -251,12 +264,42 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     </div>
 
     <div class="btn-row">
-        <a href="{{ route('orders.edit',$order) }}" class="btn btn-blue">✏️ Editar</a>
-        <a href="{{ route('orders.operario',$order) }}" class="btn btn-green">🚀 Operario</a>
-    </div>
-    <a href="{{ route('orders.pdf',$order) }}" class="btn btn-gray" style="width:100%;">
-        📄 Ver / Descargar PDF
+
+    <a
+        href="{{ route('orders.edit', $order) }}"
+        class="btn btn-blue"
+    >
+        ✏️ Editar
     </a>
+
+    <a
+        href="{{ route('orders.operario', $order) }}"
+        class="btn btn-green"
+    >
+        🚀 Operario
+    </a>
+
+</div>
+
+<button
+    type="button"
+    class="btn btn-gray btn-asociar-documentos"
+    style="width:100%;"
+    data-id="{{ $order->id }}"
+    data-numero="{{ $order->numero_orden }}"
+    data-factura="{{ $order->factura_asociada }}"
+    data-guia="{{ $order->guia_asociada }}"
+>
+    🧾 Asociar Factura y Guía
+</button>
+
+<a
+    href="{{ route('orders.pdf', $order) }}"
+    class="btn btn-gray"
+    style="width:100%;"
+>
+    📄 Ver / Descargar PDF
+</a>
 </div>
 
 @endforeach
@@ -279,6 +322,107 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
+const modalDocumentos =
+    document.getElementById('modalDocumentos');
+
+const formDocumentos =
+    document.getElementById('formDocumentos');
+
+const inputFactura =
+    document.getElementById('inputFactura');
+
+const inputGuia =
+    document.getElementById('inputGuia');
+
+const modalNumeroOrden =
+    document.getElementById('modalNumeroOrden');
+
+
+document
+    .querySelectorAll('.btn-asociar-documentos')
+    .forEach(function (boton) {
+
+        boton.addEventListener(
+            'click',
+            function () {
+
+                const id =
+                    this.dataset.id;
+
+                const numero =
+                    this.dataset.numero;
+
+                const factura =
+                    this.dataset.factura || '';
+
+                const guia =
+                    this.dataset.guia || '';
+
+
+                modalNumeroOrden.textContent =
+                    'Orden: ' + numero;
+
+
+                inputFactura.value =
+                    factura;
+
+
+                inputGuia.value =
+                    guia;
+
+
+                formDocumentos.action =
+                    '/orders/' +
+                    id +
+                    '/documentos';
+
+
+                modalDocumentos.style.display =
+                    'flex';
+
+            }
+        );
+
+    });
+
+
+function cerrarModalDocumentos()
+{
+    modalDocumentos.style.display =
+        'none';
+}
+
+
+document
+    .getElementById('cerrarModalDocumentos')
+    .addEventListener(
+        'click',
+        cerrarModalDocumentos
+    );
+
+
+document
+    .getElementById('cancelarModalDocumentos')
+    .addEventListener(
+        'click',
+        cerrarModalDocumentos
+    );
+
+
+modalDocumentos.addEventListener(
+    'click',
+    function (event) {
+
+        if (
+            event.target ===
+            modalDocumentos
+        ) {
+            cerrarModalDocumentos();
+        }
+
+    }
+);
+
 var meses      = {!! $chartMeses !!};
 var montos     = {!! $chartMontos !!};
 var cantOrd    = {!! $chartCantOrd !!};
@@ -352,5 +496,178 @@ tipoLabels.forEach(function(l, i) {
     legTipo.appendChild(span);
 });
 </script>
+
+<div
+    id="modalDocumentos"
+    style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(15,23,42,.55);
+        z-index:9999;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+    "
+>
+
+    <div
+        style="
+            background:white;
+            width:100%;
+            max-width:450px;
+            border-radius:12px;
+            padding:22px;
+            box-shadow:0 20px 60px rgba(0,0,0,.25);
+        "
+    >
+
+        <div
+            style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:18px;
+            "
+        >
+
+            <div>
+
+                <div
+                    style="
+                        font-size:16px;
+                        font-weight:700;
+                        color:#0f172a;
+                    "
+                >
+                    🧾 Asociar documentos
+                </div>
+
+                <div
+                    id="modalNumeroOrden"
+                    style="
+                        font-size:11px;
+                        color:#64748b;
+                        margin-top:3px;
+                    "
+                ></div>
+
+            </div>
+
+            <button
+                type="button"
+                id="cerrarModalDocumentos"
+                style="
+                    border:none;
+                    background:#f1f5f9;
+                    width:32px;
+                    height:32px;
+                    border-radius:6px;
+                    cursor:pointer;
+                    font-size:18px;
+                "
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        <form
+            id="formDocumentos"
+            method="POST"
+        >
+
+            @csrf
+
+            @method('PUT')
+
+
+            <div style="margin-bottom:15px;">
+
+                <label
+                    style="
+                        display:block;
+                        font-size:12px;
+                        font-weight:600;
+                        margin-bottom:5px;
+                        color:#374151;
+                    "
+                >
+                    🧾 Factura asociada
+                </label>
+
+                <input
+                    type="text"
+                    name="factura_asociada"
+                    id="inputFactura"
+                    placeholder="Ej: F001-00012345"
+                    class="finput"
+                >
+
+            </div>
+
+
+            <div style="margin-bottom:20px;">
+
+                <label
+                    style="
+                        display:block;
+                        font-size:12px;
+                        font-weight:600;
+                        margin-bottom:5px;
+                        color:#374151;
+                    "
+                >
+                    🚚 Guía asociada
+                </label>
+
+                <input
+                    type="text"
+                    name="guia_asociada"
+                    id="inputGuia"
+                    placeholder="Ej: T001-00012345"
+                    class="finput"
+                >
+
+            </div>
+
+
+            <div
+                style="
+                    display:flex;
+                    gap:8px;
+                "
+            >
+
+                <button
+                    type="button"
+                    id="cancelarModalDocumentos"
+                    class="btn btn-gray"
+                    style="flex:1;"
+                >
+                    Cancelar
+                </button>
+
+
+                <button
+                    type="submit"
+                    class="btn btn-green"
+                    style="
+                        flex:1;
+                        background:#15803d;
+                        color:white;
+                    "
+                >
+                    💾 Guardar
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
 
 @endsection

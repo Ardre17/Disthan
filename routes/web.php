@@ -35,6 +35,11 @@ use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
 
+Route::put(
+    '/orders/{order}/documentos',
+    [OrderController::class, 'actualizarDocumentos']
+)->name('orders.documentos.update');
+
 Route::get(
     '/production-orders/{production_order}/ver',
     [ProductionOrderController::class, 'ver']
