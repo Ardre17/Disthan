@@ -659,6 +659,33 @@ async function cargarStockPedidos()
             let estadoBg = '#dcfce7';
             let icono = '✅';
 
+            const cantidadPorCaja =
+    Number(producto.cantidad_por_caja || 0);
+
+const formatoCajas = (cantidad) => {
+
+    cantidad = Number(cantidad || 0);
+
+    if (cantidadPorCaja <= 0) {
+        return 'Sin configuración';
+    }
+
+    const cajas =
+        Math.floor(cantidad / cantidadPorCaja);
+
+    const unidadesRestantes =
+        cantidad % cantidadPorCaja;
+
+        
+    if (unidadesRestantes > 0) {
+
+        return `${cajas} cajas + ${unidadesRestantes} und.`;
+
+    }
+
+    return `${cajas} cajas`;
+};
+
             if (producto.estado === 'STOCK PARCIAL') {
 
                 estadoColor = '#b45309';
@@ -691,34 +718,102 @@ async function cargarStockPedidos()
                     ">
                         ${producto.nombre}
                     </td>
+    <td style="
+    padding:10px;
+    text-align:center;
+">
+    <div style="
+        font-family:monospace;
+        font-weight:700;
+        color:#1e293b;
+    ">
+        ${Number(producto.pendiente).toLocaleString()} und.
+    </div>
 
-                    <td style="
-                        padding:10px;
-                        text-align:center;
-                        font-family:monospace;
-                        font-weight:700;
-                    ">
-                        ${Number(producto.pendiente).toLocaleString()}
-                    </td>
+    <div style="
+        margin-top:3px;
+        font-size:10px;
+        color:#64748b;
+    ">
+        📦 ${formatoCajas(producto.pendiente)}
+    </div>
+</td>
 
-                    <td style="
-                        padding:10px;
-                        text-align:center;
-                        font-family:monospace;
-                        font-weight:700;
-                    ">
-                        ${Number(producto.stock).toLocaleString()}
-                    </td>
+    <div style="
+        margin-top:3px;
+        font-size:10px;
+        color:#64748b;
+    ">
+        ${producto.cantidad_por_caja > 0
+            ? (Number(producto.pendiente) / Number(producto.cantidad_por_caja)).toFixed(2)
+            : '0'} cajas
+    </div>
+</td>
+    <td style="
+    padding:10px;
+    text-align:center;
+">
+    <div style="
+        font-family:monospace;
+        font-weight:700;
+        color:#1e293b;
+    ">
+        ${Number(producto.stock).toLocaleString()} und.
+    </div>
 
-                    <td style="
-                        padding:10px;
-                        text-align:center;
-                        font-family:monospace;
-                        font-weight:800;
-                        color:${producto.faltante > 0 ? '#dc2626' : '#15803d'};
-                    ">
-                        ${Number(producto.faltante).toLocaleString()}
-                    </td>
+    <div style="
+        margin-top:3px;
+        font-size:10px;
+        color:#64748b;
+    ">
+        📦 ${formatoCajas(producto.stock)}
+    </div>
+</td>
+              <td style="
+    padding:10px;
+    text-align:center;
+">
+    <div style="
+        margin-top:3px;
+        font-size:10px;
+        color:#64748b;
+    ">
+        ${producto.cantidad_por_caja > 0
+            ? (Number(producto.stock) / Number(producto.cantidad_por_caja)).toFixed(2)
+            : '0'} cajas
+    </div>
+</td>
+<td style="
+    padding:10px;
+    text-align:center;
+">
+    <div style="
+        font-family:monospace;
+        font-weight:800;
+        color:${producto.faltante > 0 ? '#dc2626' : '#15803d'};
+    ">
+        ${Number(producto.faltante).toLocaleString()} und.
+    </div>
+
+    <div style="
+        margin-top:3px;
+        font-size:10px;
+        color:#64748b;
+    ">
+        📦 ${formatoCajas(producto.faltante)}
+    </div>
+</td>
+
+    <div style="
+        margin-top:3px;
+        font-size:10px;
+        color:#64748b;
+    ">
+        ${producto.cantidad_por_caja > 0
+            ? (Number(producto.faltante) / Number(producto.cantidad_por_caja)).toFixed(2)
+            : '0'} cajas
+    </div>
+</td>
 
                     <td style="
                         padding:10px;
