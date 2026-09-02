@@ -984,7 +984,7 @@
                 <div class="scanner-product-data">
 
                     <div>
-                        <span>SOLICITADO</span>
+                        <span>DESPACHADO</span>
 
                         <strong id="scannerSolicitado">
                             0
@@ -3218,7 +3218,7 @@ document.addEventListener('DOMContentLoaded', function () {
                             </td>
 
                             <td>
-                                ${detalle.cantidad_solicitada ?? 0}
+                                ${detalle.cantidad_despachada ?? 0}
                             </td>
 
                             <td>
@@ -3682,7 +3682,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById(
             'itemCantidadSolicitada'
         ).textContent =
-            detail.cantidad_solicitada ??
+            detail.cantidad_despachada ??
             0;
 
 
@@ -3845,12 +3845,12 @@ document.addEventListener('DOMContentLoaded', function () {
             if (
                 cantidad >=
                 parseFloat(
-                    detail.cantidad_solicitada
+                    detail.cantidad_despachada
                 )
             ) {
 
                 mostrarAlerta(
-                    'La cantidad parcial debe ser menor que la cantidad solicitada.',
+                    'La cantidad parcial debe ser menor que la cantidad despachada.',
                     'warning'
                 );
 
@@ -3889,7 +3889,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'COMPLETO',
                 parseFloat(
                     detalles[indiceItem]
-                        .cantidad_solicitada
+                        .cantidad_despachada
                 )
             );
 
@@ -4162,9 +4162,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
             document.getElementById(
-                'scannerSolicitado'
+                'scannerDespachado'
             ).textContent =
-                detail.cantidad_solicitada ??
+                detail.cantidad_despachada ??
                 0;
 
 
@@ -4366,21 +4366,21 @@ document.addEventListener('DOMContentLoaded', function () {
                 );
 
 
-            const solicitada =
-                parseFloat(
-                    itemScannerActual
-                        .cantidad_solicitada
-                );
+            const despachada =
+            parseFloat(
+                itemScannerActual
+                    .cantidad_despachada
+            );
 
 
             if (
                 isNaN(cantidad) ||
                 cantidad <= 0 ||
-                cantidad >= solicitada
+                cantidad >= despachada
             ) {
 
                 mostrarAlerta(
-                    'La cantidad parcial debe ser mayor a 0 y menor a la cantidad solicitada.',
+                    'La cantidad parcial debe ser mayor a 0 y menor a la cantidad despachada.',
                     'warning'
                 );
 
@@ -4423,7 +4423,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 'COMPLETO',
                 parseFloat(
                     itemScannerActual
-                        .cantidad_solicitada
+                        .cantidad_despachada
                 )
             );
 
@@ -4597,7 +4597,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                         <span class="table-quantity">
 
-                            ${detail.cantidad_solicitada}
+                            ${detail.cantidad_despachada}
 
                         </span>
 
@@ -4779,7 +4779,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ) {
 
             input.value =
-                detail.cantidad_solicitada;
+                detail.cantidad_despachada;
 
         }
 
@@ -4901,9 +4901,9 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
 
-                const solicitada =
+                const despachada =
                     parseFloat(
-                        detail.cantidad_solicitada
+                        detail.cantidad_despachada
                     );
 
 
@@ -4919,11 +4919,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 if (
                     validation.estado ===
                     'COMPLETO' &&
-                    cantidad < solicitada
+                    cantidad < despachada
                 ) {
 
                     mostrarAlerta(
-                        `El producto "${detail.product?.nombre || ''}" está marcado como COMPLETO pero la cantidad validada es menor a la solicitada.`,
+                        `El producto "${detail.product?.nombre || ''}" está marcado como COMPLETO pero la cantidad validada es menor a la despachada.`,
                         'warning'
                     );
 
@@ -4940,7 +4940,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     'PARCIAL' &&
                     (
                         cantidad <= 0 ||
-                        cantidad >= solicitada
+                        cantidad >= despachada
                     )
                 ) {
 
