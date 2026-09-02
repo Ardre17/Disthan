@@ -11,6 +11,19 @@ use Illuminate\Support\Facades\DB;
 
 class OrderValidationController extends Controller
 {
+    public function datos(Order $order)
+{
+    $order->load([
+        'client',
+        'details.product',
+    ]);
+
+    return response()->json([
+        'success' => true,
+        'order' => $order,
+    ]);
+}
+
     public function index()
 {
     // =========================================================

@@ -174,9 +174,7 @@
                                     <button
                                         type="button"
                                         class="validation-row-button open"
-                                        onclick="abrirPedidoDesdeLista(
-                                            '{{ $pedido->factura_asociada ?? $pedido->guia_asociada }}'
-                                        )"
+                                        onclick="abrirPedidoDesdeLista({{ $pedido->id }})"
                                     >
                                         <i class="bi bi-play-fill"></i>
                                         VALIDAR
@@ -319,10 +317,7 @@
                                         <button
                                             type="button"
                                             class="validation-row-button revalidate"
-                                            onclick="abrirPedidoDesdeLista(
-                                                '{{ $pedidoHistorial->factura_asociada
-                                                    ?? $pedidoHistorial->guia_asociada }}'
-                                            )"
+                                            onclick="abrirPedidoDesdeLista({{ $pedidoHistorial->id }})"
                                         >
                                             <i class="bi bi-arrow-repeat"></i>
                                             REVALIDAR
@@ -2893,32 +2888,128 @@ document.addEventListener('DOMContentLoaded', function () {
     |--------------------------------------------------------------------------
     */
 
-    window.abrirPedidoDesdeLista = function (codigo) {
+   window.abrirPedidoDesdeLista = async function (orderId) {
 
-        if (!codigo) {
+    if (!orderId) {
 
-            mostrarAlerta(
-                'Este pedido no tiene factura ni guía asociada.',
-                'warning'
+        mostrarAlerta(
+            'No se pudo identificar el pedido.',
+            'danger'
+        );
+
+        return;
+    }
+
+    ocultarAlerta();
+
+    try {
+
+        const response = await fetch(
+            `/validacion-pedidos/${orderId}/datos`,
+            {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json'
+                }
+            }
+        );
+
+        const data = await response.json();
+
+        if (!response.ok || !data.success) {
+
+            throw new Error(
+                data.message ||
+                'No se pudo cargar el pedido.'
             );
-
-            return;
         }
 
-        codigoPedido.value = codigo;
+        /*
+        |--------------------------------------------------------------------------
+        | CARGAR PEDIDO
+        |--------------------------------------------------------------------------
+        */
 
-        buscarPedido();
+        pedidoActual = data.order;
 
-        setTimeout(function () {
+        detalles =
+            pedidoActual.details || [];
 
-            document.getElementById('pedidoInfo')
-                ?.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
+        validaciones = {};
 
-        }, 300);
-    };
+        indiceItem = 0;
+
+        itemScannerActual = null;
+
+        modoActual = null;
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | VERIFICAR PRODUCTOS
+        |--------------------------------------------------------------------------
+        */
+
+        if (!detalles.length) {
+
+            throw new Error(
+                'El pedido no tiene productos.'
+            );
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | MOSTRAR INFORMACIÓN
+        |--------------------------------------------------------------------------
+        */
+
+        mostrarInformacionPedido();
+
+        modalidades.classList.remove(
+            'd-none'
+        );
+
+        ocultarPaneles();
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | LIMPIAR BUSCADOR
+        |--------------------------------------------------------------------------
+        */
+
+        codigoPedido.value =
+            pedidoActual.factura_asociada ||
+            pedidoActual.guia_asociada ||
+            '';
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | IR AL PEDIDO
+        |--------------------------------------------------------------------------
+        */
+
+        document.getElementById(
+            'pedidoInfo'
+        ).scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+
+
+    } catch (error) {
+
+        mostrarAlerta(
+            error.message,
+            'danger'
+        );
+
+    }
+
+};
 
 
     window.cerrarHistorialPedido = function () {

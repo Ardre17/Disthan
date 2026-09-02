@@ -36,6 +36,7 @@ use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\OrderValidationController;
 
+
 Route::prefix('validacion-pedidos')
     ->name('orders.validation.')
     ->group(function () {
@@ -59,6 +60,11 @@ Route::prefix('validacion-pedidos')
             OrderValidationController::class,
             'buscarProducto'
         ])->name('producto.buscar');
+
+        Route::get('/{order}/datos', [
+            OrderValidationController::class,
+            'datos'
+        ])->name('datos');
 
         Route::get('/{order}/historial', [
             OrderValidationController::class,
