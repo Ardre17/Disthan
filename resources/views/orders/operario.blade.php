@@ -834,6 +834,7 @@ if(btnEtiqueta){
             : 'none';
 }
 
+
 // Scanner principal
 // =====================================
 // PROCESAR CÓDIGO
@@ -1119,18 +1120,10 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
 });
 
 setInterval(() => {
-
-    if(camaraActiva) return;
-
-    if(
-        document.activeElement !== scanner &&
-        document.activeElement !== document.getElementById('activoCantidad')
-    ){
-
+    if(document.activeElement !== scanner &&
+       document.activeElement !== document.getElementById('activoCantidad')){
         scanner.focus();
-
     }
-
 }, 800);
 
 function confirmarCierre(){
