@@ -58,4 +58,11 @@ class Order extends Model
     {
         return $this->hasMany(Pallet::class);
     }
+    public function validations()
+{
+    return $this->hasMany(
+        OrderValidation::class,
+        'order_id'
+    );
+}
 }

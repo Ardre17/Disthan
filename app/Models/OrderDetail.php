@@ -159,4 +159,11 @@ public function palletDetails()
 {
     return $this->hasMany(PalletDetail::class);
 }
+public function validations()
+{
+    return $this->hasMany(
+        OrderValidationDetail::class,
+        'order_detail_id'
+    );
+}
 }

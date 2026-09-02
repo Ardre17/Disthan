@@ -34,6 +34,37 @@ use App\Http\Controllers\StockCountController;
 use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
+use App\Http\Controllers\OrderValidationController;
+
+Route::prefix('validacion-pedidos')
+    ->name('orders.validation.')
+    ->group(function () {
+
+        Route::get('/', [
+            OrderValidationController::class,
+            'index'
+        ])->name('index');
+
+        Route::post('/buscar', [
+            OrderValidationController::class,
+            'buscar'
+        ])->name('buscar');
+
+        Route::post('/{order}/guardar', [
+            OrderValidationController::class,
+            'guardar'
+        ])->name('guardar');
+
+        Route::post('/producto/buscar', [
+            OrderValidationController::class,
+            'buscarProducto'
+        ])->name('producto.buscar');
+
+        Route::get('/{order}/historial', [
+            OrderValidationController::class,
+            'historial'
+        ])->name('historial');
+    });
 
 Route::put(
     '/orders/{order}/documentos',
