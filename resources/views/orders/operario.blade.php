@@ -336,7 +336,12 @@ opacity:1;
         </div>
         <div>
             <label class="activo-label">Despachado ✏️</label>
-            <input type="number" class="activo-input big" id="activoCantidad" id="cantidad" placeholder="0">
+        <input
+    type="number"
+    class="activo-input big"
+    id="activoCantidad"
+    placeholder="0"
+>
         </div>
     </div>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:3px;">
@@ -458,7 +463,7 @@ opacity:1;
     </a>
 
 @elseif($order->tipo_orden === 'SUPERMERCADO')
-const item = detalles.find(d =>
+
     <a
         href="{{ route('orders.etiqueta', $item) }}"
         target="_blank"
@@ -765,29 +770,59 @@ function actualizarCajasUI(item){
 }
 
 function actualizarItemUI(item){
+
     const pct = item.cantidad_solicitada > 0
-        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100 : 0;
-    const color = pct >= 100 ? '#22c55e' : (pct > 0 ? '#f59e0b' : '#ef4444');
+        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100
+        : 0;
+
+    const color = pct >= 100
+        ? '#22c55e'
+        : (pct > 0 ? '#f59e0b' : '#ef4444');
 
     const card = document.getElementById('item-' + item.id);
+
+    if(!card) return;
+
     card.style.borderLeftColor = color;
 
     const span = document.getElementById('despachado-' + item.id);
-    if(span){ span.textContent = item.cantidad_despachada; span.style.color = color; }
+
+    if(span){
+        span.textContent = item.cantidad_despachada;
+        span.style.color = color;
+    }
 
     actualizarCajasUI(item);
 
     const pctEl = document.getElementById('pct-' + item.id);
-    if(pctEl){ pctEl.textContent = Math.round(pct) + '%'; pctEl.style.color = color; }
+
+    if(pctEl){
+        pctEl.textContent = Math.round(pct) + '%';
+        pctEl.style.color = color;
+    }
 
     const barEl = document.getElementById('bar-' + item.id);
-    if(barEl){ barEl.style.width = pct + '%'; barEl.style.background = color; }
+
+    if(barEl){
+        barEl.style.width = pct + '%';
+        barEl.style.background = color;
+    }
 
     const badge = card.querySelector('.prod-item-badge');
+
     if(badge){
-        badge.className = 'prod-item-badge ' + (pct >= 100 ? 'bc' : (pct > 0 ? 'bp' : 'bi'));
-        badge.textContent = pct >= 100 ? 'COMPLETO' : (pct > 0 ? 'PARCIAL' : 'INCOMPLETO');
-            // Mostrar/ocultar botón de etiqueta según cantidad despachada
+
+        badge.className =
+            'prod-item-badge ' +
+            (pct >= 100 ? 'bc' : (pct > 0 ? 'bp' : 'bi'));
+
+        badge.textContent =
+            pct >= 100
+                ? 'COMPLETO'
+                : (pct > 0 ? 'PARCIAL' : 'INCOMPLETO');
+    }
+
+    // Mostrar / ocultar botón de etiqueta
     const btnEtiqueta = card.querySelector('.btn-etiqueta');
 
     if(btnEtiqueta){
@@ -795,7 +830,6 @@ function actualizarItemUI(item){
             parseFloat(item.cantidad_despachada) > 0
                 ? 'inline-flex'
                 : 'none';
-    
     }
 }
 // =====================================
@@ -808,7 +842,6 @@ function procesarCodigo(codigo){
 
     if(!codigo) return;
 
-    const item = detalles.find(d =>
         d.product && d.product.barcode == codigo
     );
 
