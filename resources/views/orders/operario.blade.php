@@ -458,7 +458,7 @@ opacity:1;
     </a>
 
 @elseif($order->tipo_orden === 'SUPERMERCADO')
-
+const item = detalles.find(d =>
     <a
         href="{{ route('orders.etiqueta', $item) }}"
         target="_blank"
@@ -809,15 +809,13 @@ function procesarCodigo(codigo){
     if(!codigo) return;
 
     const item = detalles.find(d =>
-        String(d.product?.barcode || '').trim() === codigo
+        d.product && d.product.barcode == codigo
     );
 
     if(!item){
-
         showToast('❌ Producto no pertenece a esta orden', 'ter');
-
         scanner.value = '';
-
+        scanner.focus();
         return;
     }
 
@@ -833,11 +831,11 @@ function procesarCodigo(codigo){
         );
 
         scanner.value = '';
+        scanner.focus();
 
         return;
     }
 
-    // Scroll y highlight en lista
     const card = document.getElementById('item-' + item.id);
 
     if(card){
@@ -878,6 +876,7 @@ scanner.addEventListener('keydown', function(e){
     e.preventDefault();
 
     procesarCodigo(this.value);
+
 });
 
 // =====================================
