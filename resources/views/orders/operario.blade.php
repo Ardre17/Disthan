@@ -470,8 +470,6 @@ opacity:1;
 
 @endif
 
-    @endif
-
 </div>
 @endforeach
 
