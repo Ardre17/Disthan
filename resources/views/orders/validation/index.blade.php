@@ -2521,8 +2521,8 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById(
             'pedidoCliente'
         ).textContent =
-            pedidoActual.client?.nombre ||
-            pedidoActual.client?.name ||
+            pedidoActual.client?.razon_social ||
+            pedidoActual.client?.nombre_comercial ||
             '-';
 
 

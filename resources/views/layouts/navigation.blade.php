@@ -19,6 +19,7 @@ if (
     str_contains($url, 'kardex') ||
     str_contains($url, 'production') ||
     str_contains($url, 'pedidos') ||
+    str_contains($url, 'validacion-pedidos') ||
     str_contains($url, 'produccion')
 ) {
     $seccionActiva = 'ops';
@@ -752,6 +753,10 @@ $t = $temas[$seccionActiva];
                     </a>
                     <a href="{{ route('rechazos.index') }}">
                         <span>↩</span><span>Rechazos</span>
+                    </a>
+                    <a href="{{ route('orders.validation.index') }}">
+                        <span class="sb-icon">✅</span>
+                        <span>Validación de Pedidos</span>
                     </a>
                 </div>
             </div>
