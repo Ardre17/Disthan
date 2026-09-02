@@ -758,7 +758,7 @@
                     <div class="product-data-box">
 
                         <span>
-                            CANTIDAD SOLICITADA
+                            CANTIDAD DESPACHADO
                         </span>
 
                         <strong id="itemCantidadSolicitada">
@@ -1140,7 +1140,7 @@
                             </th>
 
                             <th class="text-center">
-                                SOLICITADO
+                                DESPACHADO
                             </th>
 
                             <th class="text-center">
