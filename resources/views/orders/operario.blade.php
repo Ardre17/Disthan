@@ -468,7 +468,7 @@ opacity:1;
 @elseif($order->tipo_orden === 'SUPERMERCADO')
 
     <a
-        href="{{ route('orders.etiqueta', $item) }}"
+        href="{{ route('orders.details.etiqueta', $item) }}"
         target="_blank"
         class="btn-etiqueta"
         style="{{ $item->cantidad_despachada > 0 ? '' : 'display:none;' }}"
