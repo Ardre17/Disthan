@@ -59,6 +59,7 @@
 .prod-mini-fill{height:100%;border-radius:99px;transition:width .4s;}
 .btn-cerrar{width:100%;background:#16a34a;color:#fff;border:none;padding:14px;border-radius:10px;font-size:15px;font-weight:700;cursor:pointer;margin-top:1rem;display:flex;align-items:center;justify-content:center;gap:8px;transition:background .15s;}
 .btn-cerrar:hover{background:#15803d;}
+
 .btn-etiqueta{
     display:inline-flex;
     align-items:center;
@@ -95,6 +96,113 @@ to{
 transform:scale(1);
 opacity:1;
 }}
+/* =========================================
+   ESCÁNER POR CÁMARA
+========================================= */
+
+.camera-scan-wrap{
+    display:none;
+    margin-top:10px;
+}
+
+.btn-camara{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #3b82f6;
+    background:#1e40af;
+    color:#fff;
+    font-size:14px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.btn-camara:active{
+    transform:scale(.98);
+}
+
+.modal-camara{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,.85);
+    z-index:10000;
+    align-items:center;
+    justify-content:center;
+    padding:15px;
+}
+
+.modal-camara.activo{
+    display:flex;
+}
+
+.camara-box{
+    width:100%;
+    max-width:500px;
+    background:#0f172a;
+    border:1px solid #334155;
+    border-radius:16px;
+    overflow:hidden;
+    box-shadow:0 20px 50px rgba(0,0,0,.5);
+}
+
+.camara-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:15px;
+    border-bottom:1px solid #334155;
+}
+
+.camara-title{
+    color:#f8fafc;
+    font-size:16px;
+    font-weight:700;
+}
+
+.camara-subtitle{
+    color:#64748b;
+    font-size:11px;
+    margin-top:3px;
+}
+
+.btn-cerrar-camara{
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:50%;
+    background:#334155;
+    color:#fff;
+    font-size:18px;
+    cursor:pointer;
+}
+
+#lectorCamara{
+    width:100%;
+    min-height:280px;
+    background:#000;
+}
+
+#lectorCamara video{
+    width:100% !important;
+    max-height:55vh;
+    object-fit:cover;
+}
+
+.camara-mensaje{
+    padding:12px;
+    text-align:center;
+    color:#94a3b8;
+    font-size:12px;
+}
+
+@media (max-width:768px){
+
+    .camera-scan-wrap{
+        display:block;
+    }
+
+}
 </style>
 
 {{-- Fondo oscuro para toda la página --}}
@@ -179,6 +287,49 @@ opacity:1;
     <div class="scanner-hint">⌨ Presiona <strong style="color:#94a3b8;">Enter</strong> para confirmar · El foco regresa automáticamente</div>
 </div>
 
+<div class="camera-scan-wrap">
+    <button type="button" id="btnAbrirCamara" class="btn-camara">
+        📷 Escanear con cámara
+    </button>
+</div>
+{{-- =========================================
+     MODAL ESCÁNER POR CÁMARA
+========================================= --}}
+<div id="modalCamara" class="modal-camara">
+
+    <div class="camara-box">
+
+        <div class="camara-header">
+
+            <div>
+                <div class="camara-title">
+                    📷 Escanear producto
+                </div>
+
+                <div class="camara-subtitle">
+                    Apunta la cámara al código de barras
+                </div>
+            </div>
+
+            <button
+                type="button"
+                id="btnCerrarCamara"
+                class="btn-cerrar-camara"
+            >
+                ✕
+            </button>
+
+        </div>
+
+        <div id="lectorCamara"></div>
+
+        <div id="camaraMensaje" class="camara-mensaje">
+            Iniciando cámara...
+        </div>
+
+    </div>
+
+</div>
 {{-- Producto activo --}}
 <div class="activo-box" id="activoBox">
     <div class="activo-name" id="activoNombre">—</div>
@@ -302,7 +453,30 @@ opacity:1;
              style="width:{{ $pct2 }}%;background:{{ $lc }};">
         </div>
     </div>
+{{-- Imprimir etiqueta --}}
+@if($order->tipo_orden === 'LOCAL')
 
+    <a
+        href="{{ route('orders.etiqueta.local', $item) }}"
+        target="_blank"
+        class="btn-etiqueta"
+        style="{{ $item->cantidad_despachada > 0 ? '' : 'display:none;' }}"
+    >
+        🖨️ Imprimir etiqueta
+    </a>
+
+@elseif($order->tipo_orden === 'SUPERMERCADO')
+
+    <a
+        href="{{ route('orders.etiqueta', $item) }}"
+        target="_blank"
+        class="btn-etiqueta"
+        style="{{ $item->cantidad_despachada > 0 ? '' : 'display:none;' }}"
+    >
+        🖨️ Imprimir etiqueta
+    </a>
+
+@endif
 
 </div>
 @endforeach
@@ -409,7 +583,7 @@ font-weight:bold;
 
 </div>
 
-
+<script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 <script>
 let detalles = @json($order->details->load('product'));
 let scanner  = document.getElementById('scanner');
@@ -650,39 +824,242 @@ function actualizarItemUI(item){
     }
 }
 
+// Mostrar / ocultar botón de etiqueta
+const btnEtiqueta = card.querySelector('.btn-etiqueta');
+
+if(btnEtiqueta){
+    btnEtiqueta.style.display =
+        parseFloat(item.cantidad_despachada) > 0
+            ? 'inline-flex'
+            : 'none';
+}
+
 // Scanner principal
-scanner.addEventListener('keydown', function(e){
-    if(e.key !== 'Enter') return;
-    e.preventDefault();
-    const codigo = this.value.trim();
+// =====================================
+// PROCESAR CÓDIGO
+// =====================================
+
+function procesarCodigo(codigo){
+
+    codigo = String(codigo || '').trim();
+
     if(!codigo) return;
 
-    const item = detalles.find(d => d.product.barcode == codigo);
+    const item = detalles.find(d =>
+        d.product && d.product.barcode == codigo
+    );
+
     if(!item){
-        showToast('❌ Producto no pertenece a esta orden', 'ter');
-        this.value = '';
+
+        showToast(
+            '❌ Producto no pertenece a esta orden',
+            'ter'
+        );
+
+        scanner.value = '';
+        scanner.focus();
+
         return;
     }
 
     const pct = item.cantidad_solicitada > 0
-        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100 : 0;
+        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100
+        : 0;
+
     if(pct >= 100){
-        showToast('⚠ ' + item.product.nombre + ' ya está completo', 'twk');
-        this.value = '';
+
+        showToast(
+            '⚠ ' + item.product.nombre + ' ya está completo',
+            'twk'
+        );
+
+        scanner.value = '';
+        scanner.focus();
+
         return;
     }
 
-    // Scroll y highlight en lista
     const card = document.getElementById('item-' + item.id);
-    card.scrollIntoView({ behavior:'smooth', block:'center' });
-    card.style.boxShadow = '0 0 0 2px #3b82f6';
-    setTimeout(() => { card.style.boxShadow = ''; }, 1500);
+
+    if(card){
+
+        card.scrollIntoView({
+            behavior:'smooth',
+            block:'center'
+        });
+
+        card.style.boxShadow =
+            '0 0 0 2px #3b82f6';
+
+        setTimeout(() => {
+            card.style.boxShadow = '';
+        }, 1500);
+    }
 
     mostrarActivo(item);
-    showToast('✔ ' + item.product.nombre, 'tok');
+
+    showToast(
+        '✔ ' + item.product.nombre,
+        'tok'
+    );
+
     beep();
-    this.value = '';
+
+    scanner.value = '';
+}
+
+
+// =====================================
+// SCANNER FÍSICO / TECLADO
+// =====================================
+
+scanner.addEventListener('keydown', function(e){
+
+    if(e.key !== 'Enter') return;
+
+    e.preventDefault();
+
+    procesarCodigo(this.value);
+
 });
+
+// =====================================
+// ESCÁNER POR CÁMARA
+// =====================================
+
+let lectorCamara = null;
+let camaraActiva = false;
+let procesandoCamara = false;
+
+const modalCamara =
+    document.getElementById('modalCamara');
+
+const btnAbrirCamara =
+    document.getElementById('btnAbrirCamara');
+
+const btnCerrarCamara =
+    document.getElementById('btnCerrarCamara');
+
+const camaraMensaje =
+    document.getElementById('camaraMensaje');
+
+
+// Abrir cámara
+btnAbrirCamara.addEventListener('click', async function(){
+
+    modalCamara.classList.add('activo');
+
+    camaraMensaje.textContent =
+        'Solicitando acceso a la cámara...';
+
+    try{
+
+        if(!lectorCamara){
+
+            lectorCamara =
+                new Html5Qrcode('lectorCamara');
+
+        }
+
+        await lectorCamara.start(
+
+            {
+                facingMode: {
+                    ideal: 'environment'
+                }
+            },
+
+            {
+                fps: 10,
+
+                qrbox: {
+                    width: 280,
+                    height: 140
+                }
+            },
+
+            (codigoDetectado) => {
+
+                if(procesandoCamara) return;
+
+                procesandoCamara = true;
+
+                camaraMensaje.textContent =
+                    '✅ Código detectado';
+
+                detenerCamara();
+
+                procesarCodigo(codigoDetectado);
+
+                setTimeout(() => {
+                    procesandoCamara = false;
+                }, 1000);
+
+            },
+
+            () => {
+
+                camaraMensaje.textContent =
+                    'Apunta la cámara al código de barras';
+
+            }
+
+        );
+
+        camaraActiva = true;
+
+        camaraMensaje.textContent =
+            '📷 Cámara activa · Apunta al código de barras';
+
+    }catch(error){
+
+        console.error(error);
+
+        camaraMensaje.textContent =
+            '❌ No se pudo acceder a la cámara. Verifica los permisos del navegador.';
+
+    }
+
+});
+
+
+// Cerrar cámara
+btnCerrarCamara.addEventListener('click', function(){
+
+    detenerCamara();
+
+});
+
+
+// Detener cámara
+async function detenerCamara(){
+
+    if(lectorCamara && camaraActiva){
+
+        try{
+
+            await lectorCamara.stop();
+
+        }catch(error){
+
+            console.warn(
+                'No se pudo detener la cámara:',
+                error
+            );
+
+        }
+
+        camaraActiva = false;
+    }
+
+    modalCamara.classList.remove('activo');
+
+    camaraMensaje.textContent =
+        'Iniciando cámara...';
+
+    scanner.focus();
+
+}
 
 // Guardar desde campo cantidad
 document.getElementById('activoCantidad').addEventListener('keydown', function(e){
@@ -741,12 +1118,19 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
     });
 });
 
-// Mantener foco
 setInterval(() => {
-    if(document.activeElement !== scanner &&
-       document.activeElement !== document.getElementById('activoCantidad')){
+
+    if(camaraActiva) return;
+
+    if(
+        document.activeElement !== scanner &&
+        document.activeElement !== document.getElementById('activoCantidad')
+    ){
+
         scanner.focus();
+
     }
+
 }, 800);
 
 function confirmarCierre(){
