@@ -85,7 +85,325 @@
         </div>
 
     </div>
+    {{-- =========================================================
+     PEDIDOS PENDIENTES + HISTORIAL
+========================================================= --}}
+<div class="validation-orders-section">
 
+    {{-- =====================================================
+         PEDIDOS PENDIENTES
+    ====================================================== --}}
+    <div class="validation-list-card">
+
+        <div class="validation-list-header">
+
+            <div class="validation-list-title">
+
+                <div class="validation-list-icon pending">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+
+                <div>
+                    <strong>Pedidos pendientes de validar</strong>
+                    <span>
+                        Pedidos que todavía no tienen ninguna validación registrada.
+                    </span>
+                </div>
+
+            </div>
+
+            <span class="validation-count">
+                {{ $pendientes->count() }}
+            </span>
+
+        </div>
+
+        @if($pendientes->count())
+
+            <div class="validation-table-wrapper">
+
+                <table class="validation-list-table">
+
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Factura</th>
+                            <th>Guía</th>
+                            <th>Fecha</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach($pendientes as $pedido)
+
+                            <tr>
+
+                                <td>
+                                    <span class="validation-order-number">
+                                        {{ $pedido->numero_orden ?? '-' }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="validation-client-name">
+                                        {{ $pedido->client->razon_social
+                                            ?? $pedido->client->nombre_comercial
+                                            ?? 'Sin cliente' }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ $pedido->factura_asociada ?? '-' }}
+                                </td>
+
+                                <td>
+                                    {{ $pedido->guia_asociada ?? '-' }}
+                                </td>
+
+                                <td>
+                                    {{ $pedido->fecha_pedido
+                                        ? \Carbon\Carbon::parse($pedido->fecha_pedido)->format('d/m/Y')
+                                        : '-' }}
+                                </td>
+
+                                <td>
+
+                                    <button
+                                        type="button"
+                                        class="validation-row-button open"
+                                        onclick="abrirPedidoDesdeLista(
+                                            '{{ $pedido->factura_asociada ?? $pedido->guia_asociada }}'
+                                        )"
+                                    >
+                                        <i class="bi bi-play-fill"></i>
+                                        VALIDAR
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+                        @endforeach
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        @else
+
+            <div class="validation-empty">
+
+                <i class="bi bi-check-circle"></i>
+
+                <strong>No hay pedidos pendientes</strong>
+
+                <div>
+                    Todos los pedidos registrados ya tienen una validación.
+                </div>
+
+            </div>
+
+        @endif
+
+    </div>
+
+
+    {{-- =====================================================
+         HISTORIAL
+    ====================================================== --}}
+    <div class="validation-list-card">
+
+        <div class="validation-list-header">
+
+            <div class="validation-list-title">
+
+                <div class="validation-list-icon history">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+
+                <div>
+                    <strong>Historial de validaciones</strong>
+                    <span>
+                        Registro de todas las validaciones realizadas.
+                    </span>
+                </div>
+
+            </div>
+
+            <span class="validation-count">
+                {{ $historial->count() }}
+            </span>
+
+        </div>
+
+        @if($historial->count())
+
+            <div class="validation-table-wrapper">
+
+                <table class="validation-list-table">
+
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Estado</th>
+                            <th>Fecha validación</th>
+                            <th>Usuario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach($historial as $validacion)
+
+                            @php
+                                $pedidoHistorial = $validacion->order;
+                                $estadoHistorial = $validacion->estado;
+                            @endphp
+
+                            <tr>
+
+                                <td>
+                                    <span class="validation-order-number">
+                                        {{ $pedidoHistorial->numero_orden ?? '-' }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="validation-client-name">
+                                        {{ $pedidoHistorial->client->razon_social
+                                            ?? $pedidoHistorial->client->nombre_comercial
+                                            ?? 'Sin cliente' }}
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    <span class="validation-status
+                                        {{ strtolower(str_replace('_', '-', $estadoHistorial)) }}"
+                                    >
+                                        {{ $estadoHistorial }}
+                                    </span>
+
+                                </td>
+
+                                <td>
+                                    {{ $validacion->fecha_validacion
+                                        ? \Carbon\Carbon::parse($validacion->fecha_validacion)->format('d/m/Y H:i')
+                                        : '-' }}
+                                </td>
+
+                                <td>
+                                    {{ $validacion->usuario->name ?? 'Sistema' }}
+                                </td>
+
+                                <td>
+
+                                    <div class="validation-row-actions">
+
+                                        <button
+                                            type="button"
+                                            class="validation-row-button history"
+                                            onclick="verHistorialPedido({{ $pedidoHistorial->id }})"
+                                        >
+                                            <i class="bi bi-clock-history"></i>
+                                            HISTORIAL
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            class="validation-row-button revalidate"
+                                            onclick="abrirPedidoDesdeLista(
+                                                '{{ $pedidoHistorial->factura_asociada
+                                                    ?? $pedidoHistorial->guia_asociada }}'
+                                            )"
+                                        >
+                                            <i class="bi bi-arrow-repeat"></i>
+                                            REVALIDAR
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @endforeach
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        @else
+
+            <div class="validation-empty">
+
+                <i class="bi bi-clock-history"></i>
+
+                <strong>Sin historial</strong>
+
+                <div>
+                    Todavía no se ha realizado ninguna validación.
+                </div>
+
+            </div>
+
+        @endif
+
+    </div>
+
+</div>
+
+
+{{-- =========================================================
+     MODAL HISTORIAL
+========================================================= --}}
+<div
+    id="validationHistoryModal"
+    class="validation-history-modal d-none"
+>
+
+    <div class="validation-history-dialog">
+
+        <div class="validation-history-dialog-header">
+
+            <strong id="validationHistoryTitle">
+                Historial del pedido
+            </strong>
+
+            <button
+                type="button"
+                class="validation-history-close"
+                onclick="cerrarHistorialPedido()"
+            >
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+        </div>
+
+        <div
+            id="validationHistoryBody"
+            class="validation-history-dialog-body"
+        >
+
+            <div class="validation-empty">
+                <i class="bi bi-arrow-repeat"></i>
+                Cargando historial...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
     {{-- =========================================================
          INFORMACIÓN DEL PEDIDO
@@ -2248,7 +2566,299 @@
         }
 
     }
+/* =========================================================
+   PENDIENTES E HISTORIAL
+========================================================= */
 
+.validation-orders-section {
+    margin-top: 24px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 20px;
+}
+
+.validation-list-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+}
+
+.validation-list-header {
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.validation-list-title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.validation-list-icon {
+    width: 42px;
+    height: 42px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 19px;
+}
+
+.validation-list-icon.pending {
+    background: #fff7ed;
+    color: #ea580c;
+}
+
+.validation-list-icon.history {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.validation-list-title strong {
+    display: block;
+    font-size: 16px;
+    color: #0f172a;
+}
+
+.validation-list-title span {
+    display: block;
+    margin-top: 2px;
+    font-size: 12px;
+    color: #64748b;
+}
+
+.validation-count {
+    min-width: 30px;
+    height: 30px;
+    padding: 0 9px;
+    border-radius: 20px;
+    background: #f1f5f9;
+    color: #475569;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.validation-table-wrapper {
+    overflow-x: auto;
+}
+
+.validation-list-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 700px;
+}
+
+.validation-list-table th {
+    padding: 11px 16px;
+    text-align: left;
+    background: #f8fafc;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    white-space: nowrap;
+}
+
+.validation-list-table td {
+    padding: 14px 16px;
+    border-top: 1px solid #f1f5f9;
+    color: #334155;
+    font-size: 13px;
+    vertical-align: middle;
+}
+
+.validation-list-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.validation-order-number {
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.validation-client-name {
+    color: #475569;
+}
+
+.validation-empty {
+    padding: 35px 20px;
+    text-align: center;
+    color: #94a3b8;
+}
+
+.validation-empty i {
+    display: block;
+    font-size: 30px;
+    margin-bottom: 8px;
+}
+
+.validation-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.validation-status.completo {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.validation-status.parcial {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.validation-status.no-enviado {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+.validation-status.pendiente {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.validation-row-actions {
+    display: flex;
+    gap: 7px;
+    flex-wrap: wrap;
+}
+
+.validation-row-button {
+    border: 0;
+    border-radius: 8px;
+    padding: 7px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .15s ease;
+}
+
+.validation-row-button:hover {
+    transform: translateY(-1px);
+}
+
+.validation-row-button.open {
+    background: #eff6ff;
+    color: #2563eb;
+}
+
+.validation-row-button.history {
+    background: #f1f5f9;
+    color: #475569;
+}
+
+.validation-row-button.revalidate {
+    background: #ecfdf5;
+    color: #047857;
+}
+
+.validation-history-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: rgba(15, 23, 42, .55);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.validation-history-modal.d-none {
+    display: none;
+}
+
+.validation-history-dialog {
+    width: min(1000px, 100%);
+    max-height: 90vh;
+    background: #fff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 25px 70px rgba(15, 23, 42, .25);
+    display: flex;
+    flex-direction: column;
+}
+
+.validation-history-dialog-header {
+    padding: 18px 20px;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+}
+
+.validation-history-dialog-header strong {
+    font-size: 17px;
+    color: #0f172a;
+}
+
+.validation-history-close {
+    width: 34px;
+    height: 34px;
+    border: 0;
+    border-radius: 8px;
+    background: #f1f5f9;
+    color: #475569;
+    cursor: pointer;
+    font-size: 17px;
+}
+
+.validation-history-dialog-body {
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.validation-history-summary {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    margin-bottom: 18px;
+}
+
+.validation-history-summary-item {
+    padding: 12px;
+    border-radius: 10px;
+    background: #f8fafc;
+}
+
+.validation-history-summary-item span {
+    display: block;
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.validation-history-summary-item strong {
+    display: block;
+    margin-top: 4px;
+    color: #0f172a;
+    font-size: 13px;
+}
+
+@media (max-width: 700px) {
+    .validation-history-summary {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .validation-list-header {
+        align-items: flex-start;
+    }
+}
 </style>
 
 
@@ -2277,6 +2887,351 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let modoActual = null;
 
+        /*
+    |--------------------------------------------------------------------------
+    | PEDIDOS PENDIENTES / HISTORIAL
+    |--------------------------------------------------------------------------
+    */
+
+    window.abrirPedidoDesdeLista = function (codigo) {
+
+        if (!codigo) {
+
+            mostrarAlerta(
+                'Este pedido no tiene factura ni guía asociada.',
+                'warning'
+            );
+
+            return;
+        }
+
+        codigoPedido.value = codigo;
+
+        buscarPedido();
+
+        setTimeout(function () {
+
+            document.getElementById('pedidoInfo')
+                ?.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+
+        }, 300);
+    };
+
+
+    window.cerrarHistorialPedido = function () {
+
+        const modal =
+            document.getElementById('validationHistoryModal');
+
+        if (modal) {
+            modal.classList.add('d-none');
+        }
+    };
+
+
+    window.verHistorialPedido = async function (orderId) {
+
+        const modal =
+            document.getElementById('validationHistoryModal');
+
+        const body =
+            document.getElementById('validationHistoryBody');
+
+        const title =
+            document.getElementById('validationHistoryTitle');
+
+        modal.classList.remove('d-none');
+
+        body.innerHTML = `
+            <div class="validation-empty">
+                <i class="bi bi-arrow-repeat"></i>
+                Cargando historial...
+            </div>
+        `;
+
+        try {
+
+            const response = await fetch(
+                `/validacion-pedidos/${orderId}/historial`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(
+                    data.message ||
+                    'No se pudo obtener el historial.'
+                );
+            }
+
+            const validaciones =
+                data.validations || [];
+
+            if (!validaciones.length) {
+
+                body.innerHTML = `
+                    <div class="validation-empty">
+                        <i class="bi bi-clock-history"></i>
+                        No existen validaciones para este pedido.
+                    </div>
+                `;
+
+                return;
+            }
+
+            const primera =
+                validaciones[0];
+
+            const order =
+                primera.order ||
+                primera.order_detail?.order ||
+                null;
+
+            title.textContent =
+                `Historial del pedido ${
+                    order?.numero_orden || ''
+                }`;
+
+            let html = '';
+
+            validaciones.forEach(function (validacion, index) {
+
+                const estado =
+                    validacion.estado || 'PENDIENTE';
+
+                const estadoClase =
+                    estado
+                        .toLowerCase()
+                        .replaceAll('_', '-');
+
+                const fecha =
+                    validacion.fecha_validacion
+                        ? new Date(
+                            validacion.fecha_validacion
+                          ).toLocaleString('es-PE')
+                        : '-';
+
+                const usuario =
+                    validacion.usuario?.name ||
+                    'Sistema';
+
+                html += `
+
+                    <div
+                        style="
+                            border:1px solid #e2e8f0;
+                            border-radius:12px;
+                            margin-bottom:16px;
+                            overflow:hidden;
+                        "
+                    >
+
+                        <div
+                            style="
+                                padding:14px 16px;
+                                background:#f8fafc;
+                                display:flex;
+                                align-items:center;
+                                justify-content:space-between;
+                                gap:10px;
+                            "
+                        >
+
+                            <div>
+
+                                <strong style="
+                                    display:block;
+                                    color:#0f172a;
+                                    font-size:14px;
+                                ">
+                                    Validación #${validaciones.length - index}
+                                </strong>
+
+                                <span style="
+                                    display:block;
+                                    margin-top:3px;
+                                    color:#64748b;
+                                    font-size:11px;
+                                ">
+                                    ${fecha} · ${usuario}
+                                </span>
+
+                            </div>
+
+                            <span class="
+                                validation-status
+                                ${estadoClase}
+                            ">
+                                ${estado}
+                            </span>
+
+                        </div>
+
+                        <div style="overflow-x:auto;">
+
+                            <table class="validation-list-table">
+
+                                <thead>
+
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Solicitado</th>
+                                        <th>Validado</th>
+                                        <th>Estado</th>
+                                        <th>Código</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+                `;
+
+                const detallesValidacion =
+                    validacion.details || [];
+
+                detallesValidacion.forEach(function (detalle) {
+
+                    const producto =
+                        detalle.order_detail?.product;
+
+                    const nombreProducto =
+                        producto?.nombre ||
+                        'Producto';
+
+                    const estadoDetalle =
+                        detalle.estado ||
+                        'PENDIENTE';
+
+                    const claseDetalle =
+                        estadoDetalle
+                            .toLowerCase()
+                            .replaceAll('_', '-');
+
+                    html += `
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    ${nombreProducto}
+                                </strong>
+                            </td>
+
+                            <td>
+                                ${detalle.cantidad_solicitada ?? 0}
+                            </td>
+
+                            <td>
+                                ${detalle.cantidad_validada ?? 0}
+                            </td>
+
+                            <td>
+
+                                <span class="
+                                    validation-status
+                                    ${claseDetalle}
+                                ">
+                                    ${estadoDetalle}
+                                </span>
+
+                            </td>
+
+                            <td>
+                                ${detalle.codigo_escaneado || '-'}
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                });
+
+                html += `
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            });
+
+            body.innerHTML = html;
+
+        } catch (error) {
+
+            body.innerHTML = `
+
+                <div class="validation-empty">
+
+                    <i class="bi bi-exclamation-triangle"></i>
+
+                    ${error.message}
+
+                </div>
+
+            `;
+
+        }
+
+    };
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CERRAR MODAL CON ESCAPE / CLICK EXTERIOR
+    |--------------------------------------------------------------------------
+    */
+
+    const historyModal =
+        document.getElementById(
+            'validationHistoryModal'
+        );
+
+    if (historyModal) {
+
+        historyModal.addEventListener(
+            'click',
+            function (event) {
+
+                if (event.target === historyModal) {
+                    cerrarHistorialPedido();
+                }
+
+            }
+        );
+
+    }
+
+    document.addEventListener(
+        'keydown',
+        function (event) {
+
+            if (
+                event.key === 'Escape' &&
+                historyModal &&
+                !historyModal.classList.contains('d-none')
+            ) {
+
+                cerrarHistorialPedido();
+
+            }
+
+        }
+    );
 
     /*
     |--------------------------------------------------------------------------
@@ -4020,7 +4975,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     '✓ Validación guardada correctamente.',
                     'success'
                 );
-
+                setTimeout(function () {
+                    window.location.reload();
+                }, 1000);
 
                 boton.disabled = false;
 

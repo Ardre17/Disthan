@@ -14,7 +14,7 @@ class OrderValidationController extends Controller
     public function index()
 {
     // =========================================================
-    // PEDIDOS PENDIENTES DE VALIDACIÓN
+    // PEDIDOS QUE NUNCA HAN SIDO VALIDADOS
     // =========================================================
     $pendientes = Order::with('client')
         ->whereDoesntHave('validations')
@@ -23,7 +23,7 @@ class OrderValidationController extends Controller
 
 
     // =========================================================
-    // HISTORIAL DE PEDIDOS YA VALIDADOS
+    // HISTORIAL DE VALIDACIONES
     // =========================================================
     $historial = OrderValidation::with([
         'order.client',
