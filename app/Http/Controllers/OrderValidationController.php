@@ -11,13 +11,34 @@ use Illuminate\Support\Facades\DB;
 
 class OrderValidationController extends Controller
 {
-    /**
-     * Pantalla principal de Validación de Pedidos.
-     */
     public function index()
-    {
-        return view('orders.validation.index');
-    }
+{
+    // =========================================================
+    // PEDIDOS PENDIENTES DE VALIDACIÓN
+    // =========================================================
+    $pendientes = Order::with('client')
+        ->whereDoesntHave('validations')
+        ->latest('fecha_pedido')
+        ->get();
+
+
+    // =========================================================
+    // HISTORIAL DE PEDIDOS YA VALIDADOS
+    // =========================================================
+    $historial = OrderValidation::with([
+        'order.client',
+        'usuario',
+        'details.orderDetail.product',
+    ])
+        ->latest('fecha_validacion')
+        ->get();
+
+
+    return view('orders.validation.index', compact(
+        'pendientes',
+        'historial'
+    ));
+}
 
     /**
      * Buscar un pedido por factura o guía.
