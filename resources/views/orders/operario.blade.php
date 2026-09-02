@@ -302,11 +302,6 @@ opacity:1;
              style="width:{{ $pct2 }}%;background:{{ $lc }};">
         </div>
     </div>
-
-    
-
-    @endif
-
 </div>
 @endforeach
 
