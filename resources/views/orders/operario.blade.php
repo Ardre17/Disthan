@@ -177,7 +177,6 @@ opacity:1;
     <input type="text" id="scanner" class="scanner-input"
            placeholder="Escanea o escribe el código y presiona Enter..." autofocus>
     <div class="scanner-hint">⌨ Presiona <strong style="color:#94a3b8;">Enter</strong> para confirmar · El foco regresa automáticamente</div>
-
 </div>
 
 {{-- Producto activo --}}
@@ -304,30 +303,7 @@ opacity:1;
         </div>
     </div>
 
-    {{-- Imprimir etiqueta --}}
-@if($order->tipo_orden === 'LOCAL')
-
-    <a
-        href="{{ route('orders.etiqueta.local', $item) }}"
-        target="_blank"
-        class="btn-etiqueta"
-        style="{{ $item->cantidad_despachada > 0 ? '' : 'display:none;' }}"
-    >
-        🖨️ Imprimir etiqueta
-    </a>
-
-@elseif($order->tipo_orden === 'SUPERMERCADO')
-
-    <a
-        href="{{ route('orders.etiqueta', $item) }}"
-        target="_blank"
-        class="btn-etiqueta"
-        style="{{ $item->cantidad_despachada > 0 ? '' : 'display:none;' }}"
-    >
-        🖨️ Imprimir etiqueta
-    </a>
-
-@endif
+    
 
     @endif
 
