@@ -30,6 +30,7 @@ class Pallet extends Model
 
         'cerrado',
 
+        'capacidad_cajas',
     ];
 
     /*

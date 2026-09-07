@@ -543,12 +543,44 @@
             <div class="sec-hdr-num" style="background:#7c3aed;">3</div>
             <div class="sec-hdr-title">🟫 Pallets de exportación</div>
             <div style="margin-left:auto;">
-                <form action="{{ route('exportacion.pallet.store', $order) }}" method="POST" style="display:inline;">
-                    @csrf
-                    <button type="submit" class="btn-primary" style="background:#7c3aed;">
-                        ➕ Crear pallet
-                    </button>
-                </form>
+                <form action="{{ route('exportacion.pallet.store', $order) }}"
+            method="POST"
+            style="display:flex;align-items:center;gap:7px;">
+            @csrf
+
+            <input
+                type="number"
+                name="capacidad_cajas"
+                value="20"
+                min="1"
+                max="1000"
+                required
+                style="
+                    width:90px;
+                    padding:7px 8px;
+                    border:1px solid #cbd5e1;
+                    border-radius:4px;
+                    font-size:12px;
+                    font-weight:700;
+                    text-align:center;
+                "
+                title="Capacidad del pallet"
+                    >
+
+            <span style="
+                font-size:11px;
+                color:var(--erp-ink-muted);
+                white-space:nowrap;
+            ">
+                cajas
+            </span>
+
+            <button type="submit"
+                    class="btn-primary"
+                    style="background:#7c3aed;">
+                ➕ Crear pallet
+            </button>
+        </form>
             </div>
         </div>
         <div class="sec-body">
@@ -559,10 +591,25 @@
         @foreach($order->pallets as $pallet)
         @php
             /* ── Datos para el gráfico 2D ── */
-            $cols        = 5;
-            $rows        = 4;
-            $totalSlots  = $cols * $rows;          // 20 posiciones por capa
-            $totalCajas  = $pallet->detalles->sum('cantidad');
+
+            $cols = 5;
+
+            $capacidadPallet = max(
+                1,
+                (int) $pallet->capacidad_cajas
+            );
+
+            $rows = (int) ceil($capacidadPallet / $cols);
+
+            $totalSlots = $capacidadPallet;
+
+            $totalCajas = $pallet->detalles->sum('cantidad');
+
+            $totalCajas = (float) $totalCajas;
+
+            $pct = $totalSlots > 0
+                ? min(100, round(($totalCajas / $totalSlots) * 100))
+                : 0;
 
             // Paleta de colores por producto
             $colorPalette = [
@@ -603,7 +650,7 @@
                 <div>
                     <div class="pallet-code">🟫 {{ $pallet->codigo }}</div>
                     <div style="font-size:10px;color:#7eb8f7;margin-top:2px;">
-                        {{ $totalCajas }} / {{ $totalSlots }} posiciones · {{ number_format($pesoP,2) }} kg
+                        {{ $totalCajas }} / {{ $capacidadPallet }} cajas · {{ number_format($pesoP,2) }} kg · {{ $pct }}% lleno
                     </div>
                 </div>
                 <span class="badge" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);">
