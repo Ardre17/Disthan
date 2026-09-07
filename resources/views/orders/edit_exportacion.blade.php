@@ -597,7 +597,7 @@
                         <div class="pallet-hdr">
                             <div>
                                 <div class="pallet-code">
-                                    🟫 {{ $pallet->codigo }}
+                                    🟫 Pallet {{ $pallet->orden }}
                                 </div>
                                 <div style="font-size:10px;color:#7eb8f7;margin-top:3px;">
                                     {{ number_format($totalCajas, 0) }}
