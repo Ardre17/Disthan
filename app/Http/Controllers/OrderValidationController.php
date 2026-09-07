@@ -39,12 +39,19 @@ class OrderValidationController extends Controller
     // HISTORIAL DE VALIDACIONES
     // =========================================================
     $historial = OrderValidation::with([
-        'order.client',
-        'usuario',
-        'details.orderDetail.product',
-    ])
-        ->latest('fecha_validacion')
-        ->get();
+    'order.client',
+    'usuario',
+    'details.orderDetail.product',
+])
+    ->when(request('fecha_desde'), function ($query, $fechaDesde) {
+        $query->whereDate('fecha_validacion', '>=', $fechaDesde);
+    })
+    ->when(request('fecha_hasta'), function ($query, $fechaHasta) {
+        $query->whereDate('fecha_validacion', '<=', $fechaHasta);
+    })
+    ->latest('fecha_validacion')
+    ->paginate(15)
+    ->withQueryString();
 
 
     return view('orders.validation.index', compact(

@@ -233,69 +233,77 @@
 
             </div>
 
-            <span class="validation-count">
-                {{ $historial->count() }}
-            </span>
+            <div class="validation-history-header-right"><span class="validation-count">{{ $historial->total() }}</span></div>
 
         </div>
 
-        @if($historial->count())
+        @if($historial->total() > 0)
 
-                {{-- =====================================================
-             FILTROS DEL HISTORIAL
-        ====================================================== --}}
-        <div class="validation-history-filters">
+    {{-- =====================================================
+         FILTROS DEL HISTORIAL
+    ====================================================== --}}
+    <form
+        method="GET"
+        action="{{ route('orders.validation.index') }}"
+        class="validation-history-filters"
+    >
 
-            <div class="validation-history-filter-group">
+        <div class="validation-history-filter-group">
 
-                <label for="historialFechaDesde">
-                    <i class="bi bi-calendar3"></i>
-                    DESDE
-                </label>
+            <label for="historialFechaDesde">
+                <i class="bi bi-calendar3"></i>
+                DESDE
+            </label>
 
-                <input
-                    type="date"
-                    id="historialFechaDesde"
-                >
-
-            </div>
-
-
-            <div class="validation-history-filter-group">
-
-                <label for="historialFechaHasta">
-                    <i class="bi bi-calendar3"></i>
-                    HASTA
-                </label>
-
-                <input
-                    type="date"
-                    id="historialFechaHasta"
-                >
-
-            </div>
-
-
-            <button
-                type="button"
-                id="btnFiltrarHistorial"
-                class="validation-history-filter-button"
+            <input
+                type="date"
+                id="historialFechaDesde"
+                name="fecha_desde"
+                value="{{ request('fecha_desde') }}"
             >
-                <i class="bi bi-funnel"></i>
-                FILTRAR
-            </button>
+
+        </div>
 
 
-            <button
-                type="button"
-                id="btnLimpiarHistorial"
+        <div class="validation-history-filter-group">
+
+            <label for="historialFechaHasta">
+                <i class="bi bi-calendar3"></i>
+                HASTA
+            </label>
+
+            <input
+                type="date"
+                id="historialFechaHasta"
+                name="fecha_hasta"
+                value="{{ request('fecha_hasta') }}"
+            >
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="validation-history-filter-button"
+        >
+            <i class="bi bi-funnel"></i>
+            FILTRAR
+        </button>
+
+
+        @if(request('fecha_desde') || request('fecha_hasta'))
+
+            <a
+                href="{{ route('orders.validation.index') }}"
                 class="validation-history-clear-button"
             >
                 <i class="bi bi-x-circle"></i>
                 LIMPIAR
-            </button>
+            </a>
 
-        </div>
+        @endif
+
+    </form>
 
             <div class="validation-table-wrapper">
 
@@ -393,14 +401,62 @@
                     </tbody>
 
                 </table>
+@if($historial->total() > 0)
+
+    <div class="historial-paginacion">
+
+        <div class="historial-info">
+            Mostrando
+            <strong>{{ $historial->firstItem() }}</strong>
+            -
+            <strong>{{ $historial->lastItem() }}</strong>
+            de
+            <strong>{{ $historial->total() }}</strong>
+            validaciones
+        </div>
+
+        @if($historial->hasPages())
+            <div class="pagination-buttons">
+
+                @if($historial->onFirstPage())
+                    <span class="pagina disabled">‹</span>
+                @else
+                    <a href="{{ $historial->previousPageUrl() }}" class="pagina">
+                        ‹
+                    </a>
+                @endif
+
+                @foreach($historial->getUrlRange(
+                    max(1, $historial->currentPage() - 2),
+                    min($historial->lastPage(), $historial->currentPage() + 2)
+                ) as $page => $url)
+
+                    @if($page == $historial->currentPage())
+                        <span class="pagina activa">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}" class="pagina">
+                            {{ $page }}
+                        </a>
+                    @endif
+
+                @endforeach
+
+                @if($historial->hasMorePages())
+                    <a href="{{ $historial->nextPageUrl() }}" class="pagina">
+                        ›
+                    </a>
+                @else
+                    <span class="pagina disabled">›</span>
+                @endif
 
             </div>
-                </div>
+        @endif
 
-            <div
-                id="historialPagination"
-                class="validation-history-pagination"
-            ></div>
+    </div>
+
+@endif
+            </div>
+                </div>
 
         @else
 
