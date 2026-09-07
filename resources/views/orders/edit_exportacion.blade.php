@@ -1195,34 +1195,59 @@
                 </tr>
             </thead>
             <tbody>
-            @foreach($order->details as $detalle)
+          @foreach($order->details as $detalle)
+    @php
+        $porCaja = (int) ($detalle->product->cantidad_por_caja ?? 1);
 
-                @php
+        if ($porCaja < 1) {
+            $porCaja = 1;
+        }
 
-                    $porCaja = (int) ($detalle->product->cantidad_por_caja ?? 1);
+        // Cajas ya asignadas a pallets
+        $cajasEnPallets = (int) $detalle->palletDetails
+            ->sum('cantidad_cajas');
 
-                    if ($porCaja < 1) {
-                        $porCaja = 1;
-                    }
+        // Cajas solicitadas según la cantidad de unidades del pedido
+        $cajasSolicitadas = intdiv(
+            (int) $detalle->cantidad_solicitada,
+            $porCaja
+        );
 
-                $cajasEnPallets = (int) $detalle->palletDetails
-                    ->sum('cantidad_cajas');
+        // Cajas que todavía faltan asignar
+        $pendiente = max(
+            0,
+            $cajasSolicitadas - $cajasEnPallets
+        );
 
-                $cajasSolicitadas = intdiv(
-                    (int) $detalle->cantidad_solicitada,
-                    $porCaja
-                );
+        // Porcentaje de avance
+        $pct2 = $cajasSolicitadas > 0
+            ? min(
+                100,
+                round(
+                    ($cajasEnPallets / $cajasSolicitadas) * 100
+                )
+            )
+            : 0;
 
-                $pendiente = max(
-                    0,
-                    $cajasSolicitadas - $cajasEnPallets
-                );
+        // Color de la barra
+        $bc2 = $pct2 >= 100
+            ? 'var(--erp-ok)'
+            : ($pct2 > 0 ? '#f59e0b' : '#94a3b8');
 
-            @endphp
-            <tr class="{{ $rowClass }}">
+        // Color de la fila
+        $rowClass = $pct2 >= 100
+            ? 'prod-row-ok'
+            : ($pct2 > 0 ? 'prod-row-warn' : '');
+
+        // Peso solicitado en kg
+        $peso = ($detalle->product->peso ?? 0)
+            * $detalle->cantidad_solicitada;
+    @endphp
+
+    <tr class="{{ $rowClass }}">
+      
                 <td style="font-weight:600;">{{ $detalle->product->nombre }}</td>
-                <td style="text-align:center;" class="num-mono">{{ $detalle->cantidad_solicitada }}</td>
-                <td style="text-align:center;" class="num-mono" style="color:var(--erp-ok);">{{ $enPallets }}</td>
+                
                 <td style="text-align:center;">
                     @if($pendiente > 0)
                     <span class="badge badge-warn">{{ $pendiente }}</span>
