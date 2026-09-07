@@ -670,46 +670,44 @@
 
     <div class="pallet-wrap">
 
-        @foreach($order->pallets->sortBy('orden') as $pallet)
-        @if($order->pallets->count())
+    @foreach($order->pallets->sortBy('orden') as $pallet)
 
-            <div class="pallet-wrap">
+        @php
+            $capacidadPallet = max(1, (int) ($pallet->capacidad_cajas ?? 20));
+            $totalCajas = (int) $pallet->detalles->sum('cantidad_cajas');
+            $disponible = max(0, $capacidadPallet - $totalCajas);
+            $pct = $capacidadPallet > 0
+                ? min(100, round(($totalCajas / $capacidadPallet) * 100))
+                : 0;
 
-                @foreach($order->pallets as $pallet)
+            $pesoP = $pallet->detalles->sum(
+                fn($d) => (($d->product->peso ?? 0) * $d->cantidad) / 1000
+            );
 
-                    @php
-                        $capacidadPallet = max(1, (int) ($pallet->capacidad_cajas ?? 20));
-                        $totalCajas = (int) $pallet->detalles->sum('cantidad_cajas');
-                        $disponible = max(0, $capacidadPallet - $totalCajas);
-                        $pct = $capacidadPallet > 0 ? min(100, round(($totalCajas / $capacidadPallet) * 100)) : 0;
+            $colorPalette = [
+                '#0ea5e9',
+                '#7c3aed',
+                '#22c55e',
+                '#f59e0b',
+                '#ef4444',
+                '#06b6d4',
+                '#ec4899',
+                '#84cc16',
+                '#f97316',
+                '#8b5cf6',
+            ];
 
-                        $pesoP = $pallet->detalles->sum(
-                            fn($d) => (($d->product->peso ?? 0) * $d->cantidad) / 1000
-                        );
+            $prodColores = [];
+            $ci = 0;
 
-                        $colorPalette = [
-                            '#0ea5e9',
-                            '#7c3aed',
-                            '#22c55e',
-                            '#f59e0b',
-                            '#ef4444',
-                            '#06b6d4',
-                            '#ec4899',
-                            '#84cc16',
-                            '#f97316',
-                            '#8b5cf6',
-                        ];
-
-                        $prodColores = [];
-                        $ci = 0;
-
-                        foreach ($pallet->detalles as $det) {
-                            if (!isset($prodColores[$det->product_id])) {
-                                $prodColores[$det->product_id] = $colorPalette[$ci % count($colorPalette)];
-                                $ci++;
-                            }
-                        }
-                    @endphp
+            foreach ($pallet->detalles as $det) {
+                if (!isset($prodColores[$det->product_id])) {
+                    $prodColores[$det->product_id] =
+                        $colorPalette[$ci % count($colorPalette)];
+                    $ci++;
+                }
+            }
+        @endphp
 
                     <div class="pallet-card" id="pallet-{{ $pallet->id }}" style="scroll-margin-top:90px;">
 
