@@ -215,8 +215,8 @@
 
 @php
     $totalCajasAsignadas = $order->pallets
-        ->flatMap(fn($pallet) => $pallet->detalles)
-        ->sum('cantidad');
+    ->flatMap(fn($pallet) => $pallet->detalles)
+    ->sum('cantidad_cajas');
 
     $objetivoCajas = (int) ($order->cajas_objetivo ?? 0);
 
@@ -621,8 +621,8 @@
                             (int) $pallet->capacidad_cajas
                         );
 
-                        $totalCajas = (float) $pallet->detalles
-                            ->sum('cantidad');
+                        $totalCajas = (int) $pallet->detalles
+                            ->sum('cantidad_cajas');
 
                         $disponible = max(
                             0,
@@ -935,7 +935,7 @@
                                             ?? '#64748b';
 
                                         $cantidadDetalle =
-                                            (float) $detalle->cantidad;
+                                        (int) $detalle->cantidad_cajas;
 
                                         $porcentajeProducto =
                                             $totalCajas > 0
@@ -1081,8 +1081,7 @@
                                         <select
                                             name="order_detail_id"
                                             class="fselect"
-                                            required
-                                        >
+                                            required>
 
                                             <option value="">
                                                 Seleccionar producto pendiente
@@ -1103,37 +1102,19 @@
                                                 @if($pendiente > 0)
 
                                                     <option
-                                                        value="{{ $detalle->id }}"
-                                                    >
+                                                        value="{{ $detalle->id }}">
                                                         {{ $detalle->product->nombre }}
-                                                        ({{ number_format($pendiente, 0) }}
-                                                        pend.)
-                                                    </option>
+                                                        ({{ number_format($pendiente, 0) }} cajas pend.)</option>
 
                                                 @endif
-
                                             @endforeach
 
-                                        </select>
-
-                                    </div>
-
-
+                                        </select> </div>
+                                    
                                     <div style="width:110px;">
 
-                                        <label class="flabel">
-                                            Cantidad
-                                        </label>
-
-                                        <input
-                                            type="number"
-                                            name="cantidad"
-                                            class="finput"
-                                            min="1"
-                                            required
-                                            placeholder="0"
-                                        >
-
+                                    <label class="flabel">Cajas</label>
+                                    <input type="number" name="cantidad_cajas" class="finput" min="1" step="1" required placeholder="0"></div>
                                     </div>
 
 
@@ -1215,14 +1196,28 @@
             </thead>
             <tbody>
             @foreach($order->details as $detalle)
-            @php
-                $enPallets = $detalle->palletDetails->sum('cantidad');
-                $pendiente = $detalle->cantidad_solicitada - $enPallets;
-                $peso      = ($detalle->product->peso ?? 0) * $detalle->cantidad_solicitada;
-                $pct2      = $detalle->cantidad_solicitada > 0
-                    ? round($enPallets / $detalle->cantidad_solicitada * 100) : 0;
-                $bc2 = $pct2 >= 100 ? 'var(--erp-ok)' : ($pct2 > 0 ? '#f59e0b' : '#94a3b8');
-                $rowClass = $pct2 >= 100 ? 'prod-row-ok' : ($pct2 > 0 ? 'prod-row-warn' : '');
+
+                @php
+
+                    $porCaja = (int) ($detalle->product->cantidad_por_caja ?? 1);
+
+                    if ($porCaja < 1) {
+                        $porCaja = 1;
+                    }
+
+                $cajasEnPallets = (int) $detalle->palletDetails
+                    ->sum('cantidad_cajas');
+
+                $cajasSolicitadas = intdiv(
+                    (int) $detalle->cantidad_solicitada,
+                    $porCaja
+                );
+
+                $pendiente = max(
+                    0,
+                    $cajasSolicitadas - $cajasEnPallets
+                );
+
             @endphp
             <tr class="{{ $rowClass }}">
                 <td style="font-weight:600;">{{ $detalle->product->nombre }}</td>

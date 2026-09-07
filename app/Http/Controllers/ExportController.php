@@ -96,100 +96,155 @@ public function storePallet(Request $request, Order $order)
     );
 }
 
-    /**
-     * Agregar producto a un pallet.
-     */
     public function agregarProducto(Request $request, Pallet $pallet)
-    {
-        $request->validate([
-            'order_detail_id' => 'required|exists:order_details,id',
-            'cantidad'        => 'required|numeric|min:1',
-        ]);
+{
+    $request->validate([
+        'order_detail_id' => 'required|exists:order_details,id',
+        'cantidad_cajas'  => 'required|integer|min:1',
+    ]);
 
-        $order = $pallet->order;
+    $order = $pallet->order;
 
-        $cajasEnPallet = $pallet->detalles()->sum('cantidad');
+    $orderDetail = $order->details()
+        ->with(['palletDetails', 'product'])
+        ->findOrFail($request->order_detail_id);
 
-        $capacidadDisponible = $pallet->capacidad_cajas - $cajasEnPallet;
+    $producto = $orderDetail->product;
 
-        if ($request->cantidad > $capacidadDisponible) {
-            return back()->with(
-                'error',
-                "El pallet {$pallet->codigo} tiene capacidad para {$pallet->capacidad_cajas} cajas. " .
-                "Actualmente tiene {$cajasEnPallet} y solo quedan {$capacidadDisponible} disponibles."
-            );
-        }
+    /*
+     * =========================================================
+     * 1. DATOS DEL PRODUCTO
+     * =========================================================
+     */
 
-        $orderDetail = $order->details()
-            ->with('palletDetails')
-            ->findOrFail($request->order_detail_id);
+    $porCaja = (int) ($producto->cantidad_por_caja ?? 1);
 
-        /*
-         * ---------------------------------------------------------
-         * 1. Pendiente de este producto
-         * ---------------------------------------------------------
-         */
+    if ($porCaja < 1) {
+        $porCaja = 1;
+    }
 
-        $cantidadEnPallets = $orderDetail->palletDetails->sum('cantidad');
+    $cajasSolicitadas = (int) $request->cantidad_cajas;
 
-        $pendienteProducto =
-            $orderDetail->cantidad_solicitada - $cantidadEnPallets;
+    /*
+     * =========================================================
+     * 2. CONVERTIR CAJAS A UNIDADES
+     * =========================================================
+     */
 
-        if ($request->cantidad > $pendienteProducto) {
-            return back()->with(
-                'error',
-                'La cantidad supera el pendiente del producto.'
-            );
-        }
+    $unidadesSolicitadas = $cajasSolicitadas * $porCaja;
 
-        /*
-         * ---------------------------------------------------------
-         * 2. Validar objetivo global de cajas
-         * ---------------------------------------------------------
-         */
+    /*
+     * =========================================================
+     * 3. VALIDAR PENDIENTE DEL PRODUCTO
+     * =========================================================
+     */
 
-        if ($order->cajas_objetivo) {
+    $unidadesEnPallets = $orderDetail->palletDetails
+        ->sum('cantidad');
 
-            $totalAsignado = PalletDetail::whereHas('pallet', function ($query) use ($order) {
-                $query->where('order_id', $order->id);
-            })->sum('cantidad');
+    $unidadesPendientes =
+        $orderDetail->cantidad_solicitada - $unidadesEnPallets;
 
-            $nuevoTotal = $totalAsignado + $request->cantidad;
+    if ($unidadesSolicitadas > $unidadesPendientes) {
 
-            if ($nuevoTotal > $order->cajas_objetivo) {
-
-                $disponible = max(
-                    0,
-                    $order->cajas_objetivo - $totalAsignado
-                );
-
-                return back()->with(
-                    'error',
-                    "No puedes superar el objetivo de {$order->cajas_objetivo} cajas. " .
-                    "Actualmente hay {$totalAsignado} asignadas y solo quedan {$disponible} disponibles."
-                );
-            }
-        }
-
-        /*
-         * ---------------------------------------------------------
-         * 3. Crear detalle del pallet
-         * ---------------------------------------------------------
-         */
-
-        $producto = $orderDetail->product;
-
-        PalletDetail::create([
-            'pallet_id'       => $pallet->id,
-            'order_detail_id' => $orderDetail->id,
-            'product_id'      => $producto->id,
-            'cantidad'        => $request->cantidad,
-            'peso'            => ($producto->peso * $request->cantidad) / 1000,
-        ]);
+        $cajasDisponibles = intdiv(
+            max(0, (int) $unidadesPendientes),
+            $porCaja
+        );
 
         return back()->with(
-            'success',
-            'Producto agregado al pallet.'
+            'error',
+            "Solo puedes agregar {$cajasDisponibles} cajas de este producto."
         );
     }
+
+    /*
+     * =========================================================
+     * 4. VALIDAR CAPACIDAD DEL PALLET
+     * =========================================================
+     */
+
+    $capacidadPallet = (int) ($pallet->capacidad_cajas ?? 0);
+
+    if ($capacidadPallet < 1) {
+        $capacidadPallet = 1;
+    }
+
+    $cajasActuales = (int) $pallet->detalles()
+        ->sum('cantidad_cajas');
+
+    $nuevoTotalCajas = $cajasActuales + $cajasSolicitadas;
+
+    if ($nuevoTotalCajas > $capacidadPallet) {
+
+        $disponibles = max(
+            0,
+            $capacidadPallet - $cajasActuales
+        );
+
+        return back()->with(
+            'error',
+            "El pallet solo tiene espacio para {$disponibles} cajas."
+        );
+    }
+
+    /*
+     * =========================================================
+     * 5. VALIDAR OBJETIVO GLOBAL
+     * =========================================================
+     */
+
+    if ($order->cajas_objetivo) {
+
+        $totalAsignado = PalletDetail::whereHas(
+            'pallet',
+            function ($query) use ($order) {
+                $query->where('order_id', $order->id);
+            }
+        )->sum('cantidad_cajas');
+
+        $nuevoTotal = $totalAsignado + $cajasSolicitadas;
+
+        if ($nuevoTotal > $order->cajas_objetivo) {
+
+            $disponible = max(
+                0,
+                $order->cajas_objetivo - $totalAsignado
+            );
+
+            return back()->with(
+                'error',
+                "No puedes superar el objetivo de {$order->cajas_objetivo} cajas. " .
+                "Actualmente hay {$totalAsignado} asignadas y solo quedan {$disponible} disponibles."
+            );
+        }
+    }
+
+    /*
+     * =========================================================
+     * 6. GUARDAR
+     * =========================================================
+     */
+
+    PalletDetail::create([
+        'pallet_id'       => $pallet->id,
+        'order_detail_id' => $orderDetail->id,
+        'product_id'      => $producto->id,
+
+        // Unidades
+        'cantidad'        => $unidadesSolicitadas,
+
+        // Cajas
+        'cantidad_cajas'  => $cajasSolicitadas,
+
+        // Peso
+        'peso'            => ($producto->peso * $unidadesSolicitadas) / 1000,
+    ]);
+
+    return back()->with(
+        'success',
+        "{$cajasSolicitadas} cajas agregadas al pallet correctamente."
+    );
+}
+   
 }

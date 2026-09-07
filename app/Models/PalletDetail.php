@@ -6,12 +6,13 @@ use Illuminate\Database\Eloquent\Model;
 class PalletDetail extends Model
 {
     protected $fillable = [
-        'pallet_id',
-        'order_detail_id',
-        'product_id',
-        'cantidad',
-        'peso',
-    ];
+    'pallet_id',
+    'order_detail_id',
+    'product_id',
+    'cantidad',
+    'cantidad_cajas',
+    'peso',
+];
 
     public function product()
     {
