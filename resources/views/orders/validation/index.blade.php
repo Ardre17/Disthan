@@ -1,1338 +1,6 @@
 @extends('layouts.app')
 
 @section('content')
-
-<div class="validation-page">
-
-    {{-- =========================================================
-         ENCABEZADO
-    ========================================================== --}}
-    <div class="validation-header">
-
-        <div class="validation-title">
-
-            <div class="validation-title-icon">
-                <i class="bi bi-clipboard2-check"></i>
-            </div>
-
-            <div>
-                <h1>Validación de Pedidos</h1>
-
-                <p>
-                    Verifica los productos recibidos contra el pedido.
-                </p>
-            </div>
-
-        </div>
-
-        <div class="validation-status-badge">
-            <span class="status-dot"></span>
-            Módulo de validación
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         BUSCADOR
-    ========================================================== --}}
-    <div class="validation-search-card">
-
-        <div class="search-card-label">
-            <i class="bi bi-search"></i>
-
-            <div>
-                <strong>Buscar pedido</strong>
-
-                <span>
-                    Ingresa el número de factura o guía asociada.
-                </span>
-            </div>
-        </div>
-
-
-        <div class="search-row">
-
-            <div class="search-input-wrapper">
-
-                <i class="bi bi-upc-scan"></i>
-
-                <input
-                    type="text"
-                    id="codigoPedido"
-                    placeholder="Factura o guía..."
-                    autocomplete="off"
-                    autofocus
-                >
-
-            </div>
-
-
-            <button
-                type="button"
-                id="btnBuscarPedido"
-                class="btn-search"
-            >
-                <i class="bi bi-search"></i>
-                <span>BUSCAR PEDIDO</span>
-            </button>
-
-        </div>
-
-        <div class="search-help">
-            <i class="bi bi-info-circle"></i>
-            También puedes presionar <strong>Enter</strong> después de ingresar el código.
-        </div>
-
-    </div>
-    {{-- =========================================================
-     PEDIDOS PENDIENTES + HISTORIAL
-========================================================= --}}
-<div class="validation-orders-section">
-
-    {{-- =====================================================
-         PEDIDOS PENDIENTES
-    ====================================================== --}}
-    <div class="validation-list-card">
-
-        <div class="validation-list-header">
-
-            <div class="validation-list-title">
-
-                <div class="validation-list-icon pending">
-                    <i class="bi bi-hourglass-split"></i>
-                </div>
-
-                <div>
-                    <strong>Pedidos pendientes de validar</strong>
-                    <span>
-                        Pedidos que todavía no tienen ninguna validación registrada.
-                    </span>
-                </div>
-
-            </div>
-
-            <span class="validation-count">
-                {{ $pendientes->count() }}
-            </span>
-
-        </div>
-
-        @if($pendientes->count())
-
-            <div class="validation-table-wrapper">
-
-                <table class="validation-list-table">
-
-                    <thead>
-                        <tr>
-                            <th>Pedido</th>
-                            <th>Cliente</th>
-                            <th>Factura</th>
-                            <th>Guía</th>
-                            <th>Fecha</th>
-                            <th>Acción</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @foreach($pendientes as $pedido)
-
-                            <tr>
-
-                                <td>
-                                    <span class="validation-order-number">
-                                        {{ $pedido->numero_orden ?? '-' }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <span class="validation-client-name">
-                                        {{ $pedido->client->razon_social
-                                            ?? $pedido->client->nombre_comercial
-                                            ?? 'Sin cliente' }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    {{ $pedido->factura_asociada ?? '-' }}
-                                </td>
-
-                                <td>
-                                    {{ $pedido->guia_asociada ?? '-' }}
-                                </td>
-
-                                <td>
-                                    {{ $pedido->fecha_pedido
-                                        ? \Carbon\Carbon::parse($pedido->fecha_pedido)->format('d/m/Y')
-                                        : '-' }}
-                                </td>
-
-                                <td>
-
-                                    <button
-                                        type="button"
-                                        class="validation-row-button open"
-                                        onclick="abrirPedidoDesdeLista({{ $pedido->id }})"
-                                    >
-                                        <i class="bi bi-play-fill"></i>
-                                        VALIDAR
-                                    </button>
-
-                                </td>
-
-                            </tr>
-
-                        @endforeach
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-        @else
-
-            <div class="validation-empty">
-
-                <i class="bi bi-check-circle"></i>
-
-                <strong>No hay pedidos pendientes</strong>
-
-                <div>
-                    Todos los pedidos registrados ya tienen una validación.
-                </div>
-
-            </div>
-
-        @endif
-
-    </div>
-
-
-    {{-- =====================================================
-         HISTORIAL
-    ====================================================== --}}
-    <div class="validation-list-card">
-
-        <div class="validation-list-header">
-
-            <div class="validation-list-title">
-
-                <div class="validation-list-icon history">
-                    <i class="bi bi-clock-history"></i>
-                </div>
-
-                <div>
-                    <strong>Historial de validaciones</strong>
-                    <span>
-                        Registro de todas las validaciones realizadas.
-                    </span>
-                </div>
-
-            </div>
-
-            <div class="validation-history-header-right"><span class="validation-count">{{ $historial->total() }}</span></div>
-
-        </div>
-
-        @if($historial->total() > 0)
-
-    {{-- =====================================================
-         FILTROS DEL HISTORIAL
-    ====================================================== --}}
-    <form
-        method="GET"
-        action="{{ route('orders.validation.index') }}"
-        class="validation-history-filters"
-    >
-
-        <div class="validation-history-filter-group">
-
-            <label for="historialFechaDesde">
-                <i class="bi bi-calendar3"></i>
-                DESDE
-            </label>
-
-            <input
-                type="date"
-                id="historialFechaDesde"
-                name="fecha_desde"
-                value="{{ request('fecha_desde') }}"
-            >
-
-        </div>
-
-
-        <div class="validation-history-filter-group">
-
-            <label for="historialFechaHasta">
-                <i class="bi bi-calendar3"></i>
-                HASTA
-            </label>
-
-            <input
-                type="date"
-                id="historialFechaHasta"
-                name="fecha_hasta"
-                value="{{ request('fecha_hasta') }}"
-            >
-
-        </div>
-
-
-        <button
-            type="submit"
-            class="validation-history-filter-button"
-        >
-            <i class="bi bi-funnel"></i>
-            FILTRAR
-        </button>
-
-
-        @if(request('fecha_desde') || request('fecha_hasta'))
-
-            <a
-                href="{{ route('orders.validation.index') }}"
-                class="validation-history-clear-button"
-            >
-                <i class="bi bi-x-circle"></i>
-                LIMPIAR
-            </a>
-
-        @endif
-
-    </form>
-
-            <div class="validation-table-wrapper">
-
-                <table class="validation-list-table">
-
-                    <thead>
-                        <tr>
-                            <th>Pedido</th>
-                            <th>Cliente</th>
-                            <th>Estado</th>
-                            <th>Fecha validación</th>
-                            <th>Usuario</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
-
-                    <tbody>
-
-                        @foreach($historial as $validacion)
-
-                            @php
-                                $pedidoHistorial = $validacion->order;
-                                $estadoHistorial = $validacion->estado;
-                            @endphp
-
-                           <tr
-                                    class="historial-row"
-                                    data-fecha="{{ $validacion->fecha_validacion ? \Carbon\Carbon::parse($validacion->fecha_validacion)->format('Y-m-d') : '' }}"
-                                >
-
-                                <td>
-                                    <span class="validation-order-number">
-                                        {{ $pedidoHistorial->numero_orden ?? '-' }}
-                                    </span>
-                                </td>
-
-                                <td>
-                                    <span class="validation-client-name">
-                                        {{ $pedidoHistorial->client->razon_social
-                                            ?? $pedidoHistorial->client->nombre_comercial
-                                            ?? 'Sin cliente' }}
-                                    </span>
-                                </td>
-
-                                <td>
-
-                                    <span class="validation-status
-                                        {{ strtolower(str_replace('_', '-', $estadoHistorial)) }}"
-                                    >
-                                        {{ $estadoHistorial }}
-                                    </span>
-
-                                </td>
-
-                                <td>
-                                    {{ $validacion->fecha_validacion
-                                        ? \Carbon\Carbon::parse($validacion->fecha_validacion)->format('d/m/Y H:i')
-                                        : '-' }}
-                                </td>
-
-                                <td>
-                                    {{ $validacion->usuario->name ?? 'Sistema' }}
-                                </td>
-
-                                <td>
-
-                                    <div class="validation-row-actions">
-
-                                        <button
-                                            type="button"
-                                            class="validation-row-button history"
-                                            onclick="verHistorialPedido({{ $pedidoHistorial->id }})"
-                                        >
-                                            <i class="bi bi-clock-history"></i>
-                                            HISTORIAL
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            class="validation-row-button revalidate"
-                                            onclick="abrirPedidoDesdeLista({{ $pedidoHistorial->id }})"
-                                        >
-                                            <i class="bi bi-arrow-repeat"></i>
-                                            REVALIDAR
-                                        </button>
-
-                                    </div>
-
-                                </td>
-
-                            </tr>
-
-                        @endforeach
-
-                    </tbody>
-
-                </table>
-@if($historial->total() > 0)
-
-    <div class="historial-paginacion">
-
-        <div class="historial-info">
-            Mostrando
-            <strong>{{ $historial->firstItem() }}</strong>
-            -
-            <strong>{{ $historial->lastItem() }}</strong>
-            de
-            <strong>{{ $historial->total() }}</strong>
-            validaciones
-        </div>
-
-        @if($historial->hasPages())
-            <div class="pagination-buttons">
-
-                @if($historial->onFirstPage())
-                    <span class="pagina disabled">‹</span>
-                @else
-                    <a href="{{ $historial->previousPageUrl() }}" class="pagina">
-                        ‹
-                    </a>
-                @endif
-
-                @foreach($historial->getUrlRange(
-                    max(1, $historial->currentPage() - 2),
-                    min($historial->lastPage(), $historial->currentPage() + 2)
-                ) as $page => $url)
-
-                    @if($page == $historial->currentPage())
-                        <span class="pagina activa">{{ $page }}</span>
-                    @else
-                        <a href="{{ $url }}" class="pagina">
-                            {{ $page }}
-                        </a>
-                    @endif
-
-                @endforeach
-
-                @if($historial->hasMorePages())
-                    <a href="{{ $historial->nextPageUrl() }}" class="pagina">
-                        ›
-                    </a>
-                @else
-                    <span class="pagina disabled">›</span>
-                @endif
-
-            </div>
-        @endif
-
-    </div>
-
-@endif
-            </div>
-                </div>
-
-        @else
-
-            <div class="validation-empty">
-
-                <i class="bi bi-clock-history"></i>
-
-                <strong>Sin historial</strong>
-
-                <div>
-                    Todavía no se ha realizado ninguna validación.
-                </div>
-
-            </div>
-
-        @endif
-
-    </div>
-
-</div>
-
-
-{{-- =========================================================
-     MODAL HISTORIAL
-========================================================= --}}
-<div
-    id="validationHistoryModal"
-    class="validation-history-modal d-none"
->
-
-    <div class="validation-history-dialog">
-
-        <div class="validation-history-dialog-header">
-
-            <strong id="validationHistoryTitle">
-                Historial del pedido
-            </strong>
-
-            <button
-                type="button"
-                class="validation-history-close"
-                onclick="cerrarHistorialPedido()"
-            >
-                <i class="bi bi-x-lg"></i>
-            </button>
-
-        </div>
-
-        <div
-            id="validationHistoryBody"
-            class="validation-history-dialog-body"
-        >
-
-            <div class="validation-empty">
-                <i class="bi bi-arrow-repeat"></i>
-                Cargando historial...
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-    {{-- =========================================================
-         INFORMACIÓN DEL PEDIDO
-    ========================================================== --}}
-    <div
-        id="pedidoInfo"
-        class="order-info-card d-none"
-    >
-
-        <div class="order-info-main">
-
-            <div class="order-icon">
-                <i class="bi bi-box-seam"></i>
-            </div>
-
-            <div class="order-main-text">
-
-                <span class="order-label">
-                    PEDIDO
-                </span>
-
-                <strong id="pedidoNumero">
-                    -
-                </strong>
-
-            </div>
-
-        </div>
-
-
-        <div class="order-info-item">
-
-            <span>CLIENTE</span>
-
-            <strong id="pedidoCliente">
-                -
-            </strong>
-
-        </div>
-
-
-        <div class="order-info-item">
-
-            <span>FACTURA</span>
-
-            <strong id="pedidoFactura">
-                -
-            </strong>
-
-        </div>
-
-
-        <div class="order-info-item">
-
-            <span>GUÍA</span>
-
-            <strong id="pedidoGuia">
-                -
-            </strong>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         MODALIDADES
-    ========================================================== --}}
-    <div
-        id="modalidades"
-        class="modalities-section d-none"
-    >
-
-        <div class="section-heading">
-
-            <div>
-                <h2>¿Cómo deseas validar?</h2>
-
-                <p>
-                    Selecciona el método que utilizarás para verificar este pedido.
-                </p>
-            </div>
-
-        </div>
-
-
-        <div class="modalities-grid">
-
-
-            {{-- =================================================
-                 ITEM POR ITEM
-            ================================================== --}}
-            <div class="modality-card modality-blue">
-
-                <div class="modality-top">
-
-                    <div class="modality-icon">
-                        <i class="bi bi-list-check"></i>
-                    </div>
-
-                    <span class="modality-number">
-                        01
-                    </span>
-
-                </div>
-
-
-                <h3>
-                    ITEM POR ITEM
-                </h3>
-
-                <p>
-                    Revisa cada producto individualmente y define
-                    si fue recibido completo, parcialmente o no enviado.
-                </p>
-
-
-                <div class="modality-features">
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Un producto a la vez
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Avance automático
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Cantidad parcial
-                    </span>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="btnModoItem"
-                    class="modality-button"
-                >
-                    INICIAR VALIDACIÓN
-                    <i class="bi bi-arrow-right"></i>
-                </button>
-
-            </div>
-
-
-            {{-- =================================================
-                 ESCÁNER
-            ================================================== --}}
-            <div class="modality-card modality-green">
-
-                <div class="modality-top">
-
-                    <div class="modality-icon">
-                        <i class="bi bi-upc-scan"></i>
-                    </div>
-
-                    <span class="modality-number">
-                        02
-                    </span>
-
-                </div>
-
-
-                <h3>
-                    ESCÁNER
-                </h3>
-
-                <p>
-                    Escanea los productos mediante código de barras
-                    utilizando un lector físico o dispositivo compatible.
-                </p>
-
-
-                <div class="modality-features">
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Código de producto
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Código de caja
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Validación inmediata
-                    </span>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="btnModoScanner"
-                    class="modality-button"
-                >
-                    INICIAR ESCÁNER
-                    <i class="bi bi-arrow-right"></i>
-                </button>
-
-            </div>
-
-
-            {{-- =================================================
-                 PEDIDO COMPLETO
-            ================================================== --}}
-            <div class="modality-card modality-orange">
-
-                <div class="modality-top">
-
-                    <div class="modality-icon">
-                        <i class="bi bi-boxes"></i>
-                    </div>
-
-                    <span class="modality-number">
-                        03
-                    </span>
-
-                </div>
-
-
-                <h3>
-                    PEDIDO COMPLETO
-                </h3>
-
-                <p>
-                    Visualiza todos los productos del pedido
-                    y define su estado desde una sola pantalla.
-                </p>
-
-
-                <div class="modality-features">
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Todos los productos
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Estado individual
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Guardado completo
-                    </span>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="btnModoCompleto"
-                    class="modality-button"
-                >
-                    VALIDAR PEDIDO
-                    <i class="bi bi-arrow-right"></i>
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         PANEL ITEM POR ITEM
-    ========================================================== --}}
-    <div
-        id="panelItem"
-        class="validation-panel d-none"
-    >
-
-        <div class="panel-header panel-blue">
-
-            <div class="panel-header-left">
-
-                <div class="panel-icon">
-                    <i class="bi bi-list-check"></i>
-                </div>
-
-                <div>
-                    <span>VALIDACIÓN</span>
-                    <strong>ITEM POR ITEM</strong>
-                </div>
-
-            </div>
-
-
-            <div class="progress-counter">
-
-                <span id="contadorItem">
-                    0 / 0
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="panel-body">
-
-            <div class="item-progress">
-
-                <div class="progress-line">
-
-                    <div
-                        id="itemProgressBar"
-                        class="progress-line-fill progress-blue"
-                    ></div>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="itemActual"
-                class="item-validation-content"
-            >
-
-                <div class="product-main-icon">
-                    <i class="bi bi-box-seam"></i>
-                </div>
-
-
-                <div class="product-information">
-
-                    <span class="product-overline">
-                        PRODUCTO A VALIDAR
-                    </span>
-
-                    <h2 id="itemNombre">
-                        -
-                    </h2>
-
-                    <div
-                        id="itemMarca"
-                        class="product-brand"
-                    >
-                        -
-                    </div>
-
-                </div>
-
-
-                <div class="product-data-grid">
-
-                    <div class="product-data-box">
-
-                        <span>
-                            CANTIDAD DESPACHADO
-                        </span>
-
-                        <strong id="itemCantidadSolicitada">
-                            0
-                        </strong>
-
-                    </div>
-
-
-                    <div class="product-data-box">
-
-                        <span>
-                            CÓDIGO
-                        </span>
-
-                        <strong
-                            id="itemCodigo"
-                            class="product-code"
-                        >
-                            -
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                {{-- CANTIDAD PARCIAL --}}
-                <div
-                    id="itemCantidadParcial"
-                    class="partial-quantity-box d-none"
-                >
-
-                    <div>
-
-                        <span>
-                            VALIDACIÓN PARCIAL
-                        </span>
-
-                        <strong>
-                            ¿Cuánto recibiste?
-                        </strong>
-
-                    </div>
-
-                    <input
-                        type="number"
-                        id="cantidadItem"
-                        min="0"
-                        step="0.01"
-                        placeholder="0"
-                    >
-
-                </div>
-
-
-                <div class="validation-actions">
-
-                    <button
-                        type="button"
-                        id="btnItemIncompleto"
-                        class="validation-action action-danger"
-                    >
-                        <i class="bi bi-x-circle"></i>
-
-                        <span>
-                            <strong>NO ENVIADO</strong>
-                            <small>No se recibió</small>
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        id="btnItemParcial"
-                        class="validation-action action-warning"
-                    >
-                        <i class="bi bi-dash-circle"></i>
-
-                        <span>
-                            <strong>PARCIAL</strong>
-                            <small>Recibido parcialmente</small>
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        id="btnItemCompleto"
-                        class="validation-action action-success"
-                    >
-                        <i class="bi bi-check-circle"></i>
-
-                        <span>
-                            <strong>COMPLETO</strong>
-                            <small>Recibido completo</small>
-                        </span>
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         PANEL ESCÁNER
-    ========================================================== --}}
-    <div
-        id="panelScanner"
-        class="validation-panel d-none"
-    >
-
-        <div class="panel-header panel-green">
-
-            <div class="panel-header-left">
-
-                <div class="panel-icon">
-                    <i class="bi bi-upc-scan"></i>
-                </div>
-
-                <div>
-                    <span>VALIDACIÓN</span>
-                    <strong>ESCÁNER</strong>
-                </div>
-
-            </div>
-
-
-            <div class="progress-counter">
-
-                <span id="contadorScanner">
-                    0 / 0
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="panel-body scanner-body">
-
-            <div class="scanner-instruction">
-
-                <div class="scanner-large-icon">
-                    <i class="bi bi-upc-scan"></i>
-                </div>
-
-                <h2>
-                    Escanea el producto
-                </h2>
-
-                <p>
-                    Utiliza el lector de códigos o escribe el código manualmente.
-                </p>
-
-            </div>
-
-
-            <div class="scanner-input-wrapper">
-
-                <i class="bi bi-upc"></i>
-
-                <input
-                    type="text"
-                    id="codigoScanner"
-                    placeholder="Esperando código..."
-                    autocomplete="off"
-                >
-
-            </div>
-
-
-            <div class="scanner-help">
-
-                <span>
-                    <i class="bi bi-check-circle"></i>
-                    Código de producto
-                </span>
-
-                <span>
-                    <i class="bi bi-box-seam"></i>
-                    Código de caja
-                </span>
-
-            </div>
-
-
-            {{-- PRODUCTO ENCONTRADO --}}
-            <div
-                id="scannerProducto"
-                class="scanner-product-card d-none"
-            >
-
-                <div class="scanner-product-icon">
-                    <i class="bi bi-box-seam"></i>
-                </div>
-
-
-                <div class="scanner-product-info">
-
-                    <span>
-                        PRODUCTO ENCONTRADO
-                    </span>
-
-                    <h2 id="scannerNombre">
-                        -
-                    </h2>
-
-                    <p id="scannerMarca">
-                        -
-                    </p>
-
-                </div>
-
-
-                <div class="scanner-product-data">
-
-                    <div>
-                        <span>DESPACHADO</span>
-
-                        <strong id="scannerSolicitado">
-                            0
-                        </strong>
-                    </div>
-
-                    <div>
-                        <span>CÓDIGO</span>
-
-                        <strong id="scannerCodigo">
-                            -
-                        </strong>
-                    </div>
-
-                </div>
-
-
-                {{-- CANTIDAD PARCIAL --}}
-                <div
-                    id="scannerCantidadParcial"
-                    class="partial-quantity-box d-none"
-                >
-
-                    <div>
-
-                        <span>
-                            VALIDACIÓN PARCIAL
-                        </span>
-
-                        <strong>
-                            ¿Cuánto recibiste?
-                        </strong>
-
-                    </div>
-
-                    <input
-                        type="number"
-                        id="cantidadScanner"
-                        min="0"
-                        step="0.01"
-                        placeholder="0"
-                    >
-
-                </div>
-
-
-                <div class="validation-actions">
-
-                    <button
-                        type="button"
-                        id="btnScannerIncompleto"
-                        class="validation-action action-danger"
-                    >
-                        <i class="bi bi-x-circle"></i>
-
-                        <span>
-                            <strong>NO ENVIADO</strong>
-                            <small>No se recibió</small>
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        id="btnScannerParcial"
-                        class="validation-action action-warning"
-                    >
-                        <i class="bi bi-dash-circle"></i>
-
-                        <span>
-                            <strong>PARCIAL</strong>
-                            <small>Recibido parcialmente</small>
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        id="btnScannerCompleto"
-                        class="validation-action action-success"
-                    >
-                        <i class="bi bi-check-circle"></i>
-
-                        <span>
-                            <strong>COMPLETO</strong>
-                            <small>Recibido completo</small>
-                        </span>
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         PANEL PEDIDO COMPLETO
-    ========================================================== --}}
-    <div
-        id="panelCompleto"
-        class="validation-panel d-none"
-    >
-
-        <div class="panel-header panel-orange">
-
-            <div class="panel-header-left">
-
-                <div class="panel-icon">
-                    <i class="bi bi-boxes"></i>
-                </div>
-
-                <div>
-                    <span>VALIDACIÓN</span>
-                    <strong>PEDIDO COMPLETO</strong>
-                </div>
-
-            </div>
-
-
-            <div class="progress-counter">
-
-                <span id="contadorCompleto">
-                    0 / 0
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="panel-body">
-
-            <div class="table-wrapper">
-
-                <table class="validation-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                PRODUCTO
-                            </th>
-
-                            <th>
-                                CÓDIGO
-                            </th>
-
-                            <th class="text-center">
-                                DESPACHADO
-                            </th>
-
-                            <th class="text-center">
-                                VALIDADO
-                            </th>
-
-                            <th class="text-center">
-                                ESTADO
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="tablaValidacion">
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-
-            <div class="complete-footer">
-
-                <div class="observation-box">
-
-                    <label for="observacionesValidacion">
-                        <i class="bi bi-chat-left-text"></i>
-                        OBSERVACIONES
-                    </label>
-
-                    <textarea
-                        id="observacionesValidacion"
-                        rows="3"
-                        placeholder="Agrega una observación si es necesario..."
-                    ></textarea>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="btnGuardarValidacion"
-                    class="save-validation-button"
-                >
-                    <i class="bi bi-check-circle"></i>
-
-                    <span>
-                        GUARDAR VALIDACIÓN
-                    </span>
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         ALERTA
-    ========================================================== --}}
-    <div
-        id="alertaValidacion"
-        class="validation-alert d-none"
-    ></div>
-
-</div>
-
-
 {{-- =============================================================
      ESTILOS
 ============================================================= --}}
@@ -3128,8 +1796,1455 @@
     }
 
 }
-</style>
+/* =========================================================
+   PAGINADOR - HISTORIAL DE VALIDACIONES
+   ========================================================= */
 
+.historial-paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    padding: 18px 20px;
+    margin-top: 10px;
+    border-top: 1px solid #e5e7eb;
+    background: #fafafa;
+}
+
+.historial-paginacion-info {
+    color: #6b7280;
+    font-size: 13px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.historial-paginacion-nav {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.historial-paginacion-nav a,
+.historial-paginacion-nav span {
+    min-width: 36px;
+    height: 36px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 10px;
+
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+
+    background: #ffffff;
+
+    color: #374151;
+
+    font-size: 13px;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        transform 0.2s ease;
+}
+
+.historial-paginacion-nav a:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+    color: #111827;
+    transform: translateY(-1px);
+}
+
+.historial-paginacion-nav .active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+    cursor: default;
+}
+
+.historial-paginacion-nav .disabled {
+    background: #f9fafb;
+    border-color: #f0f0f0;
+    color: #c4c7cc;
+    cursor: not-allowed;
+}
+
+.historial-paginacion-nav .dots {
+    min-width: auto;
+    padding: 0 5px;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+}
+
+/* Iconos de anterior / siguiente */
+.historial-paginacion-nav .pagina-anterior,
+.historial-paginacion-nav .pagina-siguiente {
+    font-size: 15px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+
+    .historial-paginacion {
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+    }
+
+    .historial-paginacion-info {
+        white-space: normal;
+        text-align: center;
+    }
+
+    .historial-paginacion-nav {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .historial-paginacion-nav a,
+    .historial-paginacion-nav span {
+        min-width: 34px;
+        height: 34px;
+    }
+}
+</style>
+<div class="validation-page">
+
+    {{-- =========================================================
+         ENCABEZADO
+    ========================================================== --}}
+    <div class="validation-header">
+
+        <div class="validation-title">
+
+            <div class="validation-title-icon">
+                <i class="bi bi-clipboard2-check"></i>
+            </div>
+
+            <div>
+                <h1>Validación de Pedidos</h1>
+
+                <p>
+                    Verifica los productos recibidos contra el pedido.
+                </p>
+            </div>
+
+        </div>
+
+        <div class="validation-status-badge">
+            <span class="status-dot"></span>
+            Módulo de validación
+        </div>
+
+    </div>
+
+
+    {{-- =========================================================
+         BUSCADOR
+    ========================================================== --}}
+    <div class="validation-search-card">
+
+        <div class="search-card-label">
+            <i class="bi bi-search"></i>
+
+            <div>
+                <strong>Buscar pedido</strong>
+
+                <span>
+                    Ingresa el número de factura o guía asociada.
+                </span>
+            </div>
+        </div>
+
+
+        <div class="search-row">
+
+            <div class="search-input-wrapper">
+
+                <i class="bi bi-upc-scan"></i>
+
+                <input
+                    type="text"
+                    id="codigoPedido"
+                    placeholder="Factura o guía..."
+                    autocomplete="off"
+                    autofocus
+                >
+
+            </div>
+
+
+            <button
+                type="button"
+                id="btnBuscarPedido"
+                class="btn-search"
+            >
+                <i class="bi bi-search"></i>
+                <span>BUSCAR PEDIDO</span>
+            </button>
+
+        </div>
+
+        <div class="search-help">
+            <i class="bi bi-info-circle"></i>
+            También puedes presionar <strong>Enter</strong> después de ingresar el código.
+        </div>
+
+    </div>
+    {{-- =========================================================
+     PEDIDOS PENDIENTES + HISTORIAL
+========================================================= --}}
+<div class="validation-orders-section">
+
+    {{-- =====================================================
+         PEDIDOS PENDIENTES
+    ====================================================== --}}
+    <div class="validation-list-card">
+
+        <div class="validation-list-header">
+
+            <div class="validation-list-title">
+
+                <div class="validation-list-icon pending">
+                    <i class="bi bi-hourglass-split"></i>
+                </div>
+
+                <div>
+                    <strong>Pedidos pendientes de validar</strong>
+                    <span>
+                        Pedidos que todavía no tienen ninguna validación registrada.
+                    </span>
+                </div>
+
+            </div>
+
+            <span class="validation-count">
+                {{ $pendientes->count() }}
+            </span>
+
+        </div>
+
+        @if($pendientes->count())
+
+            <div class="validation-table-wrapper">
+
+                <table class="validation-list-table">
+
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Factura</th>
+                            <th>Guía</th>
+                            <th>Fecha</th>
+                            <th>Acción</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach($pendientes as $pedido)
+
+                            <tr>
+
+                                <td>
+                                    <span class="validation-order-number">
+                                        {{ $pedido->numero_orden ?? '-' }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="validation-client-name">
+                                        {{ $pedido->client->razon_social
+                                            ?? $pedido->client->nombre_comercial
+                                            ?? 'Sin cliente' }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    {{ $pedido->factura_asociada ?? '-' }}
+                                </td>
+
+                                <td>
+                                    {{ $pedido->guia_asociada ?? '-' }}
+                                </td>
+
+                                <td>
+                                    {{ $pedido->fecha_pedido
+                                        ? \Carbon\Carbon::parse($pedido->fecha_pedido)->format('d/m/Y')
+                                        : '-' }}
+                                </td>
+
+                                <td>
+
+                                    <button
+                                        type="button"
+                                        class="validation-row-button open"
+                                        onclick="abrirPedidoDesdeLista({{ $pedido->id }})"
+                                    >
+                                        <i class="bi bi-play-fill"></i>
+                                        VALIDAR
+                                    </button>
+
+                                </td>
+
+                            </tr>
+
+                        @endforeach
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        @else
+
+            <div class="validation-empty">
+
+                <i class="bi bi-check-circle"></i>
+
+                <strong>No hay pedidos pendientes</strong>
+
+                <div>
+                    Todos los pedidos registrados ya tienen una validación.
+                </div>
+
+            </div>
+
+        @endif
+
+    </div>
+
+
+    {{-- =====================================================
+         HISTORIAL
+    ====================================================== --}}
+    <div class="validation-list-card">
+
+        <div class="validation-list-header">
+
+            <div class="validation-list-title">
+
+                <div class="validation-list-icon history">
+                    <i class="bi bi-clock-history"></i>
+                </div>
+
+                <div>
+                    <strong>Historial de validaciones</strong>
+                    <span>
+                        Registro de todas las validaciones realizadas.
+                    </span>
+                </div>
+
+            </div>
+
+            <div class="validation-history-header-right"><span class="validation-count">{{ $historial->total() }}</span></div>
+
+        </div>
+
+        @if($historial->total() > 0)
+
+    {{-- =====================================================
+         FILTROS DEL HISTORIAL
+    ====================================================== --}}
+    <form
+        method="GET"
+        action="{{ route('orders.validation.index') }}"
+        class="validation-history-filters"
+    >
+
+        <div class="validation-history-filter-group">
+
+            <label for="historialFechaDesde">
+                <i class="bi bi-calendar3"></i>
+                DESDE
+            </label>
+
+            <input
+                type="date"
+                id="historialFechaDesde"
+                name="fecha_desde"
+                value="{{ request('fecha_desde') }}"
+            >
+
+        </div>
+
+
+        <div class="validation-history-filter-group">
+
+            <label for="historialFechaHasta">
+                <i class="bi bi-calendar3"></i>
+                HASTA
+            </label>
+
+            <input
+                type="date"
+                id="historialFechaHasta"
+                name="fecha_hasta"
+                value="{{ request('fecha_hasta') }}"
+            >
+
+        </div>
+
+
+        <button
+            type="submit"
+            class="validation-history-filter-button"
+        >
+            <i class="bi bi-funnel"></i>
+            FILTRAR
+        </button>
+
+
+        @if(request('fecha_desde') || request('fecha_hasta'))
+
+            <a
+                href="{{ route('orders.validation.index') }}"
+                class="validation-history-clear-button"
+            >
+                <i class="bi bi-x-circle"></i>
+                LIMPIAR
+            </a>
+
+        @endif
+
+    </form>
+
+            <div class="validation-table-wrapper">
+
+                <table class="validation-list-table">
+
+                    <thead>
+                        <tr>
+                            <th>Pedido</th>
+                            <th>Cliente</th>
+                            <th>Estado</th>
+                            <th>Fecha validación</th>
+                            <th>Usuario</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach($historial as $validacion)
+
+                            @php
+                                $pedidoHistorial = $validacion->order;
+                                $estadoHistorial = $validacion->estado;
+                            @endphp
+
+                           <tr
+                                    class="historial-row"
+                                    data-fecha="{{ $validacion->fecha_validacion ? \Carbon\Carbon::parse($validacion->fecha_validacion)->format('Y-m-d') : '' }}"
+                                >
+
+                                <td>
+                                    <span class="validation-order-number">
+                                        {{ $pedidoHistorial->numero_orden ?? '-' }}
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="validation-client-name">
+                                        {{ $pedidoHistorial->client->razon_social
+                                            ?? $pedidoHistorial->client->nombre_comercial
+                                            ?? 'Sin cliente' }}
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    <span class="validation-status
+                                        {{ strtolower(str_replace('_', '-', $estadoHistorial)) }}"
+                                    >
+                                        {{ $estadoHistorial }}
+                                    </span>
+
+                                </td>
+
+                                <td>
+                                    {{ $validacion->fecha_validacion
+                                        ? \Carbon\Carbon::parse($validacion->fecha_validacion)->format('d/m/Y H:i')
+                                        : '-' }}
+                                </td>
+
+                                <td>
+                                    {{ $validacion->usuario->name ?? 'Sistema' }}
+                                </td>
+
+                                <td>
+
+                                    <div class="validation-row-actions">
+
+                                        <button
+                                            type="button"
+                                            class="validation-row-button history"
+                                            onclick="verHistorialPedido({{ $pedidoHistorial->id }})"
+                                        >
+                                            <i class="bi bi-clock-history"></i>
+                                            HISTORIAL
+                                        </button>
+
+                                        <button
+                                            type="button"
+                                            class="validation-row-button revalidate"
+                                            onclick="abrirPedidoDesdeLista({{ $pedidoHistorial->id }})"
+                                        >
+                                            <i class="bi bi-arrow-repeat"></i>
+                                            REVALIDAR
+                                        </button>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+
+                        @endforeach
+
+                    </tbody>
+
+                </table>
+@if($historial->total() > 0)
+
+    <div class="historial-paginacion">
+
+        <div class="historial-info">
+            Mostrando
+            <strong>{{ $historial->firstItem() }}</strong>
+            -
+            <strong>{{ $historial->lastItem() }}</strong>
+            de
+            <strong>{{ $historial->total() }}</strong>
+            validaciones
+        </div>
+
+        @if($historial->hasPages())
+            <div class="pagination-buttons">
+
+                @if($historial->onFirstPage())
+                    <span class="pagina disabled">‹</span>
+                @else
+                    <a href="{{ $historial->previousPageUrl() }}" class="pagina">
+                        ‹
+                    </a>
+                @endif
+
+                @foreach($historial->getUrlRange(
+                    max(1, $historial->currentPage() - 2),
+                    min($historial->lastPage(), $historial->currentPage() + 2)
+                ) as $page => $url)
+
+                    @if($page == $historial->currentPage())
+                        <span class="pagina activa">{{ $page }}</span>
+                    @else
+                        <a href="{{ $url }}" class="pagina">
+                            {{ $page }}
+                        </a>
+                    @endif
+
+                @endforeach
+
+                @if($historial->hasMorePages())
+                    <a href="{{ $historial->nextPageUrl() }}" class="pagina">
+                        ›
+                    </a>
+                @else
+                    <span class="pagina disabled">›</span>
+                @endif
+
+            </div>
+        @endif
+
+    </div>
+
+@endif
+            </div>
+                </div>
+
+        @else
+
+            <div class="validation-empty">
+
+                <i class="bi bi-clock-history"></i>
+
+                <strong>Sin historial</strong>
+
+                <div>
+                    Todavía no se ha realizado ninguna validación.
+                </div>
+
+            </div>
+
+        @endif
+
+    </div>
+
+</div>
+
+
+{{-- =========================================================
+     MODAL HISTORIAL
+========================================================= --}}
+<div
+    id="validationHistoryModal"
+    class="validation-history-modal d-none"
+>
+
+    <div class="validation-history-dialog">
+
+        <div class="validation-history-dialog-header">
+
+            <strong id="validationHistoryTitle">
+                Historial del pedido
+            </strong>
+
+            <button
+                type="button"
+                class="validation-history-close"
+                onclick="cerrarHistorialPedido()"
+            >
+                <i class="bi bi-x-lg"></i>
+            </button>
+
+        </div>
+
+        <div
+            id="validationHistoryBody"
+            class="validation-history-dialog-body"
+        >
+
+            <div class="validation-empty">
+                <i class="bi bi-arrow-repeat"></i>
+                Cargando historial...
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+    {{-- =========================================================
+         INFORMACIÓN DEL PEDIDO
+    ========================================================== --}}
+    <div
+        id="pedidoInfo"
+        class="order-info-card d-none"
+    >
+
+        <div class="order-info-main">
+
+            <div class="order-icon">
+                <i class="bi bi-box-seam"></i>
+            </div>
+
+            <div class="order-main-text">
+
+                <span class="order-label">
+                    PEDIDO
+                </span>
+
+                <strong id="pedidoNumero">
+                    -
+                </strong>
+
+            </div>
+
+        </div>
+
+
+        <div class="order-info-item">
+
+            <span>CLIENTE</span>
+
+            <strong id="pedidoCliente">
+                -
+            </strong>
+
+        </div>
+
+
+        <div class="order-info-item">
+
+            <span>FACTURA</span>
+
+            <strong id="pedidoFactura">
+                -
+            </strong>
+
+        </div>
+
+
+        <div class="order-info-item">
+
+            <span>GUÍA</span>
+
+            <strong id="pedidoGuia">
+                -
+            </strong>
+
+        </div>
+
+    </div>
+
+
+    {{-- =========================================================
+         MODALIDADES
+    ========================================================== --}}
+    <div
+        id="modalidades"
+        class="modalities-section d-none"
+    >
+
+        <div class="section-heading">
+
+            <div>
+                <h2>¿Cómo deseas validar?</h2>
+
+                <p>
+                    Selecciona el método que utilizarás para verificar este pedido.
+                </p>
+            </div>
+
+        </div>
+
+
+        <div class="modalities-grid">
+
+
+            {{-- =================================================
+                 ITEM POR ITEM
+            ================================================== --}}
+            <div class="modality-card modality-blue">
+
+                <div class="modality-top">
+
+                    <div class="modality-icon">
+                        <i class="bi bi-list-check"></i>
+                    </div>
+
+                    <span class="modality-number">
+                        01
+                    </span>
+
+                </div>
+
+
+                <h3>
+                    ITEM POR ITEM
+                </h3>
+
+                <p>
+                    Revisa cada producto individualmente y define
+                    si fue recibido completo, parcialmente o no enviado.
+                </p>
+
+
+                <div class="modality-features">
+
+                    <span>
+                        <i class="bi bi-check2"></i>
+                        Un producto a la vez
+                    </span>
+
+                    <span>
+                        <i class="bi bi-check2"></i>
+                        Avance automático
+                    </span>
+
+                    <span>
+                        <i class="bi bi-check2"></i>
+                        Cantidad parcial
+                    </span>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="btnModoItem"
+                    class="modality-button"
+                >
+                    INICIAR VALIDACIÓN
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+
+            </div>
+
+
+            {{-- =================================================
+                 ESCÁNER
+            ================================================== --}}
+            <div class="modality-card modality-green">
+
+                <div class="modality-top">
+
+                    <div class="modality-icon">
+                        <i class="bi bi-upc-scan"></i>
+                    </div>
+
+                    <span class="modality-number">
+                        02
+                    </span>
+
+                </div>
+
+
+                <h3>
+                    ESCÁNER
+                </h3>
+
+                <p>
+                    Escanea los productos mediante código de barras
+                    utilizando un lector físico o dispositivo compatible.
+                </p>
+
+
+                <div class="modality-features">
+
+                    <span>
+                        <i class="bi bi-check2"></i>
+                        Código de producto
+                    </span>
+
+                    <span>
+                        <i class="bi bi-check2"></i>
+                        Código de caja
+                    </span>
+
+                    <span>
+                        <i class="bi bi-check2"></i>
+                        Validación inmediata
+                    </span>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="btnModoScanner"
+                    class="modality-button"
+                >
+                    INICIAR ESCÁNER
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+
+            </div>
+
+
+            {{-- =================================================
+                 PEDIDO COMPLETO
+            ================================================== --}}
+            <div class="modality-card modality-orange">
+
+                <div class="modality-top">
+
+                    <div class="modality-icon">
+                        <i class="bi bi-boxes"></i>
+                    </div>
+
+                    <span class="modality-number">
+                        03
+                    </span>
+
+                </div>
+
+
+                <h3>
+                    PEDIDO COMPLETO
+                </h3>
+
+                <p>
+                    Visualiza todos los productos del pedido
+                    y define su estado desde una sola pantalla.
+                </p>
+
+
+                <div class="modality-features">
+
+                    <span>
+                        <i class="bi bi-check2"></i>
+                        Todos los productos
+                    </span>
+
+                    <span>
+                        <i class="bi bi-check2"></i>
+                        Estado individual
+                    </span>
+
+                    <span>
+                        <i class="bi bi-check2"></i>
+                        Guardado completo
+                    </span>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="btnModoCompleto"
+                    class="modality-button"
+                >
+                    VALIDAR PEDIDO
+                    <i class="bi bi-arrow-right"></i>
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- =========================================================
+         PANEL ITEM POR ITEM
+    ========================================================== --}}
+    <div
+        id="panelItem"
+        class="validation-panel d-none"
+    >
+
+        <div class="panel-header panel-blue">
+
+            <div class="panel-header-left">
+
+                <div class="panel-icon">
+                    <i class="bi bi-list-check"></i>
+                </div>
+
+                <div>
+                    <span>VALIDACIÓN</span>
+                    <strong>ITEM POR ITEM</strong>
+                </div>
+
+            </div>
+
+
+            <div class="progress-counter">
+
+                <span id="contadorItem">
+                    0 / 0
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel-body">
+
+            <div class="item-progress">
+
+                <div class="progress-line">
+
+                    <div
+                        id="itemProgressBar"
+                        class="progress-line-fill progress-blue"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="itemActual"
+                class="item-validation-content"
+            >
+
+                <div class="product-main-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+
+                <div class="product-information">
+
+                    <span class="product-overline">
+                        PRODUCTO A VALIDAR
+                    </span>
+
+                    <h2 id="itemNombre">
+                        -
+                    </h2>
+
+                    <div
+                        id="itemMarca"
+                        class="product-brand"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="product-data-grid">
+
+                    <div class="product-data-box">
+
+                        <span>
+                            CANTIDAD DESPACHADO
+                        </span>
+
+                        <strong id="itemCantidadSolicitada">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="product-data-box">
+
+                        <span>
+                            CÓDIGO
+                        </span>
+
+                        <strong
+                            id="itemCodigo"
+                            class="product-code"
+                        >
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                {{-- CANTIDAD PARCIAL --}}
+                <div
+                    id="itemCantidadParcial"
+                    class="partial-quantity-box d-none"
+                >
+
+                    <div>
+
+                        <span>
+                            VALIDACIÓN PARCIAL
+                        </span>
+
+                        <strong>
+                            ¿Cuánto recibiste?
+                        </strong>
+
+                    </div>
+
+                    <input
+                        type="number"
+                        id="cantidadItem"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                    >
+
+                </div>
+
+
+                <div class="validation-actions">
+
+                    <button
+                        type="button"
+                        id="btnItemIncompleto"
+                        class="validation-action action-danger"
+                    >
+                        <i class="bi bi-x-circle"></i>
+
+                        <span>
+                            <strong>NO ENVIADO</strong>
+                            <small>No se recibió</small>
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btnItemParcial"
+                        class="validation-action action-warning"
+                    >
+                        <i class="bi bi-dash-circle"></i>
+
+                        <span>
+                            <strong>PARCIAL</strong>
+                            <small>Recibido parcialmente</small>
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btnItemCompleto"
+                        class="validation-action action-success"
+                    >
+                        <i class="bi bi-check-circle"></i>
+
+                        <span>
+                            <strong>COMPLETO</strong>
+                            <small>Recibido completo</small>
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- =========================================================
+         PANEL ESCÁNER
+    ========================================================== --}}
+    <div
+        id="panelScanner"
+        class="validation-panel d-none"
+    >
+
+        <div class="panel-header panel-green">
+
+            <div class="panel-header-left">
+
+                <div class="panel-icon">
+                    <i class="bi bi-upc-scan"></i>
+                </div>
+
+                <div>
+                    <span>VALIDACIÓN</span>
+                    <strong>ESCÁNER</strong>
+                </div>
+
+            </div>
+
+
+            <div class="progress-counter">
+
+                <span id="contadorScanner">
+                    0 / 0
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel-body scanner-body">
+
+            <div class="scanner-instruction">
+
+                <div class="scanner-large-icon">
+                    <i class="bi bi-upc-scan"></i>
+                </div>
+
+                <h2>
+                    Escanea el producto
+                </h2>
+
+                <p>
+                    Utiliza el lector de códigos o escribe el código manualmente.
+                </p>
+
+            </div>
+
+
+            <div class="scanner-input-wrapper">
+
+                <i class="bi bi-upc"></i>
+
+                <input
+                    type="text"
+                    id="codigoScanner"
+                    placeholder="Esperando código..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="scanner-help">
+
+                <span>
+                    <i class="bi bi-check-circle"></i>
+                    Código de producto
+                </span>
+
+                <span>
+                    <i class="bi bi-box-seam"></i>
+                    Código de caja
+                </span>
+
+            </div>
+
+
+            {{-- PRODUCTO ENCONTRADO --}}
+            <div
+                id="scannerProducto"
+                class="scanner-product-card d-none"
+            >
+
+                <div class="scanner-product-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+
+                <div class="scanner-product-info">
+
+                    <span>
+                        PRODUCTO ENCONTRADO
+                    </span>
+
+                    <h2 id="scannerNombre">
+                        -
+                    </h2>
+
+                    <p id="scannerMarca">
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="scanner-product-data">
+
+                    <div>
+                        <span>DESPACHADO</span>
+
+                        <strong id="scannerSolicitado">
+                            0
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>CÓDIGO</span>
+
+                        <strong id="scannerCodigo">
+                            -
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                {{-- CANTIDAD PARCIAL --}}
+                <div
+                    id="scannerCantidadParcial"
+                    class="partial-quantity-box d-none"
+                >
+
+                    <div>
+
+                        <span>
+                            VALIDACIÓN PARCIAL
+                        </span>
+
+                        <strong>
+                            ¿Cuánto recibiste?
+                        </strong>
+
+                    </div>
+
+                    <input
+                        type="number"
+                        id="cantidadScanner"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                    >
+
+                </div>
+
+
+                <div class="validation-actions">
+
+                    <button
+                        type="button"
+                        id="btnScannerIncompleto"
+                        class="validation-action action-danger"
+                    >
+                        <i class="bi bi-x-circle"></i>
+
+                        <span>
+                            <strong>NO ENVIADO</strong>
+                            <small>No se recibió</small>
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btnScannerParcial"
+                        class="validation-action action-warning"
+                    >
+                        <i class="bi bi-dash-circle"></i>
+
+                        <span>
+                            <strong>PARCIAL</strong>
+                            <small>Recibido parcialmente</small>
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btnScannerCompleto"
+                        class="validation-action action-success"
+                    >
+                        <i class="bi bi-check-circle"></i>
+
+                        <span>
+                            <strong>COMPLETO</strong>
+                            <small>Recibido completo</small>
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- =========================================================
+         PANEL PEDIDO COMPLETO
+    ========================================================== --}}
+    <div
+        id="panelCompleto"
+        class="validation-panel d-none"
+    >
+
+        <div class="panel-header panel-orange">
+
+            <div class="panel-header-left">
+
+                <div class="panel-icon">
+                    <i class="bi bi-boxes"></i>
+                </div>
+
+                <div>
+                    <span>VALIDACIÓN</span>
+                    <strong>PEDIDO COMPLETO</strong>
+                </div>
+
+            </div>
+
+
+            <div class="progress-counter">
+
+                <span id="contadorCompleto">
+                    0 / 0
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel-body">
+
+            <div class="table-wrapper">
+
+                <table class="validation-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                PRODUCTO
+                            </th>
+
+                            <th>
+                                CÓDIGO
+                            </th>
+
+                            <th class="text-center">
+                                DESPACHADO
+                            </th>
+
+                            <th class="text-center">
+                                VALIDADO
+                            </th>
+
+                            <th class="text-center">
+                                ESTADO
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="tablaValidacion">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="complete-footer">
+
+                <div class="observation-box">
+
+                    <label for="observacionesValidacion">
+                        <i class="bi bi-chat-left-text"></i>
+                        OBSERVACIONES
+                    </label>
+
+                    <textarea
+                        id="observacionesValidacion"
+                        rows="3"
+                        placeholder="Agrega una observación si es necesario..."
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="btnGuardarValidacion"
+                    class="save-validation-button"
+                >
+                    <i class="bi bi-check-circle"></i>
+
+                    <span>
+                        GUARDAR VALIDACIÓN
+                    </span>
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- =========================================================
+         ALERTA
+    ========================================================== --}}
+    <div
+        id="alertaValidacion"
+        class="validation-alert d-none"
+    ></div>
+
+</div>
 
 {{-- =============================================================
      JAVASCRIPT

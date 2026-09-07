@@ -277,8 +277,6 @@
                         <div class="info-row"><span>Proveedor</span><span class="info-val">{{ $raw_material->supplier ?? '—' }}</span></div>
                         <div class="info-row"><span>Color</span><span class="info-val">{{ $raw_material->color ?? '—' }}</span></div>
                         <div class="info-row"><span>Stock mínimo</span><span class="info-val">{{ $raw_material->minimum_stock }}</span></div>
-                        <div class="form-group">
-
                     </div>
                 </div>
 
