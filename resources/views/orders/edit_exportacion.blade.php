@@ -554,6 +554,125 @@
     <div class="sec-body">
         @if($order->pallets->count())
 
+    {{-- =====================================================
+         MINI MAPA DE PALLETS
+    ====================================================== --}}
+    <div
+        style="
+            position:sticky;
+            top:10px;
+            z-index:20;
+            background:#ffffff;
+            border:1px solid var(--erp-border);
+            border-radius:8px;
+            padding:10px;
+            margin-bottom:12px;
+            box-shadow:0 2px 8px rgba(15,23,42,.08);
+        "
+    >
+
+        <div
+            style="
+                font-size:10px;
+                font-weight:800;
+                color:var(--erp-ink);
+                text-transform:uppercase;
+                margin-bottom:8px;
+                letter-spacing:.04em;
+            "
+        >
+            🗺️ Pallets de la orden
+        </div>
+
+        <div
+            style="
+                display:flex;
+                gap:7px;
+                flex-wrap:wrap;
+            "
+        >
+
+            @foreach($order->pallets->sortBy('orden') as $mapPallet)
+
+                @php
+                    $mapCapacidad = max(
+                        1,
+                        (int) $mapPallet->capacidad_cajas
+                    );
+
+                    $mapCajas = (int) $mapPallet->detalles
+                        ->sum('cantidad_cajas');
+
+                    $mapPorcentaje = min(
+                        100,
+                        round(($mapCajas / $mapCapacidad) * 100)
+                    );
+                @endphp
+
+                <a
+                    href="#pallet-{{ $mapPallet->id }}"
+                    style="
+                        display:flex;
+                        flex-direction:column;
+                        align-items:center;
+                        justify-content:center;
+                        min-width:58px;
+                        height:48px;
+                        padding:4px 8px;
+                        box-sizing:border-box;
+                        text-decoration:none;
+                        background:#f8fafc;
+                        border:1px solid #cbd5e1;
+                        border-radius:6px;
+                        color:#334155;
+                        transition:all .15s ease;
+                    "
+                    onmouseover="
+                        this.style.background='#e2e8f0';
+                        this.style.borderColor='#94a3b8';
+                    "
+                    onmouseout="
+                        this.style.background='#f8fafc';
+                        this.style.borderColor='#cbd5e1';
+                    "
+                >
+
+                    <span
+                        style="
+                            font-size:11px;
+                            font-weight:800;
+                        "
+                    >
+                        Pallet {{ $mapPallet->orden }}
+                    </span>
+
+                    <span
+                        style="
+                            font-size:9px;
+                            color:#64748b;
+                            margin-top:2px;
+                        "
+                    >
+                        {{ $mapCajas }}/{{ $mapCapacidad }}
+                    </span>
+
+                </a>
+
+            @endforeach
+
+        </div>
+
+    </div>
+
+    {{-- =====================================================
+         LISTA DE PALLETS
+    ====================================================== --}}
+
+    <div class="pallet-wrap">
+
+        @foreach($order->pallets->sortBy('orden') as $pallet)
+        @if($order->pallets->count())
+
             <div class="pallet-wrap">
 
                 @foreach($order->pallets as $pallet)
@@ -592,7 +711,7 @@
                         }
                     @endphp
 
-                    <div class="pallet-card">
+                    <div class="pallet-card" id="pallet-{{ $pallet->id }}" style="scroll-margin-top:90px;">
 
                         <div class="pallet-hdr">
                             <div>
