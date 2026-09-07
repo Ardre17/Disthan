@@ -15,22 +15,27 @@ class ExportController extends Controller
         'capacidad_cajas' => 'required|integer|min:1|max:1000',
     ]);
 
-    $cajasActuales = $pallet->detalles()->sum('cantidad');
+    $cajasActuales = (int) $pallet->detalles()->sum('cantidad_cajas');
 
-    if ((int) $request->capacidad_cajas < $cajasActuales) {
+    $nuevaCapacidad = (int) $request->capacidad_cajas;
+
+    if ($nuevaCapacidad < $cajasActuales) {
         return back()->with(
             'error',
             "La capacidad no puede ser menor que las {$cajasActuales} cajas que ya tiene el pallet."
         );
     }
 
-    $pallet->update([
-        'capacidad_cajas' => $request->capacidad_cajas,
-    ]);
+    // Guardado directo para evitar problemas de $fillable
+    $pallet->capacidad_cajas = $nuevaCapacidad;
+    $pallet->save();
+
+    // Confirmamos que realmente quedó guardado en BD
+    $pallet->refresh();
 
     return back()->with(
         'success',
-        "Capacidad del pallet {$pallet->codigo} actualizada correctamente."
+        "Capacidad del pallet {$pallet->codigo} actualizada correctamente a {$pallet->capacidad_cajas} cajas."
     );
 }
     public function show(Order $order)
