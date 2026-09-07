@@ -536,72 +536,22 @@
         </table>
         </div>
     </div>
-    {{-- ── Sección 3: Pallets ── --}}
+  {{-- ── Sección 3: Pallets ── --}}
 <div class="sec-card">
-
     <div class="sec-hdr">
-
-        <div class="sec-hdr-num" style="background:#7c3aed;">
-            3
-        </div>
-
-        <div class="sec-hdr-title">
-            🟫 Pallets de exportación
-        </div>
-
+        <div class="sec-hdr-num" style="background:#7c3aed;">3</div>
+        <div class="sec-hdr-title">🟫 Pallets de exportación</div>
         <div style="margin-left:auto;">
-
-            <form
-                action="{{ route('exportacion.pallet.store', $order) }}"
-                method="POST"
-                style="display:flex;align-items:center;gap:7px;"
-            >
-
+            <form action="{{ route('exportacion.pallet.store', $order) }}" method="POST" style="display:flex;align-items:center;gap:7px;">
                 @csrf
-
-                <input
-                    type="number"
-                    name="capacidad_cajas"
-                    value="20"
-                    min="1"
-                    max="1000"
-                    required
-                    style="
-                        width:90px;
-                        padding:7px 8px;
-                        border:1px solid #cbd5e1;
-                        border-radius:4px;
-                        font-size:12px;
-                        font-weight:700;
-                        text-align:center;
-                    "
-                    title="Capacidad del pallet"
-                >
-
-                <span style="
-                    font-size:11px;
-                    color:var(--erp-ink-muted);
-                    white-space:nowrap;
-                ">
-                    cajas
-                </span>
-
-                <button
-                    type="submit"
-                    class="btn-primary"
-                    style="background:#7c3aed;"
-                >
-                    ➕ Crear pallet
-                </button>
-
+                <input type="number" name="capacidad_cajas" value="20" min="1" max="1000" required style="width:75px;padding:7px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px;font-weight:700;text-align:center;">
+                <span style="font-size:11px;color:var(--erp-ink-muted);white-space:nowrap;">cajas</span>
+                <button type="submit" class="btn-primary" style="background:#7c3aed;">➕ Crear pallet</button>
             </form>
-
         </div>
-
     </div>
 
     <div class="sec-body">
-
         @if($order->pallets->count())
 
             <div class="pallet-wrap">
@@ -609,45 +559,14 @@
                 @foreach($order->pallets as $pallet)
 
                     @php
-
-                        /*
-                         * =====================================================
-                         * DATOS DEL PALLET
-                         * =====================================================
-                         */
-
-                        $capacidadPallet = max(
-                            1,
-                            (int) $pallet->capacidad_cajas
-                        );
-
-                        $totalCajas = (int) $pallet->detalles
-                            ->sum('cantidad_cajas');
-
-                        $disponible = max(
-                            0,
-                            $capacidadPallet - $totalCajas
-                        );
-
-                        $pct = $capacidadPallet > 0
-                            ? min(
-                                100,
-                                round(
-                                    ($totalCajas / $capacidadPallet) * 100
-                                )
-                            )
-                            : 0;
+                        $capacidadPallet = max(1, (int) ($pallet->capacidad_cajas ?? 20));
+                        $totalCajas = (int) $pallet->detalles->sum('cantidad_cajas');
+                        $disponible = max(0, $capacidadPallet - $totalCajas);
+                        $pct = $capacidadPallet > 0 ? min(100, round(($totalCajas / $capacidadPallet) * 100)) : 0;
 
                         $pesoP = $pallet->detalles->sum(
-                            fn($d) =>
-                                (($d->product->peso ?? 0) * $d->cantidad) / 1000
+                            fn($d) => (($d->product->peso ?? 0) * $d->cantidad) / 1000
                         );
-
-                        /*
-                         * =====================================================
-                         * COLORES DE PRODUCTOS
-                         * =====================================================
-                         */
 
                         $colorPalette = [
                             '#0ea5e9',
@@ -666,115 +585,45 @@
                         $ci = 0;
 
                         foreach ($pallet->detalles as $det) {
-
                             if (!isset($prodColores[$det->product_id])) {
-
-                                $prodColores[$det->product_id] =
-                                    $colorPalette[
-                                        $ci % count($colorPalette)
-                                    ];
-
+                                $prodColores[$det->product_id] = $colorPalette[$ci % count($colorPalette)];
                                 $ci++;
                             }
                         }
-
                     @endphp
-
-
-                    {{-- =====================================================
-                         TARJETA DEL PALLET
-                    ====================================================== --}}
 
                     <div class="pallet-card">
 
-
-                        {{-- HEADER --}}
                         <div class="pallet-hdr">
-
                             <div>
-
                                 <div class="pallet-code">
                                     🟫 {{ $pallet->codigo }}
                                 </div>
-
-                                <div style="
-                                    font-size:10px;
-                                    color:#7eb8f7;
-                                    margin-top:3px;
-                                ">
-
+                                <div style="font-size:10px;color:#7eb8f7;margin-top:3px;">
                                     {{ number_format($totalCajas, 0) }}
                                     /
                                     {{ number_format($capacidadPallet, 0) }}
                                     cajas
-
                                     ·
-
                                     {{ number_format($pesoP, 2) }}
                                     kg
-
                                 </div>
-
                             </div>
 
-
-                            <span
-                                class="badge"
-                                style="
-                                    background:rgba(255,255,255,.1);
-                                    color:#fff;
-                                    border:1px solid rgba(255,255,255,.2);
-                                "
-                            >
+                            <span class="badge" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);">
                                 {{ $pallet->estado }}
                             </span>
-
                         </div>
-
 
                         <div class="pallet-body">
 
-
-                            {{-- =================================================
-                                 CAPACIDAD
-                            ================================================== --}}
-
-                            <div style="
-                                background:#f8fafc;
-                                border:1px solid var(--erp-border);
-                                border-radius:5px;
-                                padding:.7rem;
-                                margin-bottom:.8rem;
-                            ">
-
-                                <form
-                                    action="{{ route('exportacion.pallet.capacidad', $pallet) }}"
-                                    method="POST"
-                                    style="
-                                        display:flex;
-                                        align-items:end;
-                                        gap:8px;
-                                        flex-wrap:wrap;
-                                    "
-                                >
-
+                            <div style="background:#f8fafc;border:1px solid var(--erp-border);border-radius:5px;padding:.7rem;margin-bottom:.8rem;">
+                                <form action="{{ route('exportacion.pallet.capacidad', $pallet) }}" method="POST" style="display:flex;align-items:end;gap:8px;flex-wrap:wrap;">
                                     @csrf
                                     @method('PUT')
 
-
-                                    <div style="
-                                        flex:1;
-                                        min-width:150px;
-                                    ">
-
-                                        <label style="
-                                            display:block;
-                                            font-size:10px;
-                                            font-weight:700;
-                                            color:var(--erp-ink-muted);
-                                            text-transform:uppercase;
-                                            margin-bottom:4px;
-                                        ">
+                                    <div style="flex:1;min-width:150px;">
+                                        <label style="display:block;font-size:10px;font-weight:700;color:var(--erp-ink-muted);text-transform:uppercase;margin-bottom:4px;">
                                             Capacidad del pallet
                                         </label>
 
@@ -782,252 +631,98 @@
                                             type="number"
                                             name="capacidad_cajas"
                                             value="{{ $capacidadPallet }}"
-                                            min="{{ max(1, (int) ceil($totalCajas)) }}"
+                                            min="{{ max(1, $totalCajas) }}"
                                             max="1000"
                                             required
-                                            style="
-                                                width:100%;
-                                                padding:7px 8px;
-                                                border:1px solid #cbd5e1;
-                                                border-radius:4px;
-                                                font-size:12px;
-                                                font-weight:700;
-                                                box-sizing:border-box;
-                                            "
+                                            style="width:100%;padding:7px 8px;border:1px solid #cbd5e1;border-radius:4px;font-size:12px;font-weight:700;box-sizing:border-box;"
                                         >
-
                                     </div>
 
-
-                                    <button
-                                        type="submit"
-                                        class="btn-sm-add"
-                                        style="padding:7px 12px;"
-                                    >
+                                    <button type="submit" class="btn-sm-add" style="padding:7px 12px;">
                                         💾 Guardar capacidad
                                     </button>
-
                                 </form>
-
                             </div>
 
+                            <div style="border:1px solid var(--erp-border);border-radius:5px;padding:.75rem;margin-bottom:.8rem;background:#fff;">
 
-                            {{-- =================================================
-                                 OCUPACIÓN
-                            ================================================== --}}
-
-                            <div style="
-                                border:1px solid var(--erp-border);
-                                border-radius:5px;
-                                padding:.75rem;
-                                margin-bottom:.8rem;
-                                background:#fff;
-                            ">
-
-                                <div style="
-                                    display:flex;
-                                    justify-content:space-between;
-                                    align-items:center;
-                                    margin-bottom:7px;
-                                ">
-
-                                    <span style="
-                                        font-size:11px;
-                                        font-weight:700;
-                                        color:var(--erp-ink-muted);
-                                        text-transform:uppercase;
-                                    ">
+                                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:7px;">
+                                    <span style="font-size:11px;font-weight:700;color:var(--erp-ink-muted);text-transform:uppercase;">
                                         Ocupación del pallet
                                     </span>
 
-                                    <strong style="
-                                        font-size:13px;
-                                        font-family:var(--font-mono);
-                                    ">
-
+                                    <strong style="font-size:13px;font-family:var(--font-mono);">
                                         {{ number_format($totalCajas, 0) }}
                                         /
                                         {{ number_format($capacidadPallet, 0) }}
                                         cajas
-
                                     </strong>
-
                                 </div>
 
-
-                                <div style="
-                                    height:10px;
-                                    background:#e2e8f0;
-                                    border-radius:999px;
-                                    overflow:hidden;
-                                ">
-
-                                    <div style="
-                                        width:{{ $pct }}%;
-                                        height:100%;
-                                        background:#0ea5e9;
-                                        border-radius:999px;
-                                        transition:width .3s;
-                                    "></div>
-
+                                <div style="height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden;">
+                                    <div style="width:{{ $pct }}%;height:100%;background:#0ea5e9;border-radius:999px;transition:width .3s;"></div>
                                 </div>
 
-
-                                <div style="
-                                    display:flex;
-                                    justify-content:space-between;
-                                    margin-top:6px;
-                                    font-size:10px;
-                                ">
-
+                                <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;">
                                     <span style="color:var(--erp-ink-muted);">
-
                                         Disponible:
-
-                                        <strong>
-                                            {{ number_format($disponible, 0) }}
-                                        </strong>
-
+                                        <strong>{{ number_format($disponible, 0) }}</strong>
                                         cajas
-
                                     </span>
-
 
                                     <strong style="color:#0ea5e9;">
                                         {{ $pct }}%
                                     </strong>
-
                                 </div>
-
                             </div>
 
+                            <div style="border:1px solid var(--erp-border);border-radius:5px;overflow:hidden;margin-bottom:.8rem;">
 
-                            {{-- =================================================
-                                 PRODUCTOS EN EL PALLET
-                            ================================================== --}}
-
-                            <div style="
-                                border:1px solid var(--erp-border);
-                                border-radius:5px;
-                                overflow:hidden;
-                                margin-bottom:.8rem;
-                            ">
-
-                                <div style="
-                                    background:#f8fafc;
-                                    padding:.55rem .7rem;
-                                    font-size:10px;
-                                    font-weight:800;
-                                    color:var(--erp-ink-muted);
-                                    text-transform:uppercase;
-                                    border-bottom:1px solid var(--erp-border);
-                                ">
+                                <div style="background:#f8fafc;padding:.55rem .7rem;font-size:10px;font-weight:800;color:var(--erp-ink-muted);text-transform:uppercase;border-bottom:1px solid var(--erp-border);">
                                     📦 Productos en el pallet
                                 </div>
-
 
                                 @forelse($pallet->detalles as $detalle)
 
                                     @php
+                                        $colorProducto = $prodColores[$detalle->product_id] ?? '#64748b';
+                                        $cantidadDetalle = (int) ($detalle->cantidad_cajas ?? 0);
 
-                                        $colorProducto =
-                                            $prodColores[$detalle->product_id]
-                                            ?? '#64748b';
-
-                                        $cantidadDetalle =
-                                        (int) $detalle->cantidad_cajas;
-
-                                        $porcentajeProducto =
-                                            $totalCajas > 0
-                                                ? min(
-                                                    100,
-                                                    round(
-                                                        ($cantidadDetalle / $totalCajas) * 100
-                                                    )
-                                                )
-                                                : 0;
-
+                                        $porcentajeProducto = $totalCajas > 0
+                                            ? min(100, round(($cantidadDetalle / $totalCajas) * 100))
+                                            : 0;
                                     @endphp
 
+                                    <div style="padding:.65rem .7rem;border-bottom:1px solid #eef2f7;">
 
-                                    <div style="
-                                        padding:.65rem .7rem;
-                                        border-bottom:1px solid #eef2f7;
-                                    ">
+                                        <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
 
-                                        <div style="
-                                            display:flex;
-                                            justify-content:space-between;
-                                            align-items:center;
-                                            gap:8px;
-                                        ">
+                                            <div style="display:flex;align-items:center;gap:7px;min-width:0;">
 
+                                                <span style="width:10px;height:10px;border-radius:2px;background:{{ $colorProducto }};flex-shrink:0;"></span>
 
-                                            <div style="
-                                                display:flex;
-                                                align-items:center;
-                                                gap:7px;
-                                                min-width:0;
-                                            ">
-
-                                                <span style="
-                                                    width:10px;
-                                                    height:10px;
-                                                    border-radius:2px;
-                                                    background:{{ $colorProducto }};
-                                                    flex-shrink:0;
-                                                "></span>
-
-
-                                                <span style="
-                                                    font-size:11px;
-                                                    font-weight:700;
-                                                    color:var(--erp-ink);
-                                                ">
+                                                <span style="font-size:11px;font-weight:700;color:var(--erp-ink);">
                                                     {{ $detalle->product->nombre }}
                                                 </span>
 
                                             </div>
 
-
-                                            <strong style="
-                                                font-size:12px;
-                                                font-family:var(--font-mono);
-                                                white-space:nowrap;
-                                            ">
+                                            <strong style="font-size:12px;font-family:var(--font-mono);white-space:nowrap;">
                                                 {{ number_format($cantidadDetalle, 0) }}
                                                 cajas
                                             </strong>
 
                                         </div>
 
-
-                                        <div style="
-                                            height:5px;
-                                            background:#eef2f7;
-                                            border-radius:999px;
-                                            margin-top:6px;
-                                            overflow:hidden;
-                                        ">
-
-                                            <div style="
-                                                width:{{ $porcentajeProducto }}%;
-                                                height:100%;
-                                                background:{{ $colorProducto }};
-                                            "></div>
-
+                                        <div style="height:5px;background:#eef2f7;border-radius:999px;margin-top:6px;overflow:hidden;">
+                                            <div style="width:{{ $porcentajeProducto }}%;height:100%;background:{{ $colorProducto }};"></div>
                                         </div>
 
                                     </div>
 
                                 @empty
 
-                                    <div style="
-                                        padding:1rem;
-                                        text-align:center;
-                                        color:#94a3b8;
-                                        font-size:11px;
-                                    ">
+                                    <div style="padding:1rem;text-align:center;color:#94a3b8;font-size:11px;">
                                         Este pallet aún no tiene productos.
                                     </div>
 
@@ -1035,42 +730,14 @@
 
                             </div>
 
+                            <div style="background:#f8fafc;border:1px solid var(--erp-border);border-radius:5px;padding:.7rem;">
 
-                            {{-- =================================================
-                                 AGREGAR PRODUCTO
-                            ================================================== --}}
-
-                            <div style="
-                                background:#f8fafc;
-                                border:1px solid var(--erp-border);
-                                border-radius:5px;
-                                padding:.7rem;
-                            ">
-
-                                <div style="
-                                    font-size:10px;
-                                    font-weight:800;
-                                    color:var(--erp-ink-muted);
-                                    text-transform:uppercase;
-                                    margin-bottom:7px;
-                                ">
+                                <div style="font-size:10px;font-weight:800;color:var(--erp-ink-muted);text-transform:uppercase;margin-bottom:7px;">
                                     ➕ Agregar producto al pallet
                                 </div>
 
-
-                                <form
-                                    action="{{ route('exportacion.pallet.agregarProducto', $pallet) }}"
-                                    method="POST"
-                                    style="
-                                        display:flex;
-                                        gap:7px;
-                                        align-items:end;
-                                        flex-wrap:wrap;
-                                    "
-                                >
-
+                                <form action="{{ route('exportacion.pallet.agregarProducto', $pallet) }}" method="POST" style="display:flex;gap:7px;align-items:end;flex-wrap:wrap;">
                                     @csrf
-
 
                                     <div style="flex:1;min-width:180px;">
 
@@ -1078,10 +745,7 @@
                                             Producto
                                         </label>
 
-                                        <select
-                                            name="order_detail_id"
-                                            class="fselect"
-                                            required>
+                                        <select name="order_detail_id" class="fselect" required>
 
                                             <option value="">
                                                 Seleccionar producto pendiente
@@ -1090,46 +754,66 @@
                                             @foreach($order->details as $detalle)
 
                                                 @php
-                                                    $enPallets =
-                                                        $detalle->palletDetails
-                                                            ->sum('cantidad');
+                                                    $porCaja = (int) ($detalle->product->cantidad_por_caja ?? 1);
 
-                                                    $pendiente =
-                                                        $detalle->cantidad_solicitada
-                                                        - $enPallets;
+                                                    if ($porCaja < 1) {
+                                                        $porCaja = 1;
+                                                    }
+
+                                                    $cajasSolicitadas = intdiv(
+                                                        (int) $detalle->cantidad_solicitada,
+                                                        $porCaja
+                                                    );
+
+                                                    $cajasEnPallets = (int) $detalle->palletDetails
+                                                        ->sum('cantidad_cajas');
+
+                                                    $pendiente = max(
+                                                        0,
+                                                        $cajasSolicitadas - $cajasEnPallets
+                                                    );
                                                 @endphp
 
                                                 @if($pendiente > 0)
 
-                                                    <option
-                                                        value="{{ $detalle->id }}">
+                                                    <option value="{{ $detalle->id }}">
                                                         {{ $detalle->product->nombre }}
-                                                        ({{ number_format($pendiente, 0) }} cajas pend.)</option>
+                                                        ({{ number_format($pendiente, 0) }} cajas pend.)
+                                                    </option>
 
                                                 @endif
+
                                             @endforeach
 
-                                        </select> </div>
-                                    
-                                    <div style="width:110px;">
+                                        </select>
 
-                                    <label class="flabel">Cajas</label>
-                                    <input type="number" name="cantidad_cajas" class="finput" min="1" step="1" required placeholder="0"></div>
                                     </div>
 
+                                    <div style="width:110px;">
 
-                                    <button
-                                        type="submit"
-                                        class="btn-sm-add"
-                                        style="padding:7px 12px;"
-                                    >
+                                        <label class="flabel">
+                                            Cajas
+                                        </label>
+
+                                        <input
+                                            type="number"
+                                            name="cantidad_cajas"
+                                            class="finput"
+                                            min="1"
+                                            step="1"
+                                            required
+                                            placeholder="0"
+                                        >
+
+                                    </div>
+
+                                    <button type="submit" class="btn-sm-add" style="padding:7px 12px;">
                                         ✔ Agregar
                                     </button>
 
                                 </form>
 
                             </div>
-
 
                         </div>
 
@@ -1141,25 +825,13 @@
 
         @else
 
-            <div style="
-                text-align:center;
-                padding:2rem;
-                color:var(--erp-ink-muted);
-            ">
+            <div style="text-align:center;padding:2rem;color:var(--erp-ink-muted);">
 
-                <div style="
-                    font-size:36px;
-                    margin-bottom:8px;
-                ">
+                <div style="font-size:36px;margin-bottom:8px;">
                     🟫
                 </div>
 
-                <div style="
-                    font-size:14px;
-                    font-weight:600;
-                    color:var(--erp-ink);
-                    margin-bottom:4px;
-                ">
+                <div style="font-size:14px;font-weight:600;color:var(--erp-ink);margin-bottom:4px;">
                     No hay pallets creados
                 </div>
 
