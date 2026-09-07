@@ -9,9 +9,30 @@ use Illuminate\Http\Request;
 
 class ExportController extends Controller
 {
-    /**
-     * Mostrar la vista de exportación.
-     */
+    public function actualizarCapacidadPallet(Request $request, Pallet $pallet)
+{
+    $request->validate([
+        'capacidad_cajas' => 'required|integer|min:1|max:1000',
+    ]);
+
+    $cajasActuales = $pallet->detalles()->sum('cantidad');
+
+    if ((int) $request->capacidad_cajas < $cajasActuales) {
+        return back()->with(
+            'error',
+            "La capacidad no puede ser menor que las {$cajasActuales} cajas que ya tiene el pallet."
+        );
+    }
+
+    $pallet->update([
+        'capacidad_cajas' => $request->capacidad_cajas,
+    ]);
+
+    return back()->with(
+        'success',
+        "Capacidad del pallet {$pallet->codigo} actualizada correctamente."
+    );
+}
     public function show(Order $order)
     {
         $order->load([

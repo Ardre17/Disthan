@@ -120,6 +120,9 @@ Route::post('/exportacion/pallets/{pallet}/agregar-producto',[ExportController::
 Route::post('/exportacion/{order}/pallet', [ExportController::class, 'storePallet'])
     ->name('exportacion.pallet.store');
 
+Route::put('/exportacion/pallets/{pallet}/capacidad', [ExportController::class, 'actualizarCapacidadPallet'])
+    ->name('exportacion.pallet.capacidad');
+
 Route::get('/order-details/{item}/etiqueta', [OrderController::class, 'etiqueta'])->name('orders.etiqueta');
 Route::get('/order-details/{item}/etiqueta', [App\Http\Controllers\OrderController::class, 'etiqueta'])
     ->name('orders.details.etiqueta');
