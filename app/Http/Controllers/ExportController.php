@@ -246,5 +246,6 @@ public function storePallet(Request $request, Order $order)
         "{$cajasSolicitadas} cajas agregadas al pallet correctamente."
     );
 }
+
    
 }

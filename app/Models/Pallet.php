@@ -7,31 +7,19 @@ use Illuminate\Database\Eloquent\Model;
 class Pallet extends Model
 {
     protected $fillable = [
-
-        'order_id',
-
-        'codigo',
-
-        'orden',
-
-        'estado',
-
-        'peso_neto',
-
-        'peso_bruto',
-
-        'altura',
-
-        'ancho',
-
-        'largo',
-
-        'observaciones',
-
-        'cerrado',
-
-        'capacidad_cajas',
-    ];
+    'order_id',
+    'codigo',
+    'orden',
+    'estado',
+    'peso_neto',
+    'peso_bruto',
+    'altura',
+    'ancho',
+    'largo',
+    'observaciones',
+    'cerrado',
+    'capacidad_cajas',
+];
 
     /*
     |--------------------------------------------------------------------------
