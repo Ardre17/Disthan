@@ -241,6 +241,62 @@
 
         @if($historial->count())
 
+                {{-- =====================================================
+             FILTROS DEL HISTORIAL
+        ====================================================== --}}
+        <div class="validation-history-filters">
+
+            <div class="validation-history-filter-group">
+
+                <label for="historialFechaDesde">
+                    <i class="bi bi-calendar3"></i>
+                    DESDE
+                </label>
+
+                <input
+                    type="date"
+                    id="historialFechaDesde"
+                >
+
+            </div>
+
+
+            <div class="validation-history-filter-group">
+
+                <label for="historialFechaHasta">
+                    <i class="bi bi-calendar3"></i>
+                    HASTA
+                </label>
+
+                <input
+                    type="date"
+                    id="historialFechaHasta"
+                >
+
+            </div>
+
+
+            <button
+                type="button"
+                id="btnFiltrarHistorial"
+                class="validation-history-filter-button"
+            >
+                <i class="bi bi-funnel"></i>
+                FILTRAR
+            </button>
+
+
+            <button
+                type="button"
+                id="btnLimpiarHistorial"
+                class="validation-history-clear-button"
+            >
+                <i class="bi bi-x-circle"></i>
+                LIMPIAR
+            </button>
+
+        </div>
+
             <div class="validation-table-wrapper">
 
                 <table class="validation-list-table">
@@ -265,7 +321,10 @@
                                 $estadoHistorial = $validacion->estado;
                             @endphp
 
-                            <tr>
+                           <tr
+                                    class="historial-row"
+                                    data-fecha="{{ $validacion->fecha_validacion ? \Carbon\Carbon::parse($validacion->fecha_validacion)->format('Y-m-d') : '' }}"
+                                >
 
                                 <td>
                                     <span class="validation-order-number">
@@ -336,6 +395,12 @@
                 </table>
 
             </div>
+                </div>
+
+            <div
+                id="historialPagination"
+                class="validation-history-pagination"
+            ></div>
 
         @else
 
@@ -2854,6 +2919,159 @@
         align-items: flex-start;
     }
 }
+/* =========================================================
+   FILTROS HISTORIAL
+========================================================= */
+
+.validation-history-filters {
+    display: flex;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 16px 18px;
+    border-top: 1px solid #e2e8f0;
+    border-bottom: 1px solid #e2e8f0;
+    background: #f8fafc;
+}
+
+.validation-history-filter-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.validation-history-filter-group label {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: .5px;
+}
+
+.validation-history-filter-group input {
+    height: 38px;
+    min-width: 155px;
+    padding: 0 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #334155;
+    font-size: 12px;
+    outline: none;
+}
+
+.validation-history-filter-group input:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, .08);
+}
+
+.validation-history-filter-button,
+.validation-history-clear-button {
+    height: 38px;
+    border: 0;
+    border-radius: 8px;
+    padding: 0 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    font-size: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: .15s ease;
+}
+
+.validation-history-filter-button {
+    background: #2563eb;
+    color: #ffffff;
+}
+
+.validation-history-filter-button:hover {
+    background: #1d4ed8;
+}
+
+.validation-history-clear-button {
+    background: #e2e8f0;
+    color: #475569;
+}
+
+.validation-history-clear-button:hover {
+    background: #cbd5e1;
+}
+
+
+/* =========================================================
+   PAGINACIÓN HISTORIAL
+========================================================= */
+
+.validation-history-pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 16px;
+    border-top: 1px solid #e2e8f0;
+    background: #ffffff;
+    flex-wrap: wrap;
+}
+
+.validation-history-page-button {
+    min-width: 34px;
+    height: 34px;
+    padding: 0 9px;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    background: #ffffff;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: .15s ease;
+}
+
+.validation-history-page-button:hover {
+    background: #f1f5f9;
+}
+
+.validation-history-page-button.active {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: #ffffff;
+}
+
+.validation-history-page-button:disabled {
+    opacity: .45;
+    cursor: not-allowed;
+}
+
+.validation-history-page-info {
+    margin: 0 8px;
+    color: #64748b;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+
+/* =========================================================
+   RESPONSIVE FILTROS HISTORIAL
+========================================================= */
+
+@media (max-width: 700px) {
+
+    .validation-history-filters {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .validation-history-filter-group input,
+    .validation-history-filter-button,
+    .validation-history-clear-button {
+        width: 100%;
+    }
+
+}
 </style>
 
 
@@ -3008,7 +3226,387 @@ document.addEventListener('DOMContentLoaded', function () {
         );
 
     }
+    /*
+    |--------------------------------------------------------------------------
+    | PAGINACIÓN Y FILTRO DEL HISTORIAL
+    |--------------------------------------------------------------------------
+    */
 
+    const historialFilas = Array.from(
+        document.querySelectorAll('.historial-row')
+    );
+
+    const historialFechaDesde =
+        document.getElementById('historialFechaDesde');
+
+    const historialFechaHasta =
+        document.getElementById('historialFechaHasta');
+
+    const btnFiltrarHistorial =
+        document.getElementById('btnFiltrarHistorial');
+
+    const btnLimpiarHistorial =
+        document.getElementById('btnLimpiarHistorial');
+
+    const historialPagination =
+        document.getElementById('historialPagination');
+
+    const historialCount =
+        document.querySelector(
+            '.validation-list-card:nth-child(2) .validation-count'
+        );
+
+
+    const HISTORIAL_POR_PAGINA = 15;
+
+    let historialPaginaActual = 1;
+
+    let historialFilasFiltradas = [...historialFilas];
+
+
+    function renderizarHistorial() {
+
+        const total =
+            historialFilasFiltradas.length;
+
+        const totalPaginas =
+            Math.max(
+                1,
+                Math.ceil(
+                    total / HISTORIAL_POR_PAGINA
+                )
+            );
+
+
+        if (
+            historialPaginaActual >
+            totalPaginas
+        ) {
+            historialPaginaActual =
+                totalPaginas;
+        }
+
+
+        const inicio =
+            (historialPaginaActual - 1) *
+            HISTORIAL_POR_PAGINA;
+
+        const fin =
+            inicio + HISTORIAL_POR_PAGINA;
+
+
+        historialFilas.forEach(function (fila) {
+            fila.style.display = 'none';
+        });
+
+
+        historialFilasFiltradas
+            .slice(inicio, fin)
+            .forEach(function (fila) {
+                fila.style.display = '';
+            });
+
+
+        if (historialCount) {
+            historialCount.textContent =
+                total;
+        }
+
+
+        renderizarBotonesPaginacion(
+            totalPaginas,
+            total
+        );
+    }
+
+
+    function renderizarBotonesPaginacion(
+        totalPaginas,
+        total
+    ) {
+
+        if (!historialPagination) {
+            return;
+        }
+
+
+        if (total === 0) {
+
+            historialPagination.innerHTML = `
+                <span class="validation-history-page-info">
+                    No hay resultados para el filtro seleccionado.
+                </span>
+            `;
+
+            return;
+        }
+
+
+        let html = '';
+
+
+        html += `
+            <button
+                type="button"
+                class="validation-history-page-button"
+                ${historialPaginaActual === 1 ? 'disabled' : ''}
+                onclick="cambiarPaginaHistorial(${historialPaginaActual - 1})"
+            >
+                <i class="bi bi-chevron-left"></i>
+            </button>
+        `;
+
+
+        const maxBotones = 7;
+
+        let inicioPagina =
+            Math.max(
+                1,
+                historialPaginaActual -
+                Math.floor(maxBotones / 2)
+            );
+
+        let finPagina =
+            Math.min(
+                totalPaginas,
+                inicioPagina + maxBotones - 1
+            );
+
+
+        if (
+            finPagina - inicioPagina + 1 <
+            maxBotones
+        ) {
+            inicioPagina =
+                Math.max(
+                    1,
+                    finPagina - maxBotones + 1
+                );
+        }
+
+
+        for (
+            let pagina = inicioPagina;
+            pagina <= finPagina;
+            pagina++
+        ) {
+
+            html += `
+                <button
+                    type="button"
+                    class="validation-history-page-button ${
+                        pagina === historialPaginaActual
+                            ? 'active'
+                            : ''
+                    }"
+                    onclick="cambiarPaginaHistorial(${pagina})"
+                >
+                    ${pagina}
+                </button>
+            `;
+        }
+
+
+        html += `
+            <span class="validation-history-page-info">
+                Página ${historialPaginaActual} de ${totalPaginas}
+            </span>
+        `;
+
+
+        html += `
+            <button
+                type="button"
+                class="validation-history-page-button"
+                ${historialPaginaActual === totalPaginas ? 'disabled' : ''}
+                onclick="cambiarPaginaHistorial(${historialPaginaActual + 1})"
+            >
+                <i class="bi bi-chevron-right"></i>
+            </button>
+        `;
+
+
+        historialPagination.innerHTML =
+            html;
+    }
+
+
+    window.cambiarPaginaHistorial =
+        function (pagina) {
+
+            const totalPaginas =
+                Math.max(
+                    1,
+                    Math.ceil(
+                        historialFilasFiltradas.length /
+                        HISTORIAL_POR_PAGINA
+                    )
+                );
+
+
+            if (
+                pagina < 1 ||
+                pagina > totalPaginas
+            ) {
+                return;
+            }
+
+
+            historialPaginaActual =
+                pagina;
+
+            renderizarHistorial();
+
+
+            const historialCard =
+                document.querySelector(
+                    '.validation-list-card:nth-child(2)'
+                );
+
+
+            if (historialCard) {
+                historialCard.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }
+        };
+
+
+    function aplicarFiltroHistorial() {
+
+        const desde =
+            historialFechaDesde?.value || '';
+
+        const hasta =
+            historialFechaHasta?.value || '';
+
+
+        if (
+            desde &&
+            hasta &&
+            desde > hasta
+        ) {
+
+            mostrarAlerta(
+                'La fecha desde no puede ser mayor que la fecha hasta.',
+                'warning'
+            );
+
+            return;
+        }
+
+
+        historialFilasFiltradas =
+            historialFilas.filter(
+                function (fila) {
+
+                    const fecha =
+                        fila.dataset.fecha || '';
+
+
+                    if (!fecha) {
+                        return false;
+                    }
+
+
+                    if (
+                        desde &&
+                        fecha < desde
+                    ) {
+                        return false;
+                    }
+
+
+                    if (
+                        hasta &&
+                        fecha > hasta
+                    ) {
+                        return false;
+                    }
+
+
+                    return true;
+                }
+            );
+
+
+        historialPaginaActual = 1;
+
+        renderizarHistorial();
+    }
+
+
+    if (btnFiltrarHistorial) {
+
+        btnFiltrarHistorial.addEventListener(
+            'click',
+            function () {
+
+                aplicarFiltroHistorial();
+
+            }
+        );
+
+    }
+
+
+    if (btnLimpiarHistorial) {
+
+        btnLimpiarHistorial.addEventListener(
+            'click',
+            function () {
+
+                if (historialFechaDesde) {
+                    historialFechaDesde.value = '';
+                }
+
+                if (historialFechaHasta) {
+                    historialFechaHasta.value = '';
+                }
+
+                historialFilasFiltradas =
+                    [...historialFilas];
+
+                historialPaginaActual = 1;
+
+                renderizarHistorial();
+
+            }
+        );
+
+    }
+
+
+    if (historialFechaDesde) {
+
+        historialFechaDesde.addEventListener(
+            'change',
+            aplicarFiltroHistorial
+        );
+
+    }
+
+
+    if (historialFechaHasta) {
+
+        historialFechaHasta.addEventListener(
+            'change',
+            aplicarFiltroHistorial
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | INICIALIZAR HISTORIAL
+    |--------------------------------------------------------------------------
+    */
+
+    if (historialFilas.length) {
+        renderizarHistorial();
+    }
 };
 
 
