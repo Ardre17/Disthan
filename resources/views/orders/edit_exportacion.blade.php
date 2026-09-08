@@ -678,7 +678,6 @@
     @foreach($order->pallets->sortBy('orden') as $pallet)
 
         @php
-            @php
     $capacidadPallet = max(
         1,
         (int) ($pallet->capacidad_cajas ?? 20)
