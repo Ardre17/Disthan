@@ -37,6 +37,11 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\OrderValidationController;
 
 
+Route::delete(
+    '/exportacion/pallet-detalle/{detalle}',
+    [PalletController::class, 'destroyDetalle']
+)->name('exportacion.pallet.detalle.destroy');
+
 Route::prefix('validacion-pedidos')
     ->name('orders.validation.')
     ->group(function () {

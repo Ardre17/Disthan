@@ -607,35 +607,40 @@
                         100,
                         round(($mapCajas / $mapCapacidad) * 100)
                     );
+                    if ($mapCajas <= 0) {
+
+    $mapColor = '#94a3b8';
+
+} elseif ($mapCajas < $mapCapacidad) {
+
+    $mapColor = '#f59e0b';
+
+} else {
+
+    $mapColor = '#22c55e';
+
+}
                 @endphp
 
                 <a
-                    href="#pallet-{{ $mapPallet->id }}"
-                    style="
-                        display:flex;
-                        flex-direction:column;
-                        align-items:center;
-                        justify-content:center;
-                        min-width:58px;
-                        height:48px;
-                        padding:4px 8px;
-                        box-sizing:border-box;
-                        text-decoration:none;
-                        background:#f8fafc;
-                        border:1px solid #cbd5e1;
-                        border-radius:6px;
-                        color:#334155;
-                        transition:all .15s ease;
-                    "
-                    onmouseover="
-                        this.style.background='#e2e8f0';
-                        this.style.borderColor='#94a3b8';
-                    "
-                    onmouseout="
-                        this.style.background='#f8fafc';
-                        this.style.borderColor='#cbd5e1';
-                    "
-                >
+    href="#pallet-{{ $mapPallet->id }}"
+    style="
+        display:flex;
+        flex-direction:column;
+        align-items:center;
+        justify-content:center;
+        min-width:58px;
+        height:48px;
+        padding:4px 8px;
+        box-sizing:border-box;
+        text-decoration:none;
+        background:{{ $mapColor }}15;
+        border:2px solid {{ $mapColor }};
+        border-radius:6px;
+        color:#334155;
+        transition:all .15s ease;
+    "
+>
 
                     <span
                         style="
@@ -673,12 +678,52 @@
     @foreach($order->pallets->sortBy('orden') as $pallet)
 
         @php
-            $capacidadPallet = max(1, (int) ($pallet->capacidad_cajas ?? 20));
-            $totalCajas = (int) $pallet->detalles->sum('cantidad_cajas');
-            $disponible = max(0, $capacidadPallet - $totalCajas);
-            $pct = $capacidadPallet > 0
-                ? min(100, round(($totalCajas / $capacidadPallet) * 100))
-                : 0;
+            @php
+    $capacidadPallet = max(
+        1,
+        (int) ($pallet->capacidad_cajas ?? 20)
+    );
+
+    $totalCajas = (int) $pallet->detalles
+        ->sum('cantidad_cajas');
+
+    $disponible = max(
+        0,
+        $capacidadPallet - $totalCajas
+    );
+
+    $pct = $capacidadPallet > 0
+        ? min(
+            100,
+            round(($totalCajas / $capacidadPallet) * 100)
+        )
+        : 0;
+
+    /*
+    |--------------------------------------------------------------------------
+    | Estado visual del pallet
+    |--------------------------------------------------------------------------
+    */
+
+    if ($totalCajas <= 0) {
+
+        $estadoPallet = 'INCOMPLETO';
+        $colorPallet = '#94a3b8';
+        $bgPallet = '#f8fafc';
+
+    } elseif ($totalCajas < $capacidadPallet) {
+
+        $estadoPallet = 'PARCIAL';
+        $colorPallet = '#f59e0b';
+        $bgPallet = '#fffbeb';
+
+    } else {
+
+        $estadoPallet = 'COMPLETO';
+        $colorPallet = '#22c55e';
+        $bgPallet = '#f0fdf4';
+
+    }
 
             $pesoP = $pallet->detalles->sum(
                 fn($d) => (($d->product->peso ?? 0) * $d->cantidad) / 1000
@@ -709,7 +754,7 @@
             }
         @endphp
 
-                    <div class="pallet-card" id="pallet-{{ $pallet->id }}" style="scroll-margin-top:90px;">
+                    <div class="pallet-card" id="pallet-{{ $pallet->id }}" style="scroll-margin-top:90px; border:2px solid {{ $colorPallet }}; background:{{ $bgPallet }}; box-shadow:0 0 0 1px {{ $colorPallet }}20; transition:all .2s ease;">
 
                         <div class="pallet-hdr">
                             <div>
@@ -727,9 +772,7 @@
                                 </div>
                             </div>
 
-                            <span class="badge" style="background:rgba(255,255,255,.1);color:#fff;border:1px solid rgba(255,255,255,.2);">
-                                {{ $pallet->estado }}
-                            </span>
+                            <span class="badge" style="background:{{ $colorPallet }}; color:#fff; border:1px solid {{ $colorPallet }};"> {{ $estadoPallet }} </span>
                         </div>
 
                         <div class="pallet-body">
@@ -776,9 +819,17 @@
                                     </strong>
                                 </div>
 
-                                <div style="height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden;">
-                                    <div style="width:{{ $pct }}%;height:100%;background:#0ea5e9;border-radius:999px;transition:width .3s;"></div>
-                                </div>
+                               <div style="height:10px;background:#e2e8f0;border-radius:999px;overflow:hidden;">
+    <div
+        style="
+            width:{{ $pct }}%;
+            height:100%;
+            background:{{ $colorPallet }};
+            border-radius:999px;
+            transition:width .3s;
+        "
+    ></div>
+</div>
 
                                 <div style="display:flex;justify-content:space-between;margin-top:6px;font-size:10px;">
                                     <span style="color:var(--erp-ink-muted);">
@@ -787,7 +838,7 @@
                                         cajas
                                     </span>
 
-                                    <strong style="color:#0ea5e9;">
+                                    <strong style="color:{{ $colorPallet }};">
                                         {{ $pct }}%
                                     </strong>
                                 </div>
@@ -824,10 +875,51 @@
 
                                             </div>
 
-                                            <strong style="font-size:12px;font-family:var(--font-mono);white-space:nowrap;">
-                                                {{ number_format($cantidadDetalle, 0) }}
-                                                cajas
-                                            </strong>
+                                            <div style="display:flex;align-items:center;gap:6px;">
+
+    <strong style="
+        font-size:12px;
+        font-family:var(--font-mono);
+        white-space:nowrap;
+    ">
+        {{ number_format($cantidadDetalle, 0) }}
+        cajas
+    </strong>
+
+    <form
+        method="POST"
+        action="{{ route('exportacion.pallet.detalle.destroy', $detalle) }}"
+        style="display:inline;"
+        onsubmit="return confirm('¿Eliminar {{ addslashes($detalle->product->nombre) }} del Pallet {{ $pallet->orden }}?');"
+    >
+
+        @csrf
+        @method('DELETE')
+
+        <button
+            type="submit"
+            style="
+                width:25px;
+                height:25px;
+                padding:0;
+                border:1px solid #f3c7c4;
+                background:#fbe9e8;
+                color:#c0312b;
+                border-radius:4px;
+                cursor:pointer;
+                font-size:11px;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+            "
+            title="Eliminar producto del pallet"
+        >
+            🗑
+        </button>
+
+    </form>
+
+</div>
 
                                         </div>
 

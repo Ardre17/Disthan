@@ -9,6 +9,23 @@ use Illuminate\Http\Request;
 
 class ExportController extends Controller
 {
+
+public function destroyDetalle($detalle)
+{
+    $pallet = $detalle->pallet;
+
+    // No permitir modificaciones de una exportación cerrada
+    if ($pallet->order && $pallet->order->estado === 'COMPLETO') {
+        return back()->with('error', 'No se puede modificar una exportación cerrada.');
+    }
+
+    $detalle->delete();
+
+    return back()->with(
+        'success',
+        'Producto eliminado del pallet correctamente.'
+    );
+}
     public function actualizarCapacidadPallet(Request $request, Pallet $pallet)
 {
     $request->validate([
