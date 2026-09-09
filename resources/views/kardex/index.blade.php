@@ -561,9 +561,7 @@ const subtotales = @json($chartData['subtotal']);
 
 </tr>
 
-@endforelse
-                    @php
-                       
+@endforelse     
                 </tbody>
                 @if($movimientosPaginados->total() > 0)
 
