@@ -15,11 +15,13 @@ class KardexController extends Controller
     public function index(Request $request)
     {
         $productId = $request->input('product_id');
-        $clientId  = $request->input('client_id');
-        $dateFrom  = $request->input('date_from');
-        $dateTo    = $request->input('date_to');
+$clientId  = $request->input('client_id');
+$dateFrom  = $request->input('date_from');
+$dateTo    = $request->input('date_to');
 
-        $perPage = 20;
+$perPage = 20;
+
+$movimientos = collect();
 
         /*
 |--------------------------------------------------------------------------
