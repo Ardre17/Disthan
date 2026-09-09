@@ -155,11 +155,14 @@
     $chartTitle = $chartData['producto']
         ? '📈 Tendencia de despachos · ' . $chartData['producto']
         : ($chartData['cliente'] ? '📈 Tendencia de despachos · ' . $chartData['cliente'] : '📈 Tendencia');
-    $totalDesp  = collect($chartData['despachado'])->sum();
-    $totalSoli  = collect($chartData['solicitado'])->sum();
-    $totalFact  = collect($chartData['subtotal'])->sum();
-    $totalOrd   = collect($chartData['ordenes'])->sum();
-    $eficiencia = $totalSoli > 0 ? round(($totalDesp / $totalSoli) * 100, 1) : 0;
+    $totalProduccionGrafico = collect($chartData['produccion'])->sum();
+$totalSalidasGrafico    = collect($chartData['salidas'])->sum();
+$totalFact              = collect($chartData['subtotal'])->sum();
+$totalOrd               = collect($chartData['ordenes'])->sum();
+
+$eficiencia = $totalProduccionGrafico > 0
+    ? round(($totalSalidasGrafico / $totalProduccionGrafico) * 100, 1)
+    : 0;
 @endphp
 
 <div style="background:white;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.07);overflow:hidden;margin-bottom:20px;">
@@ -171,27 +174,45 @@
     </div>
 
     {{-- Mini KPIs del gráfico --}}
-    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid #f0f0f0;">
-        <div style="padding:12px 18px;border-right:1px solid #f0f0f0;">
-            <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Total despachado</p>
-            <p style="font-size:20px;font-weight:700;color:#cf1322;margin:3px 0 0;">{{ number_format($totalDesp) }} u.</p>
-        </div>
-        <div style="padding:12px 18px;border-right:1px solid #f0f0f0;">
-            <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Total solicitado</p>
-            <p style="font-size:20px;font-weight:700;color:#595959;margin:3px 0 0;">{{ number_format($totalSoli) }} u.</p>
-        </div>
-        <div style="padding:12px 18px;border-right:1px solid #f0f0f0;">
-            <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Facturado (filtro)</p>
-            <p style="font-size:20px;font-weight:700;color:#389e0d;margin:3px 0 0;">S/ {{ number_format($totalFact, 2) }}</p>
-        </div>
-        <div style="padding:12px 18px;">
-            <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Eficiencia despacho</p>
-            <p style="font-size:20px;font-weight:700;margin:3px 0 0;
-                color:{{ $eficiencia >= 90 ? '#389e0d' : ($eficiencia >= 60 ? '#d48806' : '#cf1322') }};">
-                {{ $eficiencia }}%
-            </p>
-        </div>
+<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid #f0f0f0;">
+
+    <div style="padding:12px 18px;border-right:1px solid #f0f0f0;">
+        <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">
+            Producción
+        </p>
+        <p style="font-size:20px;font-weight:700;color:#389e0d;margin:3px 0 0;">
+            {{ number_format($totalProduccionGrafico) }} u.
+        </p>
     </div>
+
+    <div style="padding:12px 18px;border-right:1px solid #f0f0f0;">
+        <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">
+            Salidas
+        </p>
+        <p style="font-size:20px;font-weight:700;color:#cf1322;margin:3px 0 0;">
+            {{ number_format($totalSalidasGrafico) }} u.
+        </p>
+    </div>
+
+    <div style="padding:12px 18px;border-right:1px solid #f0f0f0;">
+        <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">
+            Facturado
+        </p>
+        <p style="font-size:20px;font-weight:700;color:#389e0d;margin:3px 0 0;">
+            S/ {{ number_format($totalFact, 2) }}
+        </p>
+    </div>
+
+    <div style="padding:12px 18px;">
+        <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">
+            Movimientos
+        </p>
+        <p style="font-size:20px;font-weight:700;color:#722ed1;margin:3px 0 0;">
+            {{ number_format($totalOrd) }}
+        </p>
+    </div>
+
+</div>
 
     {{-- Canvas --}}
     <div style="padding:16px 20px;">
@@ -212,10 +233,9 @@
 <script>
 (function(){
     const labels     = @json($chartData['labels']);
-    const despachado = @json($chartData['despachado']);
-    const solicitado = @json($chartData['solicitado']);
-    const produccion = @json($chartData['produccion']);
-    const subtotales = @json($chartData['subtotal']);
+const salidas    = @json($chartData['salidas']);
+const produccion = @json($chartData['produccion']);
+const subtotales = @json($chartData['subtotal']);
 
     if (!labels.length) return;
 
@@ -239,32 +259,19 @@
         yAxisID: 'y',
     },
                 {
-                    label: 'Despachado',
-                    data: despachado,
-                    borderColor: '#cf1322',
-                    backgroundColor: 'rgba(207,19,34,.07)',
-                    borderWidth: 2.5,
-                    pointBackgroundColor: '#cf1322',
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    tension: 0.35,
-                    fill: true,
-                    yAxisID: 'y',
-                },
-                {
-                    label: 'Solicitado',
-                    data: solicitado,
-                    borderColor: '#1890ff',
-                    backgroundColor: 'rgba(24,144,255,.05)',
-                    borderWidth: 2,
-                    pointBackgroundColor: '#1890ff',
-                    pointRadius: 3,
-                    pointHoverRadius: 5,
-                    tension: 0.35,
-                    fill: false,
-                    borderDash: [5,3],
-                    yAxisID: 'y',
-                },
+    label: 'Salidas',
+    data: salidas,
+    borderColor: '#cf1322',
+    backgroundColor: 'rgba(207,19,34,.07)',
+    borderWidth: 2.5,
+    pointBackgroundColor: '#cf1322',
+    pointRadius: 4,
+    pointHoverRadius: 6,
+    tension: 0.35,
+    fill: true,
+    yAxisID: 'y',
+},
+                
             ]
         },
         options: {
@@ -556,53 +563,7 @@
 
 @endforelse
                     @php
-                        $estadoItemColors = [
-                            'COMPLETO'   => ['bg'=>'#f6ffed','color'=>'#389e0d'],
-                            'PARCIAL'    => ['bg'=>'#fffbe6','color'=>'#d48806'],
-                            'INCOMPLETO' => ['bg'=>'#fff1f0','color'=>'#cf1322'],
-                        ];
-                        $ec = $estadoItemColors[$mov['estado_item']] ?? ['bg'=>'#f5f5f5','color'=>'#595959'];
-                        $pctDespachado = $mov['cantidad_solicitada'] > 0
-                            ? round(($mov['cantidad_despachada'] / $mov['cantidad_solicitada']) * 100)
-                            : 0;
-                    @endphp
-                    <tr>
-                        <td style="color:#bfbfbf;font-size:12px;">{{ $i + 1 }}</td>
-                        <td style="white-space:nowrap;color:#595959;font-size:12px;">
-                            {{ \Carbon\Carbon::parse($mov['fecha'])->format('d/m/Y') }}
-                        </td>
-                        <td>
-                            <span style="font-weight:600;color:#1890ff;">{{ $mov['numero_orden'] }}</span>
-                        </td>
-                        <td style="max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                            {{ $mov['cliente'] }}
-                        </td>
-                        <td style="max-width:160px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
-                            {{ $mov['producto'] }}
-                        </td>
-                        <td style="text-align:right;color:#595959;">{{ number_format($mov['cantidad_solicitada']) }}</td>
-                        <td style="text-align:right;">
-                            <span style="font-weight:700;color:#cf1322;">{{ number_format($mov['cantidad_despachada']) }}</span>
-                            <div style="height:4px;background:#f0f0f0;border-radius:3px;margin-top:3px;min-width:50px;">
-                                <div style="height:4px;width:{{ $pctDespachado }}%;background:{{ $ec['color'] }};border-radius:3px;"></div>
-                            </div>
-                        </td>
-                        <td style="text-align:right;color:#595959;">S/ {{ number_format($mov['precio_unitario'], 2) }}</td>
-                        <td style="text-align:right;font-weight:600;">S/ {{ number_format($mov['subtotal'], 2) }}</td>
-                        <td>
-                            <span class="kx-estado" style="background:{{ $ec['bg'] }};color:{{ $ec['color'] }};">
-                                {{ $mov['estado_item'] }}
-                            </span>
-                        </td>
-                    </tr>
-                    @empty
-                    <tr>
-                        <td colspan="10" style="text-align:center;padding:48px;color:#bfbfbf;">
-                            <p style="font-size:32px;margin:0;">📭</p>
-                            <p style="margin:8px 0 0;">No hay movimientos con los filtros aplicados</p>
-                        </td>
-                    </tr>
-                    @endforelse
+                       
                 </tbody>
                 @if($movimientosPaginados->total() > 0)
 
