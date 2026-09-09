@@ -63,31 +63,47 @@
 
 {{-- KPIs --}}
 <div class="kx-kpi-grid">
+
     <div class="kx-kpi" style="border-top-color:#1890ff;">
         <p class="kx-kpi-label">Movimientos</p>
-        <p class="kx-kpi-value">{{ number_format($totalMovimientos) }}</p>
+        <p class="kx-kpi-value">
+            {{ number_format($totalMovimientos) }}
+        </p>
         <span style="font-size:16px;opacity:.35;">📋</span>
     </div>
+
+    <div class="kx-kpi" style="border-top-color:#389e0d;">
+        <p class="kx-kpi-label">Producción</p>
+        <p class="kx-kpi-value" style="color:#389e0d;">
+            {{ number_format($totalProduccion) }}
+        </p>
+        <span style="font-size:16px;opacity:.35;">🟢</span>
+    </div>
+
     <div class="kx-kpi" style="border-top-color:#cf1322;">
-        <p class="kx-kpi-label">Uds. Despachadas</p>
-        <p class="kx-kpi-value" style="color:#cf1322;">{{ number_format($totalSalidas) }}</p>
-        <span style="font-size:16px;opacity:.35;">📤</span>
+        <p class="kx-kpi-label">Salidas</p>
+        <p class="kx-kpi-value" style="color:#cf1322;">
+            {{ number_format($totalSalidas) }}
+        </p>
+        <span style="font-size:16px;opacity:.35;">🔴</span>
     </div>
-    <div class="kx-kpi" style="border-top-color:#08979c;">
-        <p class="kx-kpi-label">Clientes Activos</p>
-        <p class="kx-kpi-value" style="color:#08979c;">{{ $clientesActivos }}</p>
-        <span style="font-size:16px;opacity:.35;">👥</span>
-    </div>
+
     <div class="kx-kpi" style="border-top-color:#722ed1;">
         <p class="kx-kpi-label">Productos Movidos</p>
-        <p class="kx-kpi-value" style="color:#722ed1;">{{ $productosMovidos }}</p>
+        <p class="kx-kpi-value" style="color:#722ed1;">
+            {{ $productosMovidos }}
+        </p>
         <span style="font-size:16px;opacity:.35;">📦</span>
     </div>
+
     <div class="kx-kpi" style="border-top-color:#389e0d;">
         <p class="kx-kpi-label">Total Facturado</p>
-        <p class="kx-kpi-value" style="color:#389e0d;">S/ {{ number_format($totalFacturado, 2) }}</p>
+        <p class="kx-kpi-value" style="color:#389e0d;">
+            S/ {{ number_format($totalFacturado, 2) }}
+        </p>
         <span style="font-size:16px;opacity:.35;">💰</span>
     </div>
+
 </div>
 
 {{-- FILTROS --}}
@@ -198,6 +214,7 @@
     const labels     = @json($chartData['labels']);
     const despachado = @json($chartData['despachado']);
     const solicitado = @json($chartData['solicitado']);
+    const produccion = @json($chartData['produccion']);
     const subtotales = @json($chartData['subtotal']);
 
     if (!labels.length) return;
@@ -208,6 +225,19 @@
         data: {
             labels,
             datasets: [
+                {
+        label: 'Producción',
+        data: produccion,
+        borderColor: '#389e0d',
+        backgroundColor: 'rgba(56,158,13,.07)',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#389e0d',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        tension: 0.35,
+        fill: true,
+        yAxisID: 'y',
+    },
                 {
                     label: 'Despachado',
                     data: despachado,
@@ -293,18 +323,238 @@
                     <tr>
                         <th>#</th>
                         <th>Fecha</th>
+                        <th>Tipo</th>
                         <th>N° Orden</th>
                         <th>Cliente</th>
                         <th>Producto</th>
-                        <th style="text-align:right;">Solicitado</th>
-                        <th style="text-align:right;">Despachado</th>
+                        <th style="text-align:right;">Producción</th>
+                        <th style="text-align:right;">Salida</th>
+                        <th style="text-align:right;">Saldo</th>
                         <th style="text-align:right;">Precio U.</th>
                         <th style="text-align:right;">Subtotal</th>
-                        <th>Estado ítem</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($movimientosPaginados as $i => $mov)
+
+@php
+
+    $esProduccion = $mov['tipo'] === 'PRODUCCIÓN';
+
+    $tipoColor = $esProduccion
+        ? '#389e0d'
+        : '#cf1322';
+
+    $tipoBg = $esProduccion
+        ? '#f6ffed'
+        : '#fff1f0';
+
+@endphp
+
+<tr>
+
+    {{-- # --}}
+    <td style="
+        color:#bfbfbf;
+        font-size:12px;
+    ">
+        {{ $i + 1 }}
+    </td>
+
+
+    {{-- FECHA --}}
+    <td style="
+        white-space:nowrap;
+        color:#595959;
+        font-size:12px;
+    ">
+        {{ \Carbon\Carbon::parse($mov['fecha'])->format('d/m/Y H:i') }}
+    </td>
+
+
+    {{-- TIPO --}}
+    <td>
+
+        <span
+            style="
+                display:inline-block;
+                padding:4px 9px;
+                border-radius:20px;
+                font-size:10px;
+                font-weight:700;
+                background:{{ $tipoBg }};
+                color:{{ $tipoColor }};
+            "
+        >
+
+            @if($esProduccion)
+                🟢 PRODUCCIÓN
+            @else
+                🔴 SALIDA
+            @endif
+
+        </span>
+
+    </td>
+
+
+    {{-- ORDEN --}}
+    <td>
+
+        @if($mov['numero_orden'])
+
+            <span style="
+                font-weight:600;
+                color:#1890ff;
+            ">
+                {{ $mov['numero_orden'] }}
+            </span>
+
+        @else
+
+            <span style="
+                color:#8c8c8c;
+                font-size:11px;
+            ">
+                —
+            </span>
+
+        @endif
+
+    </td>
+
+
+    {{-- CLIENTE --}}
+    <td style="
+        max-width:150px;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+    ">
+
+        {{ $mov['cliente'] }}
+
+    </td>
+
+
+    {{-- PRODUCTO --}}
+    <td style="
+        max-width:160px;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        font-weight:600;
+    ">
+
+        {{ $mov['producto'] }}
+
+    </td>
+
+
+    {{-- PRODUCCIÓN --}}
+    <td style="
+        text-align:right;
+        font-weight:700;
+        color:#389e0d;
+    ">
+
+        @if($mov['cantidad_produccion'] > 0)
+
+            +{{ number_format($mov['cantidad_produccion']) }}
+
+        @else
+
+            —
+
+        @endif
+
+    </td>
+
+
+    {{-- SALIDA --}}
+    <td style="
+        text-align:right;
+        font-weight:700;
+        color:#cf1322;
+    ">
+
+        @if($mov['cantidad_despachada'] > 0)
+
+            -{{ number_format($mov['cantidad_despachada']) }}
+
+        @else
+
+            —
+
+        @endif
+
+    </td>
+
+
+    {{-- SALDO --}}
+    <td style="
+        text-align:right;
+        font-weight:800;
+        color:#1890ff;
+    ">
+
+        {{ number_format($mov['saldo']) }}
+
+    </td>
+
+
+    {{-- PRECIO --}}
+    <td style="
+        text-align:right;
+        color:#595959;
+    ">
+
+        @if($mov['tipo'] === 'SALIDA')
+
+            S/ {{ number_format($mov['precio_unitario'], 2) }}
+
+        @else
+
+            —
+
+        @endif
+
+    </td>
+
+
+    {{-- SUBTOTAL --}}
+    <td style="
+        text-align:right;
+        font-weight:600;
+    ">
+
+        @if($mov['tipo'] === 'SALIDA')
+
+            S/ {{ number_format($mov['subtotal'], 2) }}
+
+        @else
+
+            —
+
+        @endif
+
+    </td>
+
+</tr>
+
+@empty
+
+<tr>
+
+    <td colspan="11" style="text-align:center; padding:48px; color:#bfbfbf;">
+        <p style="font-size:32px;margin:0;">📭</p>
+        <p style="margin:8px 0 0;"> No hay movimientos con los filtros aplicados</p>
+
+    </td>
+
+</tr>
+
+@endforelse
                     @php
                         $estadoItemColors = [
                             'COMPLETO'   => ['bg'=>'#f6ffed','color'=>'#389e0d'],
@@ -355,17 +605,55 @@
                     @endforelse
                 </tbody>
                 @if($movimientosPaginados->total() > 0)
-                <tfoot>
-                    <tr>
-                        <td colspan="5" style="text-align:right;color:#595959;">TOTALES</td>
-                        <td style="text-align:right;">{{ number_format($movimientosPaginados->sum('cantidad_solicitada')) }}</td>
-                        <td style="text-align:right;">{{ number_format($totalSalidas) }}</td>
-                        <td></td>
-                        <td style="text-align:right;">S/ {{ number_format($totalFacturado, 2) }}</td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-                @endif
+
+<tfoot>
+
+    <tr>
+
+        <td colspan="6" style="
+            text-align:right;
+            color:#595959;
+        ">
+            TOTALES
+        </td>
+
+        <td style="
+            text-align:right;
+            color:#389e0d;
+        ">
+            {{ number_format(
+                $movimientosPaginados->sum('cantidad_produccion')
+            ) }}
+        </td>
+
+        <td style="
+            text-align:right;
+            color:#cf1322;
+        ">
+            {{ number_format(
+                $movimientosPaginados->sum('cantidad_despachada')
+            ) }}
+        </td>
+
+        <td></td>
+
+        <td></td>
+
+        <td style="
+            text-align:right;
+        ">
+            S/
+            {{ number_format(
+                $movimientosPaginados->sum('subtotal'),
+                2
+            ) }}
+        </td>
+
+    </tr>
+
+</tfoot>
+
+@endif
             </table>
         </div>
         @if($movimientosPaginados->hasPages())
