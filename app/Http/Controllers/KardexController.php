@@ -8,6 +8,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\Client;
 use App\Models\ProductEntry;
+use App\Models\ProductionOrder;
 
 class KardexController extends Controller
 {
@@ -21,40 +22,74 @@ class KardexController extends Controller
         $perPage = 20;
 
         /*
-        |--------------------------------------------------------------------------
-        | MOVIMIENTOS
-        |--------------------------------------------------------------------------
-        |
-        | PRODUCCIÓN = ProductEntry
-        | SALIDA     = OrderDetail.cantidad_despachada
-        |
-        */
+|--------------------------------------------------------------------------
+| 1. PRODUCCIÓN
+|--------------------------------------------------------------------------
+| La producción se registra al finalizar una ProductionOrder.
+| Al finalizar:
+| - se aumenta el stock del producto
+| - la orden pasa a FINALIZADA
+|--------------------------------------------------------------------------
+*/
 
-        $movimientos = collect();
+$produccionesQuery = ProductionOrder::with([
+    'product',
+    'user'
+])
+->where('status', 'FINALIZADA')
+->orderBy('created_at', 'asc');
 
-        /*
-        |--------------------------------------------------------------------------
-        | 1. ENTRADAS / PRODUCCIÓN
-        |--------------------------------------------------------------------------
-        */
+if ($productId) {
+    $produccionesQuery->where('product_id', $productId);
+}
 
-        $entradasQuery = ProductEntry::with([
-            'product',
-            'user'
-        ])->orderBy('created_at', 'asc');
+if ($dateFrom) {
+    $produccionesQuery->whereDate('created_at', '>=', $dateFrom);
+}
 
-        if ($productId) {
-            $entradasQuery->where('product_id', $productId);
-        }
+if ($dateTo) {
+    $produccionesQuery->whereDate('created_at', '<=', $dateTo);
+}
 
-        if ($dateFrom) {
-            $entradasQuery->whereDate('created_at', '>=', $dateFrom);
-        }
+$producciones = $produccionesQuery->get();
 
-        if ($dateTo) {
-            $entradasQuery->whereDate('created_at', '<=', $dateTo);
-        }
+foreach ($producciones as $produccion) {
 
+    $movimientos->push([
+        'fecha'               => $produccion->created_at,
+        'tipo'                => 'PRODUCCIÓN',
+
+        'numero_orden'        => $produccion->number,
+
+        'cliente'             => 'Producción',
+        'client_id'           => null,
+
+        'producto'            => optional($produccion->product)->nombre
+            ?? 'Sin producto',
+
+        'product_id'          => $produccion->product_id,
+
+        'cantidad_solicitada' => 0,
+
+        'cantidad_produccion' => (float) $produccion->produced_quantity,
+
+        'cantidad_despachada' => 0,
+
+        'precio_unitario'     => 0,
+
+        'subtotal'            => 0,
+
+        'estado_orden'        => $produccion->status,
+
+        'stock_before'        => null,
+        'stock_after'         => null,
+
+        'usuario'             => optional($produccion->user)->name
+            ?? 'Sistema',
+
+        'origen_id'           => $produccion->id,
+    ]);
+}
         $entradas = $entradasQuery->get();
 
         foreach ($entradas as $entrada) {
