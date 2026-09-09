@@ -236,38 +236,28 @@ class KardexController extends Controller
 
         $saldos = [];
 
-        foreach ($movimientos as $index => $mov) {
+foreach ($movimientos as $index => $mov) {
 
-            $productIdMovimiento = $mov['product_id'];
+    $productIdMovimiento = $mov['product_id'];
 
-            if (!isset($saldos[$productIdMovimiento])) {
-                $saldos[$productIdMovimiento] = 0;
-            }
+    if (!isset($saldos[$productIdMovimiento])) {
+        $saldos[$productIdMovimiento] = 0;
+    }
 
-            /*
-            Producción = entrada
-            */
+    $saldos[$productIdMovimiento] +=
+        (float) $mov['cantidad_produccion'];
 
-            $saldos[$productIdMovimiento] +=
-                (float) $mov['cantidad_produccion'];
+    $saldos[$productIdMovimiento] -=
+        (float) $mov['cantidad_despachada'];
 
-            /*
-            Salida = resta
-            */
+    $saldos[$productIdMovimiento] =
+        max(0, $saldos[$productIdMovimiento]);
 
-            $saldos[$productIdMovimiento] -=
-                (float) $mov['cantidad_despachada'];
+    // Collection::put() permite modificar correctamente el elemento
+    $mov['saldo'] = $saldos[$productIdMovimiento];
 
-            /*
-            No permitir saldo negativo visual.
-            */
-
-            $saldos[$productIdMovimiento] =
-                max(0, $saldos[$productIdMovimiento]);
-
-            $movimientos[$index]['saldo'] =
-                $saldos[$productIdMovimiento];
-        }
+    $movimientos->put($index, $mov);
+}
 
 
         /*
