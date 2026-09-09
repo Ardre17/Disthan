@@ -92,43 +92,7 @@ foreach ($producciones as $produccion) {
         'origen_id'           => $produccion->id,
     ]);
 }
-        $entradas = $entradasQuery->get();
-
-        foreach ($entradas as $entrada) {
-
-            $movimientos->push([
-                'fecha'               => $entrada->created_at,
-                'tipo'                => 'PRODUCCIÓN',
-
-                'numero_orden'        => null,
-                'cliente'             => 'Producción',
-                'client_id'           => null,
-
-                'producto'            => optional($entrada->product)->nombre
-                    ?? 'Sin producto',
-
-                'product_id'          => $entrada->product_id,
-
-                'cantidad_solicitada' => 0,
-                'cantidad_produccion' => $entrada->quantity,
-                'cantidad_despachada' => 0,
-
-                'precio_unitario'     => 0,
-                'subtotal'            => 0,
-
-                'estado_orden'        => null,
-
-                'stock_before'        => $entrada->stock_before,
-                'stock_after'         => $entrada->stock_after,
-
-                'usuario'             => optional($entrada->user)->name
-                    ?? 'Sistema',
-
-                'origen_id'           => $entrada->id,
-            ]);
-        }
-
-
+       
         /*
         |--------------------------------------------------------------------------
         | 2. SALIDAS / DESPACHOS
