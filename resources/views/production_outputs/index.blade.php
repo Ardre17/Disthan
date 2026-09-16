@@ -253,7 +253,7 @@
         <div class="options">
 
             {{-- CAJAS --}}
-            <a href="#" class="option">
+            <a href="{{ route('production.outputs.cajas') }}" class="option">
 
                 <div class="option-image">
                     📦
