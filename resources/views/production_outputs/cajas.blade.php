@@ -431,10 +431,11 @@
                                     type="number"
                                     name="cantidad"
                                     class="form-control"
-                                    min="0.01"
-                                    max="{{ $caja->stock_actual }}"
+                                    min="1"
+                                    max="{{ floor($caja->stock_actual) }}"
                                     step="1"
                                     inputmode="numeric"
+                                    pattern="[0-9]*"
                                     placeholder="Ejemplo: 10"
                                     required
                                 >

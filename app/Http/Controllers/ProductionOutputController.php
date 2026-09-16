@@ -36,7 +36,7 @@ class ProductionOutputController extends Controller
     public function salidaCaja(Request $request, Caja $caja)
     {
         $request->validate([
-            'cantidad' => 'required|numeric|min:0.01',
+            'cantidad' => 'required|integer|min:1',
             'responsable' => 'required|string|max:100',
             'observacion' => 'nullable|string|max:255',
         ], [
@@ -46,7 +46,7 @@ class ProductionOutputController extends Controller
             'responsable.required' => 'Ingresa el nombre del responsable.',
         ]);
 
-        $cantidad = (float) $request->cantidad;
+        $cantidad = (int) $request->cantidad;
 
         DB::transaction(function () use (
             $caja,
