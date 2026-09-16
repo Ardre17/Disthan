@@ -511,7 +511,7 @@ html,body{
                 <span class="btn-arrow">→</span>
             </button>
             <a
-                href="{{ route('production.outputs', ['token' => config('app.production_output_token')]) }}"
+                href="{{ route('production.outputs') }}"
                 class="btn-production"
             >
                 <span>📦</span>

@@ -38,7 +38,7 @@ use App\Http\Controllers\OrderValidationController;
 use App\Http\Controllers\ProductionOutputController;
 
 Route::get(
-    '/produccion/salidas/{token}',
+    '/produccion/salidas',
     [ProductionOutputController::class, 'index']
 )->name('production.outputs');
 
