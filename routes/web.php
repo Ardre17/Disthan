@@ -35,7 +35,12 @@ use App\Http\Controllers\DesmedroController;
 use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\OrderValidationController;
+use App\Http\Controllers\ProductionOutputController;
 
+Route::get(
+    '/produccion/salidas/{token}',
+    [ProductionOutputController::class, 'index']
+)->name('production.outputs');
 
 Route::delete(
     '/exportacion/pallet-detalle/{detalle}',

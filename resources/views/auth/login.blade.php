@@ -343,6 +343,42 @@ html,body{
 @media(max-width:360px){
     .panel-right{padding:1.25rem 1rem;}
 }
+.btn-production {
+    width: 100%;
+    margin-top: 12px;
+
+    min-height: 52px;
+    padding: 14px 18px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+
+    border-radius: 10px;
+
+    background: #f1f5f9;
+    color: #0f172a;
+
+    border: 1px solid #cbd5e1;
+
+    text-decoration: none;
+
+    font-size: 15px;
+    font-weight: 700;
+
+    transition: all 0.2s ease;
+}
+
+.btn-production:hover {
+    background: #e2e8f0;
+    border-color: #94a3b8;
+    transform: translateY(-1px);
+}
+
+.btn-production span {
+    font-size: 20px;
+}
 </style>
 </head>
 
@@ -474,6 +510,13 @@ html,body{
                 Ingresar al sistema
                 <span class="btn-arrow">→</span>
             </button>
+            <a
+                href="{{ route('production.outputs', ['token' => config('app.production_output_token')]) }}"
+                class="btn-production"
+            >
+                <span>📦</span>
+                Registrar salida de producción
+            </a>
 
         </form>
 
