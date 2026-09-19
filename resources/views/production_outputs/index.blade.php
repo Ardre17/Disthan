@@ -513,7 +513,7 @@
             </a>
 
             {{-- ── ETIQUETAS ── --}}
-            <a href="#" class="option option-etiquetas">
+            <a href="{{ route('production.outputs.etiquetas') }}" class="option">
                 <span class="option-num">02</span>
                 <div class="option-icon-wrap">
                     <span>🔖</span>
@@ -647,7 +647,7 @@
 
     {{-- ── Footer ── --}}
     <div class="page-footer">
-        <span class="page-footer-left">JOYBER PERÚ · Sistema ERP · Producción › Salidas</span>
+        <span class="page-footer-left">DISTAN ERP · Sistema ERP · Producción › Salidas</span>
         <span class="page-footer-right">v2025.1</span>
     </div>
 

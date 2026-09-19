@@ -38,6 +38,16 @@ use App\Http\Controllers\OrderValidationController;
 use App\Http\Controllers\ProductionOutputController;
 
 Route::get(
+    '/produccion/salidas/etiquetas',
+    [ProductionOutputController::class, 'etiquetas']
+)->name('production.outputs.etiquetas');
+
+Route::post(
+    '/produccion/salidas/etiquetas/{label}',
+    [ProductionOutputController::class, 'salidaEtiqueta']
+)->name('production.outputs.etiquetas.salida');
+
+Route::get(
     '/produccion/salidas/cajas',
     [ProductionOutputController::class, 'cajas']
 )->name('production.outputs.cajas');
