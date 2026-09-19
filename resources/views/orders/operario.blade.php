@@ -71,6 +71,33 @@ to{
 transform:scale(1);
 opacity:1;
 }}
+.btn-etiqueta{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:6px;
+    width:100%;
+    margin-top:10px;
+    padding:9px 12px;
+    border:1px solid #475569;
+    border-radius:8px;
+    background:#0f172a;
+    color:#f8fafc;
+    text-decoration:none;
+    font-size:11px;
+    font-weight:700;
+    cursor:pointer;
+    transition:.15s;
+}
+
+.btn-etiqueta:hover{
+    background:#334155;
+    border-color:#64748b;
+}
+
+.btn-etiqueta:active{
+    transform:scale(.98);
+}
 </style>
 
 {{-- Fondo oscuro para toda la página --}}
@@ -273,8 +300,31 @@ opacity:1;
     </span>
 </div>
     <div class="prod-mini-bar">
-        <div class="prod-mini-fill" id="bar-{{ $item->id }}" style="width:{{ $pct2 }}%;background:{{ $lc }};"></div>
+    <div class="prod-mini-fill"
+         id="bar-{{ $item->id }}"
+         style="width:{{ $pct2 }}%;background:{{ $lc }};">
     </div>
+</div>
+
+{{-- IMPRIMIR ETIQUETA --}}
+@if(strtoupper(trim($order->tipo_orden)) === 'LOCAL')
+
+    <a href="{{ route('orders.etiqueta.local', $item) }}"
+       target="_blank"
+       class="btn-etiqueta">
+        🖨️ Imprimir etiqueta LOCAL
+    </a>
+
+@else
+
+    <a href="{{ route('orders.etiqueta', $item) }}"
+       target="_blank"
+       class="btn-etiqueta">
+        🖨️ Imprimir etiqueta
+    </a>
+
+@endif
+
 </div>
 @endforeach
 
