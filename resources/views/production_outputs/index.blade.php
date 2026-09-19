@@ -513,7 +513,7 @@
             </a>
 
             {{-- ── ETIQUETAS ── --}}
-            <a href="{{ route('production.outputs.etiquetas') }}" class="option-etiquetas">
+            <a href="{{ route('production.outputs.etiquetas') }}" class="option option-etiquetas">
                 <span class="option-num">02</span>
                 <div class="option-icon-wrap">
                     <span>🔖</span>
@@ -531,7 +531,7 @@
             </a>
 
             {{-- ── PRECINTOS ── --}}
-            <a href="#" class="option option-precintos">
+            <a href="{{ route('production.outputs.precintos') }}" class="option option-precintos">
                 <span class="option-num">03</span>
                 <div class="option-icon-wrap">
                     <span>🔒</span>

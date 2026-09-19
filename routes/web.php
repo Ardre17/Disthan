@@ -38,6 +38,16 @@ use App\Http\Controllers\OrderValidationController;
 use App\Http\Controllers\ProductionOutputController;
 
 Route::get(
+    '/produccion/salidas/precintos',
+    [ProductionOutputController::class, 'precintos']
+)->name('production.outputs.precintos');
+
+Route::post(
+    '/produccion/salidas/precintos/{precinto}',
+    [ProductionOutputController::class, 'salidaPrecinto']
+)->name('production.outputs.precintos.salida');
+
+Route::get(
     '/produccion/salidas/etiquetas',
     [ProductionOutputController::class, 'etiquetas']
 )->name('production.outputs.etiquetas');

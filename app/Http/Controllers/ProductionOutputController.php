@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Precinto;
+use App\Models\PrecintoMovement;
 use App\Models\Caja;
 use App\Models\CajaMovement;
 use App\Models\Label;
@@ -11,6 +13,90 @@ use Illuminate\Support\Facades\DB;
 
 class ProductionOutputController extends Controller
 {
+    /**
+ * Mostrar precintos disponibles para producción.
+ */
+public function precintos()
+{
+    $precintos = Precinto::where('activo', true)
+        ->orderBy('nombre')
+        ->get();
+
+    return view(
+        'production_outputs.precintos',
+        compact('precintos')
+    );
+}
+
+/**
+ * Registrar salida de un precinto.
+ */
+public function salidaPrecinto(Request $request, Precinto $precinto)
+{
+    $request->validate([
+        'cantidad' => 'required|integer|min:1',
+        'responsable' => 'required|string|max:100',
+        'observacion' => 'nullable|string|max:255',
+    ], [
+        'cantidad.required' => 'Ingresa la cantidad.',
+        'cantidad.integer' => 'La cantidad debe ser un número entero.',
+        'cantidad.min' => 'La cantidad debe ser como mínimo 1.',
+        'responsable.required' => 'Ingresa el nombre del responsable.',
+    ]);
+
+    $cantidad = (int) $request->cantidad;
+
+    DB::transaction(function () use (
+        $precinto,
+        $cantidad,
+        $request
+    ) {
+        $precinto = Precinto::where('id', $precinto->id)
+            ->lockForUpdate()
+            ->firstOrFail();
+
+        if (!$precinto->activo) {
+            abort(404);
+        }
+
+        if ($cantidad > $precinto->stock_actual) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'cantidad' =>
+                    'Stock insuficiente. Disponible: ' .
+                    number_format($precinto->stock_actual, 0)
+            ]);
+        }
+
+        $nuevoSaldo = $precinto->stock_actual - $cantidad;
+
+        $referencia =
+            'Salida producción - Responsable: ' .
+            $request->responsable;
+
+        if ($request->filled('observacion')) {
+            $referencia .= ' - ' . $request->observacion;
+        }
+
+        PrecintoMovement::create([
+            'precinto_id' => $precinto->id,
+            'tipo' => 'SALIDA',
+            'cantidad' => $cantidad,
+            'motivo' => 'Producción',
+            'referencia' => $referencia,
+            'saldo_post' => $nuevoSaldo,
+        ]);
+
+        $precinto->stock_actual = $nuevoSaldo;
+        $precinto->save();
+    });
+
+    return redirect()
+        ->route('production.outputs.precintos')
+        ->with(
+            'success',
+            'Salida de precintos registrada correctamente.'
+        );
+}
     /**
      * Pantalla principal de salidas de producción.
      */
