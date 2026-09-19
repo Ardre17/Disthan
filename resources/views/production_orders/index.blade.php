@@ -242,6 +242,341 @@
     color:var(--erp-ink-muted);grid-column:1/-1;
 }
 .empty-state h3{color:var(--erp-ink);font-size:15px;margin-bottom:6px;}
+
+/* =========================================================
+   CALENDARIO DE PRODUCCIÓN
+========================================================= */
+
+.calendario-modal{
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(15,23,42,.60);
+    z-index:11000;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.calendario-box{
+    background:#fff;
+    width:min(950px,96vw);
+    max-height:92vh;
+    border-radius:8px;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);
+    overflow:hidden;
+    display:flex;
+    flex-direction:column;
+}
+
+.calendario-header{
+    padding:15px 18px;
+    border-bottom:1px solid #e2e8f0;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+}
+
+.calendario-titulo{
+    font-size:16px;
+    font-weight:800;
+    color:#0f172a;
+}
+
+.calendario-subtitulo{
+    font-size:11px;
+    color:#94a3b8;
+    margin-top:2px;
+}
+
+.calendario-close{
+    border:0;
+    background:#f1f5f9;
+    width:32px;
+    height:32px;
+    border-radius:5px;
+    font-size:18px;
+    cursor:pointer;
+}
+
+.calendario-body{
+    padding:18px;
+    overflow:auto;
+}
+
+.calendario-navegacion{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:15px;
+}
+
+.calendario-mes{
+    font-size:17px;
+    font-weight:800;
+    color:#0f172a;
+    text-transform:capitalize;
+}
+
+.calendario-nav-btn{
+    border:1px solid #cbd5e1;
+    background:#fff;
+    color:#334155;
+    width:36px;
+    height:34px;
+    border-radius:5px;
+    cursor:pointer;
+    font-size:16px;
+}
+
+.calendario-nav-btn:hover{
+    background:#f8fafc;
+}
+
+.calendario-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:5px;
+}
+
+.calendario-dia-semana{
+    text-align:center;
+    font-size:10px;
+    font-weight:800;
+    color:#64748b;
+    padding:6px 2px;
+    text-transform:uppercase;
+}
+
+.calendario-dia{
+    min-height:78px;
+    border:1px solid #e2e8f0;
+    background:#fff;
+    border-radius:5px;
+    padding:7px;
+    cursor:pointer;
+    position:relative;
+    transition:.15s;
+}
+
+.calendario-dia:hover{
+    border-color:#93c5fd;
+    background:#f8fbff;
+}
+
+.calendario-dia.vacio{
+    background:#f8fafc;
+    cursor:default;
+}
+
+.calendario-dia-numero{
+    font-size:12px;
+    font-weight:800;
+    color:#334155;
+}
+
+.calendario-dia.hoy{
+    border-color:#0b5ed7;
+    box-shadow:inset 0 0 0 1px #0b5ed7;
+}
+
+.calendario-dia.hoy .calendario-dia-numero{
+    color:#0b5ed7;
+}
+
+.calendario-producciones{
+    margin-top:7px;
+    display:flex;
+    flex-direction:column;
+    gap:3px;
+}
+
+.calendario-produccion-indicador{
+    display:flex;
+    align-items:center;
+    gap:4px;
+    background:#e8f5ee;
+    color:#166534;
+    border-radius:3px;
+    padding:3px 5px;
+    font-size:9px;
+    font-weight:700;
+    overflow:hidden;
+    white-space:nowrap;
+}
+
+.calendario-produccion-indicador .punto{
+    width:5px;
+    height:5px;
+    border-radius:50%;
+    background:#1c7c4d;
+    flex-shrink:0;
+}
+
+.calendario-mas{
+    font-size:9px;
+    color:#64748b;
+    font-weight:700;
+    margin-top:2px;
+}
+
+.producciones-dia{
+    margin-top:18px;
+    border-top:1px solid #e2e8f0;
+    padding-top:15px;
+}
+
+.producciones-dia-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.producciones-dia-titulo{
+    font-size:14px;
+    font-weight:800;
+    color:#0f172a;
+}
+
+.producciones-dia-resumen{
+    display:flex;
+    gap:6px;
+    flex-wrap:wrap;
+}
+
+.resumen-chip{
+    background:#f1f5f9;
+    border:1px solid #e2e8f0;
+    border-radius:4px;
+    padding:5px 8px;
+    font-size:10px;
+    color:#475569;
+    font-weight:700;
+}
+
+.produccion-dia-card{
+    border:1px solid #e2e8f0;
+    border-radius:5px;
+    padding:10px;
+    margin-bottom:7px;
+    background:#fff;
+}
+
+.produccion-dia-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+}
+
+.produccion-dia-op{
+    font-family:var(--font-mono);
+    font-size:12px;
+    font-weight:800;
+    color:#0f172a;
+}
+
+.produccion-dia-hora{
+    font-size:10px;
+    color:#64748b;
+}
+
+.produccion-dia-producto{
+    font-size:12px;
+    font-weight:700;
+    color:#334155;
+    margin-top:6px;
+}
+
+.produccion-dia-detalles{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:7px;
+    margin-top:8px;
+}
+
+.produccion-dia-detalle{
+    background:#f8fafc;
+    border:1px solid #eef2f7;
+    border-radius:4px;
+    padding:6px;
+}
+
+.produccion-dia-detalle-label{
+    font-size:9px;
+    color:#94a3b8;
+    text-transform:uppercase;
+    font-weight:700;
+}
+
+.produccion-dia-detalle-value{
+    font-size:11px;
+    color:#334155;
+    font-weight:700;
+    margin-top:2px;
+}
+
+.btn-ver-produccion{
+    margin-top:8px;
+    border:1px solid #cbd5e1;
+    background:#fff;
+    color:#475569;
+    border-radius:4px;
+    padding:5px 9px;
+    font-size:10px;
+    font-weight:700;
+    cursor:pointer;
+}
+
+.btn-ver-produccion:hover{
+    background:#f8fafc;
+}
+
+.calendario-sin-producciones{
+    padding:25px 10px;
+    text-align:center;
+    color:#94a3b8;
+    font-size:12px;
+    border:1px dashed #dbe2ea;
+    border-radius:5px;
+}
+
+@media(max-width:700px){
+
+    .calendario-modal{
+        padding:8px;
+    }
+
+    .calendario-box{
+        width:100%;
+        max-height:96vh;
+    }
+
+    .calendario-body{
+        padding:10px;
+    }
+
+    .calendario-dia{
+        min-height:65px;
+        padding:5px;
+    }
+
+    .calendario-dia-numero{
+        font-size:11px;
+    }
+
+    .calendario-produccion-indicador{
+        font-size:8px;
+        padding:2px 3px;
+    }
+
+    .produccion-dia-detalles{
+        grid-template-columns:1fr;
+    }
+}
 </style>
 
 <div class="page">
@@ -696,8 +1031,8 @@
                 data-number="{{ $orden->number }}"
                 data-quantity="{{ number_format($orden->produced_quantity, 2) }}"
                 data-status="{{ $orden->status }}"
-                data-date="{{ $orden->created_at
-                    ? $orden->created_at->format('d/m/Y H:i')
+                data-date="{{ $orden->fecha_produccion
+                    ? $orden->fecha_produccion->format('d/m/Y H:i')
                     : '—'
                 }}"
                 data-material="{{ $orden->rawMaterial->name ?? '—' }}"
@@ -1387,6 +1722,98 @@ document.getElementById('modalEditarProduccion')
             </div>
 
         </form>
+
+    </div>
+</div>
+{{-- =========================================================
+     CALENDARIO DE PRODUCCIÓN
+========================================================= --}}
+
+<div
+    id="modalCalendarioProduccion"
+    class="calendario-modal"
+>
+    <div class="calendario-box">
+
+        <div class="calendario-header">
+
+            <div>
+                <div class="calendario-titulo">
+                    📅 Calendario de producción
+                </div>
+
+                <div class="calendario-subtitulo">
+                    Selecciona un día para consultar las producciones finalizadas
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="calendario-close"
+                onclick="cerrarCalendarioProduccion()"
+            >
+                ×
+            </button>
+
+        </div>
+
+        <div class="calendario-body">
+
+            <div class="calendario-navegacion">
+
+                <button
+                    type="button"
+                    class="calendario-nav-btn"
+                    onclick="cambiarMesCalendario(-1)"
+                >
+                    ‹
+                </button>
+
+                <div
+                    id="calendarioMes"
+                    class="calendario-mes"
+                ></div>
+
+                <button
+                    type="button"
+                    class="calendario-nav-btn"
+                    onclick="cambiarMesCalendario(1)"
+                >
+                    ›
+                </button>
+
+            </div>
+
+            <div
+                id="calendarioGrid"
+                class="calendario-grid"
+            ></div>
+
+            <div
+                id="produccionesDia"
+                class="producciones-dia"
+                style="display:none;"
+            >
+
+                <div class="producciones-dia-header">
+
+                    <div
+                        id="produccionesDiaTitulo"
+                        class="producciones-dia-titulo"
+                    ></div>
+
+                    <div
+                        id="produccionesDiaResumen"
+                        class="producciones-dia-resumen"
+                    ></div>
+
+                </div>
+
+                <div id="listaProduccionesDia"></div>
+
+            </div>
+
+        </div>
 
     </div>
 </div>
