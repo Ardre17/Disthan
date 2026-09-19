@@ -513,7 +513,7 @@
             </a>
 
             {{-- ── ETIQUETAS ── --}}
-            <a href="{{ route('production.outputs.etiquetas') }}" class="option">
+            <a href="{{ route('production.outputs.etiquetas') }}" class="option-etiquetas">
                 <span class="option-num">02</span>
                 <div class="option-icon-wrap">
                     <span>🔖</span>
