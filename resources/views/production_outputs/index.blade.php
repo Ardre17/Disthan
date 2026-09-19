@@ -567,7 +567,7 @@
             </a>
 
             {{-- ── PRODUCTOS (span 2) ── --}}
-            <a href="#" class="option option-productos productos">
+            <a href="{{ route('production.outputs.productos') }}" class="option option-productos productos">
                 <span class="option-num">05</span>
                 <div class="option-icon-wrap" style="width:64px;height:64px;font-size:32px;flex-shrink:0;">
                     <span>🛒</span>

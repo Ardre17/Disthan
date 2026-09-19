@@ -38,6 +38,15 @@ use App\Http\Controllers\OrderValidationController;
 use App\Http\Controllers\ProductionOutputController;
 
 Route::get(
+    '/produccion/salidas/productos',
+    [ProductionOutputController::class, 'productos']
+)->name('production.outputs.productos');
+
+Route::post(
+    '/produccion/salidas/productos/{product}',
+    [ProductionOutputController::class, 'salidaProducto']
+)->name('production.outputs.productos.salida');
+Route::get(
     '/produccion/salidas/stickers',
     [ProductionOutputController::class, 'stickers']
 )->name('production.outputs.stickers');

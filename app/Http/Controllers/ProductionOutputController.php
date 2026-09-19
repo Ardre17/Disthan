@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Product;
+use App\Models\Movement;
 use App\Models\Sticker;
 use App\Models\StickerMovement;
 use App\Models\Precinto;
@@ -354,6 +356,104 @@ public function salidaEtiqueta(Request $request, Label $label)
         ->with(
             'success',
             'Salida de etiquetas registrada correctamente.'
+        );
+}
+/**
+ * Mostrar productos disponibles para producción.
+ */
+public function productos(Request $request)
+{
+    $busqueda = trim($request->input('buscar', ''));
+
+    $productos = Product::where('activo', true)
+        ->when($busqueda !== '', function ($query) use ($busqueda) {
+            $query->where(function ($q) use ($busqueda) {
+                $q->where('nombre', 'like', '%' . $busqueda . '%')
+                    ->orWhere('sku', 'like', '%' . $busqueda . '%')
+                    ->orWhere('barcode', 'like', '%' . $busqueda . '%')
+                    ->orWhere('box_barcode', 'like', '%' . $busqueda . '%')
+                    ->orWhere('lote', 'like', '%' . $busqueda . '%');
+            });
+        })
+        ->orderBy('nombre')
+        ->get();
+
+    return view(
+        'production_outputs.productos',
+        compact('productos', 'busqueda')
+    );
+}
+
+/**
+ * Registrar salida de un producto para producción.
+ */
+public function salidaProducto(Request $request, Product $product)
+{
+    $request->validate([
+        'cantidad' => 'required|integer|min:1',
+        'responsable' => 'required|string|max:100',
+        'observacion' => 'nullable|string|max:255',
+    ], [
+        'cantidad.required' => 'Ingresa la cantidad.',
+        'cantidad.integer' => 'La cantidad debe ser un número entero.',
+        'cantidad.min' => 'La cantidad debe ser como mínimo 1.',
+        'responsable.required' => 'Ingresa el nombre del responsable.',
+    ]);
+
+    $cantidad = (int) $request->cantidad;
+
+    DB::transaction(function () use (
+        $product,
+        $cantidad,
+        $request
+    ) {
+        $product = Product::where('id', $product->id)
+            ->lockForUpdate()
+            ->firstOrFail();
+
+        if (!$product->activo) {
+            abort(404);
+        }
+
+        if ($cantidad > $product->stock) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'cantidad' =>
+                    'Stock insuficiente. Disponible: ' .
+                    number_format($product->stock, 0),
+            ]);
+        }
+
+        $nuevoSaldo = $product->stock - $cantidad;
+
+        /*
+         * El modelo Movement no tiene columnas independientes
+         * para responsable y observación.
+         *
+         * Por eso conservamos ambos datos dentro de "motivo",
+         * sin modificar la estructura actual del inventario.
+         */
+        $motivo = 'PRODUCCIÓN - Responsable: ' . $request->responsable;
+
+        if ($request->filled('observacion')) {
+            $motivo .= ' - ' . $request->observacion;
+        }
+
+        Movement::create([
+            'product_id' => $product->id,
+            'tipo' => 'SALIDA',
+            'cantidad' => $cantidad,
+            'motivo' => $motivo,
+        ]);
+
+        $product->stock = $nuevoSaldo;
+        $product->save();
+    });
+
+    return redirect()
+        ->route('production.outputs.productos')
+        ->with(
+            'success',
+            'Salida de producto registrada correctamente.'
         );
 }
 }
