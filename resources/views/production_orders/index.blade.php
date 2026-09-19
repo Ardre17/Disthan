@@ -1725,96 +1725,592 @@ document.getElementById('modalEditarProduccion')
 
     </div>
 </div>
-{{-- =========================================================
-     CALENDARIO DE PRODUCCIÓN
-========================================================= --}}
+<script>
+/* =========================================================
+   CALENDARIO DE PRODUCCIÓN
+========================================================= */
 
-<div
-    id="modalCalendarioProduccion"
-    class="calendario-modal"
->
-    <div class="calendario-box">
+let fechaCalendario = new Date();
 
-        <div class="calendario-header">
+function abrirCalendarioProduccion()
+{
+    const modal = document.getElementById(
+        'modalCalendarioProduccion'
+    );
 
-            <div>
-                <div class="calendario-titulo">
-                    📅 Calendario de producción
-                </div>
+    if (!modal) {
+        console.error('No se encontró el modal del calendario.');
+        return;
+    }
 
-                <div class="calendario-subtitulo">
-                    Selecciona un día para consultar las producciones finalizadas
-                </div>
+    modal.style.display = 'flex';
+
+    document.body.style.overflow = 'hidden';
+
+    fechaCalendario = new Date();
+
+    renderizarCalendarioProduccion();
+}
+
+
+function cerrarCalendarioProduccion()
+{
+    const modal = document.getElementById(
+        'modalCalendarioProduccion'
+    );
+
+    if (!modal) {
+        return;
+    }
+
+    modal.style.display = 'none';
+
+    document.body.style.overflow = '';
+}
+
+
+function cambiarMesCalendario(movimiento)
+{
+    fechaCalendario.setMonth(
+        fechaCalendario.getMonth() + movimiento
+    );
+
+    renderizarCalendarioProduccion();
+}
+
+
+function formatearFechaCalendario(fecha)
+{
+    const anio = fecha.getFullYear();
+
+    const mes = String(
+        fecha.getMonth() + 1
+    ).padStart(2, '0');
+
+    const dia = String(
+        fecha.getDate()
+    ).padStart(2, '0');
+
+    return `${anio}-${mes}-${dia}`;
+}
+
+
+function formatearFechaTexto(fecha)
+{
+    const partes = fecha.split('-');
+
+    if (partes.length !== 3) {
+        return fecha;
+    }
+
+    return `${partes[2]}/${partes[1]}/${partes[0]}`;
+}
+
+
+function renderizarCalendarioProduccion()
+{
+    const grid = document.getElementById(
+        'calendarioGrid'
+    );
+
+    const titulo = document.getElementById(
+        'calendarioMes'
+    );
+
+    if (!grid || !titulo) {
+        console.error(
+            'No se encontraron los elementos del calendario.'
+        );
+
+        return;
+    }
+
+    const anio =
+        fechaCalendario.getFullYear();
+
+    const mes =
+        fechaCalendario.getMonth();
+
+    const nombresMeses = [
+        'enero',
+        'febrero',
+        'marzo',
+        'abril',
+        'mayo',
+        'junio',
+        'julio',
+        'agosto',
+        'septiembre',
+        'octubre',
+        'noviembre',
+        'diciembre'
+    ];
+
+    titulo.textContent =
+        nombresMeses[mes] + ' ' + anio;
+
+    grid.innerHTML = '';
+
+    const diasSemana = [
+        'Lun',
+        'Mar',
+        'Mié',
+        'Jue',
+        'Vie',
+        'Sáb',
+        'Dom'
+    ];
+
+    diasSemana.forEach(function(dia) {
+
+        const encabezado =
+            document.createElement('div');
+
+        encabezado.className =
+            'calendario-dia-semana';
+
+        encabezado.textContent =
+            dia;
+
+        grid.appendChild(encabezado);
+    });
+
+
+    const primerDia =
+        new Date(
+            anio,
+            mes,
+            1
+        );
+
+    let diaInicio =
+        primerDia.getDay();
+
+    /*
+     * JavaScript:
+     * Domingo = 0
+     * Lunes = 1
+     *
+     * Convertimos para que lunes sea
+     * el primer día del calendario.
+     */
+    diaInicio =
+        diaInicio === 0
+            ? 6
+            : diaInicio - 1;
+
+
+    const cantidadDias =
+        new Date(
+            anio,
+            mes + 1,
+            0
+        ).getDate();
+
+
+    /*
+     * Espacios antes del primer día
+     */
+    for (
+        let i = 0;
+        i < diaInicio;
+        i++
+    ) {
+
+        const vacio =
+            document.createElement('div');
+
+        vacio.className =
+            'calendario-dia vacio';
+
+        grid.appendChild(vacio);
+    }
+
+
+    /*
+     * Días del mes
+     */
+    for (
+        let dia = 1;
+        dia <= cantidadDias;
+        dia++
+    ) {
+
+        const fecha =
+            new Date(
+                anio,
+                mes,
+                dia
+            );
+
+        const fechaKey =
+            formatearFechaCalendario(
+                fecha
+            );
+
+
+        const producciones =
+            Array.isArray(
+                produccionesCalendario
+            )
+                ? produccionesCalendario.filter(
+                    function(produccion) {
+
+                        return produccion.fecha === fechaKey;
+
+                    }
+                )
+                : [];
+
+
+        const celda =
+            document.createElement('div');
+
+        celda.className =
+            'calendario-dia';
+
+
+        /*
+         * Día actual
+         */
+        const hoy =
+            new Date();
+
+        if (
+            dia === hoy.getDate() &&
+            mes === hoy.getMonth() &&
+            anio === hoy.getFullYear()
+        ) {
+
+            celda.classList.add('hoy');
+        }
+
+
+        let contenido = `
+            <div class="calendario-dia-numero">
+                ${dia}
             </div>
+        `;
 
-            <button
-                type="button"
-                class="calendario-close"
-                onclick="cerrarCalendarioProduccion()"
-            >
-                ×
-            </button>
 
-        </div>
+        /*
+         * Mostrar producciones
+         */
+        if (producciones.length > 0) {
 
-        <div class="calendario-body">
+            contenido += `
+                <div class="calendario-producciones">
+            `;
 
-            <div class="calendario-navegacion">
+
+            const limite =
+                Math.min(
+                    producciones.length,
+                    2
+                );
+
+
+            for (
+                let i = 0;
+                i < limite;
+                i++
+            ) {
+
+                const produccion =
+                    producciones[i];
+
+                contenido += `
+                    <div class="calendario-produccion-indicador">
+                        <span class="punto"></span>
+                        ${produccion.number}
+                    </div>
+                `;
+            }
+
+
+            if (producciones.length > 2) {
+
+                contenido += `
+                    <div class="calendario-mas">
+                        +${producciones.length - 2} más
+                    </div>
+                `;
+            }
+
+
+            contenido += `
+                </div>
+            `;
+        }
+
+
+        celda.innerHTML =
+            contenido;
+
+
+        celda.addEventListener(
+            'click',
+            function() {
+
+                mostrarProduccionesDelDia(
+                    fechaKey
+                );
+
+            }
+        );
+
+
+        grid.appendChild(celda);
+    }
+}
+
+
+function mostrarProduccionesDelDia(fecha)
+{
+    const producciones =
+        Array.isArray(
+            produccionesCalendario
+        )
+            ? produccionesCalendario.filter(
+                function(produccion) {
+
+                    return produccion.fecha === fecha;
+
+                }
+            )
+            : [];
+
+
+    const contenedor =
+        document.getElementById(
+            'produccionesDia'
+        );
+
+    const titulo =
+        document.getElementById(
+            'produccionesDiaTitulo'
+        );
+
+    const resumen =
+        document.getElementById(
+            'produccionesDiaResumen'
+        );
+
+    const lista =
+        document.getElementById(
+            'listaProduccionesDia'
+        );
+
+
+    if (
+        !contenedor ||
+        !titulo ||
+        !resumen ||
+        !lista
+    ) {
+
+        return;
+    }
+
+
+    contenedor.style.display =
+        'block';
+
+
+    titulo.textContent =
+        'Producciones del ' +
+        formatearFechaTexto(fecha);
+
+
+    /*
+     * No hay producciones
+     */
+    if (producciones.length === 0) {
+
+        resumen.innerHTML = '';
+
+        lista.innerHTML = `
+            <div class="calendario-sin-producciones">
+                No hay producciones finalizadas en este día.
+            </div>
+        `;
+
+        return;
+    }
+
+
+    /*
+     * Total producido
+     */
+    const total =
+        producciones.reduce(
+            function(
+                acumulado,
+                produccion
+            ) {
+
+                return acumulado +
+                    Number(
+                        produccion.quantity || 0
+                    );
+
+            },
+            0
+        );
+
+
+    resumen.innerHTML = `
+        <span class="resumen-chip">
+            🏭 ${producciones.length}
+            producción${producciones.length !== 1 ? 'es' : ''}
+        </span>
+
+        <span class="resumen-chip">
+            📦 ${total.toLocaleString(
+                'es-PE',
+                {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                }
+            )} unidades
+        </span>
+    `;
+
+
+    lista.innerHTML = '';
+
+
+    /*
+     * Ordenar por hora
+     */
+    producciones.sort(
+        function(a, b) {
+
+            return a.hora.localeCompare(
+                b.hora
+            );
+
+        }
+    );
+
+
+    producciones.forEach(
+        function(produccion) {
+
+            const tarjeta =
+                document.createElement('div');
+
+            tarjeta.className =
+                'produccion-dia-card';
+
+
+            tarjeta.innerHTML = `
+                <div class="produccion-dia-top">
+
+                    <div class="produccion-dia-op">
+                        ${produccion.number}
+                    </div>
+
+                    <div class="produccion-dia-hora">
+                        🕐 ${produccion.hora}
+                    </div>
+
+                </div>
+
+                <div class="produccion-dia-producto">
+                    ${produccion.product}
+                </div>
+
+                <div class="produccion-dia-detalles">
+
+                    <div class="produccion-dia-detalle">
+
+                        <div class="produccion-dia-detalle-label">
+                            Cantidad
+                        </div>
+
+                        <div class="produccion-dia-detalle-value">
+                            ${Number(
+                                produccion.quantity
+                            ).toLocaleString(
+                                'es-PE',
+                                {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2
+                                }
+                            )}
+                        </div>
+
+                    </div>
+
+
+                    <div class="produccion-dia-detalle">
+
+                        <div class="produccion-dia-detalle-label">
+                            Materia prima
+                        </div>
+
+                        <div class="produccion-dia-detalle-value">
+                            ${produccion.material}
+                        </div>
+
+                    </div>
+
+
+                    <div class="produccion-dia-detalle">
+
+                        <div class="produccion-dia-detalle-label">
+                            Responsable
+                        </div>
+
+                        <div class="produccion-dia-detalle-value">
+                            ${produccion.user}
+                        </div>
+
+                    </div>
+
+                </div>
+
 
                 <button
                     type="button"
-                    class="calendario-nav-btn"
-                    onclick="cambiarMesCalendario(-1)"
+                    class="btn-ver-produccion"
+                    onclick="verProduccion(${produccion.id})"
                 >
-                    ‹
+                    👁️ Ver producción
                 </button>
+            `;
 
-                <div
-                    id="calendarioMes"
-                    class="calendario-mes"
-                ></div>
 
-                <button
-                    type="button"
-                    class="calendario-nav-btn"
-                    onclick="cambiarMesCalendario(1)"
-                >
-                    ›
-                </button>
+            lista.appendChild(
+                tarjeta
+            );
 
-            </div>
+        }
+    );
+}
 
-            <div
-                id="calendarioGrid"
-                class="calendario-grid"
-            ></div>
 
-            <div
-                id="produccionesDia"
-                class="producciones-dia"
-                style="display:none;"
-            >
+/*
+ * Cerrar al hacer clic fuera
+ */
+document
+    .getElementById(
+        'modalCalendarioProduccion'
+    )
+    ?.addEventListener(
+        'click',
+        function(event) {
 
-                <div class="producciones-dia-header">
+            if (
+                event.target === this
+            ) {
 
-                    <div
-                        id="produccionesDiaTitulo"
-                        class="producciones-dia-titulo"
-                    ></div>
+                cerrarCalendarioProduccion();
 
-                    <div
-                        id="produccionesDiaResumen"
-                        class="producciones-dia-resumen"
-                    ></div>
+            }
 
-                </div>
-
-                <div id="listaProduccionesDia"></div>
-
-            </div>
-
-        </div>
-
-    </div>
-</div>
+        }
+    );
+</script>
 @endsection
