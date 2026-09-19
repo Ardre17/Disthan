@@ -739,11 +739,10 @@
 </div>
 </div>
 
-<script>
-const produccionesCalendario = @json(
-    $orders
+@php
+    $produccionesCalendario = $orders
         ->filter(function ($orden) {
-            return $orden->status === 'FINALIZADA'
+            return strtoupper($orden->status) === 'FINALIZADA'
                 && $orden->fecha_produccion !== null;
         })
         ->map(function ($orden) {
@@ -758,8 +757,13 @@ const produccionesCalendario = @json(
                 'hora' => $orden->fecha_produccion->format('H:i'),
             ];
         })
-        ->values()
-);
+        ->values();
+@endphp
+
+<script>
+    const produccionesCalendario = @json($produccionesCalendario);
+</script>
+<script>
 
 function filtrarOrdenes() {
     var texto  = document.getElementById('filtroTexto').value.toLowerCase();
