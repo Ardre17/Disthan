@@ -368,62 +368,68 @@ public function update(
         ->route('production-orders.index')
         ->with('success', 'La orden de producción fue eliminada y el inventario restaurado correctamente.');
 }
-    public function finish(ProductionOrder $production_order)
+   public function finish(ProductionOrder $production_order)
 {
-    if($production_order->status=='FINALIZADA'){
+    if ($production_order->status == 'FINALIZADA') {
 
-        return back()->with('error',
-            'La producción ya fue finalizada.');
-
+        return back()->with(
+            'error',
+            'La producción ya fue finalizada.'
+        );
     }
 
-    DB::transaction(function() use($production_order){
+    DB::transaction(function () use ($production_order) {
 
-        $material=$production_order->rawMaterial;
+        $material = $production_order->rawMaterial;
 
-        $producto=$production_order->product;
+        $producto = $production_order->product;
 
-        // Validar stock
-
-        if($material->stock < $production_order->consumed_quantity){
+        // Validar stock de materia prima
+        if ($material->stock < $production_order->consumed_quantity) {
 
             throw new \Exception(
                 'No hay suficiente materia prima.'
             );
-
         }
-        
-    // Descontar materia prima
 
-$material->stock -= $production_order->consumed_quantity;
+        // Descontar materia prima
+        $material->stock -= $production_order->consumed_quantity;
 
-// Actualizar estado...
+        // Actualizar estado de la materia prima
+        if ($material->stock <= 0) {
 
-$material->save();
+            $material->status = 'AGOTADO';
 
-// Aumentar producto
+        } elseif ($material->stock <= $material->minimum_stock) {
 
-$producto->stock += $production_order->produced_quantity;
+            $material->status = 'STOCK_BAJO';
 
-$producto->save();
+        } else {
 
-        // Cambiar estado
-$production_order->status = 'FINALIZADA';
+            $material->status = 'DISPONIBLE';
+        }
 
-// Registrar fecha y hora REAL de producción
-$production_order->fecha_produccion = now();
+        $material->save();
 
-$production_order->save();
+        // Aumentar producto terminado
+        $producto->stock += $production_order->produced_quantity;
 
+        $producto->save();
+
+        // Cambiar estado de la producción
+        $production_order->status = 'FINALIZADA';
+
+        // Registrar la fecha y hora REAL en que terminó la producción
+        $production_order->fecha_produccion = now();
+
+        $production_order->save();
     });
 
     return redirect()
-
         ->route(
             'production-orders.show',
             $production_order
         )
-
         ->with(
             'success',
             'Producción finalizada correctamente.'

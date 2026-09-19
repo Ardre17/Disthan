@@ -62,6 +62,30 @@
     transition:background .15s;
 }
 .btn-new:hover{background:var(--erp-accent-dark);color:#fff;}
+.btn-calendar{
+    background:#fff;
+    color:var(--erp-ink);
+    border:1px solid var(--erp-border);
+    padding:8px 16px;
+    border-radius:3px;
+    font-size:12px;
+    font-weight:600;
+    text-decoration:none;
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    cursor:pointer;
+    transition:background .15s,border-color .15s;
+}
+
+.btn-calendar:hover{
+    background:#f8fafc;
+    border-color:#c2cbd8;
+}
+
+.btn-calendar:active{
+    transform:scale(.98);
+}
 
 /* ── KPIs ── */
 .kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;}
@@ -239,9 +263,22 @@
         <div class="page-title">Órdenes de producción</div>
         <div class="page-sub">Gestión y seguimiento de lotes de producción</div>
     </div>
-    <a href="{{ route('production-orders.create') }}" class="btn-new">
-        ➕ Nueva producción
-    </a>
+
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+
+        <button
+            type="button"
+            class="btn-calendar"
+            onclick="abrirCalendarioProduccion()"
+        >
+            📅 Calendario
+        </button>
+
+        <a href="{{ route('production-orders.create') }}" class="btn-new">
+            ➕ Nueva producción
+        </a>
+
+    </div>
 </div>
 
 {{-- ── KPIs ── --}}
@@ -703,6 +740,27 @@
 </div>
 
 <script>
+const produccionesCalendario = @json(
+    $orders
+        ->filter(function ($orden) {
+            return $orden->status === 'FINALIZADA'
+                && $orden->fecha_produccion !== null;
+        })
+        ->map(function ($orden) {
+            return [
+                'id' => $orden->id,
+                'number' => $orden->number,
+                'product' => $orden->product?->nombre ?? '—',
+                'quantity' => (float) $orden->produced_quantity,
+                'material' => $orden->rawMaterial?->name ?? '—',
+                'user' => $orden->user?->name ?? '—',
+                'fecha' => $orden->fecha_produccion->format('Y-m-d'),
+                'hora' => $orden->fecha_produccion->format('H:i'),
+            ];
+        })
+        ->values()
+);
+
 function filtrarOrdenes() {
     var texto  = document.getElementById('filtroTexto').value.toLowerCase();
     var estado = document.getElementById('filtroEstado').value.toLowerCase();
