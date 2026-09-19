@@ -549,7 +549,7 @@
             </a>
 
             {{-- ── STICKERS ── --}}
-            <a href="#" class="option option-stickers">
+            <a href="{{ route('production.outputs.stickers') }}" class="option option-stickers">
                 <span class="option-num">04</span>
                 <div class="option-icon-wrap">
                     <span>🏷️</span>

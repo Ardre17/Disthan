@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Sticker;
+use App\Models\StickerMovement;
 use App\Models\Precinto;
 use App\Models\PrecintoMovement;
 use App\Models\Caja;
@@ -13,6 +15,91 @@ use Illuminate\Support\Facades\DB;
 
 class ProductionOutputController extends Controller
 {
+
+/**
+ * Mostrar stickers disponibles para producción.
+ */
+public function stickers()
+{
+    $stickers = Sticker::where('activo', true)
+        ->orderBy('nombre')
+        ->get();
+
+    return view(
+        'production_outputs.stickers',
+        compact('stickers')
+    );
+}
+
+/**
+ * Registrar salida de un sticker.
+ */
+public function salidaSticker(Request $request, Sticker $sticker)
+{
+    $request->validate([
+        'cantidad' => 'required|integer|min:1',
+        'responsable' => 'required|string|max:100',
+        'observacion' => 'nullable|string|max:255',
+    ], [
+        'cantidad.required' => 'Ingresa la cantidad.',
+        'cantidad.integer' => 'La cantidad debe ser un número entero.',
+        'cantidad.min' => 'La cantidad debe ser como mínimo 1.',
+        'responsable.required' => 'Ingresa el nombre del responsable.',
+    ]);
+
+    $cantidad = (int) $request->cantidad;
+
+    DB::transaction(function () use (
+        $sticker,
+        $cantidad,
+        $request
+    ) {
+        $sticker = Sticker::where('id', $sticker->id)
+            ->lockForUpdate()
+            ->firstOrFail();
+
+        if (!$sticker->activo) {
+            abort(404);
+        }
+
+        if ($cantidad > $sticker->stock_actual) {
+            throw \Illuminate\Validation\ValidationException::withMessages([
+                'cantidad' =>
+                    'Stock insuficiente. Disponible: ' .
+                    number_format($sticker->stock_actual, 0)
+            ]);
+        }
+
+        $nuevoSaldo = $sticker->stock_actual - $cantidad;
+
+        $referencia =
+            'Salida producción - Responsable: ' .
+            $request->responsable;
+
+        if ($request->filled('observacion')) {
+            $referencia .= ' - ' . $request->observacion;
+        }
+
+        StickerMovement::create([
+            'sticker_id' => $sticker->id,
+            'tipo' => 'SALIDA',
+            'cantidad' => $cantidad,
+            'motivo' => 'Producción',
+            'referencia' => $referencia,
+            'saldo_post' => $nuevoSaldo,
+        ]);
+
+        $sticker->stock_actual = $nuevoSaldo;
+        $sticker->save();
+    });
+
+    return redirect()
+        ->route('production.outputs.stickers')
+        ->with(
+            'success',
+            'Salida de stickers registrada correctamente.'
+        );
+}
     /**
  * Mostrar precintos disponibles para producción.
  */
