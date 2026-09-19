@@ -1271,11 +1271,11 @@
 
 
         <a
-            href="{{ route('production.outputs.index') }}"
-            class="btn-back"
-        >
-            ← Volver
-        </a>
+    href="{{ url('/produccion/salidas') }}"
+    class="btn-back"
+>
+    ← Volver
+</a>
 
     </header>
 
