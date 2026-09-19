@@ -22,8 +22,14 @@ class ProductionOrder extends Model
 
         'user_id',
 
-        'status'
+        'status',
 
+        'fecha_produccion',
+
+    ];
+
+    protected $casts = [
+        'fecha_produccion' => 'datetime',
     ];
 
     public function product()
@@ -40,18 +46,19 @@ class ProductionOrder extends Model
     {
         return $this->belongsTo(User::class);
     }
+
     public function getStatusColorAttribute()
-{
-    return match($this->status){
+    {
+        return match($this->status){
 
-        'BORRADOR'=>'secondary',
+            'BORRADOR' => 'secondary',
 
-        'EN_PRODUCCION'=>'warning',
+            'EN_PRODUCCION' => 'warning',
 
-        'FINALIZADA'=>'success',
+            'FINALIZADA' => 'success',
 
-        default=>'danger'
+            default => 'danger'
 
-    };
-}
+        };
+    }
 }

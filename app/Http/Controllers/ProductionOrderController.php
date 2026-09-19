@@ -406,11 +406,14 @@ $material->save();
 $producto->stock += $production_order->produced_quantity;
 
 $producto->save();
+
         // Cambiar estado
+$production_order->status = 'FINALIZADA';
 
-        $production_order->status='FINALIZADA';
+// Registrar fecha y hora REAL de producción
+$production_order->fecha_produccion = now();
 
-        $production_order->save();
+$production_order->save();
 
     });
 
