@@ -1725,6 +1725,121 @@ document.getElementById('modalEditarProduccion')
 
     </div>
 </div>
+{{-- =========================================================
+     MODAL CALENDARIO DE PRODUCCIÓN
+========================================================= --}}
+
+<div
+    id="modalCalendarioProduccion"
+    class="calendario-modal"
+>
+
+    <div class="calendario-box">
+
+        {{-- CABECERA --}}
+        <div class="calendario-header">
+
+            <div>
+
+                <div class="calendario-titulo">
+                    📅 Calendario de producción
+                </div>
+
+                <div class="calendario-subtitulo">
+                    Selecciona un día para consultar las producciones finalizadas
+                </div>
+
+            </div>
+
+            <button
+                type="button"
+                class="calendario-close"
+                onclick="cerrarCalendarioProduccion()"
+            >
+                ×
+            </button>
+
+        </div>
+
+
+        {{-- CUERPO --}}
+        <div class="calendario-body">
+
+            {{-- NAVEGACIÓN DEL MES --}}
+            <div class="calendario-navegacion">
+
+                <button
+                    type="button"
+                    class="calendario-nav-btn"
+                    onclick="cambiarMesCalendario(-1)"
+                >
+                    ‹
+                </button>
+
+
+                <div
+                    id="calendarioMes"
+                    class="calendario-mes"
+                >
+                    Septiembre 2026
+                </div>
+
+
+                <button
+                    type="button"
+                    class="calendario-nav-btn"
+                    onclick="cambiarMesCalendario(1)"
+                >
+                    ›
+                </button>
+
+            </div>
+
+
+            {{-- CALENDARIO --}}
+            <div
+                id="calendarioGrid"
+                class="calendario-grid"
+            ></div>
+
+
+            {{-- PRODUCCIONES DEL DÍA --}}
+            <div
+                id="produccionesDia"
+                class="producciones-dia"
+                style="display:none;"
+            >
+
+                <div class="producciones-dia-header">
+
+                    <div
+                        id="produccionesDiaTitulo"
+                        class="producciones-dia-titulo"
+                    >
+                    </div>
+
+
+                    <div
+                        id="produccionesDiaResumen"
+                        class="producciones-dia-resumen"
+                    >
+                    </div>
+
+                </div>
+
+
+                <div
+                    id="listaProduccionesDia"
+                >
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 <script>
 /* =========================================================
    CALENDARIO DE PRODUCCIÓN
