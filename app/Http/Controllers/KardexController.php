@@ -9,6 +9,7 @@ use App\Models\Product;
 use App\Models\Client;
 use App\Models\ProductEntry;
 use App\Models\ProductionOrder;
+use App\Models\Movement;
 
 class KardexController extends Controller
 {
@@ -206,7 +207,108 @@ foreach ($producciones as $produccion) {
             }
         }
 
+                /*
+        |--------------------------------------------------------------------------
+        | 3. SALIDAS DE PRODUCCIÓN / MOVEMENTS
+        |--------------------------------------------------------------------------
+        | Aquí entran las salidas registradas desde:
+        | Producción → Productos
+        |
+        | Estas salidas descuentan directamente Product->stock
+        | y quedan registradas en la tabla movements.
+        |--------------------------------------------------------------------------
+        */
 
+        $movimientosProduccion = Movement::with('product')
+            ->where('tipo', 'SALIDA')
+            ->whereNotNull('product_id')
+            ->orderBy('created_at', 'asc');
+
+        if ($productId) {
+            $movimientosProduccion->where(
+                'product_id',
+                $productId
+            );
+        }
+
+        if ($dateFrom) {
+            $movimientosProduccion->whereDate(
+                'created_at',
+                '>=',
+                $dateFrom
+            );
+        }
+
+        if ($dateTo) {
+            $movimientosProduccion->whereDate(
+                'created_at',
+                '<=',
+                $dateTo
+            );
+        }
+
+        $salidasProduccion =
+            $movimientosProduccion->get();
+
+        foreach ($salidasProduccion as $movimiento) {
+
+            $movimientos->push([
+
+                'fecha' =>
+                    $movimiento->created_at,
+
+                'tipo' =>
+                    'SALIDA',
+
+                'numero_orden' =>
+                    'PROD-' . $movimiento->id,
+
+                'cliente' =>
+                    'Producción',
+
+                'client_id' =>
+                    null,
+
+                'producto' =>
+                    optional($movimiento->product)->nombre
+                    ?? 'Sin producto',
+
+                'product_id' =>
+                    $movimiento->product_id,
+
+                'cantidad_solicitada' =>
+                    0,
+
+                'cantidad_produccion' =>
+                    0,
+
+                'cantidad_despachada' =>
+                    (float) $movimiento->cantidad,
+
+                'precio_unitario' =>
+                    0,
+
+                'subtotal' =>
+                    0,
+
+                'estado_orden' =>
+                    'PRODUCCIÓN',
+
+                'stock_before' =>
+                    null,
+
+                'stock_after' =>
+                    null,
+
+                'usuario' =>
+                    $movimiento->motivo
+                    ?? 'Producción',
+
+                'origen_id' =>
+                    $movimiento->id,
+
+            ]);
+        }
         /*
         |--------------------------------------------------------------------------
         | 3. ORDENAR TODOS LOS MOVIMIENTOS
