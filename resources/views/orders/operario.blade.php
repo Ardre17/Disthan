@@ -312,15 +312,15 @@ opacity:1;
     <a href="{{ route('orders.etiqueta.local', $item) }}"
        target="_blank"
        class="btn-etiqueta">
-        🖨️ Imprimir etiqueta LOCAL
+        🖨️ Imprimir Etiqueta
     </a>
 
 @else
 
-    <a href="{{ route('orders.etiqueta', $item) }}"
+    <a href="{{ route('orders.details.etiqueta', $item) }}"
        target="_blank"
        class="btn-etiqueta">
-        🖨️ Imprimir etiqueta
+        🖨️ Imprimir Codigo de Barras
     </a>
 
 @endif
