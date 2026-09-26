@@ -217,12 +217,11 @@ public function etiqueta(OrderDetail $item)
 
     public function cerrar(Order $order)
 {
-    // 🔥 SOLO cerrar si es encomienda
-    if ($order->tipo_orden == 'ENCOMIENDA') {
-        $order->estado = 'COMPLETO';
-    } else {
-        // comportamiento normal
-        $order->estado = 'COMPLETO';
+    $order->estado = 'COMPLETO';
+
+    // Registrar fecha de cierre solo la primera vez
+    if ($order->fecha_cierre === null) {
+        $order->fecha_cierre = now();
     }
 
     $order->save();
@@ -778,6 +777,7 @@ $detail->update($updateData);
 
     // 🔄 ACTUALIZAR ORDEN
     $order = $detail->order;
+    $estadoAnterior = $order->estado;
 
     // 🔥 TOTALES CORRECTOS
     $order->subtotal = $order->details()->sum('subtotal');
@@ -799,6 +799,11 @@ $detail->update($updateData);
         } else {
             $order->estado = 'PARCIAL';
         }
+        if ($order->estado === 'COMPLETO' && $estadoAnterior !== 'COMPLETO') {
+            $order->fecha_cierre = now();
+        } elseif ($order->estado !== 'COMPLETO' && $estadoAnterior === 'COMPLETO') {
+            $order->fecha_cierre = null;
+        }
     }
 
     $order->save();
@@ -817,6 +822,7 @@ $detail->update($updateData);
     public function destroyDetail(OrderDetail $detail)
 {
     $order = $detail->order;
+    $estadoAnteriorDestroy = $order->estado;
 
     // eliminar item
     $detail->delete();
@@ -838,8 +844,12 @@ $detail->update($updateData);
     } else {
         $order->estado = 'INCOMPLETO';
     }
-
-    $order->save();
+    if ($order->estado === 'COMPLETO' && $estadoAnteriorDestroy !== 'COMPLETO') {
+        $order->fecha_cierre = now();
+    } elseif ($order->estado !== 'COMPLETO' && $estadoAnteriorDestroy === 'COMPLETO') {
+        $order->fecha_cierre = null;
+    }
+        $order->save();
 
     return back()->with('success', 'Producto eliminado de la orden');
 }

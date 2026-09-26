@@ -23,6 +23,7 @@ class Order extends Model
         'fecha_pedido',
 
         'fecha_entrega',
+        'fecha_cierre',
 
         'estado',
 
