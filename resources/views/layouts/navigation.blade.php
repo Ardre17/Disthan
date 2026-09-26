@@ -762,8 +762,38 @@ $t = $temas[$seccionActiva];
             </div>
             @endif
 
+                        {{-- Reportes --}}
+            @if($role == 'admin')
+            <div class="sb-section rep-s">
+
+                <div class="sb-section-title {{ $seccionActiva === 'rep' ? 'open' : '' }}"
+                     onclick="toggleMenu(this)">
+
+                    <div class="sb-section-left">
+                        <span class="sb-section-icon">📊</span>
+                        <span>Reportes</span>
+                    </div>
+
+                    <span class="sb-section-arrow">▾</span>
+                </div>
+
+                <div class="sb-sub">
+
+                    <a href="{{ route('reports.movimientos') }}"
+                       class="{{ request()->routeIs('reports.movimientos') ? 'active' : '' }}">
+
+                        <span class="sb-icon">🔄</span>
+                        <span>Movimientos</span>
+
+                    </a>
+
+                </div>
+
+            </div>
+            @endif
         </nav>
     </div>
+    
 
     {{-- Footer --}}
     <div class="sb-footer">

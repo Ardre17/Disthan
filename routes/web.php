@@ -36,6 +36,7 @@ use App\Http\Controllers\RechazoController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\OrderValidationController;
 use App\Http\Controllers\ProductionOutputController;
+use App\Http\Controllers\ReportController;
 
 Route::get(
     '/produccion/salidas/productos',
@@ -191,6 +192,10 @@ Route::get('orders/{order}/carta-calidad', [OrderController::class, 'cartaCalida
      ->name('orders.cartaCalidad');
 
 Route::middleware(['auth'])->group(function () {
+
+    Route::get('/reportes/movimientos', [ReportController::class, 'movimientos'])
+    ->name('reports.movimientos');
+
     Route::get('/rechazos',          [RechazoController::class, 'index'])->name('rechazos.index');
     Route::get('/rechazos/crear',    [RechazoController::class, 'create'])->name('rechazos.create');
     Route::post('/rechazos',         [RechazoController::class, 'store'])->name('rechazos.store');
