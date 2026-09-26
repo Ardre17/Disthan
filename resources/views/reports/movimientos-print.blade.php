@@ -196,47 +196,46 @@
 
         @media print {
 
-            body {
-                background: white;
-                padding: 0;
-            }
+    body {
+        background: white;
+        padding: 0;
+    }
 
-            .report-container {
-                max-width: none;
-                padding: 0;
-            }
+    .report-container {
+        max-width: none;
+        padding: 4mm 3mm;
+    }
 
-            .print-actions {
-                display: none;
-            }
+    .print-actions {
+        display: none;
+    }
 
-            .header {
-                margin-top: 0;
-            }
+    .header {
+        margin-top: 0;
+    }
 
-            table {
-                page-break-inside: auto;
-            }
+    table {
+        page-break-inside: auto;
+    }
 
-            tr {
-                page-break-inside: avoid;
-                page-break-after: auto;
-            }
+    tr {
+        page-break-inside: avoid;
+        page-break-after: auto;
+    }
 
-            thead {
-                display: table-header-group;
-            }
+    thead {
+        display: table-header-group;
+    }
 
-            .footer {
-                margin-bottom: 0;
-            }
+    .footer {
+        margin-bottom: 0;
+    }
 
-            @page {
-                size: A4 landscape;
-                margin: 12mm;
-            }
-        }
-
+    @page {
+        size: A4 landscape;
+        margin: 18mm;
+    }
+}
         @media screen and (max-width: 768px) {
 
             body {
