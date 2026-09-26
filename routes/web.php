@@ -196,6 +196,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/reportes/movimientos', [ReportController::class, 'movimientos'])
     ->name('reports.movimientos');
 
+    Route::get('/reportes/movimientos/imprimir', [ReportController::class, 'imprimirMovimientos'])
+    ->name('reports.movimientos.imprimir');
+
     Route::get('/rechazos',          [RechazoController::class, 'index'])->name('rechazos.index');
     Route::get('/rechazos/crear',    [RechazoController::class, 'create'])->name('rechazos.create');
     Route::post('/rechazos',         [RechazoController::class, 'store'])->name('rechazos.store');

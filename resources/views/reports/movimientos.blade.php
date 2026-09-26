@@ -554,6 +554,33 @@
             grid-template-columns: 1fr;
         }
     }
+    .btn-imprimir-reporte {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
+    padding: 10px 14px;
+    border-radius: 8px;
+    background: #111827;
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 700;
+    border: 1px solid #1f2937;
+    transition: .2s ease;
+    cursor: pointer;
+}
+
+.btn-imprimir-reporte:hover {
+    background: #374151;
+    transform: translateY(-1px);
+}
+
+@media (max-width: 768px) {
+    .btn-imprimir-reporte {
+        width: 100%;
+    }
+}
 </style>
 
 <div class="report-page">
@@ -579,6 +606,13 @@
             </div>
 
         </div>
+        <a
+            href="{{ route('reports.movimientos.imprimir', request()->query()) }}"
+            target="_blank"
+            class="btn-imprimir-reporte"
+        >
+            🖨️ Imprimir reporte
+        </a>
 
     </div>
 
