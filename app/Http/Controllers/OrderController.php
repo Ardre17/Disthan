@@ -14,6 +14,167 @@ use App\Services\Barcode\Ean13Generator;
 
 class OrderController extends Controller
 {
+
+public function importPdf()
+{
+    return view(
+        'orders.import_pdf'
+    );
+}
+
+
+public function previewPdf(
+    Request $request,
+    PedidoPdfParser $parser
+) {
+
+    $request->validate([
+
+        'archivo' =>
+            'required|file|mimes:pdf|max:10240',
+
+    ]);
+
+
+    try {
+
+        $datos = $parser->parse(
+            $request
+                ->file('archivo')
+                ->getRealPath()
+        );
+
+    } catch (\Throwable $e) {
+
+        return back()
+            ->withInput()
+            ->with(
+                'error',
+                $e->getMessage()
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Buscar cliente por RUC
+    |--------------------------------------------------------------------------
+    */
+
+    $client = null;
+
+    if (
+        !empty(
+            $datos['ruc_cliente']
+        )
+    ) {
+
+        $client = Client::where(
+            'ruc',
+            $datos['ruc_cliente']
+        )->first();
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Buscar productos
+    |--------------------------------------------------------------------------
+    */
+
+    foreach (
+        $datos['productos']
+        as &$item
+    ) {
+
+        /*
+         * PRIMER NIVEL:
+         * SKU
+         */
+
+        $product = Product::where(
+            'sku',
+            $item['codigo']
+        )->first();
+
+
+        /*
+         * SEGUNDO NIVEL:
+         * Código de barras
+         */
+
+        if (!$product) {
+
+            $product = Product::where(
+                'barcode',
+                $item['codigo']
+            )->first();
+        }
+
+
+        /*
+         * TERCER NIVEL:
+         * Código de caja
+         */
+
+        if (!$product) {
+
+            $product = Product::where(
+                'box_barcode',
+                $item['codigo']
+            )->first();
+        }
+
+
+        /*
+         * Resultado
+         */
+
+        if ($product) {
+
+            $item['encontrado'] = true;
+
+            $item['product_id'] =
+                $product->id;
+
+            $item['nombre_distan'] =
+                $product->nombre;
+
+            $item['sku_distan'] =
+                $product->sku;
+
+            $item['coincidencia'] =
+                'codigo';
+
+        } else {
+
+            $item['encontrado'] = false;
+
+            $item['product_id'] =
+                null;
+
+            $item['nombre_distan'] =
+                null;
+
+            $item['sku_distan'] =
+                null;
+
+            $item['coincidencia'] =
+                null;
+        }
+    }
+
+    unset($item);
+
+
+    return view(
+        'orders.import_pdf_preview',
+        [
+            'datos' => $datos,
+            'client' => $client,
+        ]
+    );
+}
 public function actualizarDocumentos(
     Request $request,
     Order $order

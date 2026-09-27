@@ -355,7 +355,16 @@ Route::middleware('auth')->group(function () {
     Route::get('/warehouse-map', [WarehouseMapController::class, 'index']) ->name('warehouse.map');
     Route::get('/warehouse-map/locations', [WarehouseMapController::class, 'locations'])
     ->name('warehouse.locations');
+    Route::get(
+        '/orders/import-pdf',
+        [OrderController::class, 'importPdf']
+    )->name('orders.importPdf');
 
+
+    Route::post(
+        '/orders/import-pdf/preview',
+        [OrderController::class, 'previewPdf']
+    )->name('orders.importPdf.preview');
 
 
     /*
