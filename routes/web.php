@@ -347,25 +347,37 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 */
 Route::middleware('auth')->group(function () {
 
-    Route::get('/products/proyectado', [ProductController::class, 'proyectado']) ->name('products.proyectado');
+    Route::get('/products/proyectado', [ProductController::class, 'proyectado'])
+        ->name('products.proyectado');
+
     Route::resource('products', ProductController::class);
+
     Route::resource('clients', ClientController::class);
+
     Route::resource('categories', CategoryController::class);
-    Route::resource('orders', OrderController::class);
-    Route::get('/warehouse-map', [WarehouseMapController::class, 'index']) ->name('warehouse.map');
-    Route::get('/warehouse-map/locations', [WarehouseMapController::class, 'locations'])
-    ->name('warehouse.locations');
+
+
+    // IMPORTAR PEDIDO PDF
     Route::get(
         '/orders/import-pdf',
         [OrderController::class, 'importPdf']
     )->name('orders.importPdf');
-
 
     Route::post(
         '/orders/import-pdf/preview',
         [OrderController::class, 'previewPdf']
     )->name('orders.importPdf.preview');
 
+
+    // ÓRDENES
+    Route::resource('orders', OrderController::class);
+
+
+    Route::get('/warehouse-map', [WarehouseMapController::class, 'index'])
+        ->name('warehouse.map');
+
+    Route::get('/warehouse-map/locations', [WarehouseMapController::class, 'locations'])
+        ->name('warehouse.locations');
 
     /*
     |--------------------------------------------------------------------------
