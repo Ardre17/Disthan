@@ -10,6 +10,7 @@ use App\Models\OrderDetail;
 use App\Services\Barcode\Code128Generator;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\Barcode\Ean13Generator;
+use App\Services\PedidoPdfParser;
 
 
 class OrderController extends Controller
