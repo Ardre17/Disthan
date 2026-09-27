@@ -157,60 +157,57 @@ class PedidoPdfParser
     /**
      * Extraer textos y coordenadas del PDF.
      */
-    private function extractTextItems(
-        string $content
-    ): array {
+   private function extractTextItems(
+    string $content
+): array {
 
-        $pattern = '/
-            1 0 0 1
-            \s+
-            (-?\d+(?:\.\d+)?)
-            \s+
-            (-?\d+(?:\.\d+)?)
-            \s+
-            Tm
-            (?:(?!1 0 0 1).)*?
-            \(
-                ((?:\\\\.|[^\\\\)])*)
-            \)
-            Tj
-        /sx';
+    $pattern = '/
+        1\s+0\s+0\s+1
+        \s+
+        (-?\d+(?:\.\d+)?)
+        \s+
+        (-?\d+(?:\.\d+)?)
+        \s+
+        Tm
+        (?:(?!1\s+0\s+0\s+1).)*?
+        \(
+            ((?:\\\\.|[^\\\\)])*)
+        \)
+        Tj
+    /sx';
 
-        preg_match_all(
-            $pattern,
-            $content,
-            $matches,
-            PREG_SET_ORDER
+    preg_match_all(
+        $pattern,
+        $content,
+        $matches,
+        PREG_SET_ORDER
+    );
+
+    $items = [];
+
+    foreach ($matches as $match) {
+
+        $text = $this->decodePdfString(
+            $match[3]
         );
 
-        $items = [];
-
-        foreach ($matches as $match) {
-
-            $text = $this->decodePdfString(
-                $match[3]
-            );
-
-            if ($text === '') {
-                continue;
-            }
-
-            $items[] = [
-
-                'x' =>
-                    (float) $match[1],
-
-                'y' =>
-                    (float) $match[2],
-
-                'text' =>
-                    $text,
-            ];
+        if ($text === '') {
+            continue;
         }
 
-        return $items;
+        $items[] = [
+
+            'x' => (float) $match[1],
+
+            'y' => (float) $match[2],
+
+            'text' => $text,
+
+        ];
     }
 
+    return $items;
+}
 
     /**
      * Decodificar texto encerrado en (...)
