@@ -15,6 +15,37 @@ use App\Services\PedidoPdfParser;
 
 class OrderController extends Controller
 {
+private function normalizarProducto(?string $nombre): string
+{
+    if (!$nombre) {
+        return '';
+    }
+
+    $nombre = mb_strtolower(
+        trim($nombre),
+        'UTF-8'
+    );
+
+    $nombre = iconv(
+        'UTF-8',
+        'ASCII//TRANSLIT//IGNORE',
+        $nombre
+    );
+
+    $nombre = preg_replace(
+        '/[^a-z0-9]+/',
+        ' ',
+        $nombre
+    );
+
+    $nombre = preg_replace(
+        '/\s+/',
+        ' ',
+        $nombre
+    );
+
+    return trim($nombre);
+}
 
 public function importPdf()
 {
@@ -89,44 +120,267 @@ public function previewPdf(
     ) {
 
         /*
-         * PRIMER NIVEL:
-         * SKU
-         */
+|--------------------------------------------------------------------------
+| 1. BUSCAR POR SKU
+|--------------------------------------------------------------------------
+*/
 
-        $product = Product::where(
-            'sku',
-            $item['codigo']
-        )->first();
+$codigo = strtoupper(trim($item['codigo']));
+
+$product = Product::whereRaw(
+    'UPPER(TRIM(sku)) = ?',
+    [$codigo]
+)->first();
+
+
+/*
+|--------------------------------------------------------------------------
+| 2. BUSCAR POR CÓDIGO DE BARRAS
+|--------------------------------------------------------------------------
+*/
+
+if (!$product) {
+
+    $product = Product::whereRaw(
+        'UPPER(TRIM(barcode)) = ?',
+        [$codigo]
+    )->first();
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| 3. BUSCAR POR CÓDIGO DE CAJA
+|--------------------------------------------------------------------------
+*/
+
+if (!$product) {
+
+    $product = Product::whereRaw(
+        'UPPER(TRIM(box_barcode)) = ?',
+        [$codigo]
+    )->first();
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| 4. SI NO EXISTE EL CÓDIGO → BUSCAR POR NOMBRE
+|--------------------------------------------------------------------------
+*/
+
+$coincidencia = null;
+$confianza = 0;
+$candidatos = collect();
+
+
+if (!$product) {
+
+    $nombrePdf = $this->normalizarProducto(
+        $item['descripcion']
+    );
+
+    /*
+     * Extraemos posibles números de presentación.
+     *
+     * Ejemplos:
+     * x 100 g
+     * x 432g
+     * x 800g
+     */
+
+    preg_match_all(
+        '/(\d+(?:\.\d+)?)\s*g\b/i',
+        $item['descripcion'],
+        $pesosPdf
+    );
+
+    $pesoPdf = !empty($pesosPdf[1])
+        ? end($pesosPdf[1])
+        : null;
+
+
+    /*
+     * Buscamos palabras principales del producto.
+     *
+     * Ejemplo:
+     * "Filete de anchoas..."
+     * "Choclo Dulce Desgranado..."
+     * "Palmitos Enteros..."
+     */
+
+    $palabras = preg_split(
+        '/\s+/',
+        $nombrePdf
+    );
+
+    $palabras = array_filter(
+        $palabras,
+        fn($p) => strlen($p) >= 4
+    );
+
+
+    /*
+     * Tomamos las primeras palabras importantes
+     * para hacer la búsqueda inicial.
+     */
+
+    $baseBusqueda = implode(
+        ' ',
+        array_slice($palabras, 0, 3)
+    );
+
+
+    $candidatos = Product::query()
+        ->where('activo', true)
+        ->where(function ($query) use ($palabras) {
+
+            foreach (
+                array_slice($palabras, 0, 3)
+                as $palabra
+            ) {
+
+                $query->where(
+                    'nombre',
+                    'ILIKE',
+                    '%' . $palabra . '%'
+                );
+            }
+        })
+        ->get();
+
+
+    /*
+     * Comparar candidatos.
+     */
+
+    $mejorProducto = null;
+    $mejorPuntaje = 0;
+
+
+    foreach ($candidatos as $candidato) {
+
+        $nombreDb = $this->normalizarProducto(
+            $candidato->nombre
+        );
 
 
         /*
-         * SEGUNDO NIVEL:
-         * Código de barras
+         * Similitud general del nombre.
          */
 
-        if (!$product) {
+        similar_text(
+            $nombrePdf,
+            $nombreDb,
+            $similitud
+        );
 
-            $product = Product::where(
-                'barcode',
-                $item['codigo']
-            )->first();
-        }
+
+        $puntaje = $similitud;
 
 
         /*
-         * TERCER NIVEL:
-         * Código de caja
+         * Dar prioridad si la presentación/peso coincide.
          */
 
-        if (!$product) {
+        if ($pesoPdf) {
 
-            $product = Product::where(
-                'box_barcode',
-                $item['codigo']
-            )->first();
+            preg_match_all(
+                '/(\d+(?:\.\d+)?)\s*g\b/i',
+                $candidato->nombre,
+                $pesosDb
+            );
+
+            if (!empty($pesosDb[1])) {
+
+                foreach ($pesosDb[1] as $pesoDb) {
+
+                    if (
+                        (float) $pesoDb
+                        ===
+                        (float) $pesoPdf
+                    ) {
+
+                        $puntaje += 25;
+
+                        break;
+                    }
+                }
+            }
         }
 
 
+        if ($puntaje > $mejorPuntaje) {
+
+            $mejorPuntaje = $puntaje;
+
+            $mejorProducto = $candidato;
+        }
+    }
+
+
+    /*
+     * Solo aceptar automáticamente
+     * una coincidencia suficientemente clara.
+     */
+
+    if (
+        $mejorProducto
+        &&
+        $mejorPuntaje >= 85
+    ) {
+
+        $product = $mejorProducto;
+
+        $coincidencia = 'nombre';
+
+        $confianza = round(
+            min($mejorPuntaje, 100),
+            2
+        );
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| RESULTADO
+|--------------------------------------------------------------------------
+*/
+
+if ($product) {
+
+    $item['encontrado'] = true;
+
+    $item['product_id'] =
+        $product->id;
+
+    $item['nombre_distan'] =
+        $product->nombre;
+
+    $item['sku_distan'] =
+        $product->sku;
+
+    $item['coincidencia'] =
+        $coincidencia ?? 'codigo';
+
+    $item['confianza'] =
+        $confianza ?: 100;
+
+} else {
+
+    $item['encontrado'] = false;
+
+    $item['product_id'] = null;
+
+    $item['nombre_distan'] = null;
+
+    $item['sku_distan'] = null;
+
+    $item['coincidencia'] = null;
+
+    $item['confianza'] = 0;
+}
         /*
          * Resultado
          */
