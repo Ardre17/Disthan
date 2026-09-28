@@ -38,6 +38,8 @@ use App\Http\Controllers\OrderValidationController;
 use App\Http\Controllers\ProductionOutputController;
 use App\Http\Controllers\ReportController;
 
+
+
 Route::get(
     '/produccion/salidas/productos',
     [ProductionOutputController::class, 'productos']
@@ -368,6 +370,10 @@ Route::middleware('auth')->group(function () {
         [OrderController::class, 'previewPdf']
     )->name('orders.importPdf.preview');
 
+    Route::get(
+        '/orders/import-pdf/product-search',
+        [OrderController::class, 'buscarProductoImportacion']
+    )->name('orders.importPdf.productSearch');
 
     // ÓRDENES
     Route::resource('orders', OrderController::class);

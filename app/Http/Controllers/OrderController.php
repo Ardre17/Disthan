@@ -15,6 +15,36 @@ use App\Services\PedidoPdfParser;
 
 class OrderController extends Controller
 {
+public function buscarProductoImportacion(Request $request)
+{
+    $q = trim($request->get('q', ''));
+
+    if (strlen($q) < 2) {
+        return response()->json([]);
+    }
+
+    $productos = Product::query()
+        ->where('activo', true)
+        ->where(function ($query) use ($q) {
+
+            $query->where('nombre', 'ILIKE', "%{$q}%")
+                ->orWhere('sku', 'ILIKE', "%{$q}%")
+                ->orWhere('barcode', 'ILIKE', "%{$q}%")
+                ->orWhere('box_barcode', 'ILIKE', "%{$q}%");
+
+        })
+        ->orderBy('nombre')
+        ->limit(20)
+        ->get([
+            'id',
+            'sku',
+            'barcode',
+            'box_barcode',
+            'nombre',
+        ]);
+
+    return response()->json($productos);
+}
 private function normalizarProducto(?string $nombre): string
 {
     if (!$nombre) {
