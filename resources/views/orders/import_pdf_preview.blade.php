@@ -74,13 +74,7 @@
          FORMULARIO
     ========================================================== --}}
 
-    <form
-        action="{{ route('orders.importPdf.store') }}"
-        method="POST"
-        id="form-importar-orden"
-    >
-
-        @csrf
+        <div id="form-importar-orden">
 
 
         {{-- =====================================================
@@ -660,7 +654,7 @@
 
 
             <button
-                type="submit"
+                type="button"
                 id="btn-crear-orden"
                 disabled
                 class="px-6 py-3
@@ -675,7 +669,7 @@
 
         </div>
 
-    </form>
+</div>
 
 </div>
 
