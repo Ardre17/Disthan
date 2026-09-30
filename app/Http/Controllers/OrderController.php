@@ -1,1885 +1,1583 @@
-@extends('layouts.app')
-
-@section('content')
-
-<style>
-
-/* =========================================================
-   BASE
-========================================================= */
-
-* {
-    box-sizing: border-box;
-}
-
-.pdf-page {
-    padding: 1.25rem;
-    background: #f1f5f9;
-    min-height: 100vh;
-}
-
-
-/* =========================================================
-   HEADER
-========================================================= */
-
-.pdf-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 15px;
-    margin-bottom: 1rem;
-}
-
-.pdf-title {
-    font-size: 17px;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.pdf-subtitle {
-    font-size: 12px;
-    color: #94a3b8;
-    margin-top: 3px;
-}
-
-
-/* =========================================================
-   BOTONES
-========================================================= */
-
-.pdf-btn {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
-    padding: 8px 12px;
-    border-radius: 8px;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    border: none;
-    text-decoration: none;
-    transition: opacity .15s, background .15s;
-}
-
-.pdf-btn:hover {
-    opacity: .85;
-}
-
-.pdf-btn-blue {
-    background: #eff6ff;
-    color: #1d4ed8;
-    border: 1px solid #bfdbfe;
-}
-
-.pdf-btn-orange {
-    background: #fff7ed;
-    color: #c2410c;
-    border: 1px solid #fed7aa;
-}
-
-.pdf-btn-green {
-    background: #f0fdf4;
-    color: #15803d;
-    border: 1px solid #bbf7d0;
-}
-
-.pdf-btn-gray {
-    background: #f8fafc;
-    color: #475569;
-    border: 1px solid #e2e8f0;
-}
-
-.pdf-btn-primary {
-    background: #2563eb;
-    color: white;
-    border: none;
-}
-
-.pdf-btn-primary:disabled {
-    background: #94a3b8;
-    cursor: not-allowed;
-    opacity: 1;
-}
-
-
-/* =========================================================
-   CARDS
-========================================================= */
-
-.pdf-card {
-    background: #fff;
-    border: 1px solid #e2e8f0;
-    border-radius: 12px;
-    margin-bottom: 1rem;
-    overflow: hidden;
-}
-
-.pdf-card-header {
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid #f1f5f9;
-}
-
-.pdf-card-title {
-    font-size: 14px;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.pdf-card-subtitle {
-    font-size: 11px;
-    color: #94a3b8;
-    margin-top: 3px;
-}
-
-.pdf-card-body {
-    padding: 1rem 1.25rem;
-}
-
-
-/* =========================================================
-   ALERTAS
-========================================================= */
-
-.pdf-alert {
-    border-radius: 10px;
-    padding: 10px 13px;
-    margin-bottom: 1rem;
-    font-size: 12px;
-}
-
-.pdf-alert-success {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    color: #15803d;
-}
-
-.pdf-alert-danger {
-    background: #fef2f2;
-    border: 1px solid #fecaca;
-    color: #b91c1c;
-}
-
-.pdf-alert-info {
-    background: #eff6ff;
-    border: 1px solid #bfdbfe;
-    color: #1d4ed8;
-}
-
-.pdf-alert-title {
-    font-weight: 700;
-    margin-bottom: 3px;
-}
-
-
-/* =========================================================
-   DATOS PEDIDO
-========================================================= */
-
-.pdf-meta {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 8px 14px;
-}
-
-.pdf-meta-item {
-    font-size: 12px;
-    color: #64748b;
-}
-
-.pdf-meta-value {
-    font-weight: 700;
-    color: #374151;
-}
-
-.pdf-meta-label {
-    font-size: 10px;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    margin-bottom: 3px;
-}
-
-
-/* =========================================================
-   TIPO DE ORDEN
-========================================================= */
-
-.pdf-type {
-    margin-top: 15px;
-}
-
-.pdf-label {
-    display: block;
-    font-size: 11px;
-    font-weight: 600;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    margin-bottom: 4px;
-}
-
-.pdf-input,
-.pdf-select {
-    padding: 8px 10px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 13px;
-    color: #1e293b;
-    background: #fff;
-    outline: none;
-}
-
-.pdf-select {
-    width: 250px;
-}
-
-.pdf-input:focus,
-.pdf-select:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37,99,235,.1);
-}
-
-
-/* =========================================================
-   TABLA
-========================================================= */
-
-.pdf-table-wrapper {
-    overflow-x: auto;
-}
-
-.pdf-table {
-    width: 100%;
-    border-collapse: collapse;
-    min-width: 1050px;
-    font-size: 12px;
-}
-
-.pdf-table thead {
-    background: #f8fafc;
-}
-
-.pdf-table th {
-    padding: 10px;
-    text-align: left;
-    font-size: 10px;
-    color: #64748b;
-    text-transform: uppercase;
-    letter-spacing: .03em;
-    border-bottom: 1px solid #e2e8f0;
-    white-space: nowrap;
-}
-
-.pdf-table td {
-    padding: 11px 10px;
-    border-bottom: 1px solid #f1f5f9;
-    color: #475569;
-    vertical-align: middle;
-}
-
-.pdf-table tbody tr:hover {
-    background: #fafafa;
-}
-
-.pdf-code {
-    font-family: monospace;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.pdf-product {
-    color: #374151;
-}
-
-.pdf-product-distan {
-    font-weight: 600;
-    color: #1e293b;
-}
-
-.pdf-sku {
-    margin-top: 2px;
-    font-size: 10px;
-    color: #94a3b8;
-}
-
-.pdf-price {
-    text-align: right;
-    font-weight: 700;
-    color: #1e293b;
-    white-space: nowrap;
-}
-
-.pdf-total {
-    text-align: right;
-    color: #94a3b8;
-    white-space: nowrap;
-}
-
-.pdf-center {
-    text-align: center !important;
-}
-
-
-/* =========================================================
-   BADGES
-========================================================= */
-
-.pdf-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 3px;
-    font-size: 10px;
-    padding: 3px 8px;
-    border-radius: 99px;
-    font-weight: 600;
-    white-space: nowrap;
-}
-
-.pdf-badge-code {
-    background: #dcfce7;
-    color: #15803d;
-}
-
-.pdf-badge-name {
-    background: #fef3c7;
-    color: #b45309;
-}
-
-.pdf-badge-manual {
-    background: #dbeafe;
-    color: #1d4ed8;
-}
-
-.pdf-badge-none {
-    background: #fee2e2;
-    color: #b91c1c;
-}
-
-
-/* =========================================================
-   FOOTER
-========================================================= */
-
-.pdf-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 10px;
-    margin-top: 1rem;
-}
-
-
-/* =========================================================
-   MODAL
-========================================================= */
-
-#modalProductoPdf {
-    display: none;
-    position: fixed;
-    inset: 0;
-    z-index: 99999;
-    background: rgba(15,23,42,.60);
-    align-items: center;
-    justify-content: center;
-    padding: 20px;
-}
-
-#modalProductoPdf.abierto {
-    display: flex;
-}
-
-.pdf-modal {
-    width: min(650px, 96vw);
-    max-height: 90vh;
-    background: #fff;
-    border-radius: 14px;
-    box-shadow: 0 25px 60px rgba(0,0,0,.30);
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.pdf-modal-header {
-    padding: 16px 20px;
-    border-bottom: 1px solid #e5e7eb;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.pdf-modal-title {
-    font-size: 16px;
-    font-weight: 800;
-    color: #1e293b;
-}
-
-.pdf-modal-subtitle {
-    font-size: 11px;
-    color: #94a3b8;
-    margin-top: 3px;
-}
-
-.pdf-modal-close {
-    width: 32px;
-    height: 32px;
-    border: none;
-    border-radius: 7px;
-    background: #f1f5f9;
-    color: #475569;
-    font-size: 20px;
-    cursor: pointer;
-}
-
-.pdf-modal-close:hover {
-    background: #e2e8f0;
-}
-
-.pdf-modal-body {
-    padding: 18px 20px;
-    overflow: auto;
-}
-
-.pdf-search {
-    width: 100%;
-    padding: 10px 12px;
-    border: 1px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 13px;
-    outline: none;
-}
-
-.pdf-search:focus {
-    border-color: #2563eb;
-    box-shadow: 0 0 0 3px rgba(37,99,235,.10);
-}
-
-.pdf-results {
-    margin-top: 12px;
-    max-height: 400px;
-    overflow-y: auto;
-}
-
-.pdf-result {
-    width: 100%;
-    border: 1px solid #e2e8f0;
-    background: #fff;
-    border-radius: 9px;
-    padding: 11px 12px;
-    margin-bottom: 7px;
-    text-align: left;
-    cursor: pointer;
-    transition: background .15s, border-color .15s;
-}
-
-.pdf-result:hover {
-    background: #eff6ff;
-    border-color: #bfdbfe;
-}
-
-.pdf-result-name {
-    font-size: 12px;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-.pdf-result-data {
-    margin-top: 4px;
-    font-size: 10px;
-    color: #94a3b8;
-}
-
-.pdf-search-message {
-    text-align: center;
-    padding: 25px;
-    color: #94a3b8;
-    font-size: 12px;
-}
-
-
-/* =========================================================
-   RESPONSIVE
-========================================================= */
-
-@media(max-width:800px) {
-
-    .pdf-meta {
-        grid-template-columns: repeat(2,1fr);
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Order;
+use App\Models\Client;
+use Illuminate\Http\Request;
+use App\Models\Product;
+use App\Models\OrderDetail;
+use App\Services\Barcode\Code128Generator;
+use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\Barcode\Ean13Generator;
+use App\Services\PedidoPdfParser;
+
+
+class OrderController extends Controller
+{
+public function buscarProductoImportacion(Request $request)
+{
+    $q = trim($request->get('q', ''));
+
+    if (strlen($q) < 2) {
+        return response()->json([]);
     }
 
-    .pdf-header {
-        flex-direction: column;
+    $productos = Product::query()
+        ->where('activo', true)
+        ->where(function ($query) use ($q) {
+
+            $query->where('nombre', 'ILIKE', "%{$q}%")
+                ->orWhere('sku', 'ILIKE', "%{$q}%")
+                ->orWhere('barcode', 'ILIKE', "%{$q}%")
+                ->orWhere('box_barcode', 'ILIKE', "%{$q}%");
+
+        })
+        ->orderBy('nombre')
+        ->limit(20)
+        ->get([
+            'id',
+            'sku',
+            'barcode',
+            'box_barcode',
+            'nombre',
+        ]);
+
+    return response()->json($productos);
+}
+private function normalizarProducto(?string $nombre): string
+{
+    if (!$nombre) {
+        return '';
     }
 
+    $nombre = mb_strtolower(
+        trim($nombre),
+        'UTF-8'
+    );
+
+    $nombre = iconv(
+        'UTF-8',
+        'ASCII//TRANSLIT//IGNORE',
+        $nombre
+    );
+
+    $nombre = preg_replace(
+        '/[^a-z0-9]+/',
+        ' ',
+        $nombre
+    );
+
+    $nombre = preg_replace(
+        '/\s+/',
+        ' ',
+        $nombre
+    );
+
+    return trim($nombre);
 }
 
-@media(max-width:500px) {
-
-    .pdf-page {
-        padding: .75rem;
-    }
-
-    .pdf-meta {
-        grid-template-columns: 1fr 1fr;
-    }
-
-    .pdf-footer {
-        flex-direction: column-reverse;
-        align-items: stretch;
-    }
-
-    .pdf-footer .pdf-btn {
-        width: 100%;
-    }
-
+public function importPdf()
+{
+    return view(
+        'orders.import_pdf'
+    );
 }
 
-</style>
 
+public function previewPdf(
+    Request $request,
+    PedidoPdfParser $parser
+) {
 
-<div class="pdf-page">
+    $request->validate([
 
+        'archivo' =>
+            'required|file|mimes:pdf|max:10240',
 
-    {{-- =====================================================
-         HEADER
-    ====================================================== --}}
+    ]);
 
-    <div class="pdf-header">
 
-        <div>
+    try {
 
-            <div class="pdf-title">
-                📋 Importar pedido PDF
-            </div>
-
-            <div class="pdf-subtitle">
-                Revisa y relaciona los productos antes de crear la orden.
-            </div>
-
-        </div>
-
-
-        <a
-            href="{{ route('orders.importPdf') }}"
-            class="pdf-btn pdf-btn-gray"
-        >
-            ← Volver
-        </a>
-
-    </div>
-
-
-    <form
-        id="importPdfForm"
-        method="POST"
-        action="{{ route('orders.importPdf.store') }}"
-    >
-
-        @csrf
-
-        <input type="hidden" name="client_id" value="{{ $client?->id ?? '' }}">
-        <input type="hidden" name="fecha_pedido" value="{{ $datos['fecha_pedido'] ?? '' }}">
-        <input type="hidden" name="fecha_entrega" value="{{ $datos['fecha_entrega'] ?? '' }}">
-        <input type="hidden" name="order_interna" value="{{ $datos['order_interna'] ?? '' }}">
-
-    {{-- =====================================================
-         CLIENTE
-    ====================================================== --}}
-
-    @if($client)
-
-        <div class="pdf-alert pdf-alert-success">
-
-            <div class="pdf-alert-title">
-                ✓ Cliente encontrado
-            </div>
-
-            {{ $client->razon_social }}
-            — RUC: {{ $client->ruc }}
-
-        </div>
-
-    @else
-
-        <div class="pdf-alert pdf-alert-danger">
-
-            <div class="pdf-alert-title">
-                ⚠ Cliente no encontrado
-            </div>
-
-            RUC detectado:
-            {{ $datos['ruc_cliente'] ?? '—' }}
-
-        </div>
-
-    @endif
-
-
-    {{-- =====================================================
-         DATOS DEL PEDIDO
-    ====================================================== --}}
-
-    <div class="pdf-card">
-
-        <div class="pdf-card-header">
-
-            <div class="pdf-card-title">
-                Datos del pedido
-            </div>
-
-        </div>
-
-
-        <div class="pdf-card-body">
-
-            <div class="pdf-meta">
-
-                <div class="pdf-meta-item">
-
-                    <div class="pdf-meta-label">
-                        Orden
-                    </div>
-
-                    <span class="pdf-meta-value">
-                        {{ $datos['numero_orden'] ?? '—' }}
-                    </span>
-
-                </div>
-
-
-                <div class="pdf-meta-item">
-
-                    <div class="pdf-meta-label">
-                        Fecha
-                    </div>
-
-                    <span class="pdf-meta-value">
-                        {{ $datos['fecha_pedido'] ?? '—' }}
-                    </span>
-
-                </div>
-
-
-                <div class="pdf-meta-item">
-
-                    <div class="pdf-meta-label">
-                        Entrega
-                    </div>
-
-                    <span class="pdf-meta-value">
-                        {{ $datos['fecha_entrega'] ?? '—' }}
-                    </span>
-
-                </div>
-
-
-                <div class="pdf-meta-item">
-
-                    <div class="pdf-meta-label">
-                        Orden interna
-                    </div>
-
-                    <span class="pdf-meta-value">
-                        {{ $datos['order_interna'] ?? '—' }}
-                    </span>
-
-                </div>
-
-            </div>
-
-
-            <div class="pdf-type">
-
-                <label
-                    class="pdf-label"
-                    for="tipoOrdenPdf"
-                >
-                    Tipo de orden
-                </label>
-
-                <select
-                    id="tipoOrdenPdf"
-                    name="tipo_orden"
-                    class="pdf-select"
-                >
-
-                    <option value="">
-                        Seleccionar...
-                    </option>
-
-                    <option value="SUPERMERCADO">
-                        SUPERMERCADO
-                    </option>
-
-                    <option value="LOCAL">
-                        LOCAL
-                    </option>
-
-                    <option value="ENCOMIENDA">
-                        ENCOMIENDA
-                    </option>
-
-                    <option value="EXPORTACION">
-                        EXPORTACIÓN
-                    </option>
-
-                </select>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =====================================================
-         PRODUCTOS
-    ====================================================== --}}
-
-    <div class="pdf-card">
-
-        <div class="pdf-card-header">
-
-            <div class="pdf-card-title">
-                Productos detectados
-            </div>
-
-            <div class="pdf-card-subtitle">
-
-                {{ count($datos['productos']) }}
-                producto(s) encontrado(s) en el PDF.
-
-            </div>
-
-        </div>
-
-
-        <div class="pdf-table-wrapper">
-
-            <table class="pdf-table">
-
-                <thead>
-
-                    <tr>
-
-                        <th>
-                            Estado
-                        </th>
-
-                        <th>
-                            Código PDF
-                        </th>
-
-                        <th>
-                            Producto PDF
-                        </th>
-
-                        <th>
-                            Producto DISTAN
-                        </th>
-
-                        <th class="pdf-center">
-                            Cant.
-                        </th>
-
-                        <th style="text-align:right;">
-                            Precio
-                        </th>
-
-                        <th style="text-align:right;">
-                            Total PDF
-                        </th>
-
-                        <th class="pdf-center">
-                            Acción
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                @foreach($datos['productos'] as $item)
-
-                    <tr
-                        data-product-row="{{ $loop->index }}"
-                    >
-
-                        {{-- ESTADO --}}
-
-                        <td class="estado-producto">
-
-                            @if($item['encontrado'])
-
-                                @if(
-                                    ($item['coincidencia'] ?? null)
-                                    === 'codigo'
-                                )
-
-                                    <span
-                                        class="pdf-badge pdf-badge-code"
-                                    >
-                                        ✓ Código
-                                    </span>
-
-                                @else
-
-                                    <span
-                                        class="pdf-badge pdf-badge-name"
-                                    >
-                                        ⚠ Nombre
-                                    </span>
-
-                                @endif
-
-                            @else
-
-                                <span
-                                    class="pdf-badge pdf-badge-none"
-                                >
-                                    ✕ No encontrado
-                                </span>
-
-                            @endif
-
-                        </td>
-
-
-                        {{-- CODIGO --}}
-
-                        <td>
-
-                            <div class="pdf-code">
-                                {{ $item['codigo'] }}
-                            </div>
-
-                        </td>
-
-
-                        {{-- PRODUCTO PDF --}}
-
-                        <td>
-
-                            <div class="pdf-product">
-                                {{ $item['descripcion'] }}
-                            </div>
-
-                        </td>
-
-
-                        {{-- PRODUCTO DISTAN --}}
-
-                        <td class="producto-distan">
-
-                            @if($item['encontrado'])
-
-                                <div class="pdf-product-distan">
-
-                                    {{ $item['nombre_distan'] }}
-
-                                </div>
-
-                                <div class="pdf-sku">
-
-                                    SKU:
-                                    {{ $item['sku_distan'] ?? '—' }}
-
-                                </div>
-
-                            @else
-
-                                <span
-                                    style="color:#b91c1c;"
-                                >
-                                    Producto no encontrado
-                                </span>
-
-                            @endif
-
-                        </td>
-
-
-                        {{-- CANTIDAD --}}
-
-                        <td class="pdf-center">
-
-                            {{
-                                rtrim(
-                                    rtrim(
-                                        number_format(
-                                            $item['cantidad'],
-                                            3
-                                        ),
-                                        '0'
-                                    ),
-                                    '.'
-                                )
-                            }}
-
-                            {{ $item['unidad'] }}
-
-                        </td>
-
-
-                        {{-- PRECIO --}}
-
-                        <td class="pdf-price">
-
-                            S/
-                            {{
-                                number_format(
-                                    $item['precio_unitario'],
-                                    2
-                                )
-                            }}
-
-                        </td>
-
-
-                        {{-- TOTAL PDF --}}
-
-                        <td class="pdf-total">
-
-                            S/
-                            {{
-                                number_format(
-                                    $item['total_pdf'],
-                                    2
-                                )
-                            }}
-
-                        </td>
-
-
-                        {{-- ACCION --}}
-
-                        <td class="pdf-center">
-
-                            <input
-                                type="hidden"
-                                id="product-id-{{ $loop->index }}"
-                                name="productos[{{ $loop->index }}][product_id]"
-                                value="{{ $item['product_id'] ?? '' }}"
-                            >
-
-                            <input
-                                type="hidden"
-                                name="productos[{{ $loop->index }}][cantidad]"
-                                value="{{ $item['cantidad'] }}"
-                            >
-
-                            <input
-                                type="hidden"
-                                name="productos[{{ $loop->index }}][precio_unitario]"
-                                value="{{ $item['precio_unitario'] }}"
-                            >
-
-
-                            <button
-                                type="button"
-                                class="pdf-btn
-                                    {{ $item['encontrado']
-                                        ? 'pdf-btn-blue'
-                                        : 'pdf-btn-orange'
-                                    }}"
-                                data-product-search="{{ $loop->index }}"
-                            >
-
-                                {{
-                                    $item['encontrado']
-                                        ? 'Cambiar'
-                                        : '🔎 Buscar producto'
-                                }}
-
-                            </button>
-
-                        </td>
-
-                    </tr>
-
-                @endforeach
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    </div>
-
-
-    {{-- =====================================================
-         AVISO
-    ====================================================== --}}
-
-    <div class="pdf-alert pdf-alert-info">
-
-        <div class="pdf-alert-title">
-            ℹ️ Vista previa
-        </div>
-
-        El precio unitario se conservará para que DISTAN
-        realice posteriormente sus cálculos.
-
-        El total del PDF es solamente informativo.
-
-    </div>
-
-
-    {{-- =====================================================
-         FOOTER
-    ====================================================== --}}
-
-    <div class="pdf-footer">
-
-        <a
-            href="{{ route('orders.importPdf') }}"
-            class="pdf-btn pdf-btn-gray"
-        >
-            ← Volver
-        </a>
-
-
-        <button
-            type="submit"
-            id="btn-crear-orden"
-            class="pdf-btn pdf-btn-primary"
-            disabled
-        >
-            Revisar productos
-        </button>
-
-    </div>
-
-
-</div>
-
-    </form>
-
-
-{{-- =========================================================
-     MODAL
-========================================================= --}}
-
-<div id="modalProductoPdf">
-
-    <div class="pdf-modal">
-
-
-        <div class="pdf-modal-header">
-
-            <div>
-
-                <div class="pdf-modal-title">
-                    Buscar producto
-                </div>
-
-                <div class="pdf-modal-subtitle">
-                    Busca por nombre, SKU, código de barras o código de caja.
-                </div>
-
-            </div>
-
-
-            <button
-                type="button"
-                class="pdf-modal-close"
-                id="cerrarModalProducto"
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        <div class="pdf-modal-body">
-
-            <input
-                type="text"
-                id="buscarProductoPdf"
-                class="pdf-search"
-                placeholder="Ejemplo: Palmitos, PL800..."
-                autocomplete="off"
-            >
-
-
-            <div
-                id="resultadosProductoPdf"
-                class="pdf-results"
-            >
-
-                <div class="pdf-search-message">
-                    Escribe al menos 2 caracteres...
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-</div>
-
-
-<script>
-
-(function () {
-
-    'use strict';
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | VARIABLES
-    |--------------------------------------------------------------------------
-    */
-
-    let filaActual = null;
-    let timerBusqueda = null;
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ELEMENTOS
-    |--------------------------------------------------------------------------
-    */
-
-    const modal =
-        document.getElementById(
-            'modalProductoPdf'
+        $datos = $parser->parse(
+            $request
+                ->file('archivo')
+                ->getRealPath()
         );
 
-    const input =
-        document.getElementById(
-            'buscarProductoPdf'
-        );
+    } catch (\Throwable $e) {
 
-    const resultados =
-        document.getElementById(
-            'resultadosProductoPdf'
-        );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ABRIR MODAL
-    |--------------------------------------------------------------------------
-    */
-
-    function abrirModal(index)
-    {
-        filaActual = index;
-
-        modal.classList.add('abierto');
-
-        document.body.style.overflow = 'hidden';
-
-        input.value = '';
-
-        resultados.innerHTML = `
-            <div class="pdf-search-message">
-                Escribe al menos 2 caracteres...
-            </div>
-        `;
-
-        setTimeout(function () {
-            input.focus();
-        }, 50);
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CERRAR MODAL
-    |--------------------------------------------------------------------------
-    */
-
-    function cerrarModal()
-    {
-        modal.classList.remove('abierto');
-
-        document.body.style.overflow = '';
-
-        filaActual = null;
-
-        input.value = '';
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BOTONES "CAMBIAR" / "BUSCAR"
-    |--------------------------------------------------------------------------
-    */
-
-    document
-        .querySelectorAll('[data-product-search]')
-        .forEach(function (button) {
-
-            button.addEventListener(
-                'click',
-                function () {
-
-                    const index =
-                        this.getAttribute(
-                            'data-product-search'
-                        );
-
-                    abrirModal(index);
-
-                }
+        return back()
+            ->withInput()
+            ->with(
+                'error',
+                $e->getMessage()
             );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Buscar cliente por RUC
+    |--------------------------------------------------------------------------
+    */
+
+    $client = null;
+
+    if (
+        !empty(
+            $datos['ruc_cliente']
+        )
+    ) {
+
+        $client = Client::where(
+            'ruc',
+            $datos['ruc_cliente']
+        )->first();
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | Buscar productos
+    |--------------------------------------------------------------------------
+    */
+
+    foreach (
+        $datos['productos']
+        as &$item
+    ) {
+
+        /*
+|--------------------------------------------------------------------------
+| 1. BUSCAR POR SKU
+|--------------------------------------------------------------------------
+*/
+
+$codigo = strtoupper(trim($item['codigo']));
+
+$product = Product::whereRaw(
+    'UPPER(TRIM(sku)) = ?',
+    [$codigo]
+)->first();
+
+
+/*
+|--------------------------------------------------------------------------
+| 2. BUSCAR POR CÓDIGO DE BARRAS
+|--------------------------------------------------------------------------
+*/
+
+if (!$product) {
+
+    $product = Product::whereRaw(
+        'UPPER(TRIM(barcode)) = ?',
+        [$codigo]
+    )->first();
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| 3. BUSCAR POR CÓDIGO DE CAJA
+|--------------------------------------------------------------------------
+*/
+
+if (!$product) {
+
+    $product = Product::whereRaw(
+        'UPPER(TRIM(box_barcode)) = ?',
+        [$codigo]
+    )->first();
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| 4. SI NO EXISTE EL CÓDIGO → BUSCAR POR NOMBRE
+|--------------------------------------------------------------------------
+*/
+
+$coincidencia = null;
+$confianza = 0;
+$candidatos = collect();
+
+
+if (!$product) {
+
+    $nombrePdf = $this->normalizarProducto(
+        $item['descripcion']
+    );
+
+    /*
+     * Extraemos posibles números de presentación.
+     *
+     * Ejemplos:
+     * x 100 g
+     * x 432g
+     * x 800g
+     */
+
+    preg_match_all(
+        '/(\d+(?:\.\d+)?)\s*g\b/i',
+        $item['descripcion'],
+        $pesosPdf
+    );
+
+    $pesoPdf = !empty($pesosPdf[1])
+        ? end($pesosPdf[1])
+        : null;
+
+
+    /*
+     * Buscamos palabras principales del producto.
+     *
+     * Ejemplo:
+     * "Filete de anchoas..."
+     * "Choclo Dulce Desgranado..."
+     * "Palmitos Enteros..."
+     */
+
+    $palabras = preg_split(
+        '/\s+/',
+        $nombrePdf
+    );
+
+    $palabras = array_filter(
+        $palabras,
+        fn($p) => strlen($p) >= 4
+    );
+
+
+    /*
+     * Tomamos las primeras palabras importantes
+     * para hacer la búsqueda inicial.
+     */
+
+    $baseBusqueda = implode(
+        ' ',
+        array_slice($palabras, 0, 3)
+    );
+
+
+    $candidatos = Product::query()
+        ->where('activo', true)
+        ->where(function ($query) use ($palabras) {
+
+            foreach (
+                array_slice($palabras, 0, 3)
+                as $palabra
+            ) {
+
+                $query->where(
+                    'nombre',
+                    'ILIKE',
+                    '%' . $palabra . '%'
+                );
+            }
+        })
+        ->get();
+
+
+    /*
+     * Comparar candidatos.
+     */
+
+    $mejorProducto = null;
+    $mejorPuntaje = 0;
+
+
+    foreach ($candidatos as $candidato) {
+
+        $nombreDb = $this->normalizarProducto(
+            $candidato->nombre
+        );
+
+
+        /*
+         * Similitud general del nombre.
+         */
+
+        similar_text(
+            $nombrePdf,
+            $nombreDb,
+            $similitud
+        );
+
+
+        $puntaje = $similitud;
+
+
+        /*
+         * Dar prioridad si la presentación/peso coincide.
+         */
+
+        if ($pesoPdf) {
+
+            preg_match_all(
+                '/(\d+(?:\.\d+)?)\s*g\b/i',
+                $candidato->nombre,
+                $pesosDb
+            );
+
+            if (!empty($pesosDb[1])) {
+
+                foreach ($pesosDb[1] as $pesoDb) {
+
+                    if (
+                        (float) $pesoDb
+                        ===
+                        (float) $pesoPdf
+                    ) {
+
+                        $puntaje += 25;
+
+                        break;
+                    }
+                }
+            }
+        }
+
+
+        if ($puntaje > $mejorPuntaje) {
+
+            $mejorPuntaje = $puntaje;
+
+            $mejorProducto = $candidato;
+        }
+    }
+
+
+    /*
+     * Solo aceptar automáticamente
+     * una coincidencia suficientemente clara.
+     */
+
+    if (
+        $mejorProducto
+        &&
+        $mejorPuntaje >= 85
+    ) {
+
+        $product = $mejorProducto;
+
+        $coincidencia = 'nombre';
+
+        $confianza = round(
+            min($mejorPuntaje, 100),
+            2
+        );
+    }
+}
+
+
+/*
+|--------------------------------------------------------------------------
+| RESULTADO
+|--------------------------------------------------------------------------
+*/
+
+if ($product) {
+
+    $item['encontrado'] = true;
+
+    $item['product_id'] =
+        $product->id;
+
+    $item['nombre_distan'] =
+        $product->nombre;
+
+    $item['sku_distan'] =
+        $product->sku;
+
+    $item['coincidencia'] =
+        $coincidencia ?? 'codigo';
+
+    $item['confianza'] =
+        $confianza ?: 100;
+
+} else {
+
+    $item['encontrado'] = false;
+
+    $item['product_id'] = null;
+
+    $item['nombre_distan'] = null;
+
+    $item['sku_distan'] = null;
+
+    $item['coincidencia'] = null;
+
+    $item['confianza'] = 0;
+}
+        /*
+         * Resultado
+         */
+
+            if ($product) {
+
+            $item['encontrado'] = true;
+
+            $item['product_id'] =
+                $product->id;
+
+            $item['nombre_distan'] =
+                $product->nombre;
+
+            $item['sku_distan'] =
+                $product->sku;
+
+            $item['coincidencia'] =
+                $coincidencia ?? 'codigo';
+
+            $item['confianza'] =
+                $confianza ?: 100;
+
+        } else {
+
+            $item['encontrado'] = false;
+
+            $item['product_id'] = null;
+
+            $item['nombre_distan'] = null;
+
+            $item['sku_distan'] = null;
+
+            $item['coincidencia'] = null;
+
+            $item['confianza'] = 0;
+        }
+
+    }
+
+    unset($item);
+
+    return view(
+        'orders.import_pdf_preview',
+        [
+            'datos' => $datos,
+            'client' => $client,
+        ]
+    );
+}
+public function storeImportPdf(Request $request)
+{
+    $request->validate([
+        'client_id' => 'required|exists:clients,id',
+        'tipo_orden' => 'required|string',
+        'fecha_pedido' => 'required|date',
+        'fecha_entrega' => 'nullable|date',
+        'order_interna' => 'nullable|string|max:255',
+
+        'productos' => 'required|array|min:1',
+
+        'productos.*.product_id' => [
+            'required',
+            'exists:products,id',
+        ],
+
+        'productos.*.cantidad' => [
+            'required',
+            'numeric',
+            'gt:0',
+        ],
+
+        'productos.*.precio_unitario' => [
+            'required',
+            'numeric',
+            'gte:0',
+        ],
+    ]);
+
+    try {
+
+        $order = \DB::transaction(function () use ($request) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | NUMERO DE ORDEN
+            |--------------------------------------------------------------------------
+            */
+
+            $lastOrder = Order::max('id') + 1;
+
+            $numeroOrden = 'ORD-' . str_pad(
+                $lastOrder,
+                6,
+                '0',
+                STR_PAD_LEFT
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | CREAR ORDEN
+            |--------------------------------------------------------------------------
+            |
+            | IMPORTANTE:
+            | No usamos el total del PDF.
+            | No usamos el IGV del PDF.
+            | No usamos el total PDF.
+            |
+            | La orden inicia con sus totales en 0.
+            |--------------------------------------------------------------------------
+            */
+
+            $order = Order::create([
+
+                'numero_orden' => $numeroOrden,
+
+                'client_id' => $request->client_id,
+
+                'tipo_orden' => $request->tipo_orden,
+
+                'fecha_pedido' => $request->fecha_pedido,
+
+                'fecha_entrega' => $request->fecha_entrega,
+
+                'order_interna' => $request->order_interna,
+
+                'estado' => 'INCOMPLETO',
+
+                'observaciones' => null,
+
+                'subtotal' => 0,
+
+                'igv' => 0,
+
+                'total' => 0,
+
+            ]);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | CREAR DETALLES
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($request->productos as $item) {
+
+                $producto = Product::findOrFail(
+                    $item['product_id']
+                );
+
+
+                $cantidad = (float) $item['cantidad'];
+
+                $precio = (float) $item['precio_unitario'];
+
+
+                OrderDetail::create([
+
+                    'order_id' => $order->id,
+
+                    'product_id' => $producto->id,
+
+                    'cantidad_solicitada' => $cantidad,
+
+                    'cantidad_despachada' => 0,
+
+                    /*
+                    | Precio tomado del PDF.
+                    */
+                    'precio_unitario' => $precio,
+
+                    /*
+                    | No copiamos el total del PDF.
+                    | El sistema lo calculará posteriormente.
+                    */
+                    'subtotal' => 0,
+
+                    'estado_item' => 'INCOMPLETO',
+
+                    'lote' => $producto->lote,
+
+                    'fecha_vencimiento' =>
+                        $producto->fecha_vencimiento,
+
+                ]);
+
+            }
+
+
+            return $order;
 
         });
 
 
-    /*
-    |--------------------------------------------------------------------------
-    | CERRAR
-    |--------------------------------------------------------------------------
-    */
-
-    document
-        .getElementById(
-            'cerrarModalProducto'
-        )
-        .addEventListener(
-            'click',
-            cerrarModal
-        );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CLICK FUERA DEL MODAL
-    |--------------------------------------------------------------------------
-    */
-
-    modal.addEventListener(
-        'click',
-        function (event) {
-
-            if (
-                event.target === modal
-            ) {
-
-                cerrarModal();
-
-            }
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ESC
-    |--------------------------------------------------------------------------
-    */
-
-    document.addEventListener(
-        'keydown',
-        function (event) {
-
-            if (
-                event.key === 'Escape'
-                &&
-                modal.classList.contains(
-                    'abierto'
-                )
-            ) {
-
-                cerrarModal();
-
-            }
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ESCRIBIR BUSQUEDA
-    |--------------------------------------------------------------------------
-    */
-
-    input.addEventListener(
-        'input',
-        function () {
-
-            clearTimeout(
-                timerBusqueda
-            );
-
-
-            const q =
-                this.value.trim();
-
-
-            if (
-                q.length < 2
-            ) {
-
-                resultados.innerHTML = `
-                    <div class="pdf-search-message">
-                        Escribe al menos 2 caracteres...
-                    </div>
-                `;
-
-                return;
-            }
-
-
-            resultados.innerHTML = `
-                <div class="pdf-search-message">
-                    ⏳ Buscando productos...
-                </div>
-            `;
-
-
-            timerBusqueda =
-                setTimeout(
-                    function () {
-
-                        buscarProductos(q);
-
-                    },
-                    250
-                );
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BUSCAR EN LARAVEL
-    |--------------------------------------------------------------------------
-    */
-
-    async function buscarProductos(q)
-    {
-        try {
-
-            const url =
-                "{{ route('orders.importPdf.productSearch') }}"
-                +
-                '?q='
-                +
-                encodeURIComponent(q);
-
-
-            const response =
-                await fetch(
-                    url,
-                    {
-                        method: 'GET',
-
-                        headers: {
-                            'Accept':
-                                'application/json',
-
-                            'X-Requested-With':
-                                'XMLHttpRequest'
-                        }
-                    }
-                );
-
-
-            if (!response.ok) {
-
-                throw new Error(
-                    'HTTP ' +
-                    response.status
-                );
-
-            }
-
-
-            const productos =
-                await response.json();
-
-
-            mostrarResultados(
-                productos
-            );
-
-
-        } catch (error) {
-
-            console.error(
-                'ERROR BUSCANDO PRODUCTO:',
-                error
-            );
-
-
-            resultados.innerHTML = `
-                <div
-                    class="pdf-search-message"
-                    style="color:#b91c1c;"
-                >
-                    ❌ No se pudo consultar
-                    el catálogo de productos.
-                    <br><br>
-                    <small>
-                        Error ${error.message}
-                    </small>
-                </div>
-            `;
-
-        }
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | MOSTRAR RESULTADOS
-    |--------------------------------------------------------------------------
-    */
-
-    function mostrarResultados(
-        productos
-    )
-    {
-
-        if (
-            !productos
-            ||
-            productos.length === 0
-        ) {
-
-            resultados.innerHTML = `
-                <div
-                    class="pdf-search-message"
-                    style="color:#b91c1c;"
-                >
-                    No se encontraron productos.
-                </div>
-            `;
-
-            return;
-        }
-
-
-        resultados.innerHTML =
-            productos
-                .map(
-                    function (producto) {
-
-                        return `
-
-                            <button
-                                type="button"
-                                class="pdf-result"
-                                data-product-id="${producto.id}"
-                            >
-
-                                <div class="pdf-result-name">
-
-                                    ${escapeHtml(
-                                        producto.nombre
-                                    )}
-
-                                </div>
-
-
-                                <div class="pdf-result-data">
-
-                                    SKU:
-                                    ${escapeHtml(
-                                        producto.sku || '—'
-                                    )}
-
-                                    &nbsp; | &nbsp;
-
-                                    Barcode:
-                                    ${escapeHtml(
-                                        producto.barcode || '—'
-                                    )}
-
-                                    ${
-                                        producto.box_barcode
-                                        ?
-                                        `
-                                        &nbsp; | &nbsp;
-                                        Caja:
-                                        ${escapeHtml(
-                                            producto.box_barcode
-                                        )}
-                                        `
-                                        :
-                                        ''
-                                    }
-
-                                </div>
-
-                            </button>
-
-                        `;
-
-                    }
-                )
-                .join('');
-
-
         /*
         |--------------------------------------------------------------------------
-        | EVENTO DE SELECCION
+        | REDIRECCION
         |--------------------------------------------------------------------------
         */
 
-        resultados
-            .querySelectorAll(
-                '[data-product-id]'
-            )
-            .forEach(
-                function (button, posicion) {
-
-                    button.addEventListener(
-                        'click',
-                        function () {
-
-                            const producto =
-                                productos[
-                                    posicion
-                                ];
-
-                            seleccionarProducto(
-                                producto
-                            );
-
-                        }
-                    );
-
-                }
-            );
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | SELECCIONAR PRODUCTO
-    |--------------------------------------------------------------------------
-    */
-
-    function seleccionarProducto(
-        producto
-    )
-    {
-
-        if (
-            filaActual === null
-        ) {
-
-            return;
-
-        }
-
-
-        const index =
-            filaActual;
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | GUARDAR PRODUCT ID
-        |--------------------------------------------------------------------------
-        */
-
-        const hidden =
-            document.getElementById(
-                'product-id-' + index
+        return redirect()
+            ->route('orders.edit', $order)
+            ->with(
+                'success',
+                'Orden PDF importada correctamente como '
+                . $order->numero_orden
             );
 
 
-        if (hidden) {
+    } catch (\Throwable $e) {
 
-            hidden.value =
-                producto.id;
-
-        }
-
-
-        /*
-        |--------------------------------------------------------------------------
-        | FILA
-        |--------------------------------------------------------------------------
-        */
-
-        const fila =
-            document.querySelector(
-                '[data-product-row="' +
-                index +
-                '"]'
+        return back()
+            ->withInput()
+            ->with(
+                'error',
+                'No se pudo crear la orden: '
+                . $e->getMessage()
             );
-
-
-        if (fila) {
-
-
-            /*
-            | Producto DISTAN
-            */
-
-            const productoDistan =
-                fila.querySelector(
-                    '.producto-distan'
-                );
-
-
-            if (
-                productoDistan
-            ) {
-
-                productoDistan.innerHTML = `
-
-                    <div class="pdf-product-distan">
-
-                        ${escapeHtml(
-                            producto.nombre
-                        )}
-
-                    </div>
-
-                    <div class="pdf-sku">
-
-                        SKU:
-                        ${escapeHtml(
-                            producto.sku || '—'
-                        )}
-
-                    </div>
-
-                `;
-
-            }
-
-
-            /*
-            | Estado
-            */
-
-            const estado =
-                fila.querySelector(
-                    '.estado-producto'
-                );
-
-
-            if (
-                estado
-            ) {
-
-                estado.innerHTML = `
-
-                    <span
-                        class="pdf-badge
-                               pdf-badge-manual"
-                    >
-                        ✓ Manual
-                    </span>
-
-                `;
-
-            }
-
-
-            /*
-            | Botón
-            */
-
-            const boton =
-                fila.querySelector(
-                    '[data-product-search]'
-                );
-
-
-            if (
-                boton
-            ) {
-
-                boton.textContent =
-                    'Cambiar';
-
-                boton.classList.remove(
-                    'pdf-btn-orange'
-                );
-
-                boton.classList.add(
-                    'pdf-btn-blue'
-                );
-
-            }
-
-        }
-
-
-        cerrarModal();
-
-        verificarProductos();
 
     }
+}
+public function actualizarDocumentos(
+    Request $request,
+    Order $order
+) {
+    $data = $request->validate([
+        'factura_asociada' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
 
+        'guia_asociada' => [
+            'nullable',
+            'string',
+            'max:255',
+        ],
+    ]);
 
-    /*
-    |--------------------------------------------------------------------------
-    | VERIFICAR PRODUCTOS
-    |--------------------------------------------------------------------------
-    */
+    $order->update([
+        'factura_asociada' =>
+            $data['factura_asociada'] ?: null,
 
-    function verificarProductos()
-    {
+        'guia_asociada' =>
+            $data['guia_asociada'] ?: null,
+    ]);
 
-        const inputs =
-            document.querySelectorAll(
-                '[id^="product-id-"]'
-            );
+    return back()->with(
+        'success',
+        'Factura y guía asociadas correctamente.'
+    );
+}
 
+    public function etiquetasBultos(Order $order)
+{
+    $order->load([
+        'client',
+        'bultos.detalles.product',
+    ]);
 
-        let completos = true;
+    $bultos = $order->bultos;
 
+    if ($bultos->isEmpty()) {
+        return back()->with('error', 'La orden no tiene bultos creados.');
+    }
 
-        inputs.forEach(
-            function (input) {
+    $pdf = Pdf::loadView(
+        'orders.pdf.etiqueta-bulto',
+        compact('bultos')
+    );
 
-                if (
-                    !input.value
-                    ||
-                    input.value.trim() === ''
-                ) {
+    $width  = 90 * 2.83464567;
+    $height = 70 * 2.83464567;
 
-                    completos = false;
+    $pdf->setPaper([
+        0,
+        0,
+        $width,
+        $height
+    ]);
 
-                }
+    return $pdf->stream(
+        'etiquetas-bultos-' . $order->id . '.pdf'
+    );
+}
+    public function etiquetaBulto(\App\Models\Bulto $bulto)
+{
+    $bulto->load([
+        'order.client',
+        'order.bultos',
+        'detalles.product',
+    ]);
 
-            }
-        );
+    $pdf = Pdf::loadView(
+        'orders.pdf.etiqueta-bulto',
+        compact('bulto')
+    );
 
+    $width  = 100 * 2.83464567;
+    $height = 70 * 2.83464567;
 
-        const tipoOrden =
-            document.getElementById(
-                'tipoOrdenPdf'
-            );
+    $pdf->setPaper([
+        0,
+        0,
+        $width,
+        $height
+    ]);
 
+    return $pdf->stream(
+        'etiqueta-bulto-' . $bulto->id . '.pdf'
+    );
+}
+    public function etiquetaLocal(OrderDetail $item)
+{
+    $item->load([
+        'product',
+        'order.client',
+    ]);
 
-        if (
-            !tipoOrden
-            ||
-            !tipoOrden.value
-        ) {
+    $width  = 90 * 2.83464567;
+    $height = 70 * 2.83464567;
 
-            completos = false;
+    $pdf = Pdf::loadView('orders.pdf.etiqueta', [
+        'item' => $item,
+    ]);
 
-        }
+    $pdf->setPaper([
+        0,
+        0,
+        $width,
+        $height
+    ]);
 
+    return $pdf->stream(
+        'etiqueta-local-' . $item->id . '.pdf'
+    );
+}
 
-        const clientId =
-            document.querySelector(
-                'input[name="client_id"]'
-            );
+public function etiqueta(OrderDetail $item)
+{
+    $item->load('product', 'order.client');
 
+    $cpc = $item->product->cantidad_por_caja ?? 1;
+    $cpc = $cpc > 0 ? $cpc : 1;
 
-        if (
-            !clientId
-            ||
-            !clientId.value
-        ) {
+    $cajas = floor($item->cantidad_despachada / $cpc);
+    $sueltas = $item->cantidad_despachada % $cpc;
 
-            completos = false;
+    // ── Clientes que requieren código de PRODUCTO en vez de código de caja ──
+    $clientesConCodigoDeProducto = [
+        'HIPERMERCADOS TOTTUS ORIENTE SAC',
+        'HIPERMERCADOS TOTTUS S.A',
+    ];
 
-        }
+    $razonSocial = strtoupper(trim($item->order->client->razon_social ?? ''));
+    $usaCodigoDeProducto = in_array($razonSocial, $clientesConCodigoDeProducto, true);
 
+    $codigoParaEtiqueta = $usaCodigoDeProducto
+        ? ($item->product->barcode ?? '')
+        : ($item->product->box_barcode ?? '');
 
-        const boton =
-            document.getElementById(
-                'btn-crear-orden'
-            );
+    $barcode = null;
 
-
-        if (!boton) {
-
-            return;
-
-        }
-
-
-        if (completos) {
-
-            boton.disabled = false;
-
-            boton.textContent =
-                '✓ Crear orden';
-
+    if ($codigoParaEtiqueta) {
+        if ($usaCodigoDeProducto) {
+            // Tottus usa EAN/JAN-13 según su software de etiquetado
+            $svg = Ean13Generator::generateSvgMm($codigoParaEtiqueta, 0.38, 23);
         } else {
+            $svg = Code128Generator::generateSvg($codigoParaEtiqueta, 1.5, 60);
+        }
+        $barcode = 'data:image/svg+xml;base64,' . base64_encode($svg);
+    }
 
-            boton.disabled = true;
+    // 90mm x 70mm (horizontal) → puntos (1mm = 2.83464567 pt)
+    $width = 60 * 2.83464567;
+    $height = 105 * 2.83464567;
 
-            boton.textContent =
-                'Revisar productos';
+    $pdf = Pdf::loadView('orders.pdf.etiqueta-barra', [
+        'item' => $item,
+        'cantidadPorCaja' => $cpc,
+        'cajas' => $cajas,
+        'sueltas' => $sueltas,
+        'barcode' => $barcode,
+        'codigoMostrado' => $codigoParaEtiqueta,
+    ])->setPaper([0, 0, $width, $height], 'landscape');
 
+    return $pdf->stream('etiqueta-' . $item->id . '.pdf');
+}
+    public function updateLote(Request $request, OrderDetail $item)
+{
+    $validated = $request->validate([
+        'lote' => 'nullable|string|max:100',
+        'fecha_vencimiento' => 'nullable|date',
+    ]);
+
+    $item->update($validated);
+
+    return back()->with('success', 'Lote y vencimiento actualizados correctamente.');
+}
+    public function cartaCalidad(Order $order)
+{
+    $detalles = $order->details()
+        ->with('product')
+        ->where('cantidad_despachada', '>', 0)
+        ->get();
+
+    $pdf = \PDF::loadView('orders.carta_calidad', compact('order', 'detalles'));
+
+    $pdf->setPaper('a4', 'portrait');
+
+    return $pdf->stream('carta-calidad-' . $order->numero_orden . '.pdf');
+}
+
+    public function pedidos()
+{
+    $orders = \App\Models\Order::where('estado', '!=', 'COMPLETO')
+        ->latest()
+        ->get();
+
+    return view('orders.pedidos', compact('orders'));
+}
+
+    public function cerrar(Order $order)
+{
+    $order->estado = 'COMPLETO';
+
+    // Registrar fecha de cierre solo la primera vez
+    if ($order->fecha_cierre === null) {
+        $order->fecha_cierre = now();
+    }
+
+    $order->save();
+
+    return redirect('/pedidos')->with('success', 'Orden cerrada correctamente');
+}
+
+    public function destroy(Order $order)
+{
+    // eliminar detalles primero (si no tienes cascade)
+    $order->details()->delete();
+
+    $order->delete();
+
+    return redirect()->route('orders.index')
+        ->with('success', 'Orden eliminada correctamente');
+}
+
+    public function eliminarDeBulto(\App\Models\BultoDetalle $detalle)
+{
+    $bulto = $detalle->bulto;
+    $product = $detalle->product;
+
+    $cantidad = $detalle->cantidad;
+
+    // 🔥 recalcular peso
+    $pesoProducto = ($product->peso * $cantidad) / 1000;
+    $pesoExtra = 0.5;
+    $pesoTotal = $pesoProducto + $pesoExtra;
+
+    // 🔥 restar peso
+    $bulto->peso_total -= $pesoTotal;
+
+    if ($bulto->peso_total < 0) {
+        $bulto->peso_total = 0;
+    }
+
+    $bulto->save();
+
+    // 🔥 eliminar registro
+    $detalle->delete();
+
+    return back()->with('success', '🗑 Producto eliminado del bulto');
+}
+    public function crearBulto(Order $order)
+{
+    $count = $order->bultos()->count() + 1;
+
+    $order->bultos()->create([
+        'nombre' => 'Bulto '.$count
+    ]);
+
+    return back();
+}
+
+public function agregarABulto(Request $request, \App\Models\Bulto $bulto)
+{
+    $product = \App\Models\Product::find($request->product_id);
+
+    $cantidad = (int) $request->cantidad;
+
+    // 🔥 VALIDACIÓN: NO EXCEDER LO SOLICITADO
+    $totalEnBultos = $bulto->order->bultos
+        ->flatMap->detalles
+        ->where('product_id', $product->id)
+        ->sum('cantidad');
+
+    $detalleOrden = $bulto->order->details
+        ->where('product_id', $product->id)
+        ->first();
+
+    $max = $detalleOrden->cantidad_solicitada;
+
+    if (($totalEnBultos + $cantidad) > $max) {
+        return back()->with('error', '❌ Excede lo solicitado');
+    }
+
+    // 🔥 PESO
+    $pesoProducto = ($product->peso * $cantidad) / 1000;
+    $pesoExtra = 0.5;
+    $pesoTotal = $pesoProducto + $pesoExtra;
+
+    // 🔥 GUARDAR
+    $bulto->detalles()->create([
+        'product_id' => $product->id,
+        'cantidad' => $cantidad
+    ]);
+
+    $bulto->peso_total += $pesoTotal;
+    $bulto->save();
+
+    return back()->with('success', '✅ Producto agregado al bulto');
+}
+    public function dashboard()
+{
+    $data = Order::selectRaw('client_id, COUNT(*) as total')
+        ->whereMonth('fecha_pedido', now()->month)
+        ->groupBy('client_id')
+        ->with('client')
+        ->get();
+
+    return view('dashboard', compact('data'));
+}
+
+public function historial(Request $request)
+{
+    $query = Order::with(['client', 'details'])
+        ->where('estado', 'COMPLETO');
+
+    // ── Filtro por fecha ──────────────────────────────────────────────
+    if ($request->filled('fecha_inicio')) {
+        $query->whereDate('fecha_pedido', '>=', $request->fecha_inicio);
+    }
+    if ($request->filled('fecha_fin')) {
+        $query->whereDate('fecha_pedido', '<=', $request->fecha_fin);
+    }
+
+    // ── Filtro por cliente o número de orden ──────────────────────────
+    if ($request->filled('cliente')) {
+        $busqueda = $request->cliente;
+        $query->where(function ($q) use ($busqueda) {
+            $q->where('numero_orden', 'like', '%' . $busqueda . '%')
+              ->orWhereHas('client', fn($c) =>
+                  $c->where('razon_social', 'like', '%' . $busqueda . '%')
+              );
+        });
+    }
+
+    // ── Filtro por tipo de orden ──────────────────────────────────────
+    if ($request->filled('tipo_orden')) {
+        $query->where('tipo_orden', $request->tipo_orden);
+    }
+
+    // ── Ordenamiento ──────────────────────────────────────────────────
+    match ($request->get('orden', 'fecha_desc')) {
+        'fecha_asc'  => $query->orderBy('fecha_pedido', 'asc'),
+        'total_desc' => $query->orderBy('total', 'desc'),
+        'total_asc'  => $query->orderBy('total', 'asc'),
+        default      => $query->orderBy('fecha_pedido', 'desc'),
+    };
+
+    $orders = $query->paginate(20)->withQueryString();
+
+    // ── Datos para el gráfico de facturación mensual (últimos 6 meses) ─
+    $chartQuery = Order::where('estado', 'COMPLETO');
+
+    if ($request->filled('tipo_orden')) {
+        $chartQuery->where('tipo_orden', $request->tipo_orden);
+    }
+
+    $datosGrafico = $chartQuery
+    ->selectRaw("TO_CHAR(fecha_pedido, 'YYYY-MM') as mes, SUM(total) as monto, COUNT(*) as cant")
+    ->whereDate('fecha_pedido', '>=', now()->subMonths(5)->startOfMonth())
+    ->groupByRaw("TO_CHAR(fecha_pedido, 'YYYY-MM')")
+    ->orderBy('mes')
+    ->get();
+
+    // Rellenar los 6 meses aunque no tengan datos
+    $meses   = [];
+    $montos  = [];
+    $cantOrd = [];
+
+    for ($i = 5; $i >= 0; $i--) {
+        $fecha = now()->subMonths($i);
+        $key   = $fecha->format('Y-m');
+
+        $fila = $datosGrafico->firstWhere('mes', $key);
+
+        $meses[]   = ucfirst($fecha->locale('es')->isoFormat('MMM YY'));
+        $montos[]  = $fila ? (float) $fila->monto : 0;
+        $cantOrd[] = $fila ? (int)   $fila->cant  : 0;
+    }
+
+    return view('orders.historial', compact(
+        'orders',
+        'meses',
+        'montos',
+        'cantOrd'
+    ));
+}
+
+    public function operario(Order $order)
+{
+    $order->load('details.product');
+
+    return view('orders.operario', compact('order'));
+}
+   public function pdf(Order $order)
+{
+    $order->load(['client','details.product']);
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView(
+        'orders.pdf',
+        compact('order')
+    );
+
+    return $pdf->stream(
+        $order->numero_orden.'.pdf'
+    );
+}
+public function pdfEncomienda(Order $order)
+{
+    $order->load([
+        'client',
+        'details.product',
+        'bultos.detalles.product'
+    ]);
+
+    $pdf = Pdf::loadView(
+        'orders.pdf_encomienda',
+        compact('order')
+    );
+
+    $pdf->setPaper('A4', 'portrait');
+
+    return $pdf->stream(
+        'Encomienda_'.$order->numero_orden.'.pdf'
+    );
+}
+
+    public function addProduct(
+    Request $request,
+    Order $order,
+    
+)
+{
+    $product = Product::findOrFail(
+        $request->product_id
+    );
+    OrderDetail::create([
+
+        'order_id' => $order->id,
+
+        'product_id' => $product->id,
+
+        'cantidad_solicitada' =>
+            $request->cantidad_solicitada,
+
+        'cantidad_despachada' => 0,
+
+        'precio_unitario' =>
+            $request->precio_unitario,
+
+        'subtotal' => 0,
+
+        'estado_item' =>
+            'INCOMPLETO',
+
+        // 🔥 Snapshot del lote/vencimiento del producto al momento de agregarlo
+        'lote' => $product->lote,
+        'fecha_vencimiento' => $product->fecha_vencimiento,
+    ]);
+
+    return back()->with(
+        'success',
+        'Producto agregado'
+    );
+}
+public function stockPedidos()
+{
+    $detalles = OrderDetail::with('product')
+        ->whereHas('order', function ($query) {
+            $query->where('estado', '!=', 'COMPLETO');
+        })
+        ->get();
+
+    $productos = $detalles
+        ->groupBy('product_id')
+        ->map(function ($items) {
+
+            $producto = $items->first()->product;
+
+            $solicitado = $items->sum(function ($item) {
+                return (float) $item->cantidad_solicitada;
+            });
+
+            $despachado = $items->sum(function ($item) {
+                return (float) $item->cantidad_despachada;
+            });
+
+            $pendiente = max(0, $solicitado - $despachado);
+
+            $stock = (float) ($producto->stock ?? 0);
+
+            $faltante = max(0, $pendiente - $stock);
+
+            if ($pendiente <= 0) {
+                $estado = 'SIN PENDIENTE';
+            } elseif ($stock >= $pendiente) {
+                $estado = 'STOCK SUFICIENTE';
+            } elseif ($stock > 0) {
+                $estado = 'STOCK PARCIAL';
+            } else {
+                $estado = 'SOLICITAR PRODUCCIÓN';
+            }
+
+            return [
+                'id'          => $producto->id,
+                'codigo'      => $producto->sku ?? $producto->barcode ?? '—',
+                'nombre'      => $producto->nombre,
+                'solicitado'  => $solicitado,
+                'despachado'  => $despachado,
+                'pendiente'   => $pendiente,
+                'stock'       => $stock,
+                'faltante'    => $faltante,
+                'estado'      => $estado,
+            ];
+        })
+        ->filter(function ($producto) {
+            return $producto['pendiente'] > 0;
+        })
+        ->sortByDesc('faltante')
+        ->values();
+
+    return response()->json($productos);
+}
+    public function index(Request $request)
+{
+    $query = Order::with('client')
+    ->where('estado', '!=', 'COMPLETO');
+
+    if ($request->filled('fecha_inicio')) {
+
+        $query->whereDate(
+            'fecha_pedido',
+            '>=',
+            $request->fecha_inicio
+        );
+    }
+
+    if ($request->filled('fecha_fin')) {
+
+        $query->whereDate(
+            'fecha_pedido',
+            '<=',
+            $request->fecha_fin
+        );
+    }
+
+    if ($request->filled('estado')) {
+
+        $query->where(
+            'estado',
+            $request->estado
+        );
+    }
+
+    $orders = $query
+        ->latest()
+        ->paginate(20);
+
+    return view(
+        'orders.index',
+        compact('orders')
+    );
+}
+
+    public function create()
+    {
+        $clients = Client::where('activo', true)
+            ->orderBy('razon_social')
+            ->get();
+
+        return view(
+            'orders.create',
+            compact('clients')
+        );
+    }
+
+    
+
+    public function store(Request $request)
+    {
+        $request->validate([
+
+            'client_id' => 'required',
+
+            'tipo_orden' => 'required',
+
+            'fecha_pedido' => 'required',
+
+            'order_interna' => 'nullable|string|max:255',
+
+        ]);
+
+        $lastOrder = Order::max('id') + 1;
+
+        $order = Order::create([
+
+    'numero_orden' => 'ORD-'.str_pad(
+        $lastOrder,
+        6,
+        '0',
+        STR_PAD_LEFT
+    ),
+
+    'client_id' => $request->client_id,
+
+    'tipo_orden' => $request->tipo_orden,
+
+    'fecha_pedido' => $request->fecha_pedido,
+
+    'fecha_entrega' => $request->fecha_entrega,
+
+    'order_interna' => $request->order_interna,
+
+    'estado' => 'INCOMPLETO',
+
+    'observaciones' => $request->observaciones,
+
+    'subtotal' => 0,
+
+    'igv' => 0,
+
+    'total' => 0
+
+]);
+
+        return redirect()
+            ->route('orders.edit', $order)
+            ->with(
+                'success',
+                'Orden creada correctamente'
+            );
+    }
+
+    public function show(Order $order)
+    {
+        //
+    }
+
+    public function edit(Order $order)
+{
+    $order->load(['client','details.product','bultos.detalles.product']);
+
+    // 🔥 ESTO FALTABA
+    $products = \App\Models\Product::where('activo', true)
+        ->orderBy('nombre')
+        ->get();
+
+    $tipo = strtoupper(trim($order->tipo_orden));
+
+    if ($tipo == 'SUPERMERCADO') {
+        return view('orders.edit', compact('order','products'));
+    }
+
+    if ($tipo == 'LOCAL') {
+        return view('orders.edit_local', compact('order','products'));
+    }
+
+    if ($tipo == 'ENCOMIENDA') {
+        return view('orders.edit_encomienda', compact('order','products'));
+    }
+
+    if ($tipo == 'EXPORTACION') {
+
+    $order->load([
+        'client',
+        'details.product',
+        'pallets.detalles.product',
+        'pallets.detalles.orderDetail',
+    ]);
+
+    return view('orders.edit_exportacion', compact('order', 'products'));
+    }
+}
+
+public function updateDetail(Request $request, OrderDetail $detail)
+{
+    $cantidadSolicitada = (float) $request->input('cantidad_solicitada');
+    $cantidadDespachada = (float) $request->input('cantidad_despachada');
+    $precio = (float) $request->input('precio_unitario');
+
+    $subtotal = $cantidadDespachada * $precio;
+
+    // 🔥 ESTADO DEL ITEM
+    if ($cantidadDespachada <= 0) {
+        $estado = 'INCOMPLETO';
+    } elseif ($cantidadDespachada < $cantidadSolicitada) {
+        $estado = 'PARCIAL';
+    } else {
+        $estado = 'COMPLETO';
+    }
+
+    // 🔥 CONTROL DE STOCK
+    $producto = $detail->product;
+
+    $cantidadAntes = $detail->cantidad_despachada ?? 0;
+    $cantidadNueva = $cantidadDespachada;
+
+    $diferencia = $cantidadNueva - $cantidadAntes;
+
+    if ($diferencia > 0) {
+
+        if ($producto->stock <= 0) {
+            return back()->with('error', '❌ Sin stock disponible. Crear orden de producción');
         }
 
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ESCAPAR HTML
-    |--------------------------------------------------------------------------
-    */
-
-    function escapeHtml(value)
-    {
-
-        const div =
-            document.createElement(
-                'div'
+        if ($producto->stock < $diferencia) {
+            return back()->with('error', 
+                '⚠️ Stock insuficiente. Disponible: ' . $producto->stock . 
+                ' | Faltante: ' . ($diferencia - $producto->stock)
             );
+        }
 
-
-        div.textContent =
-            value ?? '';
-
-
-        return div.innerHTML;
-
+        $producto->stock -= $diferencia;
+        $producto->save();
     }
 
+    // 🔥 SI DISMINUYE → DEVOLVER STOCK
+    if ($diferencia < 0) {
+        $producto->stock += abs($diferencia);
+        $producto->save();
+    }
+    // 🔥 ACTUALIZAR DETALLE
+    $updateData = [
+        'cantidad_solicitada' => $cantidadSolicitada,
+        'cantidad_despachada' => $cantidadDespachada,
+        'precio_unitario' => $precio,
+        'estado_item' => $estado,
+        'subtotal' => $subtotal,
+    ];
+    // Solo tocar estos campos si vienen en el request
+// (evita que el guardado rápido de cantidad/precio borre datos ya guardados)
+foreach (['paleta', 'lote', 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
+    if ($request->has($campo)) {
+        $updateData[$campo] = $request->input($campo);
+    }
+}
 
-    /*
-    |--------------------------------------------------------------------------
-    | TIPO DE ORDEN
-    |--------------------------------------------------------------------------
-    */
+// 🔥 LÍMITE DE ÍTEMS POR PALETA (máx. 10)
+if (array_key_exists('paleta', $updateData)) {
+    $nuevaPaleta = strtoupper(trim((string) $updateData['paleta']));
+    $paletaActual = strtoupper(trim((string) $detail->paleta));
 
-    const tipoOrden =
-        document.getElementById(
-            'tipoOrdenPdf'
-        );
+    if ($nuevaPaleta !== '' && $nuevaPaleta !== $paletaActual) {
+        $countActual = $detail->order->details()
+            ->where('id', '!=', $detail->id)
+            ->whereRaw('UPPER(paleta) = ?', [$nuevaPaleta])
+            ->count();
 
-    if (tipoOrden) {
-
-        tipoOrden.addEventListener(
-            'change',
-            verificarProductos
-        );
-
+        if ($countActual >= 10) {
+            return back()->with(
+                'error',
+                "⚠️ La paleta {$nuevaPaleta} ya tiene {$countActual} ítems (máximo 10). No se pueden agregar más productos a esta paleta."
+            );
+        }
     }
 
-
-    /*
-    |--------------------------------------------------------------------------
-    | INICIO
-    |--------------------------------------------------------------------------
-    */
-
-    verificarProductos();
+    $updateData['paleta'] = $nuevaPaleta;
+}
 
 
-})();
+$detail->update($updateData);
 
-</script>
+    // 🔄 ACTUALIZAR ORDEN
+    $order = $detail->order;
+    $estadoAnterior = $order->estado;
 
-@endsection
+    // 🔥 TOTALES CORRECTOS
+    $order->subtotal = $order->details()->sum('subtotal');
+    $order->igv = round($order->subtotal * 0.18, 2);
+    $order->total = $order->subtotal + $order->igv;
+
+    $items = $order->details;
+
+    // 🔥 ESTADO DINÁMICO REAL (CORREGIDO)
+    if ($order->tipo_orden != 'ENCOMIENDA') {
+
+        $totalSolicitado = $items->sum('cantidad_solicitada');
+        $totalDespachado = $items->sum('cantidad_despachada');
+
+        if ($totalDespachado <= 0) {
+            $order->estado = 'INCOMPLETO';
+        } elseif ($totalDespachado >= $totalSolicitado) {
+            $order->estado = 'COMPLETO';
+        } else {
+            $order->estado = 'PARCIAL';
+        }
+        if ($order->estado === 'COMPLETO' && $estadoAnterior !== 'COMPLETO') {
+            $order->fecha_cierre = now();
+        } elseif ($order->estado !== 'COMPLETO' && $estadoAnterior === 'COMPLETO') {
+            $order->fecha_cierre = null;
+        }
+    }
+
+    $order->save();
+
+    // 🔥 RESPUESTA
+    if ($request->expectsJson()) {
+        return response()->json([
+            'success' => true,
+            'estado' => $estado
+        ]);
+    }
+
+    return back()->with('success', 'Detalle actualizado correctamente');
+}
+
+    public function destroyDetail(OrderDetail $detail)
+{
+    $order = $detail->order;
+    $estadoAnteriorDestroy = $order->estado;
+
+    // eliminar item
+    $detail->delete();
+
+    // recalcular totales
+    $order->subtotal = $order->details()->sum('subtotal');
+    $order->igv = round($order->subtotal * 0.18, 2);
+    $order->total = $order->subtotal + $order->igv;
+
+    // recalcular estado de la orden
+    $items = $order->details;
+
+    if ($items->isEmpty()) {
+        $order->estado = 'INCOMPLETO';
+    } elseif ($items->every(fn ($i) => $i->estado_item === 'COMPLETO')) {
+        $order->estado = 'COMPLETO';
+    } elseif ($items->contains(fn ($i) => $i->estado_item === 'PARCIAL')) {
+        $order->estado = 'PARCIAL';
+    } else {
+        $order->estado = 'INCOMPLETO';
+    }
+    if ($order->estado === 'COMPLETO' && $estadoAnteriorDestroy !== 'COMPLETO') {
+        $order->fecha_cierre = now();
+    } elseif ($order->estado !== 'COMPLETO' && $estadoAnteriorDestroy === 'COMPLETO') {
+        $order->fecha_cierre = null;
+    }
+        $order->save();
+
+    return back()->with('success', 'Producto eliminado de la orden');
+}
+
+    public function importCsv(
+    Request $request,
+    Order $order
+)
+{
+    $request->validate([
+        'archivo' => 'required|file|mimes:csv,txt'
+    ]);
+
+    $file = fopen(
+        $request->file('archivo')->getRealPath(),
+        'r'
+    );
+
+    $fila = 0;
+
+    while (($data = fgetcsv($file, 1000, ',')) !== false) {
+
+        $fila++;
+
+        if ($fila == 1) {
+            continue;
+        }
+
+        $sku = trim($data[0]);
+        $cantidad = (float)$data[1];
+        $precio = (float)$data[2];
+
+        $product = Product::where(
+            'sku',
+            $sku
+        )->first();
+
+        if (!$product) {
+            continue;
+        }
+
+        OrderDetail::create([
+
+            'order_id' => $order->id,
+
+            'product_id' => $product->id,
+
+            'cantidad_solicitada' => $cantidad,
+
+            'cantidad_despachada' => 0,
+
+            'precio_unitario' => $precio,
+
+            'subtotal' =>
+                $cantidad * $precio,
+
+            'estado_item' =>
+                'INCOMPLETO',
+        ]);
+    }
+
+    fclose($file);
+
+    $order->subtotal =
+        $order->details()->sum('subtotal');
+
+    $order->igv =
+        round($order->subtotal * 0.18, 2);
+
+    $order->total =
+        $order->subtotal +
+        $order->igv;
+
+    $order->save();
+
+    return back()->with(
+        'success',
+        'Pedido importado correctamente'
+    );
+}
+public function palletPdf(Order $order, $paleta)
+{
+    $items = $order->details()
+        ->where('paleta', $paleta)
+        ->with('product')
+        ->get();
+
+    $numeroPaleta = preg_replace('/\D/', '', $paleta);
+    if (empty($numeroPaleta)) {
+        $numeroPaleta = 0;
+    }
+
+    $sscc = '50000014373324' . str_pad($numeroPaleta, 4, '0', STR_PAD_LEFT);
+
+    // Código de barras generado en PHP puro (sin dependencias)
+    $svg = Code128Generator::generateSvg($sscc, 2, 80);
+    $barcode = 'data:image/svg+xml;base64,' . base64_encode($svg);
+
+    $pdf = Pdf::loadView('orders.pdf.pallet', [
+        'order'   => $order,
+        'items'   => $items,
+        'paleta'  => $paleta,
+        'sscc'    => $sscc,
+        'barcode' => $barcode,
+    ]);
+
+    return $pdf->stream("Paleta-{$paleta}.pdf");
+}
+}
