@@ -378,6 +378,18 @@ Route::middleware('auth')->group(function () {
         [OrderController::class, 'buscarProductoImportacion']
     )->name('orders.importPdf.productSearch');
 
+    Route::get('/orders/import-pdf', [OrderController::class, 'importPdf'])
+    ->name('orders.importPdf');
+
+    Route::post('/orders/import-pdf/preview', [OrderController::class, 'previewPdf'])
+        ->name('orders.importPdf.preview');
+
+    Route::post('/orders/import-pdf/store', [OrderController::class, 'storeImportPdf'])
+        ->name('orders.importPdf.store');
+
+    Route::get('/orders/import-pdf/product-search', [OrderController::class, 'buscarProductoImportacion'])
+    ->name('orders.importPdf.productSearch');
+
     // ÓRDENES
     Route::resource('orders', OrderController::class);
 

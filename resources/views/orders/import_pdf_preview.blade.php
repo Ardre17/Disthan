@@ -570,6 +570,19 @@
     </div>
 
 
+    <form
+        id="importPdfForm"
+        method="POST"
+        action="{{ route('orders.importPdf.store') }}"
+    >
+
+        @csrf
+
+        <input type="hidden" name="client_id" value="{{ $client?->id ?? '' }}">
+        <input type="hidden" name="fecha_pedido" value="{{ $datos['fecha_pedido'] ?? '' }}">
+        <input type="hidden" name="fecha_entrega" value="{{ $datos['fecha_entrega'] ?? '' }}">
+        <input type="hidden" name="order_interna" value="{{ $datos['order_interna'] ?? '' }}">
+
     {{-- =====================================================
          CLIENTE
     ====================================================== --}}
@@ -687,6 +700,7 @@
 
                 <select
                     id="tipoOrdenPdf"
+                    name="tipo_orden"
                     class="pdf-select"
                 >
 
@@ -947,7 +961,20 @@
                             <input
                                 type="hidden"
                                 id="product-id-{{ $loop->index }}"
+                                name="productos[{{ $loop->index }}][product_id]"
                                 value="{{ $item['product_id'] ?? '' }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="productos[{{ $loop->index }}][cantidad]"
+                                value="{{ $item['cantidad'] }}"
+                            >
+
+                            <input
+                                type="hidden"
+                                name="productos[{{ $loop->index }}][precio_unitario]"
+                                value="{{ $item['precio_unitario'] }}"
                             >
 
 
@@ -1017,7 +1044,7 @@
 
 
         <button
-            type="button"
+            type="submit"
             id="btn-crear-orden"
             class="pdf-btn pdf-btn-primary"
             disabled
@@ -1029,6 +1056,8 @@
 
 
 </div>
+
+    </form>
 
 
 {{-- =========================================================
@@ -1729,6 +1758,40 @@
         );
 
 
+        const tipoOrden =
+            document.getElementById(
+                'tipoOrdenPdf'
+            );
+
+
+        if (
+            !tipoOrden
+            ||
+            !tipoOrden.value
+        ) {
+
+            completos = false;
+
+        }
+
+
+        const clientId =
+            document.querySelector(
+                'input[name="client_id"]'
+            );
+
+
+        if (
+            !clientId
+            ||
+            !clientId.value
+        ) {
+
+            completos = false;
+
+        }
+
+
         const boton =
             document.getElementById(
                 'btn-crear-orden'
@@ -1747,7 +1810,7 @@
             boton.disabled = false;
 
             boton.textContent =
-                '✓ Todos los productos listos';
+                '✓ Crear orden';
 
         } else {
 
@@ -1781,6 +1844,27 @@
 
 
         return div.innerHTML;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TIPO DE ORDEN
+    |--------------------------------------------------------------------------
+    */
+
+    const tipoOrden =
+        document.getElementById(
+            'tipoOrdenPdf'
+        );
+
+    if (tipoOrden) {
+
+        tipoOrden.addEventListener(
+            'change',
+            verificarProductos
+        );
 
     }
 

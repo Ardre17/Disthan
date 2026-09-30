@@ -460,6 +460,179 @@ if ($product) {
         ]
     );
 }
+public function storeImportPdf(Request $request)
+{
+    $request->validate([
+        'client_id' => 'required|exists:clients,id',
+        'tipo_orden' => 'required|string',
+        'fecha_pedido' => 'required|date',
+        'fecha_entrega' => 'nullable|date',
+        'order_interna' => 'nullable|string|max:255',
+
+        'productos' => 'required|array|min:1',
+
+        'productos.*.product_id' => [
+            'required',
+            'exists:products,id',
+        ],
+
+        'productos.*.cantidad' => [
+            'required',
+            'numeric',
+            'gt:0',
+        ],
+
+        'productos.*.precio_unitario' => [
+            'required',
+            'numeric',
+            'gte:0',
+        ],
+    ]);
+
+    try {
+
+        $order = \DB::transaction(function () use ($request) {
+
+            /*
+            |--------------------------------------------------------------------------
+            | NUMERO DE ORDEN
+            |--------------------------------------------------------------------------
+            */
+
+            $lastOrder = Order::max('id') + 1;
+
+            $numeroOrden = 'ORD-' . str_pad(
+                $lastOrder,
+                6,
+                '0',
+                STR_PAD_LEFT
+            );
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | CREAR ORDEN
+            |--------------------------------------------------------------------------
+            |
+            | IMPORTANTE:
+            | No usamos el total del PDF.
+            | No usamos el IGV del PDF.
+            | No usamos el total PDF.
+            |
+            | La orden inicia con sus totales en 0.
+            |--------------------------------------------------------------------------
+            */
+
+            $order = Order::create([
+
+                'numero_orden' => $numeroOrden,
+
+                'client_id' => $request->client_id,
+
+                'tipo_orden' => $request->tipo_orden,
+
+                'fecha_pedido' => $request->fecha_pedido,
+
+                'fecha_entrega' => $request->fecha_entrega,
+
+                'order_interna' => $request->order_interna,
+
+                'estado' => 'INCOMPLETO',
+
+                'observaciones' => null,
+
+                'subtotal' => 0,
+
+                'igv' => 0,
+
+                'total' => 0,
+
+            ]);
+
+
+            /*
+            |--------------------------------------------------------------------------
+            | CREAR DETALLES
+            |--------------------------------------------------------------------------
+            */
+
+            foreach ($request->productos as $item) {
+
+                $producto = Product::findOrFail(
+                    $item['product_id']
+                );
+
+
+                $cantidad = (float) $item['cantidad'];
+
+                $precio = (float) $item['precio_unitario'];
+
+
+                OrderDetail::create([
+
+                    'order_id' => $order->id,
+
+                    'product_id' => $producto->id,
+
+                    'cantidad_solicitada' => $cantidad,
+
+                    'cantidad_despachada' => 0,
+
+                    /*
+                    | Precio tomado del PDF.
+                    */
+                    'precio_unitario' => $precio,
+
+                    /*
+                    | No copiamos el total del PDF.
+                    | El sistema lo calculará posteriormente.
+                    */
+                    'subtotal' => 0,
+
+                    'estado_item' => 'INCOMPLETO',
+
+                    'lote' => $producto->lote,
+
+                    'fecha_vencimiento' =>
+                        $producto->fecha_vencimiento,
+
+                ]);
+
+            }
+
+
+            return $order;
+
+        });
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECCION
+        |--------------------------------------------------------------------------
+        */
+
+        return redirect()
+            ->route('orders.edit', $order)
+            ->with(
+                'success',
+                'Orden PDF importada correctamente como '
+                . $order->numero_orden
+            );
+
+
+    } catch (\Throwable $e) {
+
+        return back()
+            ->withInput()
+            ->with(
+                'error',
+                'No se pudo crear la orden: '
+                . $e->getMessage()
+            );
+
+    }
+}
 public function actualizarDocumentos(
     Request $request,
     Order $order
@@ -1036,6 +1209,8 @@ public function stockPedidos()
             compact('clients')
         );
     }
+
+    
 
     public function store(Request $request)
     {
