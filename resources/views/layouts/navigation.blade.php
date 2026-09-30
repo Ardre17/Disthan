@@ -646,13 +646,14 @@ $t = $temas[$seccionActiva];
                     <span class="sb-section-arrow">▾</span>
                 </div>
                 <div class="sb-sub">
-                    @if($role == 'admin')
+                    
                     <a href="/orders">
                         <span class="sb-icon">📋</span><span>Órdenes</span>
                     </a>
                     <a href="/historial">
                         <span class="sb-icon">📚</span><span>Historial</span>
                     </a>
+                    @if($role == 'admin')
                     <a href="{{ route('raw-materials.index') }}">
                         <span class="sb-icon">🧪</span><span>Materia Prima</span>
                     </a>
