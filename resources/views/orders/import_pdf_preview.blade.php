@@ -3,545 +3,569 @@
 @section('content')
 
 <style>
-    /* =========================================================
-       IMPORTAR PEDIDO PDF
-    ========================================================= */
 
-    .pdf-import-page {
-        max-width: 1400px;
-        margin: 0 auto;
-        padding: 30px;
-        color: #1f2937;
-        font-family: Arial, Helvetica, sans-serif;
+/* =========================================================
+   BASE
+========================================================= */
+
+* {
+    box-sizing: border-box;
+}
+
+.pdf-page {
+    padding: 1.25rem;
+    background: #f1f5f9;
+    min-height: 100vh;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.pdf-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 1rem;
+}
+
+.pdf-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.pdf-subtitle {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 3px;
+}
+
+
+/* =========================================================
+   BOTONES
+========================================================= */
+
+.pdf-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    text-decoration: none;
+    transition: opacity .15s, background .15s;
+}
+
+.pdf-btn:hover {
+    opacity: .85;
+}
+
+.pdf-btn-blue {
+    background: #eff6ff;
+    color: #1d4ed8;
+    border: 1px solid #bfdbfe;
+}
+
+.pdf-btn-orange {
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fed7aa;
+}
+
+.pdf-btn-green {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+}
+
+.pdf-btn-gray {
+    background: #f8fafc;
+    color: #475569;
+    border: 1px solid #e2e8f0;
+}
+
+.pdf-btn-primary {
+    background: #2563eb;
+    color: white;
+    border: none;
+}
+
+.pdf-btn-primary:disabled {
+    background: #94a3b8;
+    cursor: not-allowed;
+    opacity: 1;
+}
+
+
+/* =========================================================
+   CARDS
+========================================================= */
+
+.pdf-card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    margin-bottom: 1rem;
+    overflow: hidden;
+}
+
+.pdf-card-header {
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid #f1f5f9;
+}
+
+.pdf-card-title {
+    font-size: 14px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.pdf-card-subtitle {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 3px;
+}
+
+.pdf-card-body {
+    padding: 1rem 1.25rem;
+}
+
+
+/* =========================================================
+   ALERTAS
+========================================================= */
+
+.pdf-alert {
+    border-radius: 10px;
+    padding: 10px 13px;
+    margin-bottom: 1rem;
+    font-size: 12px;
+}
+
+.pdf-alert-success {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    color: #15803d;
+}
+
+.pdf-alert-danger {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    color: #b91c1c;
+}
+
+.pdf-alert-info {
+    background: #eff6ff;
+    border: 1px solid #bfdbfe;
+    color: #1d4ed8;
+}
+
+.pdf-alert-title {
+    font-weight: 700;
+    margin-bottom: 3px;
+}
+
+
+/* =========================================================
+   DATOS PEDIDO
+========================================================= */
+
+.pdf-meta {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px 14px;
+}
+
+.pdf-meta-item {
+    font-size: 12px;
+    color: #64748b;
+}
+
+.pdf-meta-value {
+    font-weight: 700;
+    color: #374151;
+}
+
+.pdf-meta-label {
+    font-size: 10px;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    margin-bottom: 3px;
+}
+
+
+/* =========================================================
+   TIPO DE ORDEN
+========================================================= */
+
+.pdf-type {
+    margin-top: 15px;
+}
+
+.pdf-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 4px;
+}
+
+.pdf-input,
+.pdf-select {
+    padding: 8px 10px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    color: #1e293b;
+    background: #fff;
+    outline: none;
+}
+
+.pdf-select {
+    width: 250px;
+}
+
+.pdf-input:focus,
+.pdf-select:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.1);
+}
+
+
+/* =========================================================
+   TABLA
+========================================================= */
+
+.pdf-table-wrapper {
+    overflow-x: auto;
+}
+
+.pdf-table {
+    width: 100%;
+    border-collapse: collapse;
+    min-width: 1050px;
+    font-size: 12px;
+}
+
+.pdf-table thead {
+    background: #f8fafc;
+}
+
+.pdf-table th {
+    padding: 10px;
+    text-align: left;
+    font-size: 10px;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    border-bottom: 1px solid #e2e8f0;
+    white-space: nowrap;
+}
+
+.pdf-table td {
+    padding: 11px 10px;
+    border-bottom: 1px solid #f1f5f9;
+    color: #475569;
+    vertical-align: middle;
+}
+
+.pdf-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.pdf-code {
+    font-family: monospace;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.pdf-product {
+    color: #374151;
+}
+
+.pdf-product-distan {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.pdf-sku {
+    margin-top: 2px;
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+.pdf-price {
+    text-align: right;
+    font-weight: 700;
+    color: #1e293b;
+    white-space: nowrap;
+}
+
+.pdf-total {
+    text-align: right;
+    color: #94a3b8;
+    white-space: nowrap;
+}
+
+.pdf-center {
+    text-align: center !important;
+}
+
+
+/* =========================================================
+   BADGES
+========================================================= */
+
+.pdf-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    font-size: 10px;
+    padding: 3px 8px;
+    border-radius: 99px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.pdf-badge-code {
+    background: #dcfce7;
+    color: #15803d;
+}
+
+.pdf-badge-name {
+    background: #fef3c7;
+    color: #b45309;
+}
+
+.pdf-badge-manual {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+.pdf-badge-none {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+
+/* =========================================================
+   FOOTER
+========================================================= */
+
+.pdf-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;
+    margin-top: 1rem;
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+#modalProductoPdf {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    background: rgba(15,23,42,.60);
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+#modalProductoPdf.abierto {
+    display: flex;
+}
+
+.pdf-modal {
+    width: min(650px, 96vw);
+    max-height: 90vh;
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 25px 60px rgba(0,0,0,.30);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.pdf-modal-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid #e5e7eb;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.pdf-modal-title {
+    font-size: 16px;
+    font-weight: 800;
+    color: #1e293b;
+}
+
+.pdf-modal-subtitle {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: 3px;
+}
+
+.pdf-modal-close {
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 7px;
+    background: #f1f5f9;
+    color: #475569;
+    font-size: 20px;
+    cursor: pointer;
+}
+
+.pdf-modal-close:hover {
+    background: #e2e8f0;
+}
+
+.pdf-modal-body {
+    padding: 18px 20px;
+    overflow: auto;
+}
+
+.pdf-search {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 13px;
+    outline: none;
+}
+
+.pdf-search:focus {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37,99,235,.10);
+}
+
+.pdf-results {
+    margin-top: 12px;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+.pdf-result {
+    width: 100%;
+    border: 1px solid #e2e8f0;
+    background: #fff;
+    border-radius: 9px;
+    padding: 11px 12px;
+    margin-bottom: 7px;
+    text-align: left;
+    cursor: pointer;
+    transition: background .15s, border-color .15s;
+}
+
+.pdf-result:hover {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+}
+
+.pdf-result-name {
+    font-size: 12px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.pdf-result-data {
+    margin-top: 4px;
+    font-size: 10px;
+    color: #94a3b8;
+}
+
+.pdf-search-message {
+    text-align: center;
+    padding: 25px;
+    color: #94a3b8;
+    font-size: 12px;
+}
+
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:800px) {
+
+    .pdf-meta {
+        grid-template-columns: repeat(2,1fr);
     }
 
-    .pdf-import-title {
-        margin-bottom: 25px;
+    .pdf-header {
+        flex-direction: column;
     }
 
-    .pdf-import-title h1 {
-        margin: 0;
-        font-size: 28px;
-        font-weight: 700;
-        color: #1f2937;
+}
+
+@media(max-width:500px) {
+
+    .pdf-page {
+        padding: .75rem;
     }
 
-    .pdf-import-title p {
-        margin: 7px 0 0;
-        color: #6b7280;
-        font-size: 14px;
+    .pdf-meta {
+        grid-template-columns: 1fr 1fr;
     }
 
-
-    /* =========================================================
-       ALERTAS
-    ========================================================= */
-
-    .pdf-alert {
-        padding: 16px 20px;
-        border-radius: 12px;
-        margin-bottom: 20px;
-        border: 1px solid;
+    .pdf-footer {
+        flex-direction: column-reverse;
+        align-items: stretch;
     }
 
-    .pdf-alert-success {
-        background: #ecfdf5;
-        border-color: #a7f3d0;
-        color: #065f46;
-    }
-
-    .pdf-alert-danger {
-        background: #fef2f2;
-        border-color: #fecaca;
-        color: #991b1b;
-    }
-
-    .pdf-alert-info {
-        background: #eff6ff;
-        border-color: #bfdbfe;
-        color: #1e40af;
-    }
-
-    .pdf-alert-title {
-        font-weight: 700;
-        margin-bottom: 5px;
-    }
-
-
-    /* =========================================================
-       TARJETAS
-    ========================================================= */
-
-    .pdf-card {
-        background: #ffffff;
-        border: 1px solid #e5e7eb;
-        border-radius: 16px;
-        box-shadow: 0 2px 8px rgba(0,0,0,.05);
-        margin-bottom: 22px;
-        overflow: hidden;
-    }
-
-    .pdf-card-body {
-        padding: 24px;
-    }
-
-    .pdf-card-header {
-        padding: 20px 24px;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .pdf-card-header h2 {
-        margin: 0;
-        font-size: 19px;
-        font-weight: 700;
-    }
-
-    .pdf-card-header p {
-        margin: 6px 0 0;
-        color: #6b7280;
-        font-size: 13px;
-    }
-
-
-    /* =========================================================
-       DATOS PEDIDO
-    ========================================================= */
-
-    .pdf-info-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 25px;
-    }
-
-    .pdf-info-label {
-        color: #6b7280;
-        font-size: 12px;
-        margin-bottom: 5px;
-    }
-
-    .pdf-info-value {
-        font-size: 16px;
-        font-weight: 700;
-        color: #111827;
-    }
-
-
-    /* =========================================================
-       TABLA
-    ========================================================= */
-
-    .pdf-table-container {
+    .pdf-footer .pdf-btn {
         width: 100%;
-        overflow-x: auto;
     }
 
-    .pdf-table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 1050px;
-    }
+}
 
-    .pdf-table thead {
-        background: #f8fafc;
-    }
-
-    .pdf-table th {
-        padding: 14px 16px;
-        text-align: left;
-        font-size: 12px;
-        font-weight: 700;
-        color: #475569;
-        border-bottom: 1px solid #e5e7eb;
-        white-space: nowrap;
-    }
-
-    .pdf-table td {
-        padding: 15px 16px;
-        border-bottom: 1px solid #eef0f3;
-        vertical-align: middle;
-        font-size: 13px;
-    }
-
-    .pdf-table tbody tr:hover {
-        background: #fafafa;
-    }
-
-    .pdf-code {
-        font-weight: 700;
-        color: #111827;
-    }
-
-    .pdf-product-name {
-        font-weight: 600;
-        color: #111827;
-    }
-
-    .pdf-product-sku {
-        margin-top: 4px;
-        font-size: 11px;
-        color: #6b7280;
-    }
-
-    .pdf-price {
-        font-weight: 700;
-        text-align: right;
-        white-space: nowrap;
-    }
-
-    .pdf-total {
-        color: #6b7280;
-        text-align: right;
-        white-space: nowrap;
-    }
-
-    .pdf-center {
-        text-align: center !important;
-    }
-
-
-    /* =========================================================
-       ESTADOS
-    ========================================================= */
-
-    .pdf-status {
-        display: inline-flex;
-        align-items: center;
-        padding: 5px 9px;
-        border-radius: 999px;
-        font-size: 11px;
-        font-weight: 700;
-        white-space: nowrap;
-    }
-
-    .pdf-status-code {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .pdf-status-name {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .pdf-status-manual {
-        background: #dbeafe;
-        color: #1d4ed8;
-    }
-
-    .pdf-status-none {
-        background: #fee2e2;
-        color: #b91c1c;
-    }
-
-
-    /* =========================================================
-       BOTONES
-    ========================================================= */
-
-    .pdf-btn {
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 6px;
-        border: 0;
-        border-radius: 9px;
-        padding: 9px 14px;
-        font-size: 12px;
-        font-weight: 700;
-        cursor: pointer;
-        transition: .15s ease;
-    }
-
-    .pdf-btn-search {
-        background: #f97316;
-        color: white;
-    }
-
-    .pdf-btn-search:hover {
-        background: #ea580c;
-    }
-
-    .pdf-btn-change {
-        background: white;
-        color: #2563eb;
-        border: 1px solid #93c5fd;
-    }
-
-    .pdf-btn-change:hover {
-        background: #eff6ff;
-    }
-
-    .pdf-btn-primary {
-        background: #2563eb;
-        color: white;
-        padding: 12px 22px;
-        font-size: 14px;
-    }
-
-    .pdf-btn-primary:hover {
-        background: #1d4ed8;
-    }
-
-    .pdf-btn-primary:disabled {
-        background: #9ca3af;
-        cursor: not-allowed;
-    }
-
-    .pdf-btn-back {
-        background: white;
-        color: #374151;
-        border: 1px solid #d1d5db;
-        text-decoration: none;
-        padding: 12px 22px;
-        font-size: 14px;
-    }
-
-    .pdf-btn-back:hover {
-        background: #f9fafb;
-    }
-
-
-    /* =========================================================
-       TIPO DE ORDEN
-    ========================================================= */
-
-    .pdf-form-group {
-        margin-top: 25px;
-    }
-
-    .pdf-form-label {
-        display: block;
-        margin-bottom: 7px;
-        font-size: 13px;
-        font-weight: 700;
-        color: #374151;
-    }
-
-    .pdf-select {
-        width: 300px;
-        max-width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 9px;
-        background: white;
-        font-size: 14px;
-        color: #374151;
-    }
-
-
-    /* =========================================================
-       BOTONES FINALES
-    ========================================================= */
-
-    .pdf-actions {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 15px;
-        margin-top: 22px;
-    }
-
-
-    /* =========================================================
-       MODAL
-    ========================================================= */
-
-    #modal-producto {
-        display: none;
-        position: fixed;
-        inset: 0;
-        z-index: 99999;
-        background: rgba(0, 0, 0, .55);
-        align-items: center;
-        justify-content: center;
-        padding: 20px;
-    }
-
-    #modal-producto.pdf-modal-visible {
-        display: flex;
-    }
-
-    .pdf-modal-box {
-        width: 100%;
-        max-width: 650px;
-        max-height: 90vh;
-        background: white;
-        border-radius: 18px;
-        box-shadow: 0 20px 60px rgba(0,0,0,.30);
-        overflow: hidden;
-        animation: pdfModalIn .15s ease-out;
-    }
-
-    @keyframes pdfModalIn {
-        from {
-            opacity: 0;
-            transform: translateY(10px) scale(.98);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-        }
-    }
-
-    .pdf-modal-header {
-        padding: 20px 22px;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-    }
-
-    .pdf-modal-header h2 {
-        margin: 0;
-        font-size: 19px;
-        font-weight: 700;
-    }
-
-    .pdf-modal-header p {
-        margin: 5px 0 0;
-        color: #6b7280;
-        font-size: 13px;
-    }
-
-    .pdf-modal-close {
-        width: 35px;
-        height: 35px;
-        border: 0;
-        border-radius: 8px;
-        background: #f3f4f6;
-        color: #4b5563;
-        font-size: 18px;
-        cursor: pointer;
-    }
-
-    .pdf-modal-close:hover {
-        background: #e5e7eb;
-    }
-
-    .pdf-modal-body {
-        padding: 22px;
-    }
-
-    .pdf-search-input {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 12px 14px;
-        border: 1px solid #d1d5db;
-        border-radius: 10px;
-        font-size: 14px;
-        outline: none;
-    }
-
-    .pdf-search-input:focus {
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37,99,235,.12);
-    }
-
-    .pdf-results {
-        margin-top: 15px;
-        max-height: 400px;
-        overflow-y: auto;
-    }
-
-    .pdf-result {
-        width: 100%;
-        box-sizing: border-box;
-        text-align: left;
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 10px;
-        padding: 14px;
-        margin-bottom: 8px;
-        cursor: pointer;
-        transition: .15s ease;
-    }
-
-    .pdf-result:hover {
-        background: #eff6ff;
-        border-color: #93c5fd;
-    }
-
-    .pdf-result-name {
-        font-size: 14px;
-        font-weight: 700;
-        color: #111827;
-    }
-
-    .pdf-result-info {
-        margin-top: 5px;
-        font-size: 11px;
-        color: #6b7280;
-    }
-
-    .pdf-search-message {
-        text-align: center;
-        color: #9ca3af;
-        padding: 30px 10px;
-        font-size: 13px;
-    }
-
-
-    /* =========================================================
-       RESPONSIVE
-    ========================================================= */
-
-    @media (max-width: 900px) {
-
-        .pdf-import-page {
-            padding: 18px;
-        }
-
-        .pdf-info-grid {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-    }
-
-    @media (max-width: 600px) {
-
-        .pdf-import-page {
-            padding: 12px;
-        }
-
-        .pdf-import-title h1 {
-            font-size: 23px;
-        }
-
-        .pdf-info-grid {
-            grid-template-columns: 1fr;
-            gap: 15px;
-        }
-
-        .pdf-actions {
-            flex-direction: column-reverse;
-            align-items: stretch;
-        }
-
-        .pdf-btn-back,
-        .pdf-btn-primary {
-            width: 100%;
-        }
-
-    }
 </style>
 
 
-<div class="pdf-import-page">
+<div class="pdf-page">
+
 
     {{-- =====================================================
-         TITULO
+         HEADER
     ====================================================== --}}
 
-    <div class="pdf-import-title">
+    <div class="pdf-header">
 
-        <h1>
-            Vista previa de importación
-        </h1>
+        <div>
 
-        <p>
-            Revisa la información antes de crear la orden.
-        </p>
+            <div class="pdf-title">
+                📋 Importar pedido PDF
+            </div>
+
+            <div class="pdf-subtitle">
+                Revisa y relaciona los productos antes de crear la orden.
+            </div>
+
+        </div>
+
+
+        <a
+            href="{{ route('orders.importPdf') }}"
+            class="pdf-btn pdf-btn-gray"
+        >
+            ← Volver
+        </a>
 
     </div>
 
@@ -558,10 +582,8 @@
                 ✓ Cliente encontrado
             </div>
 
-            <div>
-                {{ $client->razon_social }}
-                — RUC: {{ $client->ruc }}
-            </div>
+            {{ $client->razon_social }}
+            — RUC: {{ $client->ruc }}
 
         </div>
 
@@ -573,10 +595,8 @@
                 ⚠ Cliente no encontrado
             </div>
 
-            <div>
-                RUC detectado:
-                {{ $datos['ruc_cliente'] ?? '—' }}
-            </div>
+            RUC detectado:
+            {{ $datos['ruc_cliente'] ?? '—' }}
 
         </div>
 
@@ -589,83 +609,84 @@
 
     <div class="pdf-card">
 
+        <div class="pdf-card-header">
+
+            <div class="pdf-card-title">
+                Datos del pedido
+            </div>
+
+        </div>
+
+
         <div class="pdf-card-body">
 
-            <h2 style="margin:0 0 22px;font-size:19px;">
-                Datos del pedido
-            </h2>
+            <div class="pdf-meta">
 
+                <div class="pdf-meta-item">
 
-            <div class="pdf-info-grid">
-
-                <div>
-
-                    <div class="pdf-info-label">
+                    <div class="pdf-meta-label">
                         Orden
                     </div>
 
-                    <div class="pdf-info-value">
+                    <span class="pdf-meta-value">
                         {{ $datos['numero_orden'] ?? '—' }}
-                    </div>
+                    </span>
 
                 </div>
 
 
-                <div>
+                <div class="pdf-meta-item">
 
-                    <div class="pdf-info-label">
+                    <div class="pdf-meta-label">
                         Fecha
                     </div>
 
-                    <div class="pdf-info-value">
+                    <span class="pdf-meta-value">
                         {{ $datos['fecha_pedido'] ?? '—' }}
-                    </div>
+                    </span>
 
                 </div>
 
 
-                <div>
+                <div class="pdf-meta-item">
 
-                    <div class="pdf-info-label">
+                    <div class="pdf-meta-label">
                         Entrega
                     </div>
 
-                    <div class="pdf-info-value">
+                    <span class="pdf-meta-value">
                         {{ $datos['fecha_entrega'] ?? '—' }}
-                    </div>
+                    </span>
 
                 </div>
 
 
-                <div>
+                <div class="pdf-meta-item">
 
-                    <div class="pdf-info-label">
-                        N.º interno
+                    <div class="pdf-meta-label">
+                        Orden interna
                     </div>
 
-                    <div class="pdf-info-value">
+                    <span class="pdf-meta-value">
                         {{ $datos['order_interna'] ?? '—' }}
-                    </div>
+                    </span>
 
                 </div>
 
             </div>
 
 
-            {{-- Tipo de orden solamente para la vista.
-                 Lo conectamos al guardado después. --}}
-
-            <div class="pdf-form-group">
+            <div class="pdf-type">
 
                 <label
-                    class="pdf-form-label"
-                    for="tipo_orden"
+                    class="pdf-label"
+                    for="tipoOrdenPdf"
                 >
                     Tipo de orden
                 </label>
 
                 <select
-                    id="tipo_orden"
+                    id="tipoOrdenPdf"
                     class="pdf-select"
                 >
 
@@ -706,19 +727,21 @@
 
         <div class="pdf-card-header">
 
-            <h2>
+            <div class="pdf-card-title">
                 Productos detectados
-            </h2>
+            </div>
 
-            <p>
+            <div class="pdf-card-subtitle">
+
                 {{ count($datos['productos']) }}
                 producto(s) encontrado(s) en el PDF.
-            </p>
+
+            </div>
 
         </div>
 
 
-        <div class="pdf-table-container">
+        <div class="pdf-table-wrapper">
 
             <table class="pdf-table">
 
@@ -765,13 +788,11 @@
 
                 <tbody>
 
-
                 @foreach($datos['productos'] as $item)
 
                     <tr
                         data-product-row="{{ $loop->index }}"
                     >
-
 
                         {{-- ESTADO --}}
 
@@ -785,7 +806,7 @@
                                 )
 
                                     <span
-                                        class="pdf-status pdf-status-code"
+                                        class="pdf-badge pdf-badge-code"
                                     >
                                         ✓ Código
                                     </span>
@@ -793,7 +814,7 @@
                                 @else
 
                                     <span
-                                        class="pdf-status pdf-status-name"
+                                        class="pdf-badge pdf-badge-name"
                                     >
                                         ⚠ Nombre
                                     </span>
@@ -803,7 +824,7 @@
                             @else
 
                                 <span
-                                    class="pdf-status pdf-status-none"
+                                    class="pdf-badge pdf-badge-none"
                                 >
                                     ✕ No encontrado
                                 </span>
@@ -813,7 +834,7 @@
                         </td>
 
 
-                        {{-- CODIGO PDF --}}
+                        {{-- CODIGO --}}
 
                         <td>
 
@@ -828,7 +849,9 @@
 
                         <td>
 
-                            {{ $item['descripcion'] }}
+                            <div class="pdf-product">
+                                {{ $item['descripcion'] }}
+                            </div>
 
                         </td>
 
@@ -839,13 +862,13 @@
 
                             @if($item['encontrado'])
 
-                                <div class="pdf-product-name">
+                                <div class="pdf-product-distan">
 
                                     {{ $item['nombre_distan'] }}
 
                                 </div>
 
-                                <div class="pdf-product-sku">
+                                <div class="pdf-sku">
 
                                     SKU:
                                     {{ $item['sku_distan'] ?? '—' }}
@@ -854,7 +877,9 @@
 
                             @else
 
-                                <span style="color:#dc2626;">
+                                <span
+                                    style="color:#b91c1c;"
+                                >
                                     Producto no encontrado
                                 </span>
 
@@ -867,16 +892,18 @@
 
                         <td class="pdf-center">
 
-                            {{ rtrim(
+                            {{
                                 rtrim(
-                                    number_format(
-                                        $item['cantidad'],
-                                        3
+                                    rtrim(
+                                        number_format(
+                                            $item['cantidad'],
+                                            3
+                                        ),
+                                        '0'
                                     ),
-                                    '0'
-                                ),
-                                '.'
-                            ) }}
+                                    '.'
+                                )
+                            }}
 
                             {{ $item['unidad'] }}
 
@@ -888,10 +915,12 @@
                         <td class="pdf-price">
 
                             S/
-                            {{ number_format(
-                                $item['precio_unitario'],
-                                2
-                            ) }}
+                            {{
+                                number_format(
+                                    $item['precio_unitario'],
+                                    2
+                                )
+                            }}
 
                         </td>
 
@@ -901,10 +930,12 @@
                         <td class="pdf-total">
 
                             S/
-                            {{ number_format(
-                                $item['total_pdf'],
-                                2
-                            ) }}
+                            {{
+                                number_format(
+                                    $item['total_pdf'],
+                                    2
+                                )
+                            }}
 
                         </td>
 
@@ -915,32 +946,28 @@
 
                             <input
                                 type="hidden"
-                                value="{{ $item['product_id'] ?? '' }}"
                                 id="product-id-{{ $loop->index }}"
+                                value="{{ $item['product_id'] ?? '' }}"
                             >
 
 
-                            @if($item['encontrado'])
+                            <button
+                                type="button"
+                                class="pdf-btn
+                                    {{ $item['encontrado']
+                                        ? 'pdf-btn-blue'
+                                        : 'pdf-btn-orange'
+                                    }}"
+                                data-product-search="{{ $loop->index }}"
+                            >
 
-                                <button
-                                    type="button"
-                                    class="pdf-btn pdf-btn-change"
-                                    onclick="abrirBuscadorProducto({{ $loop->index }})"
-                                >
-                                    Cambiar
-                                </button>
+                                {{
+                                    $item['encontrado']
+                                        ? 'Cambiar'
+                                        : '🔎 Buscar producto'
+                                }}
 
-                            @else
-
-                                <button
-                                    type="button"
-                                    class="pdf-btn pdf-btn-search"
-                                    onclick="abrirBuscadorProducto({{ $loop->index }})"
-                                >
-                                    🔎 Buscar producto
-                                </button>
-
-                            @endif
+                            </button>
 
                         </td>
 
@@ -967,28 +994,23 @@
             ℹ️ Vista previa
         </div>
 
-        <div>
+        El precio unitario se conservará para que DISTAN
+        realice posteriormente sus cálculos.
 
-            El precio unitario será utilizado posteriormente
-            por DISTAN para realizar los cálculos.
-
-            El total mostrado del PDF es solamente informativo
-            y no se utilizará como total de la orden.
-
-        </div>
+        El total del PDF es solamente informativo.
 
     </div>
 
 
     {{-- =====================================================
-         BOTONES
+         FOOTER
     ====================================================== --}}
 
-    <div class="pdf-actions">
+    <div class="pdf-footer">
 
         <a
             href="{{ route('orders.importPdf') }}"
-            class="pdf-btn pdf-btn-back"
+            class="pdf-btn pdf-btn-gray"
         >
             ← Volver
         </a>
@@ -997,36 +1019,38 @@
         <button
             type="button"
             id="btn-crear-orden"
-            disabled
             class="pdf-btn pdf-btn-primary"
+            disabled
         >
             Revisar productos
         </button>
 
     </div>
 
+
 </div>
 
 
 {{-- =========================================================
-     MODAL BUSCAR PRODUCTO
+     MODAL
 ========================================================= --}}
 
-<div id="modal-producto">
+<div id="modalProductoPdf">
 
-    <div class="pdf-modal-box">
+    <div class="pdf-modal">
+
 
         <div class="pdf-modal-header">
 
             <div>
 
-                <h2>
+                <div class="pdf-modal-title">
                     Buscar producto
-                </h2>
+                </div>
 
-                <p>
-                    Busca por nombre, SKU o código.
-                </p>
+                <div class="pdf-modal-subtitle">
+                    Busca por nombre, SKU, código de barras o código de caja.
+                </div>
 
             </div>
 
@@ -1034,7 +1058,7 @@
             <button
                 type="button"
                 class="pdf-modal-close"
-                onclick="cerrarBuscadorProducto()"
+                id="cerrarModalProducto"
             >
                 ×
             </button>
@@ -1046,20 +1070,20 @@
 
             <input
                 type="text"
-                id="producto-busqueda"
-                class="pdf-search-input"
-                placeholder="Ej. Palmitos, PL800..."
+                id="buscarProductoPdf"
+                class="pdf-search"
+                placeholder="Ejemplo: Palmitos, PL800..."
                 autocomplete="off"
             >
 
 
             <div
-                id="resultados-productos"
+                id="resultadosProductoPdf"
                 class="pdf-results"
             >
 
                 <div class="pdf-search-message">
-                    Escribe para buscar...
+                    Escribe al menos 2 caracteres...
                 </div>
 
             </div>
@@ -1073,85 +1097,147 @@
 
 <script>
 
-let filaProductoActual = null;
-let temporizadorBusqueda = null;
+(function () {
+
+    'use strict';
 
 
-/*
-|--------------------------------------------------------------------------
-| ABRIR MODAL
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | VARIABLES
+    |--------------------------------------------------------------------------
+    */
 
-function abrirBuscadorProducto(index)
-{
-    filaProductoActual = index;
+    let filaActual = null;
+    let timerBusqueda = null;
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ELEMENTOS
+    |--------------------------------------------------------------------------
+    */
 
     const modal =
-        document.getElementById('modal-producto');
+        document.getElementById(
+            'modalProductoPdf'
+        );
 
     const input =
-        document.getElementById('producto-busqueda');
+        document.getElementById(
+            'buscarProductoPdf'
+        );
+
+    const resultados =
+        document.getElementById(
+            'resultadosProductoPdf'
+        );
 
 
-    modal.classList.add(
-        'pdf-modal-visible'
-    );
+    /*
+    |--------------------------------------------------------------------------
+    | ABRIR MODAL
+    |--------------------------------------------------------------------------
+    */
+
+    function abrirModal(index)
+    {
+        filaActual = index;
+
+        modal.classList.add('abierto');
+
+        document.body.style.overflow = 'hidden';
+
+        input.value = '';
+
+        resultados.innerHTML = `
+            <div class="pdf-search-message">
+                Escribe al menos 2 caracteres...
+            </div>
+        `;
+
+        setTimeout(function () {
+            input.focus();
+        }, 50);
+    }
 
 
-    input.value = '';
+    /*
+    |--------------------------------------------------------------------------
+    | CERRAR MODAL
+    |--------------------------------------------------------------------------
+    */
 
-    input.focus();
+    function cerrarModal()
+    {
+        modal.classList.remove('abierto');
 
+        document.body.style.overflow = '';
 
-    document.getElementById(
-        'resultados-productos'
-    ).innerHTML = `
-        <div class="pdf-search-message">
-            Escribe para buscar...
-        </div>
-    `;
-}
+        filaActual = null;
 
-
-/*
-|--------------------------------------------------------------------------
-| CERRAR MODAL
-|--------------------------------------------------------------------------
-*/
-
-function cerrarBuscadorProducto()
-{
-    const modal =
-        document.getElementById('modal-producto');
+        input.value = '';
+    }
 
 
-    modal.classList.remove(
-        'pdf-modal-visible'
-    );
+    /*
+    |--------------------------------------------------------------------------
+    | BOTONES "CAMBIAR" / "BUSCAR"
+    |--------------------------------------------------------------------------
+    */
+
+    document
+        .querySelectorAll('[data-product-search]')
+        .forEach(function (button) {
+
+            button.addEventListener(
+                'click',
+                function () {
+
+                    const index =
+                        this.getAttribute(
+                            'data-product-search'
+                        );
+
+                    abrirModal(index);
+
+                }
+            );
+
+        });
 
 
-    filaProductoActual = null;
-}
+    /*
+    |--------------------------------------------------------------------------
+    | CERRAR
+    |--------------------------------------------------------------------------
+    */
+
+    document
+        .getElementById(
+            'cerrarModalProducto'
+        )
+        .addEventListener(
+            'click',
+            cerrarModal
+        );
 
 
-/*
-|--------------------------------------------------------------------------
-| CERRAR AL HACER CLICK FUERA
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | CLICK FUERA DEL MODAL
+    |--------------------------------------------------------------------------
+    */
 
-document
-    .getElementById('modal-producto')
-    .addEventListener(
+    modal.addEventListener(
         'click',
-        function(event) {
+        function (event) {
 
             if (
-                event.target === this
+                event.target === modal
             ) {
 
-                cerrarBuscadorProducto();
+                cerrarModal();
 
             }
 
@@ -1159,42 +1245,44 @@ document
     );
 
 
-/*
-|--------------------------------------------------------------------------
-| ESC
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | ESC
+    |--------------------------------------------------------------------------
+    */
 
-document.addEventListener(
-    'keydown',
-    function(event) {
+    document.addEventListener(
+        'keydown',
+        function (event) {
 
-        if (
-            event.key === 'Escape'
-        ) {
+            if (
+                event.key === 'Escape'
+                &&
+                modal.classList.contains(
+                    'abierto'
+                )
+            ) {
 
-            cerrarBuscadorProducto();
+                cerrarModal();
+
+            }
 
         }
-
-    }
-);
+    );
 
 
-/*
-|--------------------------------------------------------------------------
-| BUSCAR AL ESCRIBIR
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | ESCRIBIR BUSQUEDA
+    |--------------------------------------------------------------------------
+    */
 
-document
-    .getElementById('producto-busqueda')
-    .addEventListener(
+    input.addEventListener(
         'input',
-        function() {
+        function () {
 
             clearTimeout(
-                temporizadorBusqueda
+                timerBusqueda
             );
 
 
@@ -1206,334 +1294,426 @@ document
                 q.length < 2
             ) {
 
-                document.getElementById(
-                    'resultados-productos'
-                ).innerHTML = `
+                resultados.innerHTML = `
                     <div class="pdf-search-message">
                         Escribe al menos 2 caracteres...
                     </div>
                 `;
 
                 return;
-
             }
 
 
-            temporizadorBusqueda =
+            resultados.innerHTML = `
+                <div class="pdf-search-message">
+                    ⏳ Buscando productos...
+                </div>
+            `;
+
+
+            timerBusqueda =
                 setTimeout(
-                    function() {
+                    function () {
 
                         buscarProductos(q);
 
                     },
-                    300
+                    250
                 );
 
         }
     );
 
 
-/*
-|--------------------------------------------------------------------------
-| CONSULTAR LARAVEL
-|--------------------------------------------------------------------------
-*/
+    /*
+    |--------------------------------------------------------------------------
+    | BUSCAR EN LARAVEL
+    |--------------------------------------------------------------------------
+    */
 
-async function buscarProductos(q)
-{
-    const contenedor =
-        document.getElementById(
-            'resultados-productos'
-        );
+    async function buscarProductos(q)
+    {
+        try {
 
-
-    contenedor.innerHTML = `
-        <div class="pdf-search-message">
-            Buscando...
-        </div>
-    `;
+            const url =
+                "{{ route('orders.importPdf.productSearch') }}"
+                +
+                '?q='
+                +
+                encodeURIComponent(q);
 
 
-    try {
+            const response =
+                await fetch(
+                    url,
+                    {
+                        method: 'GET',
 
-        const response =
-            await fetch(
-                `{{ route('orders.importPdf.productSearch') }}?q=${encodeURIComponent(q)}`,
-                {
-                    headers: {
-                        'Accept': 'application/json'
+                        headers: {
+                            'Accept':
+                                'application/json',
+
+                            'X-Requested-With':
+                                'XMLHttpRequest'
+                        }
                     }
-                }
+                );
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    'HTTP ' +
+                    response.status
+                );
+
+            }
+
+
+            const productos =
+                await response.json();
+
+
+            mostrarResultados(
+                productos
             );
 
 
-        if (!response.ok) {
+        } catch (error) {
 
-            throw new Error(
-                'HTTP ' + response.status
+            console.error(
+                'ERROR BUSCANDO PRODUCTO:',
+                error
             );
+
+
+            resultados.innerHTML = `
+                <div
+                    class="pdf-search-message"
+                    style="color:#b91c1c;"
+                >
+                    ❌ No se pudo consultar
+                    el catálogo de productos.
+                    <br><br>
+                    <small>
+                        Error ${error.message}
+                    </small>
+                </div>
+            `;
 
         }
+    }
 
 
-        const productos =
-            await response.json();
+    /*
+    |--------------------------------------------------------------------------
+    | MOSTRAR RESULTADOS
+    |--------------------------------------------------------------------------
+    */
 
+    function mostrarResultados(
+        productos
+    )
+    {
 
         if (
-            !productos.length
+            !productos
+            ||
+            productos.length === 0
         ) {
 
-            contenedor.innerHTML = `
-                <div class="pdf-search-message"
-                     style="color:#dc2626;">
+            resultados.innerHTML = `
+                <div
+                    class="pdf-search-message"
+                    style="color:#b91c1c;"
+                >
                     No se encontraron productos.
                 </div>
             `;
+
+            return;
+        }
+
+
+        resultados.innerHTML =
+            productos
+                .map(
+                    function (producto) {
+
+                        return `
+
+                            <button
+                                type="button"
+                                class="pdf-result"
+                                data-product-id="${producto.id}"
+                            >
+
+                                <div class="pdf-result-name">
+
+                                    ${escapeHtml(
+                                        producto.nombre
+                                    )}
+
+                                </div>
+
+
+                                <div class="pdf-result-data">
+
+                                    SKU:
+                                    ${escapeHtml(
+                                        producto.sku || '—'
+                                    )}
+
+                                    &nbsp; | &nbsp;
+
+                                    Barcode:
+                                    ${escapeHtml(
+                                        producto.barcode || '—'
+                                    )}
+
+                                    ${
+                                        producto.box_barcode
+                                        ?
+                                        `
+                                        &nbsp; | &nbsp;
+                                        Caja:
+                                        ${escapeHtml(
+                                            producto.box_barcode
+                                        )}
+                                        `
+                                        :
+                                        ''
+                                    }
+
+                                </div>
+
+                            </button>
+
+                        `;
+
+                    }
+                )
+                .join('');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | EVENTO DE SELECCION
+        |--------------------------------------------------------------------------
+        */
+
+        resultados
+            .querySelectorAll(
+                '[data-product-id]'
+            )
+            .forEach(
+                function (button, posicion) {
+
+                    button.addEventListener(
+                        'click',
+                        function () {
+
+                            const producto =
+                                productos[
+                                    posicion
+                                ];
+
+                            seleccionarProducto(
+                                producto
+                            );
+
+                        }
+                    );
+
+                }
+            );
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | SELECCIONAR PRODUCTO
+    |--------------------------------------------------------------------------
+    */
+
+    function seleccionarProducto(
+        producto
+    )
+    {
+
+        if (
+            filaActual === null
+        ) {
 
             return;
 
         }
 
 
-        contenedor.innerHTML =
-            productos.map(
-                function(producto) {
-
-                    return `
-
-                        <button
-                            type="button"
-                            class="pdf-result"
-                            onclick='seleccionarProducto(${JSON.stringify(producto)})'
-                        >
-
-                            <div class="pdf-result-name">
-                                ${escapeHtml(
-                                    producto.nombre
-                                )}
-                            </div>
-
-                            <div class="pdf-result-info">
-
-                                SKU:
-                                ${escapeHtml(
-                                    producto.sku ?? '—'
-                                )}
-
-                                &nbsp; | &nbsp;
-
-                                Barcode:
-                                ${escapeHtml(
-                                    producto.barcode ?? '—'
-                                )}
-
-                                ${
-                                    producto.box_barcode
-                                    ? `
-                                        &nbsp; | &nbsp;
-                                        Caja:
-                                        ${escapeHtml(
-                                            producto.box_barcode
-                                        )}
-                                      `
-                                    : ''
-                                }
-
-                            </div>
-
-                        </button>
-
-                    `;
-
-                }
-            ).join('');
+        const index =
+            filaActual;
 
 
-    } catch(error) {
+        /*
+        |--------------------------------------------------------------------------
+        | GUARDAR PRODUCT ID
+        |--------------------------------------------------------------------------
+        */
 
-        console.error(
-            'Error buscando productos:',
-            error
-        );
+        const hidden =
+            document.getElementById(
+                'product-id-' + index
+            );
 
 
-        contenedor.innerHTML = `
-            <div class="pdf-search-message"
-                 style="color:#dc2626;">
-                Error al buscar productos.
-                <br>
-                <small>
-                    Revisa la consola del navegador.
-                </small>
-            </div>
-        `;
+        if (hidden) {
+
+            hidden.value =
+                producto.id;
+
+        }
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | FILA
+        |--------------------------------------------------------------------------
+        */
+
+        const fila =
+            document.querySelector(
+                '[data-product-row="' +
+                index +
+                '"]'
+            );
+
+
+        if (fila) {
+
+
+            /*
+            | Producto DISTAN
+            */
+
+            const productoDistan =
+                fila.querySelector(
+                    '.producto-distan'
+                );
+
+
+            if (
+                productoDistan
+            ) {
+
+                productoDistan.innerHTML = `
+
+                    <div class="pdf-product-distan">
+
+                        ${escapeHtml(
+                            producto.nombre
+                        )}
+
+                    </div>
+
+                    <div class="pdf-sku">
+
+                        SKU:
+                        ${escapeHtml(
+                            producto.sku || '—'
+                        )}
+
+                    </div>
+
+                `;
+
+            }
+
+
+            /*
+            | Estado
+            */
+
+            const estado =
+                fila.querySelector(
+                    '.estado-producto'
+                );
+
+
+            if (
+                estado
+            ) {
+
+                estado.innerHTML = `
+
+                    <span
+                        class="pdf-badge
+                               pdf-badge-manual"
+                    >
+                        ✓ Manual
+                    </span>
+
+                `;
+
+            }
+
+
+            /*
+            | Botón
+            */
+
+            const boton =
+                fila.querySelector(
+                    '[data-product-search]'
+                );
+
+
+            if (
+                boton
+            ) {
+
+                boton.textContent =
+                    'Cambiar';
+
+                boton.classList.remove(
+                    'pdf-btn-orange'
+                );
+
+                boton.classList.add(
+                    'pdf-btn-blue'
+                );
+
+            }
+
+        }
+
+
+        cerrarModal();
+
+        verificarProductos();
 
     }
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| SELECCIONAR PRODUCTO
-|--------------------------------------------------------------------------
-*/
-
-function seleccionarProducto(producto)
-{
-    if (
-        filaProductoActual === null
-    ) {
-
-        return;
-
-    }
-
-
-    const index =
-        filaProductoActual;
 
 
     /*
-     * Guardar ID en la fila
-     */
+    |--------------------------------------------------------------------------
+    | VERIFICAR PRODUCTOS
+    |--------------------------------------------------------------------------
+    */
 
-    const input =
-        document.getElementById(
-            `product-id-${index}`
-        );
+    function verificarProductos()
+    {
 
-
-    if (input) {
-
-        input.value =
-            producto.id;
-
-    }
-
-
-    /*
-     * Buscar fila
-     */
-
-    const fila =
-        document.querySelector(
-            `[data-product-row="${index}"]`
-        );
-
-
-    if (fila) {
-
-
-        /*
-         * Producto DISTAN
-         */
-
-        const productoDistan =
-            fila.querySelector(
-                '.producto-distan'
+        const inputs =
+            document.querySelectorAll(
+                '[id^="product-id-"]'
             );
 
 
-        if (productoDistan) {
-
-            productoDistan.innerHTML = `
-
-                <div class="pdf-product-name">
-
-                    ${escapeHtml(
-                        producto.nombre
-                    )}
-
-                </div>
-
-                <div class="pdf-product-sku">
-
-                    SKU:
-                    ${escapeHtml(
-                        producto.sku ?? '—'
-                    )}
-
-                </div>
-
-            `;
-
-        }
+        let completos = true;
 
 
-        /*
-         * Estado
-         */
-
-        const estado =
-            fila.querySelector(
-                '.estado-producto'
-            );
-
-
-        if (estado) {
-
-            estado.innerHTML = `
-
-                <span
-                    class="pdf-status
-                           pdf-status-manual"
-                >
-                    ✓ Manual
-                </span>
-
-            `;
-
-        }
-
-
-        /*
-         * Cambiar botón
-         */
-
-        const boton =
-            fila.querySelector(
-                'button.pdf-btn'
-            );
-
-
-        if (boton) {
-
-            boton.textContent =
-                'Cambiar';
-
-            boton.className =
-                'pdf-btn pdf-btn-change';
-
-        }
-
-    }
-
-
-    cerrarBuscadorProducto();
-
-
-    verificarProductos();
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| VERIFICAR PRODUCTOS
-|--------------------------------------------------------------------------
-*/
-
-function verificarProductos()
-{
-    let completos = true;
-
-
-    document
-        .querySelectorAll(
-            '[id^="product-id-"]'
-        )
-        .forEach(
-            function(input) {
+        inputs.forEach(
+            function (input) {
 
                 if (
                     !input.value
@@ -1549,29 +1729,73 @@ function verificarProductos()
         );
 
 
-    const boton =
-        document.getElementById(
-            'btn-crear-orden'
-        );
+        const boton =
+            document.getElementById(
+                'btn-crear-orden'
+            );
 
 
-    if (!boton) {
+        if (!boton) {
 
-        return;
+            return;
+
+        }
+
+
+        if (completos) {
+
+            boton.disabled = false;
+
+            boton.textContent =
+                '✓ Todos los productos listos';
+
+        } else {
+
+            boton.disabled = true;
+
+            boton.textContent =
+                'Revisar productos';
+
+        }
 
     }
 
 
-    if (completos) {
+    /*
+    |--------------------------------------------------------------------------
+    | ESCAPAR HTML
+    |--------------------------------------------------------------------------
+    */
 
-        boton.disabled = false;
+    function escapeHtml(value)
+    {
 
-        boton.textContent =
-            '✓ Crear orden';
+        const div =
+            document.createElement(
+                'div'
+            );
 
-    } else {
 
-        boton.disabled = true;
+        div.textContent =
+            value ?? '';
 
-        boton.textContent =
-            'Revisar productos
+
+        return div.innerHTML;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | INICIO
+    |--------------------------------------------------------------------------
+    */
+
+    verificarProductos();
+
+
+})();
+
+</script>
+
+@endsection

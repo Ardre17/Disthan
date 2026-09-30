@@ -38,7 +38,10 @@ use App\Http\Controllers\OrderValidationController;
 use App\Http\Controllers\ProductionOutputController;
 use App\Http\Controllers\ReportController;
 
-
+Route::get(
+    '/orders/import-pdf/product-search',
+    [OrderController::class, 'buscarProductoImportacion']
+)->name('orders.importPdf.productSearch');
 
 Route::get(
     '/produccion/salidas/productos',
