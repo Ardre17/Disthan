@@ -663,10 +663,11 @@ $t = $temas[$seccionActiva];
                     <a href="{{ route('kardex.index') }}">
                         <span class="sb-icon">📒</span><span>Kardex</span>
                     </a>
-                    @endif
+                    
                     <a href="{{ route('production-orders.index') }}">
                         <span class="sb-icon">🏭</span><span>Producción</span>
                     </a>
+                    @endif
                     @if($role == 'operario')
                     <a href="/pedidos">
                         <span class="sb-icon">📦</span><span>Pedidos</span>

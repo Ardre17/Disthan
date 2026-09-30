@@ -415,7 +415,7 @@ if ($product) {
          * Resultado
          */
 
-        if ($product) {
+            if ($product) {
 
             $item['encontrado'] = true;
 
@@ -429,28 +429,29 @@ if ($product) {
                 $product->sku;
 
             $item['coincidencia'] =
-                'codigo';
+                $coincidencia ?? 'codigo';
+
+            $item['confianza'] =
+                $confianza ?: 100;
 
         } else {
 
             $item['encontrado'] = false;
 
-            $item['product_id'] =
-                null;
+            $item['product_id'] = null;
 
-            $item['nombre_distan'] =
-                null;
+            $item['nombre_distan'] = null;
 
-            $item['sku_distan'] =
-                null;
+            $item['sku_distan'] = null;
 
-            $item['coincidencia'] =
-                null;
+            $item['coincidencia'] = null;
+
+            $item['confianza'] = 0;
         }
+
     }
 
     unset($item);
-
 
     return view(
         'orders.import_pdf_preview',
