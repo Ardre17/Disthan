@@ -363,33 +363,49 @@ Route::middleware('auth')->group(function () {
 
 
     // IMPORTAR PEDIDO PDF
-    Route::get(
-        '/orders/import-pdf',
-        [OrderController::class, 'importPdf']
-    )->name('orders.importPdf');
+//
+// GET  /orders/import-pdf
+//      Muestra el formulario para seleccionar el PDF.
+//
+// POST /orders/import-pdf/preview
+//      Procesa el PDF.
+//
+// GET  /orders/import-pdf/preview
+//      Muestra la vista previa guardada en sesión.
+//
+// POST /orders/import-pdf/store
+//      Crea finalmente la orden.
+//
+// GET  /orders/import-pdf/product-search
+//      Búsqueda de productos para coincidencias manuales.
+//
 
-    Route::post(
-        '/orders/import-pdf/preview',
-        [OrderController::class, 'previewPdf']
-    )->name('orders.importPdf.preview');
+Route::get(
+    '/orders/import-pdf',
+    [OrderController::class, 'importPdf']
+)->name('orders.importPdf');
 
-    Route::get(
-        '/orders/import-pdf/product-search',
-        [OrderController::class, 'buscarProductoImportacion']
-    )->name('orders.importPdf.productSearch');
+Route::get(
+    '/orders/import-pdf/preview',
+    [OrderController::class, 'showImportPdfPreview']
+)->name('orders.importPdf.preview');
 
-    Route::get('/orders/import-pdf', [OrderController::class, 'importPdf'])
-    ->name('orders.importPdf');
+Route::post(
+    '/orders/import-pdf/preview',
+    [OrderController::class, 'previewPdf']
+)->name('orders.importPdf.preview.process');
 
-    Route::post('/orders/import-pdf/preview', [OrderController::class, 'previewPdf'])
-        ->name('orders.importPdf.preview');
+Route::post(
+    '/orders/import-pdf/store',
+    [OrderController::class, 'storeImportPdf']
+)->name('orders.importPdf.store');
 
-    Route::post('/orders/import-pdf/store', [OrderController::class, 'storeImportPdf'])
-        ->name('orders.importPdf.store');
+Route::get(
+    '/orders/import-pdf/product-search',
+    [OrderController::class, 'buscarProductoImportacion']
+)->name('orders.importPdf.productSearch');
 
-    Route::get('/orders/import-pdf/product-search', [OrderController::class, 'buscarProductoImportacion'])
-    ->name('orders.importPdf.productSearch');
-
+    
     // ÓRDENES
     Route::resource('orders', OrderController::class);
 
