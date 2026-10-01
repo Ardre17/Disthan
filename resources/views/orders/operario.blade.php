@@ -190,15 +190,47 @@ opacity:1;
         <span>Stock: <strong id="activoStock" style="color:#94a3b8;">—</strong></span>
         <span>Peso: <strong id="activoPeso" style="color:#94a3b8;">—</strong></span>
     </div>
-    <div class="activo-fields">
-        <div>
-            <label class="activo-label">Solicitado</label>
-            <input type="number" class="activo-input" id="activoSolicitado" readonly style="color:#64748b;">
-        </div>
-        <div>
-            <label class="activo-label">Despachado ✏️</label>
-            <input type="number" class="activo-input big" id="activoCantidad" id="cantidad" placeholder="0">
-        </div>
+    <div style="margin-bottom:.75rem;">
+    <label class="activo-label">
+        👤 Personal que retiró el producto
+    </label>
+
+    <input
+        type="text"
+        class="activo-input"
+        id="activoPersonal"
+        placeholder="Escribe el nombre del personal..."
+        maxlength="100"
+        autocomplete="off"
+    >
+</div>
+
+<div class="activo-fields">
+
+    <div>
+        <label class="activo-label">Solicitado</label>
+
+        <input
+            type="number"
+            class="activo-input"
+            id="activoSolicitado"
+            readonly
+            style="color:#64748b;"
+        >
+    </div>
+
+    <div>
+        <label class="activo-label">Despachado ✏️</label>
+
+        <input
+            type="number"
+            class="activo-input big"
+            id="activoCantidad"
+            placeholder="0"
+        >
+    </div>
+
+</div>
     </div>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:3px;">
         <span>Progreso ítem</span>
@@ -299,6 +331,34 @@ opacity:1;
         {{ number_format($pct2,0) }}%
     </span>
 </div>
+@if(!empty($item->personal_despacho))
+
+    <div
+        id="personal-{{ $item->id }}"
+        style="
+            margin-top:6px;
+            padding:5px 7px;
+            background:#0f172a;
+            border:1px solid #334155;
+            border-radius:6px;
+            font-size:10px;
+            color:#94a3b8;
+        "
+    >
+        👤 Retiró:
+        <strong style="color:#f8fafc;">
+            {{ $item->personal_despacho }}
+        </strong>
+    </div>
+
+@else
+
+    <div
+        id="personal-{{ $item->id }}"
+        style="display:none;"
+    ></div>
+
+@endif
     <div class="prod-mini-bar">
     <div class="prod-mini-fill"
          id="bar-{{ $item->id }}"
@@ -556,68 +616,7 @@ function actualizarBarra(){
     document.getElementById('kpiInc').textContent = inc;
 }
 
-function mostrarActivo(item){
-    activoActual = item;
-    const pct = item.cantidad_solicitada > 0
-        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100 : 0;
-    const color = pct >= 100 ? '#22c55e' : (pct > 0 ? '#f59e0b' : '#ef4444');
-
-    document.getElementById('activoNombre').textContent   = item.product.nombre;
-    document.getElementById('activoSku').textContent      = item.product.sku ?? '—';
-    document.getElementById('activoStock').textContent    = item.product.stock ?? '—';
-    document.getElementById('activoPeso').textContent     = item.product.peso
-        ? (item.product.peso / 1000).toFixed(3) + ' kg' : '—';
-    document.getElementById('activoSolicitado').value     = item.cantidad_solicitada;
-    document.getElementById('activoCantidad').value       = item.cantidad_despachada || '';
-    document.getElementById('activoPaleta').textContent   = item.paleta    || '—';
-    document.getElementById('activoUbicacion').textContent= item.ubicacion || '—';
-    document.getElementById('activoVence').textContent    = item.fecha_vencimiento || item.product?.fecha_vencimiento || '—';
-    document.getElementById('activoBarFill').style.width  = pct + '%';
-    document.getElementById('activoBarFill').style.background = color;
-    document.getElementById('activoPctLabel').textContent = Math.round(pct) + '%';
-    document.getElementById('activoPctLabel').style.color = color;
-
-    document.getElementById('activoBox').style.display = 'block';
-    document.getElementById('activoBox').style.display = 'block';
-
-// =====================================
-// VERIFICAR ADVERTENCIAS NUTRICIONALES
-// =====================================
-
-if(item.product.advertencias){
-
-    mostrarModalAdvertencias(item);
-
-}else{
-
-    document.getElementById('activoCantidad').focus();
-    document.getElementById('activoCantidad').select();
-
-}
-}
-
-// Update mini bar en lista
-function actualizarCajasUI(item){
-    const porCaja = parseInt(item.product?.cantidad_por_caja || 0, 10);
-    if(!porCaja || porCaja <= 0) return;
-
-    const cantidad = Math.max(0, Math.floor(parseFloat(item.cantidad_despachada) || 0));
-    const cajas = Math.floor(cantidad / porCaja);
-    const sueltas = cantidad % porCaja;
-
-    const cajasEl = document.getElementById('cajas-despachadas-' + item.id);
-    if(cajasEl) cajasEl.textContent = cajas;
-
-    const pluralEl = document.getElementById('cajas-despachadas-plural-' + item.id);
-    if(pluralEl) pluralEl.textContent = cajas !== 1 ? 's' : '';
-
-    const sueltasWrap = document.getElementById('sueltas-despachadas-wrap-' + item.id);
-    if(sueltasWrap){
-        sueltasWrap.textContent = sueltas > 0
-            ? `+ ${sueltas} suelta${sueltas !== 1 ? 's' : ''}`
-            : '';
-    }
-}
+function mostrarActivo(item)
 
 function actualizarItemUI(item){
     const pct = item.cantidad_solicitada > 0
@@ -695,9 +694,50 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
     }
 
     const formData = new FormData();
-    formData.append('cantidad_despachada', cantidad);
-    formData.append('cantidad_solicitada', activoActual.cantidad_solicitada);
-    formData.append('precio_unitario', activoActual.precio_unitario);
+    const personalInput =
+    document.getElementById('activoPersonal');
+
+const personal =
+    personalInput
+        ? personalInput.value.trim()
+        : '';
+
+if (!personal) {
+
+    showToast(
+        '⚠ Debes indicar quién retiró el producto',
+        'twk'
+    );
+
+    if (personalInput) {
+        personalInput.focus();
+    }
+
+    return;
+}
+
+const formData = new FormData();
+
+formData.append(
+    'cantidad_despachada',
+    cantidad
+);
+
+formData.append(
+    'cantidad_solicitada',
+    activoActual.cantidad_solicitada
+);
+
+formData.append(
+    'precio_unitario',
+    activoActual.precio_unitario
+);
+
+formData.append(
+    'personal_despacho',
+    personal
+);
+
     formData.append('_method', 'PUT');
     formData.append('_token', '{{ csrf_token() }}');
 
@@ -709,6 +749,25 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
     .then(res => res.json())
     .then(() => {
         activoActual.cantidad_despachada = cantidad;
+        activoActual.personal_despacho = personal;
+
+        const personalEl =
+    document.getElementById(
+        'personal-' + activoActual.id
+    );
+
+if (personalEl) {
+
+    personalEl.style.display = 'block';
+
+    personalEl.innerHTML = `
+        👤 Retiró:
+        <strong style="color:#f8fafc;">
+            ${personal}
+        </strong>
+    `;
+}
+
         actualizarItemUI(activoActual);
         actualizarBarra();
 

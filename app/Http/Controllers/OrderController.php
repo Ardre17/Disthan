@@ -1428,6 +1428,16 @@ if (array_key_exists('paleta', $updateData)) {
 
 $detail->update($updateData);
 
+    // 👤 Guardar personal que retiró/despachó el producto
+if ($request->has('personal_despacho')) {
+    $personal = trim((string) $request->input('personal_despacho'));
+
+    if ($personal !== '') {
+        $detail->personal_despacho = $personal;
+        $detail->save();
+    }
+}
+
     // 🔄 ACTUALIZAR ORDEN
     $order = $detail->order;
     $estadoAnterior = $order->estado;
