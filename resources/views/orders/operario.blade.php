@@ -230,7 +230,6 @@ opacity:1;
         >
     </div>
 
-</div>
     </div>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:3px;">
         <span>Progreso ítem</span>
@@ -581,11 +580,14 @@ function mostrarModalAdvertencias(item){
 
     setTimeout(function(){
 
-        document.getElementById("activoCantidad").focus();
+    const personalInput =
+        document.getElementById("activoPersonal");
 
-        document.getElementById("activoCantidad").select();
+    if(personalInput){
+        personalInput.focus();
+    }
 
-    },100);
+},100);
 
 });
 
@@ -616,7 +618,86 @@ function actualizarBarra(){
     document.getElementById('kpiInc').textContent = inc;
 }
 
-function mostrarActivo(item)
+function mostrarActivo(item){
+
+    activoActual = item;
+
+    // Cargar datos del producto
+    document.getElementById('activoNombre').textContent =
+        item.product.nombre || '—';
+
+    document.getElementById('activoSku').textContent =
+        item.product.sku || '—';
+
+    document.getElementById('activoStock').textContent =
+        item.product.stock ?? '—';
+
+    document.getElementById('activoPeso').textContent =
+        item.product.peso ?? '—';
+
+    document.getElementById('activoSolicitado').value =
+        item.cantidad_solicitada;
+
+    document.getElementById('activoCantidad').value =
+        item.cantidad_despachada ?? 0;
+
+    // 👤 Personal que retiró el producto
+    const personalInput =
+        document.getElementById('activoPersonal');
+
+    if (personalInput) {
+        personalInput.value =
+            item.personal_despacho || '';
+    }
+
+    // Datos adicionales
+    document.getElementById('activoPaleta').textContent =
+        item.paleta || '—';
+
+    document.getElementById('activoUbicacion').textContent =
+        item.ubicacion || '—';
+
+    document.getElementById('activoVence').textContent =
+        item.product.fecha_vencimiento || '—';
+
+    // Progreso del producto
+    const pct = item.cantidad_solicitada > 0
+        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100
+        : 0;
+
+    const pctLimitado = Math.min(pct, 100);
+
+    document.getElementById('activoPctLabel').textContent =
+        Math.round(pctLimitado) + '%';
+
+    document.getElementById('activoBarFill').style.width =
+        pctLimitado + '%';
+
+    document.getElementById('activoBarFill').style.background =
+        pctLimitado >= 100
+            ? '#22c55e'
+            : (pctLimitado > 0 ? '#f59e0b' : '#3b82f6');
+
+    // Mostrar producto activo
+    document.getElementById('activoBox').style.display = 'block';
+
+    // Si tiene advertencias, mostrar modal
+    if (item.product.advertencias) {
+
+        mostrarModalAdvertencias(item);
+
+    } else {
+
+        setTimeout(function(){
+
+            if (personalInput) {
+                personalInput.focus();
+            }
+
+        }, 100);
+
+    }
+}
 
 function actualizarItemUI(item){
     const pct = item.cantidad_solicitada > 0
@@ -716,7 +797,6 @@ if (!personal) {
     return;
 }
 
-const formData = new FormData();
 
 formData.append(
     'cantidad_despachada',
@@ -786,7 +866,16 @@ if (personalEl) {
         }
 
         beep();
+
         activoActual = null;
+
+        const personalInput =
+            document.getElementById('activoPersonal');
+
+        if(personalInput){
+            personalInput.value = '';
+        }
+
         scanner.focus();
     })
     .catch(() => {
