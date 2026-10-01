@@ -710,7 +710,74 @@ function actualizarItemUI(item){
     const span = document.getElementById('despachado-' + item.id);
     if(span){ span.textContent = item.cantidad_despachada; span.style.color = color; }
 
-    actualizarCajasUI(item);
+    function actualizarItemUI(item){
+
+    const pct = item.cantidad_solicitada > 0
+        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100
+        : 0;
+
+    const color =
+        pct >= 100
+            ? '#22c55e'
+            : (pct > 0 ? '#f59e0b' : '#ef4444');
+
+    const card =
+        document.getElementById('item-' + item.id);
+
+    if(card){
+        card.style.borderLeftColor = color;
+    }
+
+    const span =
+        document.getElementById('despachado-' + item.id);
+
+    if(span){
+        span.textContent = item.cantidad_despachada;
+        span.style.color = color;
+    }
+
+    const pctEl =
+        document.getElementById('pct-' + item.id);
+
+    if(pctEl){
+        pctEl.textContent =
+            Math.round(pct) + '%';
+
+        pctEl.style.color = color;
+    }
+
+    const barEl =
+        document.getElementById('bar-' + item.id);
+
+    if(barEl){
+        barEl.style.width =
+            Math.min(pct, 100) + '%';
+
+        barEl.style.background =
+            color;
+    }
+
+    const badge =
+        card
+            ? card.querySelector('.prod-item-badge')
+            : null;
+
+    if(badge){
+
+        badge.className =
+            'prod-item-badge ' +
+            (
+                pct >= 100
+                    ? 'bc'
+                    : (pct > 0 ? 'bp' : 'bi')
+            );
+
+        badge.textContent =
+            pct >= 100
+                ? 'COMPLETO'
+                : (pct > 0 ? 'PARCIAL' : 'INCOMPLETO');
+    }
+}
 
     const pctEl = document.getElementById('pct-' + item.id);
     if(pctEl){ pctEl.textContent = Math.round(pct) + '%'; pctEl.style.color = color; }
