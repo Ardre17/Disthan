@@ -875,22 +875,12 @@ if (personalEl) {
         if(personalInput){
             personalInput.value = '';
         }
-
-        scanner.focus();
     })
     .catch(() => {
         showToast('❌ Error al guardar', 'ter');
         scanner.focus();
     });
 });
-
-// Mantener foco
-setInterval(() => {
-    if(document.activeElement !== scanner &&
-       document.activeElement !== document.getElementById('activoCantidad')){
-        scanner.focus();
-    }
-}, 800);
 
 function confirmarCierre(){
     const faltantes = detalles.filter(d =>
