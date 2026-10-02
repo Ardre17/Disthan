@@ -115,16 +115,39 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
    </form>
 </div>
 
-
-{{-- ── Header ── --}}
 <div class="hdr">
 
     <div class="hdr-title">
         📋 Órdenes
     </div>
 
-    <div style="display:flex;gap:8px;align-items:center;">
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
 
+        {{-- IMPORTAR PEDIDO DESDE PDF --}}
+        <a
+            href="{{ route('orders.importPdf') }}"
+            style="
+                background:#eff6ff;
+                color:#1d4ed8;
+                border:1px solid #bfdbfe;
+                padding:9px 14px;
+                border-radius:9px;
+                font-size:13px;
+                font-weight:600;
+                cursor:pointer;
+                display:inline-flex;
+                align-items:center;
+                gap:5px;
+                text-decoration:none;
+                transition:all .15s;
+            "
+            onmouseover="this.style.background='#dbeafe'"
+            onmouseout="this.style.background='#eff6ff'"
+        >
+            📄 Importar pedido PDF
+        </a>
+
+        {{-- STOCK DE PEDIDOS --}}
         <button
             type="button"
             onclick="abrirStockPedidos()"
@@ -145,6 +168,7 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
             📦 Stock de pedidos
         </button>
 
+        {{-- NUEVA ORDEN --}}
         <a href="{{ route('orders.create') }}" class="btn-new">
             + Nueva orden
         </a>
@@ -152,7 +176,6 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
     </div>
 
 </div>
-
 
 {{-- ── Cards ── --}}
 <div class="cards">
