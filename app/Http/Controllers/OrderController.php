@@ -386,7 +386,37 @@ return redirect()
     ->route('orders.importPdf.preview');
 }
 
+public function showImportPdfPreview()
+{
+    $preview = session('import_pdf_preview');
 
+    if (!$preview) {
+        return redirect()
+            ->route('orders.importPdf')
+            ->with(
+                'error',
+                'No hay una importación PDF pendiente.'
+            );
+    }
+
+    $datos = $preview['datos'];
+
+    $client = null;
+
+    if (!empty($preview['client_id'])) {
+        $client = Client::find(
+            $preview['client_id']
+        );
+    }
+
+    return view(
+        'orders.import_pdf_preview',
+        [
+            'datos' => $datos,
+            'client' => $client,
+        ]
+    );
+}
 public function storeImportPdf(Request $request)
 {
     $request->validate([
