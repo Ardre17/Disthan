@@ -98,6 +98,124 @@ opacity:1;
 .btn-etiqueta:active{
     transform:scale(.98);
 }
+
+/* ═══════════════════════════════════════════════════
+   MOBILE — pantallas ≤ 480px (celulares normales)
+═══════════════════════════════════════════════════ */
+@media(max-width:480px){
+
+    /* KPIs: 2 columnas en vez de 4 para que los números se lean bien */
+    .kpis{
+        grid-template-columns:repeat(2,1fr);
+        gap:6px;
+    }
+
+    .kpi-val{ font-size:22px; }
+    .kpi-label{ font-size:10px; }
+
+    /* Porcentaje más compacto en progreso */
+    .prog-pct{ font-size:26px; }
+
+    /* Scanner: input más alto y fuente más grande para tipear fácil */
+    .scanner-input{
+        padding:16px;
+        font-size:20px;
+        min-height:58px;
+    }
+
+    /* Producto activo: campos apilados en una sola columna */
+    .activo-fields{
+        grid-template-columns:1fr;
+    }
+
+    /* Input de cantidad más grande (fácil de tocar) */
+    .activo-input.big{
+        font-size:28px;
+        padding:16px;
+        min-height:64px;
+    }
+
+    .activo-input{
+        min-height:48px;
+        font-size:15px;
+    }
+
+    /* Botón cerrar orden más alto para tocar con dedo */
+    .btn-cerrar{
+        padding:18px;
+        font-size:16px;
+        min-height:58px;
+    }
+
+    /* Botón etiqueta más alto */
+    .btn-etiqueta{
+        padding:13px;
+        font-size:12px;
+        min-height:46px;
+    }
+
+    /* Producto: texto más legible */
+    .prod-item-name{ font-size:14px; }
+    .prod-item-sku{  font-size:11px; }
+
+    /* Toast en la parte de abajo para no tapar el contenido */
+    .toast{
+        top:auto;
+        bottom:16px;
+        right:50%;
+        transform:translateX(50%);
+        white-space:nowrap;
+    }
+
+    /* Título de sección más visible */
+    .sec-title{ font-size:13px; margin-bottom:.85rem; }
+}
+
+/* ═══════════════════════════════════════════════════
+   MOBILE PEQUEÑO — pantallas ≤ 360px (teléfonos chicos)
+═══════════════════════════════════════════════════ */
+@media(max-width:360px){
+
+    .pg{ padding:.65rem; }
+
+    .prog-pct{ font-size:22px; }
+
+    /* Barra de progreso más delgada para ahorrar espacio */
+    .prog-track{ height:14px; }
+
+    .kpi-val{ font-size:20px; }
+
+    .order-title{ font-size:14px; }
+
+    .activo-name{ font-size:14px; }
+
+    /* Meta del activo apilada verticalmente */
+    .activo-meta{
+        flex-direction:column;
+        gap:3px;
+    }
+
+    .activo-input.big{
+        font-size:32px;
+        padding:18px;
+    }
+
+    /* Badges más compactos */
+    .prod-item-badge{
+        font-size:9px;
+        padding:2px 6px;
+    }
+}
+
+/* ═══════════════════════════════════════════════════
+   TABLET — pantallas entre 481px y 680px
+═══════════════════════════════════════════════════ */
+@media(min-width:481px) and (max-width:680px){
+    .kpis{ grid-template-columns:repeat(4,1fr); }
+    .scanner-input{ font-size:20px; padding:14px 16px; }
+    .btn-cerrar{ padding:16px; font-size:15px; }
+}
+
 </style>
 
 {{-- Fondo oscuro para toda la página --}}
