@@ -382,7 +382,7 @@ return redirect()
 public function showImportPdfPreview()
 {
     $preview = session('import_pdf_preview');
-    dd($preview);
+
 
     if (!$preview) {
         return redirect()
@@ -413,6 +413,7 @@ public function showImportPdfPreview()
 }
 public function storeImportPdf(Request $request)
 {
+    dd($request->all());
     $request->validate([
         'client_id' => 'required|exists:clients,id',
         'tipo_orden' => 'required|string',
