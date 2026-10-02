@@ -385,11 +385,6 @@ Route::get(
     [OrderController::class, 'importPdf']
 )->name('orders.importPdf');
 
-Route::get(
-    '/orders/import-pdf/preview',
-    [OrderController::class, 'showImportPdfPreview']
-)->name('orders.importPdf.preview');
-
 Route::post(
     '/orders/import-pdf/preview',
     [OrderController::class, 'previewPdf']

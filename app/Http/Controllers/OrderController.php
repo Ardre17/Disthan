@@ -84,26 +84,18 @@ public function importPdf()
     );
 }
 
-
 public function previewPdf(
     Request $request,
     PedidoPdfParser $parser
 ) {
-
     $request->validate([
-
-        'archivo' =>
-            'required|file|mimes:pdf|max:10240',
-
+        'archivo' => 'required|file|mimes:pdf|max:10240',
     ]);
-
 
     try {
 
         $datos = $parser->parse(
-            $request
-                ->file('archivo')
-                ->getRealPath()
+            $request->file('archivo')->getRealPath()
         );
 
     } catch (\Throwable $e) {
@@ -112,10 +104,9 @@ public function previewPdf(
             ->withInput()
             ->with(
                 'error',
-                $e->getMessage()
+                'No se pudo analizar el PDF: ' . $e->getMessage()
             );
     }
-
 
     /*
     |--------------------------------------------------------------------------
@@ -125,11 +116,7 @@ public function previewPdf(
 
     $client = null;
 
-    if (
-        !empty(
-            $datos['ruc_cliente']
-        )
-    ) {
+    if (!empty($datos['ruc_cliente'])) {
 
         $client = Client::where(
             'ruc',
@@ -137,290 +124,206 @@ public function previewPdf(
         )->first();
     }
 
-
     /*
     |--------------------------------------------------------------------------
     | Buscar productos
     |--------------------------------------------------------------------------
     */
 
-    foreach (
-        $datos['productos']
-        as &$item
-    ) {
+    foreach ($datos['productos'] as &$item) {
 
-        /*
-|--------------------------------------------------------------------------
-| 1. BUSCAR POR SKU
-|--------------------------------------------------------------------------
-*/
-
-$codigo = strtoupper(trim($item['codigo']));
-
-$product = Product::whereRaw(
-    'UPPER(TRIM(sku)) = ?',
-    [$codigo]
-)->first();
-
-
-/*
-|--------------------------------------------------------------------------
-| 2. BUSCAR POR CÓDIGO DE BARRAS
-|--------------------------------------------------------------------------
-*/
-
-if (!$product) {
-
-    $product = Product::whereRaw(
-        'UPPER(TRIM(barcode)) = ?',
-        [$codigo]
-    )->first();
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| 3. BUSCAR POR CÓDIGO DE CAJA
-|--------------------------------------------------------------------------
-*/
-
-if (!$product) {
-
-    $product = Product::whereRaw(
-        'UPPER(TRIM(box_barcode)) = ?',
-        [$codigo]
-    )->first();
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| 4. SI NO EXISTE EL CÓDIGO → BUSCAR POR NOMBRE
-|--------------------------------------------------------------------------
-*/
-
-$coincidencia = null;
-$confianza = 0;
-$candidatos = collect();
-
-
-if (!$product) {
-
-    $nombrePdf = $this->normalizarProducto(
-        $item['descripcion']
-    );
-
-    /*
-     * Extraemos posibles números de presentación.
-     *
-     * Ejemplos:
-     * x 100 g
-     * x 432g
-     * x 800g
-     */
-
-    preg_match_all(
-        '/(\d+(?:\.\d+)?)\s*g\b/i',
-        $item['descripcion'],
-        $pesosPdf
-    );
-
-    $pesoPdf = !empty($pesosPdf[1])
-        ? end($pesosPdf[1])
-        : null;
-
-
-    /*
-     * Buscamos palabras principales del producto.
-     *
-     * Ejemplo:
-     * "Filete de anchoas..."
-     * "Choclo Dulce Desgranado..."
-     * "Palmitos Enteros..."
-     */
-
-    $palabras = preg_split(
-        '/\s+/',
-        $nombrePdf
-    );
-
-    $palabras = array_filter(
-        $palabras,
-        fn($p) => strlen($p) >= 4
-    );
-
-
-    /*
-     * Tomamos las primeras palabras importantes
-     * para hacer la búsqueda inicial.
-     */
-
-    $baseBusqueda = implode(
-        ' ',
-        array_slice($palabras, 0, 3)
-    );
-
-
-    $candidatos = Product::query()
-        ->where('activo', true)
-        ->where(function ($query) use ($palabras) {
-
-            foreach (
-                array_slice($palabras, 0, 3)
-                as $palabra
-            ) {
-
-                $query->where(
-                    'nombre',
-                    'ILIKE',
-                    '%' . $palabra . '%'
-                );
-            }
-        })
-        ->get();
-
-
-    /*
-     * Comparar candidatos.
-     */
-
-    $mejorProducto = null;
-    $mejorPuntaje = 0;
-
-
-    foreach ($candidatos as $candidato) {
-
-        $nombreDb = $this->normalizarProducto(
-            $candidato->nombre
+        $codigo = strtoupper(
+            trim($item['codigo'] ?? '')
         );
 
+        $product = null;
 
         /*
-         * Similitud general del nombre.
-         */
+        |--------------------------------------------------------------------------
+        | 1. SKU
+        |--------------------------------------------------------------------------
+        */
 
-        similar_text(
-            $nombrePdf,
-            $nombreDb,
-            $similitud
-        );
+        if ($codigo !== '') {
 
-
-        $puntaje = $similitud;
-
+            $product = Product::whereRaw(
+                'UPPER(TRIM(sku)) = ?',
+                [$codigo]
+            )->first();
+        }
 
         /*
-         * Dar prioridad si la presentación/peso coincide.
-         */
+        |--------------------------------------------------------------------------
+        | 2. Código de barras
+        |--------------------------------------------------------------------------
+        */
 
-        if ($pesoPdf) {
+        if (!$product && $codigo !== '') {
+
+            $product = Product::whereRaw(
+                'UPPER(TRIM(barcode)) = ?',
+                [$codigo]
+            )->first();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 3. Código de caja
+        |--------------------------------------------------------------------------
+        */
+
+        if (!$product && $codigo !== '') {
+
+            $product = Product::whereRaw(
+                'UPPER(TRIM(box_barcode)) = ?',
+                [$codigo]
+            )->first();
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 4. Buscar por nombre
+        |--------------------------------------------------------------------------
+        */
+
+        $coincidencia = null;
+        $confianza = 0;
+
+        if (!$product) {
+
+            $nombrePdf = $this->normalizarProducto(
+                $item['descripcion'] ?? ''
+            );
 
             preg_match_all(
                 '/(\d+(?:\.\d+)?)\s*g\b/i',
-                $candidato->nombre,
-                $pesosDb
+                $item['descripcion'] ?? '',
+                $pesosPdf
             );
 
-            if (!empty($pesosDb[1])) {
+            $pesoPdf = !empty($pesosPdf[1])
+                ? end($pesosPdf[1])
+                : null;
 
-                foreach ($pesosDb[1] as $pesoDb) {
+            $palabras = preg_split(
+                '/\s+/',
+                $nombrePdf
+            );
 
-                    if (
-                        (float) $pesoDb
-                        ===
-                        (float) $pesoPdf
+            $palabras = array_values(
+                array_filter(
+                    $palabras,
+                    fn($p) => strlen($p) >= 4
+                )
+            );
+
+            $candidatos = Product::query()
+                ->where('activo', true)
+                ->where(function ($query) use ($palabras) {
+
+                    foreach (
+                        array_slice($palabras, 0, 3)
+                        as $palabra
                     ) {
 
-                        $puntaje += 25;
+                        $query->where(
+                            'nombre',
+                            'ILIKE',
+                            '%' . $palabra . '%'
+                        );
+                    }
 
-                        break;
+                })
+                ->get();
+
+            $mejorProducto = null;
+            $mejorPuntaje = 0;
+
+            foreach ($candidatos as $candidato) {
+
+                $nombreDb = $this->normalizarProducto(
+                    $candidato->nombre
+                );
+
+                similar_text(
+                    $nombrePdf,
+                    $nombreDb,
+                    $similitud
+                );
+
+                $puntaje = $similitud;
+
+                /*
+                |--------------------------------------------------------------------------
+                | Premiar coincidencia de peso
+                |--------------------------------------------------------------------------
+                */
+
+                if ($pesoPdf) {
+
+                    preg_match_all(
+                        '/(\d+(?:\.\d+)?)\s*g\b/i',
+                        $candidato->nombre,
+                        $pesosDb
+                    );
+
+                    if (!empty($pesosDb[1])) {
+
+                        foreach ($pesosDb[1] as $pesoDb) {
+
+                            if (
+                                (float) $pesoDb ===
+                                (float) $pesoPdf
+                            ) {
+
+                                $puntaje += 25;
+
+                                break;
+                            }
+                        }
                     }
                 }
+
+                if ($puntaje > $mejorPuntaje) {
+
+                    $mejorPuntaje = $puntaje;
+                    $mejorProducto = $candidato;
+                }
+            }
+
+            /*
+            |--------------------------------------------------------------------------
+            | Aceptar coincidencia automática
+            |--------------------------------------------------------------------------
+            */
+
+            if (
+                $mejorProducto &&
+                $mejorPuntaje >= 85
+            ) {
+
+                $product = $mejorProducto;
+
+                $coincidencia = 'nombre';
+
+                $confianza = round(
+                    min($mejorPuntaje, 100),
+                    2
+                );
             }
         }
 
-
-        if ($puntaje > $mejorPuntaje) {
-
-            $mejorPuntaje = $puntaje;
-
-            $mejorProducto = $candidato;
-        }
-    }
-
-
-    /*
-     * Solo aceptar automáticamente
-     * una coincidencia suficientemente clara.
-     */
-
-    if (
-        $mejorProducto
-        &&
-        $mejorPuntaje >= 85
-    ) {
-
-        $product = $mejorProducto;
-
-        $coincidencia = 'nombre';
-
-        $confianza = round(
-            min($mejorPuntaje, 100),
-            2
-        );
-    }
-}
-
-
-/*
-|--------------------------------------------------------------------------
-| RESULTADO
-|--------------------------------------------------------------------------
-*/
-
-if ($product) {
-
-    $item['encontrado'] = true;
-
-    $item['product_id'] =
-        $product->id;
-
-    $item['nombre_distan'] =
-        $product->nombre;
-
-    $item['sku_distan'] =
-        $product->sku;
-
-    $item['coincidencia'] =
-        $coincidencia ?? 'codigo';
-
-    $item['confianza'] =
-        $confianza ?: 100;
-
-} else {
-
-    $item['encontrado'] = false;
-
-    $item['product_id'] = null;
-
-    $item['nombre_distan'] = null;
-
-    $item['sku_distan'] = null;
-
-    $item['coincidencia'] = null;
-
-    $item['confianza'] = 0;
-}
         /*
-         * Resultado
-         */
+        |--------------------------------------------------------------------------
+        | Guardar resultado
+        |--------------------------------------------------------------------------
+        */
 
-            if ($product) {
+        if ($product) {
 
             $item['encontrado'] = true;
 
-            $item['product_id'] =
-                $product->id;
+            $item['product_id'] = $product->id;
 
             $item['nombre_distan'] =
                 $product->nombre;
@@ -448,10 +351,15 @@ if ($product) {
 
             $item['confianza'] = 0;
         }
-
     }
 
     unset($item);
+
+    /*
+    |--------------------------------------------------------------------------
+    | MOSTRAR DIRECTAMENTE EL PREVIEW
+    |--------------------------------------------------------------------------
+    */
 
     return view(
         'orders.import_pdf_preview',

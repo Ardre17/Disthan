@@ -392,12 +392,8 @@ input[type="file"]::-webkit-file-upload-button:hover{
             action="{{ route('orders.importPdf.preview.process') }}"
             method="POST"
             enctype="multipart/form-data"
-            id="formImportPdf"
         >
-
             @csrf
-
-
             <div class="import-card-body">
 
                 {{-- Drop zone visual --}}
