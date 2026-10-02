@@ -413,11 +413,54 @@ public function showImportPdfPreview()
 }
 public function storeImportPdf(Request $request)
 {
+    /*
+    |--------------------------------------------------------------------------
+    | NORMALIZAR FECHAS DEL PDF
+    |--------------------------------------------------------------------------
+    |
+    | La vista envía las fechas como dd/mm/YYYY.
+    | Laravel/PostgreSQL trabajarán con YYYY-mm-dd.
+    |
+    */
+
+    if ($request->filled('fecha_pedido')) {
+        $fechaPedido = \Carbon\Carbon::createFromFormat(
+            'd/m/Y',
+            $request->input('fecha_pedido')
+        )->format('Y-m-d');
+
+        $request->merge([
+            'fecha_pedido' => $fechaPedido,
+        ]);
+    }
+
+    if ($request->filled('fecha_entrega')) {
+        $fechaEntrega = \Carbon\Carbon::createFromFormat(
+            'd/m/Y',
+            $request->input('fecha_entrega')
+        )->format('Y-m-d');
+
+        $request->merge([
+            'fecha_entrega' => $fechaEntrega,
+        ]);
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | VALIDACIÓN
+    |--------------------------------------------------------------------------
+    */
+
     $request->validate([
         'client_id' => 'required|exists:clients,id',
+
         'tipo_orden' => 'required|string',
+
         'fecha_pedido' => 'required|date',
+
         'fecha_entrega' => 'nullable|date',
+
         'order_interna' => 'nullable|string|max:255',
 
         'productos' => 'required|array|min:1',
@@ -439,6 +482,7 @@ public function storeImportPdf(Request $request)
             'gte:0',
         ],
     ]);
+
 
     try {
 
@@ -464,18 +508,9 @@ public function storeImportPdf(Request $request)
             |--------------------------------------------------------------------------
             | CREAR ORDEN
             |--------------------------------------------------------------------------
-            |
-            | IMPORTANTE:
-            | No usamos el total del PDF.
-            | No usamos el IGV del PDF.
-            | No usamos el total PDF.
-            |
-            | La orden inicia con sus totales en 0.
-            |--------------------------------------------------------------------------
             */
 
             $order = Order::create([
-
                 'numero_orden' => $numeroOrden,
 
                 'client_id' => $request->client_id,
@@ -492,12 +527,14 @@ public function storeImportPdf(Request $request)
 
                 'observaciones' => null,
 
+                /*
+                | No importamos total ni IGV del PDF.
+                */
                 'subtotal' => 0,
 
                 'igv' => 0,
 
                 'total' => 0,
-
             ]);
 
 
@@ -513,14 +550,12 @@ public function storeImportPdf(Request $request)
                     $item['product_id']
                 );
 
-
                 $cantidad = (float) $item['cantidad'];
 
                 $precio = (float) $item['precio_unitario'];
 
 
                 OrderDetail::create([
-
                     'order_id' => $order->id,
 
                     'product_id' => $producto->id,
@@ -530,13 +565,12 @@ public function storeImportPdf(Request $request)
                     'cantidad_despachada' => 0,
 
                     /*
-                    | Precio tomado del PDF.
+                    | Precio unitario tomado del PDF.
                     */
                     'precio_unitario' => $precio,
 
                     /*
-                    | No copiamos el total del PDF.
-                    | El sistema lo calculará posteriormente.
+                    | Se calculará posteriormente.
                     */
                     'subtotal' => 0,
 
@@ -546,20 +580,26 @@ public function storeImportPdf(Request $request)
 
                     'fecha_vencimiento' =>
                         $producto->fecha_vencimiento,
-
                 ]);
-
             }
 
 
             return $order;
-
         });
 
 
         /*
         |--------------------------------------------------------------------------
-        | REDIRECCION
+        | LIMPIAR PREVIEW
+        |--------------------------------------------------------------------------
+        */
+
+        session()->forget('import_pdf_preview');
+
+
+        /*
+        |--------------------------------------------------------------------------
+        | REDIRECCIONAR
         |--------------------------------------------------------------------------
         */
 
@@ -581,9 +621,9 @@ public function storeImportPdf(Request $request)
                 'No se pudo crear la orden: '
                 . $e->getMessage()
             );
-
     }
 }
+        
 public function actualizarDocumentos(
     Request $request,
     Order $order
