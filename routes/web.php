@@ -363,23 +363,6 @@ Route::middleware('auth')->group(function () {
 
 
     // IMPORTAR PEDIDO PDF
-//
-// GET  /orders/import-pdf
-//      Muestra el formulario para seleccionar el PDF.
-//
-// POST /orders/import-pdf/preview
-//      Procesa el PDF.
-//
-// GET  /orders/import-pdf/preview
-//      Muestra la vista previa guardada en sesión.
-//
-// POST /orders/import-pdf/store
-//      Crea finalmente la orden.
-//
-// GET  /orders/import-pdf/product-search
-//      Búsqueda de productos para coincidencias manuales.
-//
-
 Route::get(
     '/orders/import-pdf',
     [OrderController::class, 'importPdf']
@@ -400,6 +383,10 @@ Route::get(
     [OrderController::class, 'buscarProductoImportacion']
 )->name('orders.importPdf.productSearch');
 
+Route::get(
+    '/orders/import-pdf/preview',
+    [OrderController::class, 'showImportPdfPreview']
+)->name('orders.importPdf.preview');
     
     // ÓRDENES
     Route::resource('orders', OrderController::class);
