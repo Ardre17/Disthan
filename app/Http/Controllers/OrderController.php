@@ -375,8 +375,6 @@ session([
     ],
 ]);
 
-dd(session()->all());
-
 return redirect()
     ->route('orders.importPdf.preview');
 }
@@ -384,6 +382,7 @@ return redirect()
 public function showImportPdfPreview()
 {
     $preview = session('import_pdf_preview');
+    dd($preview);
 
     if (!$preview) {
         return redirect()
