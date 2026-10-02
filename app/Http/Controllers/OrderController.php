@@ -368,7 +368,6 @@ public function previewPdf(
 | GUARDAR PREVIEW EN SESIÓN
 |--------------------------------------------------------------------------
 */
-
 session([
     'import_pdf_preview' => [
         'datos' => $datos,
@@ -376,11 +375,7 @@ session([
     ],
 ]);
 
-/*
-|--------------------------------------------------------------------------
-| IR AL PREVIEW
-|--------------------------------------------------------------------------
-*/
+dd(session()->all());
 
 return redirect()
     ->route('orders.importPdf.preview');
