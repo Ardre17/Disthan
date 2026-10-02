@@ -413,7 +413,6 @@ public function showImportPdfPreview()
 }
 public function storeImportPdf(Request $request)
 {
-    dd($request->input('productos')[0]);
     $request->validate([
         'client_id' => 'required|exists:clients,id',
         'tipo_orden' => 'required|string',
