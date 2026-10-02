@@ -389,10 +389,11 @@ input[type="file"]::-webkit-file-upload-button:hover{
              Este formulario hace POST al método que procesa el PDF.
         --}}
         <form
-            action="{{ route('orders.importPdf.preview.process') }}"
-            method="POST"
-            enctype="multipart/form-data"
-        >
+                action="{{ route('orders.importPdf.preview.process') }}"
+                method="POST"
+                enctype="multipart/form-data"
+                id="formImportPdf"
+            >
             @csrf
             <div class="import-card-body">
 
