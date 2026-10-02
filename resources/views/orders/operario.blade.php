@@ -216,6 +216,126 @@ opacity:1;
     .btn-cerrar{ padding:16px; font-size:15px; }
 }
 
+
+/* ═══════════════════════════════════════════
+   CÁMARA SCANNER
+═══════════════════════════════════════════ */
+.btn-camara{
+    width:100%;margin-top:8px;
+    padding:13px;border-radius:10px;
+    border:2px solid #334155;
+    background:#0f172a;color:#7eb8f7;
+    font-size:13px;font-weight:700;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;gap:8px;
+    transition:background .15s,border-color .15s;
+}
+.btn-camara:hover{ background:#1e293b; border-color:#3b82f6; color:#93c5fd; }
+.btn-camara:active{ transform:scale(.99); }
+
+/* Modal de cámara */
+#camaraModal{
+    display:none;
+    position:fixed;inset:0;
+    background:rgba(0,0,0,.92);
+    z-index:10000;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:16px;
+}
+#camaraModal.open{ display:flex; }
+
+.camara-dialog{
+    background:#1e293b;
+    border:1px solid #334155;
+    border-radius:16px;
+    overflow:hidden;
+    width:100%;
+    max-width:420px;
+    box-shadow:0 20px 60px rgba(0,0,0,.6);
+    animation:popup .2s ease;
+}
+.camara-hdr{
+    padding:14px 18px;
+    background:#0f172a;
+    border-bottom:1px solid #334155;
+    display:flex;align-items:center;justify-content:space-between;
+}
+.camara-hdr-title{
+    font-size:14px;font-weight:700;color:#f8fafc;
+    display:flex;align-items:center;gap:8px;
+}
+.camara-hdr-pulse{
+    width:8px;height:8px;border-radius:50%;background:#22c55e;
+    animation:pulse 1.4s infinite;flex-shrink:0;
+}
+.btn-camara-cerrar{
+    background:rgba(255,255,255,.08);border:1px solid #475569;
+    border-radius:7px;color:#94a3b8;
+    width:32px;height:32px;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    font-size:16px;transition:background .15s;
+}
+.btn-camara-cerrar:hover{ background:rgba(255,255,255,.16); color:#f8fafc; }
+
+/* Visor */
+#camaraVisor{
+    width:100%;
+    aspect-ratio:4/3;
+    background:#000;
+    position:relative;
+    overflow:hidden;
+}
+#camaraVisor video{ width:100% !important; height:100% !important; object-fit:cover; }
+
+/* Marco de escaneo */
+.scan-frame{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    pointer-events:none;
+}
+.scan-frame-inner{
+    width:65%;aspect-ratio:1;
+    border:3px solid #3b82f6;
+    border-radius:14px;
+    box-shadow:0 0 0 4000px rgba(0,0,0,.35);
+    position:relative;
+}
+.scan-line{
+    position:absolute;left:6px;right:6px;height:2px;
+    background:linear-gradient(90deg,transparent,#3b82f6,transparent);
+    border-radius:99px;
+    animation:scanLine 1.8s ease-in-out infinite;
+    top:50%;
+}
+@keyframes scanLine{
+    0%  { top:10%; opacity:.7; }
+    50% { top:88%; opacity:1;  }
+    100%{ top:10%; opacity:.7; }
+}
+
+/* Resultado detectado */
+.camara-result{
+    padding:12px 18px;
+    display:flex;align-items:center;gap:10px;
+    border-top:1px solid #334155;
+    min-height:52px;
+}
+.camara-result-code{
+    font-family:'Consolas',monospace;font-size:15px;font-weight:700;
+    color:#7eb8f7;flex:1;word-break:break-all;
+}
+.camara-result-placeholder{ color:#475569;font-size:12px;flex:1; }
+.camara-result-icon{ font-size:18px;flex-shrink:0; }
+
+/* Hint inferior */
+.camara-hint{
+    padding:10px 18px;text-align:center;
+    font-size:11px;color:#475569;border-top:1px solid #1e293b;
+    background:#0f172a;
+}
+
 </style>
 
 {{-- Fondo oscuro para toda la página --}}
@@ -298,6 +418,9 @@ opacity:1;
     <input type="text" id="scanner" class="scanner-input"
            placeholder="Escanea o escribe el código y presiona Enter..." autofocus>
     <div class="scanner-hint">⌨ Presiona <strong style="color:#94a3b8;">Enter</strong> para confirmar · El foco regresa automáticamente</div>
+    <button type="button" class="btn-camara" id="btnAbrirCamara">
+        📷 Escanear con cámara
+    </button>
 </div>
 
 {{-- Producto activo --}}
@@ -1085,6 +1208,140 @@ window.onload = () => {
     scanner.focus();
     actualizarBarra();
 };
+</script>
+
+
+
+<!-- ═══════════════════════════════════════════
+     MODAL CÁMARA SCANNER
+═══════════════════════════════════════════ -->
+<div id="camaraModal">
+    <div class="camara-dialog">
+
+        <div class="camara-hdr">
+            <div class="camara-hdr-title">
+                <span class="camara-hdr-pulse"></span>
+                Escáner de cámara
+            </div>
+            <button class="btn-camara-cerrar" id="btnCerrarCamara">✕</button>
+        </div>
+
+        <div id="camaraVisor">
+            <!-- html5-qrcode monta el video aquí -->
+            <div class="scan-frame">
+                <div class="scan-frame-inner">
+                    <div class="scan-line"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="camara-result" id="camaraResult">
+            <span class="camara-result-icon">📷</span>
+            <span class="camara-result-placeholder">Apunta al código de barras...</span>
+        </div>
+
+        <div class="camara-hint">
+            Encuadra el código en el marco azul · Se detecta automáticamente
+        </div>
+
+    </div>
+</div>
+
+<!-- Librería html5-qrcode (solo lectura de códigos de barras + QR) -->
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+(function(){
+    var html5QrCode = null;
+    var scannerInput = document.getElementById('scanner');
+    var modal        = document.getElementById('camaraModal');
+    var resultBox    = document.getElementById('camaraResult');
+    var lastCode     = '';
+    var cooldown     = false;
+
+    // Abrir modal y arrancar cámara
+    document.getElementById('btnAbrirCamara').addEventListener('click', function(){
+        modal.classList.add('open');
+        lastCode = '';
+        resultBox.innerHTML = '<span class="camara-result-icon">📷</span><span class="camara-result-placeholder">Apunta al código de barras...</span>';
+        startCamera();
+    });
+
+    // Cerrar
+    document.getElementById('btnCerrarCamara').addEventListener('click', function(){
+        stopCamera();
+        modal.classList.remove('open');
+        scannerInput.focus();
+    });
+
+    // Cerrar tocando el fondo oscuro
+    modal.addEventListener('click', function(e){
+        if(e.target === modal){
+            stopCamera();
+            modal.classList.remove('open');
+            scannerInput.focus();
+        }
+    });
+
+    function startCamera(){
+        if(html5QrCode) return;
+
+        html5QrCode = new Html5Qrcode('camaraVisor', { formatsToSupport: [
+            Html5QrcodeSupportedFormats.EAN_13,
+            Html5QrcodeSupportedFormats.EAN_8,
+            Html5QrcodeSupportedFormats.CODE_128,
+            Html5QrcodeSupportedFormats.CODE_39,
+            Html5QrcodeSupportedFormats.UPC_A,
+            Html5QrcodeSupportedFormats.UPC_E,
+            Html5QrcodeSupportedFormats.QR_CODE
+        ]});
+
+        html5QrCode.start(
+            { facingMode: 'environment' },   // cámara trasera
+            { fps: 12, qrbox: { width: 260, height: 260 }, aspectRatio: 1.333 },
+            onScanSuccess,
+            function(){}  // errores de frame — ignorar
+        ).catch(function(err){
+            resultBox.innerHTML = '<span class="camara-result-icon">⚠️</span><span class="camara-result-placeholder" style="color:#f87171;">No se pudo acceder a la cámara. Verifica los permisos.</span>';
+        });
+    }
+
+    function stopCamera(){
+        if(html5QrCode){
+            html5QrCode.stop().catch(function(){});
+            html5QrCode.clear();
+            html5QrCode = null;
+        }
+    }
+
+    function onScanSuccess(code){
+        if(cooldown || code === lastCode) return;
+        cooldown = true;
+        lastCode = code;
+
+        // Mostrar código detectado en el modal
+        resultBox.innerHTML =
+            '<span class="camara-result-icon">✅</span>' +
+            '<span class="camara-result-code">' + code + '</span>';
+
+        // Vibrar si el dispositivo lo soporta
+        if(navigator.vibrate) navigator.vibrate(80);
+
+        // Inyectar en el input del scanner existente y disparar Enter
+        scannerInput.value = code;
+        scannerInput.dispatchEvent(
+            new KeyboardEvent('keydown', { key:'Enter', bubbles:true, cancelable:true })
+        );
+
+        // Cerrar modal y devolver foco al scanner
+        setTimeout(function(){
+            stopCamera();
+            modal.classList.remove('open');
+            scannerInput.focus();
+            cooldown = false;
+        }, 600);
+    }
+
+})();
 </script>
 
 @endsection
