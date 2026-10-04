@@ -483,7 +483,48 @@ textarea.finput{
 
 
 <div class="pg">
+@if(session('success'))
+    <div style="
+        background:#f0fdf4;
+        border:1px solid #86efac;
+        color:#166534;
+        padding:10px 14px;
+        border-radius:4px;
+        margin-bottom:10px;
+        font-size:12px;
+        font-weight:600;
+    ">
+        ✓ {{ session('success') }}
+    </div>
+@endif
 
+
+@if($errors->any())
+    <div style="
+        background:#fef2f2;
+        border:1px solid #fecaca;
+        color:#991b1b;
+        padding:10px 14px;
+        border-radius:4px;
+        margin-bottom:10px;
+        font-size:12px;
+    ">
+
+        <strong>⚠ No se pudo guardar la orden</strong>
+
+        <ul style="
+            margin:6px 0 0 18px;
+            padding:0;
+        ">
+
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+
+        </ul>
+
+    </div>
+@endif
     {{-- HEADER --}}
     <div class="order-header">
 
@@ -532,128 +573,83 @@ textarea.finput{
 
                     <div class="panel-body">
 
-                        <div class="form-grid">
+                       <div class="form-grid">
 
-                            <div>
-                                <label class="flabel">
-                                    Planta
-                                </label>
+    <div>
+        <label class="flabel">
+            Planta
+        </label>
 
-                                <input
-                                    type="text"
-                                    name="planta"
-                                    class="finput"
-                                    placeholder="Ej. Dalsa"
-                                    value="{{ old('planta') }}"
-                                    required
-                                >
-                            </div>
-
-
-                            <div>
-                                <label class="flabel">
-                                    Fecha de solicitud
-                                </label>
-
-                                <input
-                                    type="date"
-                                    name="fecha_solicitud"
-                                    class="finput"
-                                    value="{{ old('fecha_solicitud', now()->format('Y-m-d')) }}"
-                                    required
-                                >
-                            </div>
+        <input
+            type="text"
+            name="planta"
+            class="finput"
+            placeholder="Ej. Dalsa"
+            value="{{ old('planta') }}"
+            required
+        >
+    </div>
 
 
-                            <div>
-                                <label class="flabel">
-                                    Fecha requerida
-                                </label>
+    <div>
+        <label class="flabel">
+            Fecha de solicitud
+        </label>
 
-                                <input
-                                    type="date"
-                                    name="fecha_requerida"
-                                    class="finput"
-                                    value="{{ old('fecha_requerida') }}"
-                                >
-                            </div>
-
-
-                            <div>
-                                <label class="flabel">
-                                    Cantidad de producción
-                                </label>
-
-                                <input
-                                    type="number"
-                                    step="0.01"
-                                    name="cantidad_produccion"
-                                    class="finput"
-                                    placeholder="Ej. 1000"
-                                    value="{{ old('cantidad_produccion') }}"
-                                >
-                            </div>
+        <input
+            type="date"
+            name="fecha_solicitud"
+            class="finput"
+            value="{{ old('fecha_solicitud', now()->format('Y-m-d')) }}"
+            required
+        >
+    </div>
 
 
-                            <div>
-                                <label class="flabel">
-                                    Producto
-                                </label>
-                <div>
-    <label class="flabel">
-        Producto
-    </label>
+    <div>
+        <label class="flabel">
+            Fecha requerida
+        </label>
 
-    <select
-        name="product_id"
-        class="finput"
+        <input
+            type="date"
+            name="fecha_requerida"
+            class="finput"
+            value="{{ old('fecha_requerida') }}"
     >
-        <option value="">
-            Seleccionar producto
-        </option>
-
-        @foreach($products as $product)
-                            <option
-                                value="{{ $product->id }}"
-                                {{ old('product_id') == $product->id ? 'selected' : '' }}
-                            >
-                                {{ $product->nombre }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+    </div>
 
 
-                            <div>
-                                <label class="flabel">
-                                    Lote
-                                </label>
+    <div>
+        <label class="flabel">
+            Lote
+        </label>
 
-                                <input
-                                    type="text"
-                                    name="lote"
-                                    class="finput"
-                                    placeholder="Ej. LOT-2026-001"
-                                    value="{{ old('lote') }}"
-                                >
-                            </div>
+        <input
+            type="text"
+            name="lote"
+            class="finput"
+            placeholder="Ej. LOT-2026-001"
+            value="{{ old('lote') }}"
+        >
+    </div>
 
 
-                            <div class="form-full">
+    <div class="form-full">
 
-                                <label class="flabel">
-                                    Observaciones
-                                </label>
+        <label class="flabel">
+            Observaciones
+        </label>
 
-                                <textarea
-                                    name="observaciones"
-                                    class="finput"
-                                    placeholder="Observaciones de la producción o del abastecimiento..."
-                                >{{ old('observaciones') }}</textarea>
+        <textarea
+            name="observaciones"
+            class="finput"
+            placeholder="Observaciones del abastecimiento..."
+        >{{ old('observaciones') }}</textarea>
 
-                            </div>
+    </div>
 
-                        </div>
+</div>
 
                     </div>
 
