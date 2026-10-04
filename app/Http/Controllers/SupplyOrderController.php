@@ -6,6 +6,7 @@ use App\Services\SupplyMaterialService;
 use App\Models\SupplyOrder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Services\SupplyDispatchService;
 
 class SupplyOrderController extends Controller
 {
@@ -293,5 +294,50 @@ public function createDispatch(SupplyOrder $supplyOrder)
         'supply-orders.dispatch',
         compact('supplyOrder')
     );
+}
+public function storeDispatch(
+    Request $request,
+    SupplyOrder $supplyOrder,
+    SupplyDispatchService $dispatchService
+) {
+    $request->validate([
+        'cantidades' => 'required|array',
+        'observaciones' => 'nullable|string|max:500',
+    ]);
+
+    try {
+
+        $salida = $dispatchService->registrar(
+            $supplyOrder,
+            $request->input('cantidades', []),
+            $request->input('observaciones')
+        );
+
+        return redirect()
+            ->route(
+                'supply-orders.show',
+                $supplyOrder
+            )
+            ->with(
+                'success',
+                "Salida {$salida->numero_salida} registrada correctamente."
+            );
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+
+        throw $e;
+
+    } catch (\Throwable $e) {
+
+        report($e);
+
+        return back()
+            ->withInput()
+            ->withErrors([
+                'error' =>
+                    'No se pudo registrar la salida: '
+                    . $e->getMessage()
+            ]);
+    }
 }
 }

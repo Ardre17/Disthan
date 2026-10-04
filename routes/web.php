@@ -39,6 +39,11 @@ use App\Http\Controllers\ProductionOutputController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplyOrderController;
 
+Route::post(
+    '/supply-orders/{supplyOrder}/dispatch',
+    [SupplyOrderController::class, 'storeDispatch']
+)->name('supply-orders.dispatch.store');
+
 Route::get(
     '/supply-orders/{supplyOrder}/dispatch',
     [SupplyOrderController::class, 'createDispatch']
