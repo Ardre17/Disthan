@@ -602,7 +602,7 @@ textarea.finput{
 
                                 <input
                                     type="text"
-                                    name="producto_produccion"
+                                    name="product_id"
                                     class="finput"
                                     placeholder="Producto a producir"
                                     value="{{ old('producto_produccion') }}"

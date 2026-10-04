@@ -40,6 +40,16 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplyOrderController;
 
 Route::get(
+    '/supply-orders/create',
+    [SupplyOrderController::class, 'create']
+)->name('supply-orders.create');
+
+Route::post(
+    '/supply-orders',
+    [SupplyOrderController::class, 'store']
+)->name('supply-orders.store');
+
+Route::get(
     '/supply-orders/materials',
     [SupplyOrderController::class, 'materials']
 )->name('supply-orders.materials');
