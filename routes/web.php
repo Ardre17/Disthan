@@ -50,6 +50,11 @@ Route::post(
 )->name('supply-orders.store');
 
 Route::get(
+    '/supply-orders',
+    [SupplyOrderController::class, 'index']
+)->name('supply-orders.index');
+
+Route::get(
     '/supply-orders/materials',
     [SupplyOrderController::class, 'materials']
 )->name('supply-orders.materials');

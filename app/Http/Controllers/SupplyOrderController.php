@@ -130,4 +130,85 @@ class SupplyOrderController extends Controller
 
     }
 }
+public function index(Request $request)
+{
+    $query = SupplyOrder::with([
+        'items.dispatchItems'
+    ]);
+
+    // Buscar por número de orden o planta
+    if ($request->filled('search')) {
+        $search = $request->search;
+
+        $query->where(function ($q) use ($search) {
+            $q->where('numero_orden', 'ILIKE', "%{$search}%")
+              ->orWhere('planta', 'ILIKE', "%{$search}%");
+        });
+    }
+
+    // Filtro por estado
+    if ($request->filled('estado')) {
+        $query->where('estado', $request->estado);
+    }
+
+    // Filtro por planta
+    if ($request->filled('planta')) {
+        $query->where('planta', $request->planta);
+    }
+
+    // Filtro fecha desde
+    if ($request->filled('fecha_desde')) {
+        $query->whereDate(
+            'fecha_solicitud',
+            '>=',
+            $request->fecha_desde
+        );
+    }
+
+    // Filtro fecha hasta
+    if ($request->filled('fecha_hasta')) {
+        $query->whereDate(
+            'fecha_solicitud',
+            '<=',
+            $request->fecha_hasta
+        );
+    }
+
+    $ordenes = $query
+        ->orderByDesc('id')
+        ->paginate(15)
+        ->withQueryString();
+
+
+    // KPIs
+    $pendientes = SupplyOrder::where('estado', 'PENDIENTE')->count();
+
+    $parciales = SupplyOrder::where('estado', 'PARCIAL')->count();
+
+    $completadas = SupplyOrder::where('estado', 'COMPLETADA')->count();
+
+    $salidasHoy = \App\Models\SupplyDispatch::whereDate(
+        'fecha_salida',
+        today()
+    )->count();
+
+
+    // Plantas para el filtro
+    $plantas = SupplyOrder::query()
+        ->whereNotNull('planta')
+        ->select('planta')
+        ->distinct()
+        ->orderBy('planta')
+        ->pluck('planta');
+
+
+    return view('supply-orders.index', compact(
+        'ordenes',
+        'pendientes',
+        'parciales',
+        'completadas',
+        'salidasHoy',
+        'plantas'
+    ));
+}
 }
