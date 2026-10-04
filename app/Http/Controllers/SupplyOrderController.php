@@ -93,7 +93,9 @@ public function store(Request $request)
 }
     public function create()
 {
-    return view('supply-orders.create');
+    $products = \App\Models\Product::orderBy('nombre')->get();
+
+    return view('supply-orders.create', compact('products'));
 }
 
     public function materials(
