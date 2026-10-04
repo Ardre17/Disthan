@@ -40,6 +40,11 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplyOrderController;
 
 Route::get(
+    '/supply-orders/{supplyOrder}/dispatch',
+    [SupplyOrderController::class, 'createDispatch']
+)->name('supply-orders.dispatch.create');
+
+Route::get(
     '/supply-orders/create',
     [SupplyOrderController::class, 'create']
 )->name('supply-orders.create');
@@ -53,6 +58,15 @@ Route::get(
     '/supply-orders',
     [SupplyOrderController::class, 'index']
 )->name('supply-orders.index');
+Route::get(
+    '/supply-orders/{supplyOrder}',
+    [SupplyOrderController::class, 'show']
+)->name('supply-orders.show');
+
+Route::delete(
+    '/supply-orders/{supplyOrder}',
+    [SupplyOrderController::class, 'destroy']
+)->name('supply-orders.destroy');
 
 Route::get(
     '/supply-orders/materials',

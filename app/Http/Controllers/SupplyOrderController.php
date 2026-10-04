@@ -211,4 +211,87 @@ public function index(Request $request)
         'plantas'
     ));
 }
+public function show(SupplyOrder $supplyOrder)
+{
+    $supplyOrder->load([
+        'items.dispatchItems.dispatch',
+        'user',
+    ]);
+
+    return view(
+        'supply-orders.show',
+        compact('supplyOrder')
+    );
+}
+public function destroy(SupplyOrder $supplyOrder)
+{
+    /*
+    |--------------------------------------------------------------------------
+    | No permitir eliminar órdenes que ya tengan salidas
+    |--------------------------------------------------------------------------
+    */
+
+    if ($supplyOrder->dispatches()->exists()) {
+
+        return back()->withErrors([
+            'error' => 'No se puede eliminar esta orden porque ya tiene salidas registradas.'
+        ]);
+
+    }
+
+
+    DB::beginTransaction();
+
+    try {
+
+        $numeroOrden = $supplyOrder->numero_orden;
+
+        /*
+        |--------------------------------------------------------------------------
+        | Eliminar materiales de la orden
+        |--------------------------------------------------------------------------
+        */
+
+        $supplyOrder->items()->delete();
+
+        /*
+        |--------------------------------------------------------------------------
+        | Eliminar orden
+        |--------------------------------------------------------------------------
+        */
+
+        $supplyOrder->delete();
+
+        DB::commit();
+
+
+        return redirect()
+            ->route('supply-orders.index')
+            ->with(
+                'success',
+                "La orden {$numeroOrden} fue eliminada correctamente."
+            );
+
+
+    } catch (\Throwable $e) {
+
+        DB::rollBack();
+
+        return back()->withErrors([
+            'error' => 'No se pudo eliminar la orden: ' . $e->getMessage()
+        ]);
+
+    }
+}
+public function createDispatch(SupplyOrder $supplyOrder)
+{
+    $supplyOrder->load([
+        'items.dispatchItems'
+    ]);
+
+    return view(
+        'supply-orders.dispatch',
+        compact('supplyOrder')
+    );
+}
 }

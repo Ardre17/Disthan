@@ -929,18 +929,76 @@
                             @endif
 
                         </td>
+                            <td>
+
+    <div style="
+        display:flex;
+        align-items:center;
+        gap:5px;
+    ">
+
+        <a
+            href="{{ route('supply-orders.show', $orden) }}"
+            class="btn-view"
+        >
+            Ver detalle
+        </a>
 
 
-                        <td>
+        @if($orden->dispatches->count() === 0)
 
-                            <a
-                                href="#"
-                                class="btn-view"
-                            >
-                                Ver detalle
-                            </a>
+            <form
+                method="POST"
+                action="{{ route('supply-orders.destroy', $orden) }}"
+                onsubmit="return confirm(
+                    '¿Estás seguro de eliminar la orden {{ $orden->numero_orden }}? Esta acción no se puede deshacer.'
+                );"
+            >
 
-                        </td>
+                @csrf
+                @method('DELETE')
+
+                <button
+                    type="submit"
+                    style="
+                        background:#fee2e2;
+                        color:#b91c1c;
+                        border:1px solid #fecaca;
+                        border-radius:3px;
+                        padding:5px 8px;
+                        font-size:10px;
+                        font-weight:600;
+                        cursor:pointer;
+                    "
+                >
+                    🗑 Eliminar
+                </button>
+
+            </form>
+
+        @else
+
+            <span
+                title="No se puede eliminar porque tiene salidas registradas"
+                style="
+                    background:#f1f5f9;
+                    color:#94a3b8;
+                    border:1px solid #e2e8f0;
+                    border-radius:3px;
+                    padding:5px 7px;
+                    font-size:10px;
+                    cursor:not-allowed;
+                "
+            >
+                🔒
+
+            </span>
+
+        @endif
+
+    </div>
+
+</td>
 
                     </tr>
 
