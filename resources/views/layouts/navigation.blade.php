@@ -650,6 +650,11 @@ $t = $temas[$seccionActiva];
                     <a href="/orders">
                         <span class="sb-icon">📋</span><span>Órdenes</span>
                     </a>
+                    <a href="{{ route('supply-orders.create') }}"
+                    class="{{ request()->routeIs('supply-orders.*') ? 'active' : '' }}">
+                        <span class="sb-icon">🚚</span>
+                        <span>Abastecimiento a Plantas</span>
+                    </a>
                     <a href="/historial">
                         <span class="sb-icon">📚</span><span>Historial</span>
                     </a>

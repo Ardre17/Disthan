@@ -37,6 +37,12 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\OrderValidationController;
 use App\Http\Controllers\ProductionOutputController;
 use App\Http\Controllers\ReportController;
+use App\Http\Controllers\SupplyOrderController;
+
+Route::get(
+    '/supply-orders/materials',
+    [SupplyOrderController::class, 'materials']
+)->name('supply-orders.materials');
 
 Route::get(
     '/orders/import-pdf/product-search',
@@ -197,6 +203,16 @@ Route::get('orders/{order}/carta-calidad', [OrderController::class, 'cartaCalida
      ->name('orders.cartaCalidad');
 
 Route::middleware(['auth'])->group(function () {
+
+    Route::get(
+        '/supply-orders/materials',
+        [SupplyOrderController::class, 'materials']
+    )->name('supply-orders.materials');
+
+    Route::get(
+        '/supply-orders/create',
+        [SupplyOrderController::class, 'create']
+    )->name('supply-orders.create');
 
     Route::get('/reportes/movimientos', [ReportController::class, 'movimientos'])
     ->name('reports.movimientos');
