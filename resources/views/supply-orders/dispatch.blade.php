@@ -1,6 +1,6 @@
-<x-app-layout>
+@extends('layouts.app')
 
-    <x-slot name="header">
+@section('content')
         <div style="display:flex; align-items:center; justify-content:space-between; gap:20px;">
             <div>
                 <h2 style="margin:0; font-size:1.5rem; font-weight:800; color:#e5f7ff;">
@@ -26,7 +26,7 @@
                 ← Volver al detalle
             </a>
         </div>
-    </x-slot>
+
 
 
     {{-- CONTENIDO --}}
@@ -643,5 +643,4 @@
         });
 
     </script>
-
-</x-app-layout>
+@endsection
