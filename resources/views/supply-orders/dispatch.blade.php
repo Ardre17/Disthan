@@ -1,636 +1,647 @@
-@extends('layouts.app')
-
-@section('content')
-
-<style>
-    * {
-        box-sizing: border-box;
-    }
-
-    .supply-page {
-        min-height: 100vh;
-        background:
-            radial-gradient(circle at top right, rgba(6,182,212,.08), transparent 30%),
-            linear-gradient(135deg, #07111f 0%, #0a1628 50%, #0b1d2d 100%);
-        padding: 28px;
-        color: #dbeafe;
-    }
-
-    .supply-container {
-        max-width: 1400px;
-        margin: 0 auto;
-    }
-
-    /* HEADER */
-
-    .page-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 20px;
-        margin-bottom: 24px;
-    }
-
-    .header-left {
-        display: flex;
-        align-items: center;
-        gap: 14px;
-    }
-
-    .header-icon {
-        width: 52px;
-        height: 52px;
-        border-radius: 14px;
-        background: linear-gradient(135deg, #06b6d4, #0891b2);
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 25px;
-        box-shadow: 0 10px 30px rgba(6,182,212,.2);
-    }
-
-    .page-title {
-        margin: 0;
-        font-size: 26px;
-        font-weight: 800;
-        color: #f8fafc;
-    }
-
-    .page-subtitle {
-        margin: 4px 0 0;
-        color: #7892ad;
-        font-size: 13px;
-    }
-
-    .btn-back {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 10px 16px;
-        border-radius: 9px;
-        border: 1px solid rgba(255,255,255,.08);
-        background: rgba(255,255,255,.04);
-        color: #b8cbe0;
-        text-decoration: none;
-        font-size: 13px;
-        font-weight: 600;
-        transition: .2s;
-    }
-
-    .btn-back:hover {
-        background: rgba(6,182,212,.12);
-        color: #67e8f9;
-        border-color: rgba(6,182,212,.3);
-    }
-
-    /* INFO PRINCIPAL */
-
-    .order-info {
-        display: grid;
-        grid-template-columns: 1.4fr 1fr 1fr 1fr;
-        gap: 14px;
-        margin-bottom: 20px;
-    }
-
-    .info-card {
-        background: rgba(10,25,42,.82);
-        border: 1px solid rgba(255,255,255,.07);
-        border-radius: 13px;
-        padding: 16px;
-        box-shadow: 0 8px 25px rgba(0,0,0,.15);
-    }
-
-    .info-label {
-        color: #64809e;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: .06em;
-        margin-bottom: 6px;
-    }
-
-    .info-value {
-        color: #f1f5f9;
-        font-size: 15px;
-        font-weight: 700;
-    }
-
-    .info-value.accent {
-        color: #67e8f9;
-    }
-
-    /* PROGRESO */
-
-    .progress-card {
-        background: rgba(10,25,42,.82);
-        border: 1px solid rgba(255,255,255,.07);
-        border-radius: 13px;
-        padding: 18px;
-        margin-bottom: 20px;
-    }
-
-    .progress-top {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 10px;
-    }
-
-    .progress-title {
-        font-size: 13px;
-        font-weight: 700;
-        color: #dbeafe;
-    }
-
-    .progress-percent {
-        color: #67e8f9;
-        font-weight: 800;
-        font-size: 14px;
-    }
-
-    .progress-bar {
-        height: 9px;
-        background: rgba(255,255,255,.07);
-        border-radius: 99px;
-        overflow: hidden;
-    }
-
-    .progress-fill {
-        height: 100%;
-        background: linear-gradient(90deg, #06b6d4, #22d3ee);
-        border-radius: 99px;
-        transition: width .3s ease;
-    }
-
-    /* ALERTAS */
-
-    .alert-box {
-        border-radius: 10px;
-        padding: 12px 15px;
-        margin-bottom: 18px;
-        font-size: 13px;
-    }
-
-    .alert-error {
-        background: rgba(239,68,68,.1);
-        border: 1px solid rgba(239,68,68,.25);
-        color: #fca5a5;
-    }
-
-    .alert-success {
-        background: rgba(34,197,94,.1);
-        border: 1px solid rgba(34,197,94,.25);
-        color: #86efac;
-    }
-
-    /* TABLA */
-
-    .materials-card {
-        background: rgba(8,22,37,.9);
-        border: 1px solid rgba(255,255,255,.07);
-        border-radius: 15px;
-        overflow: hidden;
-        box-shadow: 0 12px 35px rgba(0,0,0,.18);
-    }
-
-    .card-header {
-        padding: 18px 20px;
-        border-bottom: 1px solid rgba(255,255,255,.06);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .card-title {
-        color: #f1f5f9;
-        font-size: 15px;
-        font-weight: 800;
-    }
-
-    .card-description {
-        color: #607b98;
-        font-size: 11px;
-        margin-top: 3px;
-    }
-
-    .table-wrapper {
-        overflow-x: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-        min-width: 760px;
-    }
-
-    th {
-        background: rgba(255,255,255,.025);
-        color: #6683a0;
-        font-size: 10px;
-        text-transform: uppercase;
-        letter-spacing: .06em;
-        text-align: left;
-        padding: 12px 16px;
-        border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-
-    td {
-        padding: 14px 16px;
-        border-bottom: 1px solid rgba(255,255,255,.045);
-        color: #c7d8ea;
-        font-size: 13px;
-        vertical-align: middle;
-    }
-
-    tbody tr {
-        transition: background .15s;
-    }
-
-    tbody tr:hover {
-        background: rgba(6,182,212,.035);
-    }
-
-    .material-name {
-        color: #f1f5f9;
-        font-weight: 700;
-    }
-
-    .material-detail {
-        color: #66819c;
-        font-size: 11px;
-        margin-top: 3px;
-    }
-
-    .badge {
-        display: inline-flex;
-        align-items: center;
-        padding: 4px 9px;
-        border-radius: 99px;
-        font-size: 10px;
-        font-weight: 800;
-        letter-spacing: .03em;
-    }
-
-    .badge-label {
-        background: rgba(59,130,246,.12);
-        color: #93c5fd;
-    }
-
-    .badge-sticker {
-        background: rgba(168,85,247,.12);
-        color: #d8b4fe;
-    }
-
-    .badge-precinto {
-        background: rgba(245,158,11,.12);
-        color: #fcd34d;
-    }
-
-    .badge-caja {
-        background: rgba(34,197,94,.12);
-        color: #86efac;
-    }
-
-    .number {
-        font-family: Consolas, monospace;
-        font-weight: 700;
-    }
-
-    .stock-ok {
-        color: #86efac;
-    }
-
-    .stock-low {
-        color: #fcd34d;
-    }
-
-    .stock-danger {
-        color: #fca5a5;
-    }
-
-    .pending {
-        color: #67e8f9;
-        font-weight: 800;
-    }
-
-    .quantity-input {
-        width: 120px;
-        padding: 9px 11px;
-        border-radius: 8px;
-        border: 1px solid rgba(255,255,255,.1);
-        background: rgba(255,255,255,.045);
-        color: #f8fafc;
-        outline: none;
-        font-family: Consolas, monospace;
-        font-weight: 700;
-        text-align: center;
-        transition: .2s;
-    }
-
-    .quantity-input:focus {
-        border-color: #06b6d4;
-        box-shadow: 0 0 0 3px rgba(6,182,212,.1);
-    }
-
-    .quantity-input.invalid {
-        border-color: #ef4444;
-        background: rgba(239,68,68,.08);
-    }
-
-    .input-help {
-        display: block;
-        margin-top: 4px;
-        color: #59748f;
-        font-size: 10px;
-    }
-
-    /* FOOTER FORM */
-
-    .dispatch-footer {
-        margin-top: 20px;
-        display: grid;
-        grid-template-columns: 1fr auto;
-        gap: 20px;
-        align-items: end;
-    }
-
-    .observations {
-        background: rgba(10,25,42,.82);
-        border: 1px solid rgba(255,255,255,.07);
-        border-radius: 13px;
-        padding: 16px;
-    }
-
-    .field-label {
-        display: block;
-        color: #8ca6c0;
-        font-size: 11px;
-        font-weight: 700;
-        margin-bottom: 7px;
-    }
-
-    .textarea {
-        width: 100%;
-        min-height: 90px;
-        resize: vertical;
-        background: rgba(255,255,255,.035);
-        border: 1px solid rgba(255,255,255,.08);
-        border-radius: 8px;
-        color: #e2e8f0;
-        padding: 11px;
-        outline: none;
-        font-family: inherit;
-    }
-
-    .textarea:focus {
-        border-color: #06b6d4;
-    }
-
-    .dispatch-summary {
-        min-width: 300px;
-        background: rgba(6,182,212,.06);
-        border: 1px solid rgba(6,182,212,.16);
-        border-radius: 13px;
-        padding: 16px;
-    }
-
-    .summary-title {
-        color: #67e8f9;
-        font-size: 11px;
-        text-transform: uppercase;
-        letter-spacing: .06em;
-        font-weight: 800;
-        margin-bottom: 12px;
-    }
-
-    .summary-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        padding: 6px 0;
-        color: #8ba5bd;
-        font-size: 12px;
-    }
-
-    .summary-row strong {
-        color: #f1f5f9;
-        font-family: Consolas, monospace;
-    }
-
-    .btn-submit {
-        width: 100%;
-        margin-top: 14px;
-        padding: 12px 18px;
-        border: none;
-        border-radius: 9px;
-        background: linear-gradient(135deg, #0891b2, #06b6d4);
-        color: white;
-        font-weight: 800;
-        font-size: 13px;
-        cursor: pointer;
-        transition: .2s;
-        box-shadow: 0 7px 20px rgba(6,182,212,.18);
-    }
-
-    .btn-submit:hover {
-        transform: translateY(-1px);
-        box-shadow: 0 10px 25px rgba(6,182,212,.25);
-    }
-
-    .btn-submit:disabled {
-        opacity: .45;
-        cursor: not-allowed;
-        transform: none;
-    }
-
-    /* RESPONSIVE */
-
-    @media(max-width: 900px) {
-
-        .supply-page {
-            padding: 18px;
-        }
-
-        .order-info {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .dispatch-footer {
-            grid-template-columns: 1fr;
-        }
-
-        .dispatch-summary {
-            min-width: 0;
-        }
-    }
-
-    @media(max-width: 600px) {
-
-        .page-header {
-            flex-direction: column;
-        }
-
-        .order-info {
-            grid-template-columns: 1fr;
-        }
-
-        .page-title {
-            font-size: 21px;
-        }
-    }
-</style>
-
-
-<div class="supply-page">
-
-    <div class="supply-container">
-
-        {{-- ================================================= --}}
-        {{-- HEADER --}}
-        {{-- ================================================= --}}
-
-        <div class="page-header">
-
-            <div class="header-left">
-
-                <div class="header-icon">
-                    🚚
-                </div>
-
-                <div>
-                    <h1 class="page-title">
-                        Registrar salida
-                    </h1>
-
-                    <p class="page-subtitle">
-                        Registra los suministros que serán enviados a la planta.
-                    </p>
-                </div>
-
+<x-app-layout>
+
+    <x-slot name="header">
+        <div style="display:flex; align-items:center; justify-content:space-between; gap:20px;">
+            <div>
+                <h2 style="margin:0; font-size:1.5rem; font-weight:800; color:#e5f7ff;">
+                    🚚 Registrar salida
+                </h2>
+
+                <p style="margin:5px 0 0; color:#8da5b8; font-size:0.85rem;">
+                    Registra los suministros que serán enviados a la planta.
+                </p>
             </div>
 
-
-            <a
-                href="{{ route('supply-orders.show', $supplyOrder) }}"
-                class="btn-back"
-            >
+            <a href="{{ route('supply-orders.show', $supplyOrder) }}"
+               style="
+                    text-decoration:none;
+                    color:#d7e9f4;
+                    background:#102235;
+                    border:1px solid #20384d;
+                    padding:10px 16px;
+                    border-radius:10px;
+                    font-size:0.85rem;
+                    font-weight:700;
+               ">
                 ← Volver al detalle
             </a>
-
         </div>
+    </x-slot>
 
 
-        {{-- ================================================= --}}
-        {{-- MENSAJES --}}
-        {{-- ================================================= --}}
+    {{-- CONTENIDO --}}
+    <div style="
+        width:100%;
+        max-width:1400px;
+        margin:0 auto;
+        padding:24px;
+        box-sizing:border-box;
+    ">
 
-        @if(session('success'))
-
-            <div class="alert-box alert-success">
-                ✓ {{ session('success') }}
-            </div>
-
-        @endif
-
-
+        {{-- ERRORES --}}
         @if($errors->any())
+            <div style="
+                background:#3b1116;
+                border:1px solid #7f1d1d;
+                color:#fecaca;
+                padding:15px 18px;
+                border-radius:12px;
+                margin-bottom:20px;
+            ">
+                <strong>⚠ No se pudo registrar la salida</strong>
 
-            <div class="alert-box alert-error">
-
-                <strong>Revisa la información:</strong>
-
-                <ul style="margin:7px 0 0 18px;">
-
+                <ul style="margin:8px 0 0 18px;">
                     @foreach($errors->all() as $error)
-
                         <li>{{ $error }}</li>
-
                     @endforeach
-
                 </ul>
-
             </div>
-
         @endif
 
 
-        {{-- ================================================= --}}
         {{-- INFORMACIÓN DE LA ORDEN --}}
-        {{-- ================================================= --}}
+        <div style="
+            display:grid;
+            grid-template-columns:repeat(4, minmax(0,1fr));
+            gap:14px;
+            margin-bottom:22px;
+        ">
 
-        <div class="order-info">
-
-            <div class="info-card">
-
-                <div class="info-label">
-                    Orden de abastecimiento
-                </div>
-
-                <div class="info-value accent">
+            <div class="supply-info-card">
+                <span>ORDEN DE ABASTECIMIENTO</span>
+                <strong>
                     {{ $supplyOrder->numero_orden }}
-                </div>
-
+                </strong>
             </div>
 
-
-            <div class="info-card">
-
-                <div class="info-label">
-                    Planta
-                </div>
-
-                <div class="info-value">
+            <div class="supply-info-card">
+                <span>PLANTA</span>
+                <strong>
                     {{ $supplyOrder->planta }}
-                </div>
-
+                </strong>
             </div>
 
-
-            <div class="info-card">
-
-                <div class="info-label">
-                    Fecha requerida
-                </div>
-
-                <div class="info-value">
-
-                    @if($supplyOrder->fecha_requerida)
-
-                        {{ $supplyOrder->fecha_requerida->format('d/m/Y') }}
-
-                    @else
-
-                        —
-
-                    @endif
-
-                </div>
-
+            <div class="supply-info-card">
+                <span>FECHA REQUERIDA</span>
+                <strong>
+                    {{ $supplyOrder->fecha_requerida
+                        ? $supplyOrder->fecha_requerida->format('d/m/Y')
+                        : '—'
+                    }}
+                </strong>
             </div>
 
-
-            <div class="info-card">
-
-                <div class="info-label">
-                    Estado
-                </div>
-
-                <div class="info-value accent">
+            <div class="supply-info-card">
+                <span>ESTADO</span>
+                <strong class="estado-text">
                     {{ $supplyOrder->estado }}
-                </div>
-
+                </strong>
             </div>
 
         </div>
 
 
-        {{-- ================================================= --}}
-        {{-- PROGRESO --}}
-        {{-- ================================================= --}}
-
+        {{-- CALCULAR TOTALES --}}
         @php
-
             $totalSolicitado = 0;
             $totalEntregado = 0;
+            $totalPendiente = 0;
 
-            foreach($supplyOrder->items as $item)
+            foreach ($supplyOrder->items as $item) {
+                $totalSolicitado += (float) $item->cantidad_solicitada;
+                $totalEntregado += (float) $item->cantidad_entregada;
+                $totalPendiente += (float) $item->cantidad_pendiente;
+            }
+
+            $porcentaje = $totalSolicitado > 0
+                ? round(($totalEntregado / $totalSolicitado) * 100, 1)
+                : 0;
+        @endphp
+
+
+        {{-- RESUMEN --}}
+        <div style="
+            background:#081827;
+            border:1px solid #142d40;
+            border-radius:16px;
+            padding:20px;
+            margin-bottom:22px;
+        ">
+
+            <div style="
+                display:flex;
+                justify-content:space-between;
+                align-items:center;
+                margin-bottom:12px;
+            ">
+                <div>
+                    <div style="
+                        color:#91a8ba;
+                        font-size:0.75rem;
+                        font-weight:700;
+                        text-transform:uppercase;
+                    ">
+                        Progreso de entrega
+                    </div>
+
+                    <div style="
+                        color:#e8f5fb;
+                        font-size:1.6rem;
+                        font-weight:800;
+                        margin-top:4px;
+                    ">
+                        {{ $porcentaje }}%
+                    </div>
+                </div>
+
+                <div style="text-align:right;">
+                    <div style="color:#7f9aae; font-size:0.8rem;">
+                        Entregado
+                    </div>
+
+                    <strong style="color:#55d6e8;">
+                        {{ number_format($totalEntregado, 2) }}
+                    </strong>
+
+                    <span style="color:#688094;">
+                        /
+                    </span>
+
+                    <strong style="color:#dbeaf2;">
+                        {{ number_format($totalSolicitado, 2) }}
+                    </strong>
+                </div>
+            </div>
+
+
+            <div style="
+                height:9px;
+                background:#10283a;
+                border-radius:20px;
+                overflow:hidden;
+            ">
+                <div style="
+                    width:{{ min(100, $porcentaje) }}%;
+                    height:100%;
+                    background:linear-gradient(90deg,#0891b2,#22d3ee);
+                    border-radius:20px;
+                "></div>
+            </div>
+
+            <div style="
+                margin-top:9px;
+                color:#7891a4;
+                font-size:0.8rem;
+            ">
+                Pendiente:
+                <strong style="color:#fbbf24;">
+                    {{ number_format($totalPendiente, 2) }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        {{-- FORMULARIO --}}
+        <form method="POST"
+              action="{{ route('supply-orders.dispatch.store', $supplyOrder) }}">
+
+            @csrf
+
+            <div style="
+                background:#081827;
+                border:1px solid #142d40;
+                border-radius:16px;
+                overflow:hidden;
+            ">
+
+                {{-- CABECERA --}}
+                <div style="
+                    padding:20px 22px;
+                    border-bottom:1px solid #142d40;
+                ">
+
+                    <h3 style="
+                        margin:0;
+                        color:#e5f5fb;
+                        font-size:1.05rem;
+                        font-weight:800;
+                    ">
+                        📦 Suministros a enviar
+                    </h3>
+
+                    <p style="
+                        margin:5px 0 0;
+                        color:#728b9e;
+                        font-size:0.8rem;
+                    ">
+                        Ingresa solamente las cantidades que saldrán en esta entrega.
+                        Puedes realizar entregas parciales.
+                    </p>
+
+                </div>
+
+
+                {{-- TABLA --}}
+                <div style="overflow-x:auto;">
+
+                    <table style="
+                        width:100%;
+                        border-collapse:collapse;
+                        min-width:900px;
+                    ">
+
+                        <thead>
+                            <tr style="background:#0b1d2d;">
+
+                                <th class="supply-th">
+                                    SUMINISTRO
+                                </th>
+
+                                <th class="supply-th">
+                                    SOLICITADO
+                                </th>
+
+                                <th class="supply-th">
+                                    ENTREGADO
+                                </th>
+
+                                <th class="supply-th">
+                                    PENDIENTE
+                                </th>
+
+                                <th class="supply-th">
+                                    STOCK ACTUAL
+                                </th>
+
+                                <th class="supply-th">
+                                    CANTIDAD A ENVIAR
+                                </th>
+
+                            </tr>
+                        </thead>
+
+
+                        <tbody>
+
+                            @forelse($supplyOrder->items as $item)
+
+                                @php
+                                    $materialService = app(\App\Services\SupplyMaterialService::class);
+
+                                    $material = $materialService->find(
+                                        $item->tipo_material,
+                                        $item->material_id
+                                    );
+
+                                    $solicitado = (float) $item->cantidad_solicitada;
+                                    $entregado = (float) $item->cantidad_entregada;
+                                    $pendiente = (float) $item->cantidad_pendiente;
+
+                                    $stock = $material
+                                        ? (float) ($material['stock'] ?? 0)
+                                        : 0;
+
+                                    $stockMinimo = $material
+                                        ? (float) ($material['stock_minimo'] ?? 0)
+                                        : 0;
+
+                                    $stockBajo = $stock <= $stockMinimo;
+                                @endphp
+
+                                <tr style="border-top:1px solid #142d40;">
+
+                                    {{-- MATERIAL --}}
+                                    <td style="padding:17px 18px;">
+
+                                        <div style="
+                                            color:#e3f1f7;
+                                            font-weight:800;
+                                        ">
+                                            {{ $material['nombre'] ?? 'Material no encontrado' }}
+                                        </div>
+
+                                        <div style="
+                                            margin-top:4px;
+                                            color:#71899b;
+                                            font-size:0.75rem;
+                                        ">
+                                            {{ $item->tipo_material }}
+                                            · ID {{ $item->material_id }}
+                                        </div>
+
+                                    </td>
+
+
+                                    {{-- SOLICITADO --}}
+                                    <td class="supply-number">
+                                        {{ number_format($solicitado, 2) }}
+                                    </td>
+
+
+                                    {{-- ENTREGADO --}}
+                                    <td class="supply-number">
+                                        {{ number_format($entregado, 2) }}
+                                    </td>
+
+
+                                    {{-- PENDIENTE --}}
+                                    <td>
+                                        <span style="
+                                            display:inline-block;
+                                            padding:5px 9px;
+                                            border-radius:7px;
+                                            background:#3b2b0b;
+                                            color:#fbbf24;
+                                            font-weight:800;
+                                            font-size:0.8rem;
+                                        ">
+                                            {{ number_format($pendiente, 2) }}
+                                        </span>
+                                    </td>
+
+
+                                    {{-- STOCK --}}
+                                    <td>
+
+                                        <span style="
+                                            color:{{ $stockBajo ? '#fb7185' : '#67e8f9' }};
+                                            font-weight:800;
+                                        ">
+                                            {{ number_format($stock, 2) }}
+                                        </span>
+
+                                        @if($stockBajo)
+                                            <div style="
+                                                color:#fb7185;
+                                                font-size:0.7rem;
+                                                margin-top:3px;
+                                            ">
+                                                ⚠ Stock bajo
+                                            </div>
+                                        @endif
+
+                                    </td>
+
+
+                                    {{-- CANTIDAD --}}
+                                    <td style="padding:14px 18px;">
+
+                                        @if($pendiente > 0)
+
+                                            <input
+                                                type="number"
+                                                name="cantidades[{{ $item->id }}]"
+                                                min="0"
+                                                max="{{ $pendiente }}"
+                                                step="0.01"
+                                                value="0"
+                                                class="cantidad-salida"
+                                                data-pendiente="{{ $pendiente }}"
+                                                style="
+                                                    width:150px;
+                                                    background:#0d2233;
+                                                    color:#e8f7fc;
+                                                    border:1px solid #24445a;
+                                                    border-radius:9px;
+                                                    padding:10px 12px;
+                                                    font-size:0.95rem;
+                                                    font-weight:700;
+                                                    outline:none;
+                                                "
+                                            >
+
+                                            <div style="
+                                                margin-top:5px;
+                                                color:#627c90;
+                                                font-size:0.7rem;
+                                            ">
+                                                Máximo:
+                                                {{ number_format($pendiente, 2) }}
+                                            </div>
+
+                                        @else
+
+                                            <span style="
+                                                color:#4ade80;
+                                                font-weight:800;
+                                                font-size:0.8rem;
+                                            ">
+                                                ✓ Completo
+                                            </span>
+
+                                            <input
+                                                type="hidden"
+                                                name="cantidades[{{ $item->id }}]"
+                                                value="0"
+                                            >
+
+                                        @endif
+
+                                    </td>
+
+                                </tr>
+
+                            @empty
+
+                                <tr>
+                                    <td colspan="6"
+                                        style="
+                                            padding:50px;
+                                            text-align:center;
+                                            color:#71899b;
+                                        ">
+                                        No hay suministros registrados en esta orden.
+                                    </td>
+                                </tr>
+
+                            @endforelse
+
+                        </tbody>
+
+                    </table>
+
+                </div>
+
+
+                {{-- OBSERVACIONES --}}
+                <div style="
+                    padding:20px 22px;
+                    border-top:1px solid #142d40;
+                ">
+
+                    <label style="
+                        display:block;
+                        color:#b8ceda;
+                        font-weight:700;
+                        font-size:0.8rem;
+                        margin-bottom:8px;
+                    ">
+                        Observaciones de la salida
+                    </label>
+
+                    <textarea
+                        name="observaciones"
+                        rows="3"
+                        placeholder="Ej: Entrega parcial para producción..."
+                        style="
+                            width:100%;
+                            box-sizing:border-box;
+                            resize:vertical;
+                            background:#0a1d2c;
+                            color:#e5f5fb;
+                            border:1px solid #203b4f;
+                            border-radius:10px;
+                            padding:12px;
+                            outline:none;
+                        "
+                    >{{ old('observaciones') }}</textarea>
+
+                </div>
+
+
+                {{-- FOOTER --}}
+                <div style="
+                    display:flex;
+                    justify-content:space-between;
+                    align-items:center;
+                    gap:15px;
+                    padding:18px 22px;
+                    background:#071522;
+                    border-top:1px solid #142d40;
+                ">
+
+                    <div style="
+                        color:#7891a4;
+                        font-size:0.8rem;
+                    ">
+                        Los stocks se descontarán solamente al confirmar la salida.
+                    </div>
+
+                    <div style="display:flex; gap:10px;">
+
+                        <a href="{{ route('supply-orders.show', $supplyOrder) }}"
+                           style="
+                                text-decoration:none;
+                                padding:11px 18px;
+                                border-radius:9px;
+                                background:#172738;
+                                color:#c9dbe5;
+                                border:1px solid #294154;
+                                font-weight:700;
+                                font-size:0.85rem;
+                           ">
+                            Cancelar
+                        </a>
+
+                        <button type="submit"
+                                style="
+                                    border:none;
+                                    cursor:pointer;
+                                    padding:11px 20px;
+                                    border-radius:9px;
+                                    background:linear-gradient(135deg,#0891b2,#06b6d4);
+                                    color:white;
+                                    font-weight:800;
+                                    font-size:0.85rem;
+                                ">
+                            ✓ Confirmar salida
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <style>
+
+        .supply-info-card {
+            background:#081827;
+            border:1px solid #142d40;
+            border-radius:14px;
+            padding:17px 18px;
+            min-width:0;
+        }
+
+        .supply-info-card span {
+            display:block;
+            color:#647d90;
+            font-size:0.68rem;
+            font-weight:800;
+            letter-spacing:.04em;
+            margin-bottom:7px;
+        }
+
+        .supply-info-card strong {
+            color:#dcecf4;
+            font-size:0.95rem;
+        }
+
+        .supply-info-card .estado-text {
+            color:#22d3ee;
+        }
+
+        .supply-th {
+            padding:13px 18px;
+            text-align:left;
+            color:#6f8799;
+            font-size:0.68rem;
+            font-weight:800;
+            letter-spacing:.04em;
+        }
+
+        .supply-number {
+            padding:14px 18px;
+            color:#c9dbe5;
+            font-weight:700;
+        }
+
+        @media (max-width:900px) {
+
+            .supply-info-card {
+                grid-column:span 2;
+            }
+
+        }
+
+        @media (max-width:600px) {
+
+            .supply-info-card {
+                grid-column:span 4;
+            }
+
+        }
+
+    </style>
+
+
+    <script>
+
+        document.querySelectorAll('.cantidad-salida').forEach(function(input) {
+
+            input.addEventListener('input', function() {
+
+                let max = parseFloat(this.dataset.pendiente || 0);
+                let value = parseFloat(this.value || 0);
+
+                if (value < 0) {
+                    this.value = 0;
+                }
+
+                if (value > max) {
+                    this.value = max;
+                }
+
+            });
+
+        });
+
+    </script>
+
+</x-app-layout>
