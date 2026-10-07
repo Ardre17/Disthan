@@ -676,11 +676,212 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     color:#64748b;
     line-height:1.5;
 }
+
+/* ══════════════════════════════════════════════════════════
+   CONTROL DE LA ORDEN · rediseño ERP (prefijo oc-)
+   Todo es aditivo: no pisa las clases anteriores.
+══════════════════════════════════════════════════════════ */
+.oc{
+    --oc-navy:#1e3a5f; --oc-blue:#2563eb; --oc-blue-soft:#eaf1ff;
+    --oc-green:#16a34a; --oc-green-soft:#dcfce7;
+    --oc-orange:#f59e0b; --oc-orange-soft:#fef3c7;
+    --oc-red:#dc2626; --oc-red-soft:#fee2e2;
+    --oc-text:#0f172a; --oc-muted:#64748b; --oc-line:#e2e8f0; --oc-bg:#f8fafc;
+    --oc-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    color:var(--oc-text);
+}
+.oc-i{width:16px;height:16px;flex-shrink:0;}
+.oc-num{font-family:var(--oc-mono);font-variant-numeric:tabular-nums;}
+
+/* Cabecera */
+.oc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px;}
+.oc-head-l{display:flex;align-items:center;gap:12px;}
+.oc-back{width:42px;height:42px;border-radius:10px;border:1px solid var(--oc-line);background:#fff;display:inline-flex;align-items:center;justify-content:center;color:var(--oc-navy);cursor:pointer;text-decoration:none;}
+.oc-back .oc-i{width:18px;height:18px;}
+.oc-title{font-size:22px;font-weight:800;color:var(--oc-navy);line-height:1.1;margin:0;}
+.oc-sub{font-size:13px;color:var(--oc-muted);margin-top:3px;}
+.oc-head-r{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.oc-btn{display:inline-flex;align-items:center;gap:7px;padding:9px 14px;border:1px solid var(--oc-line);background:#fff;color:var(--oc-blue);border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;text-decoration:none;font-family:inherit;transition:background .15s,border-color .15s;}
+.oc-btn:hover{background:#f1f5ff;border-color:#bfd2ff;}
+.oc-btn.is-off{opacity:.45;cursor:not-allowed;}
+.oc-btn.is-off:hover{background:#fff;border-color:var(--oc-line);}
+.oc-btn.sq{padding:9px 11px;}
+
+/* Dropdowns */
+.oc-dd{position:relative;}
+.oc-dd-menu{display:none;position:absolute;right:0;top:calc(100% + 6px);min-width:230px;background:#fff;border:1px solid var(--oc-line);border-radius:10px;box-shadow:0 12px 30px rgba(15,23,42,.14);padding:8px;z-index:50;}
+.oc-dd.open .oc-dd-menu{display:block;}
+.oc-dd-item{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border:none;background:none;border-radius:7px;font-size:13px;color:#1e293b;cursor:pointer;text-decoration:none;font-family:inherit;text-align:left;}
+.oc-dd-item:hover{background:#f1f5f9;}
+.oc-dd-lbl{display:block;font-size:11px;font-weight:700;color:var(--oc-muted);text-transform:uppercase;letter-spacing:.04em;margin:6px 2px 4px;}
+.oc-dd-sel{width:100%;padding:8px 10px;border:1px solid var(--oc-line);border-radius:8px;font-size:13px;background:#fff;font-family:inherit;}
+
+/* Tarjetas */
+.oc-card{background:#fff;border:1px solid var(--oc-line);border-radius:14px;padding:16px 18px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+.oc-card-t{font-size:15px;font-weight:800;margin:0 0 12px;display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.oc-link{font-size:12px;font-weight:600;color:var(--oc-blue);background:var(--oc-blue-soft);border:none;border-radius:7px;padding:5px 10px;cursor:pointer;font-family:inherit;}
+.oc-top{display:grid;grid-template-columns:1.35fr 1fr 1.7fr;gap:14px;margin-bottom:14px;}
+@media(max-width:1200px){.oc-top{grid-template-columns:1fr 1fr;}.oc-top > :nth-child(3){grid-column:1/-1;}}
+@media(max-width:760px){.oc-top{grid-template-columns:1fr;}}
+.oc-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:99px;font-size:12px;font-weight:700;}
+
+/* Tarjeta de la orden */
+.oc-ord-id{display:flex;align-items:center;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
+.oc-ord-ic{width:58px;height:58px;border-radius:12px;background:var(--oc-blue-soft);color:var(--oc-blue);display:flex;align-items:center;justify-content:center;}
+.oc-ord-ic .oc-i{width:26px;height:26px;}
+.oc-ord-num{font-size:26px;font-weight:800;color:var(--oc-navy);font-family:var(--oc-mono);letter-spacing:-.5px;}
+.oc-meta{display:grid;grid-template-columns:repeat(4,auto);gap:14px;justify-content:space-between;}
+@media(max-width:560px){.oc-meta{grid-template-columns:1fr 1fr;}}
+.oc-meta label{display:block;font-size:11px;color:var(--oc-muted);margin-bottom:3px;}
+.oc-meta b{font-size:13px;font-weight:600;}
+.oc-obs{margin-top:14px;border:1px solid var(--oc-line);border-radius:10px;padding:10px 12px;background:var(--oc-bg);display:flex;gap:10px;align-items:center;color:var(--oc-muted);}
+.oc-obs small{display:block;font-size:11px;}
+.oc-obs span{font-size:13px;color:#334155;}
+
+/* Donut */
+.oc-donut-wrap{display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.oc-donut{position:relative;width:132px;height:132px;flex-shrink:0;}
+.oc-donut svg{transform:rotate(-90deg);}
+.oc-donut-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;}
+.oc-donut-c b{font-size:24px;font-weight:800;font-family:var(--oc-mono);}
+.oc-donut-c small{font-size:11px;color:var(--oc-muted);}
+.oc-leg{flex:1;min-width:150px;display:flex;flex-direction:column;gap:8px;}
+.oc-leg-r{display:flex;justify-content:space-between;align-items:center;font-size:13px;color:#475569;}
+.oc-leg-r i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:8px;}
+.oc-leg-r b{font-family:var(--oc-mono);color:var(--oc-text);}
+.oc-leg-tot{border-top:1px solid var(--oc-line);padding-top:8px;}
+
+/* Paletas */
+.oc-pals{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:10px;}
+.oc-pal-card{border:1px solid var(--oc-line);border-radius:12px;padding:10px 8px;text-align:center;cursor:pointer;position:relative;background:#fff;transition:transform .15s,box-shadow .15s;user-select:none;}
+.oc-pal-card:hover{transform:translateY(-3px);box-shadow:0 8px 20px rgba(15,23,42,.1);}
+.oc-pal-card.paleta-llena{opacity:.9;}
+.oc-pal-ic{color:#334155;display:flex;justify-content:center;margin-bottom:4px;}
+.oc-pal-ic .oc-i{width:26px;height:26px;}
+.oc-pal-n{font-size:16px;font-weight:800;font-family:var(--oc-mono);}
+.oc-pal-st{display:block;margin:6px 0 4px;padding:3px 0;border-radius:6px;font-size:12px;font-weight:700;}
+.oc-pal-cj{font-size:12px;color:#475569;}
+.oc-pal-it{font-size:10px;color:#94a3b8;margin-top:2px;}
+.oc-pal-bar{height:5px;background:#e5e7eb;border-radius:99px;overflow:hidden;margin-top:7px;}
+.oc-pal-bar > div{height:100%;border-radius:99px;}
+.oc-pal-new{border:2px dashed #cbd5e1;border-radius:12px;color:var(--oc-blue);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;font-weight:700;font-size:13px;cursor:pointer;background:#fbfdff;min-height:130px;font-family:inherit;}
+.oc-pal-new:hover{background:#f1f5ff;border-color:#93b4ff;}
+.oc-pal-new .oc-i{width:26px;height:26px;}
+.oc-pal-sin{display:flex;align-items:center;justify-content:space-between;background:#fff8f0;border:1px dashed #fed7aa;border-radius:8px;padding:8px 12px;font-size:12px;color:#92400e;margin-top:10px;cursor:pointer;}
+.oc-pal-sin:hover{background:#fef3e2;}
+
+/* Escáner */
+.oc-scan{display:flex;align-items:center;gap:14px;background:var(--oc-navy);border-radius:12px;padding:10px 16px;margin-bottom:14px;}
+.oc-scan .scanner-label{margin:0 0 4px;}
+.oc-scan-hint{font-size:10px;color:#93a4bd;text-align:right;white-space:nowrap;}
+@media(max-width:560px){.oc-scan-hint{display:none;}}
+
+/* Panel de acciones (importar / agregar) */
+.oc-accpanel{display:none;grid-template-columns:1fr 1.6fr;gap:14px;margin-bottom:14px;}
+.oc-accpanel.open{display:grid;}
+@media(max-width:900px){.oc-accpanel.open{grid-template-columns:1fr;}}
+
+/* Tarjeta de tabla + tabs */
+.oc-main{background:#fff;border:1px solid var(--oc-line);border-radius:14px;overflow:hidden;margin-bottom:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+.oc-tabsbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:1px solid var(--oc-line);padding:0 14px;}
+.oc-tabs{display:flex;gap:4px;flex-wrap:wrap;}
+.oc-tab{background:none;border:none;padding:15px 14px;font-size:13px;font-weight:600;color:var(--oc-muted);cursor:pointer;display:inline-flex;gap:8px;align-items:center;border-bottom:3px solid transparent;margin-bottom:-1px;font-family:inherit;}
+.oc-tab.on{color:var(--oc-blue);border-bottom-color:var(--oc-blue);}
+.oc-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0;}
+.oc-search{position:relative;}
+.oc-search .oc-i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94a3b8;}
+.oc-search input{padding:9px 12px 9px 34px;border:1px solid var(--oc-line);border-radius:9px;font-size:13px;width:260px;max-width:100%;outline:none;font-family:inherit;}
+.oc-search input:focus{border-color:var(--oc-blue);box-shadow:0 0 0 3px rgba(37,99,235,.1);}
+.oc-pane{display:none;}
+.oc-pane.on{display:block;}
+.oc-scroll{overflow-x:auto;}
+.oc-count{padding:8px 16px;font-size:11px;color:var(--oc-muted);border-top:1px solid var(--oc-line);background:var(--oc-bg);}
+
+/* Tabla */
+.oc-tbl{width:100%;min-width:1480px;border-collapse:separate;border-spacing:0;font-size:12.5px;}
+.oc-tbl th{background:#f1f5f9;color:#334155;font-size:11.5px;font-weight:700;text-align:left;padding:10px;white-space:nowrap;}
+.oc-tbl td{padding:9px 10px;border-bottom:1px solid #eef2f7;vertical-align:middle;}
+.oc-tbl tr.oc-row:hover td{background:#fafcff;}
+.oc-tbl .c{text-align:center;}
+.oc-prod{display:flex;align-items:center;gap:10px;min-width:200px;}
+.oc-thumb{width:42px;height:42px;border-radius:8px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:20px;flex-shrink:0;}
+.oc-thumb img{width:100%;height:100%;object-fit:cover;}
+.oc-pname{font-weight:700;font-size:13px;color:var(--oc-text);}
+.oc-pmarca{font-size:11px;color:var(--oc-muted);}
+.oc-av{display:flex;align-items:center;gap:8px;min-width:140px;}
+.oc-av-bar{flex:1;height:7px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
+.oc-av-bar > div{height:100%;border-radius:99px;}
+.oc-av b{font-family:var(--oc-mono);font-size:12px;min-width:38px;text-align:right;}
+.oc-pal{display:inline-block;padding:3px 9px;border-radius:7px;background:var(--oc-blue-soft);color:var(--oc-blue);font-weight:700;font-size:12px;font-family:var(--oc-mono);}
+.oc-dash{color:#94a3b8;}
+.oc-oct{width:38px;height:38px;background:#111;color:#fff;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:6.5px;font-weight:800;line-height:1.1;text-align:center;margin-right:3px;}
+.oc-ult{font-size:12px;line-height:1.35;}
+.oc-ult small{color:var(--oc-muted);display:block;}
+.oc-acts{display:flex;gap:6px;align-items:center;}
+.oc-acts form{display:inline;margin:0;}
+.oc-ic{width:34px;height:34px;border:1px solid var(--oc-line);background:#fff;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:var(--oc-blue);padding:0;}
+.oc-ic:hover{background:#f1f5ff;}
+.oc-ic.del{color:var(--oc-red);border-color:#fecaca;background:#fff5f5;}
+.oc-ic.del:hover{background:#fee2e2;}
+.oc-vacio{display:none;text-align:center;padding:26px;color:var(--oc-muted);font-size:13px;}
+
+/* Fila expandible (info + formulario original de edición) */
+.oc-detail{display:none;}
+.oc-detail.open{display:table-row;}
+.oc-detail > td{background:#f8fafc;padding:14px 16px !important;border-bottom:1px solid var(--oc-line);}
+.oc-panel{display:grid;grid-template-columns:270px 1fr;gap:18px;align-items:start;}
+@media(max-width:980px){.oc-panel{grid-template-columns:1fr;}}
+.oc-form{display:grid;grid-template-columns:1fr 150px 150px 130px;gap:12px;align-items:end;}
+@media(max-width:1100px){.oc-form{grid-template-columns:1fr 1fr;}.oc-form .fields-box{grid-column:1/-1;}}
+.oc-form .fields-box{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;background:transparent;padding:0;}
+@media(max-width:700px){.oc-form .fields-box{grid-template-columns:1fr 1fr;}}
+.oc-form .field-row{display:contents;}
+.oc-form hr.dv{display:none;}
+.oc-form > div[style*="margin-top"]{margin-top:0 !important;}
+.oc-form .btn-row-prod{margin-top:0 !important;}
+
+/* Historial / documentos */
+.oc-simple{width:100%;border-collapse:collapse;font-size:13px;}
+.oc-simple th{background:#f1f5f9;text-align:left;padding:10px 14px;font-size:11.5px;color:#334155;}
+.oc-simple td{padding:10px 14px;border-bottom:1px solid #eef2f7;}
+.oc-docs{padding:16px;display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px;}
+
+/* Inferior */
+.oc-bottom{display:grid;grid-template-columns:1.25fr 1fr 1fr;gap:14px;}
+@media(max-width:1200px){.oc-bottom{grid-template-columns:1fr 1fr;}.oc-bottom > :first-child{grid-column:1/-1;}}
+@media(max-width:760px){.oc-bottom{grid-template-columns:1fr;}}
+.oc-acc{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+@media(max-width:700px){.oc-acc{grid-template-columns:1fr 1fr;}}
+.oc-tile{display:flex;align-items:center;gap:10px;padding:13px 14px;border-radius:10px;border:none;text-align:left;cursor:pointer;text-decoration:none;font-family:inherit;min-height:62px;}
+.oc-tile .oc-i{width:26px;height:26px;}
+.oc-tile b{display:block;font-size:13px;font-weight:700;}
+.oc-tile small{display:block;font-size:11.5px;opacity:.8;margin-top:1px;}
+.oc-tile.is-off{opacity:.5;cursor:not-allowed;}
+.t-blue{background:#2563eb;color:#fff;}
+.t-green{background:#dcfce7;color:#15803d;}
+.t-purple{background:#ede9fe;color:#6d28d9;}
+.t-orange{background:#fef3c7;color:#b45309;}
+.t-sky{background:#e0ecff;color:#1d4ed8;}
+.t-gray{background:#f1f5f9;color:#334155;}
+.oc-kpi4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+@media(max-width:560px){.oc-kpi4{grid-template-columns:1fr 1fr;}}
+.oc-k{border:1px solid var(--oc-line);border-radius:12px;padding:12px 6px;text-align:center;}
+.oc-k-ic{width:38px;height:38px;border-radius:50%;margin:0 auto 6px;display:flex;align-items:center;justify-content:center;font-weight:800;}
+.oc-k b{display:block;font-size:20px;font-weight:800;font-family:var(--oc-mono);}
+.oc-k small{font-size:11px;color:var(--oc-muted);}
+.oc-fin{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-top:12px;padding:10px 12px;background:var(--oc-bg);border-radius:10px;font-size:12px;color:var(--oc-muted);}
+.oc-fin b{color:var(--oc-text);font-family:var(--oc-mono);}
+.oc-fin .tot b{color:#15803d;font-size:14px;}
+.oc-info{display:grid;grid-template-columns:1fr 1fr;}
+@media(max-width:560px){.oc-info{grid-template-columns:1fr;}}
+.oc-info > div{display:flex;justify-content:space-between;gap:8px;padding:10px 8px;border-bottom:1px solid #eef2f7;font-size:12.5px;}
+.oc-info span{color:var(--oc-muted);}
+.oc-info b{font-weight:600;text-align:right;}
 </style>
 
 <div class="pg">
 
-{{-- ── Header ── --}}
+{{-- ── Datos base (SIN CAMBIOS respecto al original) ── --}}
 @php
     $estadoColor = $order->estado === 'COMPLETO' ? '#15803d'
         : ($order->estado === 'PARCIAL' ? '#b45309' : '#b91c1c');
@@ -703,397 +904,725 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     $paletaCounts = $paletas->map->count();
 @endphp
 
-<div class="top-hdr">
-    <div class="hdr-left">
-        <h1>📋 {{ $order->numero_orden }}</h1>
-        <p>{{ $order->client?->razon_social }}</p>
-    </div>
-    <div class="hdr-right">
-        <span class="badge-estado" style="background:{{ $estadoColor }};">{{ $order->estado }}</span>
-        <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="btn btn-green">📄 Ver PDF</a>
-        <a href="{{ route('orders.pdf',$order) }}" class="btn btn-blue">⬇ Descargar</a>
-        <button
-    type="button"
-    class="btn"
-    onclick="abrirResumenOrden()"
-    style="
-        background:#111827;
-        color:#fff;
-        border:1px solid #111827;
-        display:inline-flex;
-        align-items:center;
-        gap:5px;
-        cursor:pointer;
-    ">
-    📋 Ver orden
-</button>
-    </div>
-</div>
+{{-- ── Datos adicionales para el rediseño (solo lectura, no tocan lógica) ── --}}
+@php
+    // Rutas opcionales: si las defines, los botones se activan solos.
+    // Ej: $ocRutaEtiquetas = route('orders.etiquetas', $order);
+    $ocRutaEtiquetas = null;
+    $ocRutaGuia      = null;
 
-{{-- ── KPIs ── --}}
-<div class="kpis">
-    <div class="kpi">
-        <div class="kpi-icon" style="background:#eff6ff;color:#2563eb;">🗂</div>
-        <div><div class="kpi-label">Productos</div><div class="kpi-val">{{ $totalItems }}</div></div>
-    </div>
-    <div class="kpi">
-        <div class="kpi-icon" style="background:#dcfce7;color:#15803d;">✅</div>
-        <div><div class="kpi-label">Completados</div><div class="kpi-val" style="color:#15803d;">{{ $completados }}</div></div>
-    </div>
-    <div class="kpi">
-        <div class="kpi-icon" style="background:#fee2e2;color:#b91c1c;">⚠️</div>
-        <div><div class="kpi-label">Faltantes</div><div class="kpi-val" style="color:#b91c1c;">{{ $faltantes }}</div></div>
-    </div>
-    <div class="kpi">
-        <div class="kpi-icon" style="background:#dcfce7;color:#15803d;">💰</div>
-        <div><div class="kpi-label">Total</div><div class="kpi-val" style="font-size:14px;color:#15803d;">S/ {{ number_format($order->total,2) }}</div></div>
-    </div>
-</div>
+    $ocFecha = fn($v, $f = 'd/m/Y') => $v ? \Carbon\Carbon::parse($v)->format($f) : '—';
+    $ocN     = fn($n) => rtrim(rtrim(number_format((float) $n, 2, '.', ''), '0'), '.');
 
-{{-- ── Layout ── --}}
-<div class="main-layout">
-    <div class="left-col">
+    $ocParciales  = $order->details->where('estado_item','PARCIAL')->count();
+    $ocPendientes = max($totalItems - $completados - $ocParciales, 0);
 
-        {{-- Scanner --}}
-        <div class="scanner-card">
-            <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 1.5s infinite;"></div>
-            <div style="flex:1;">
-                <div class="scanner-label">📡 Escanear código de barras</div>
-                <input type="text" id="scanner" class="scanner-input" placeholder="Escanea o escribe el código...">
+    $ocSumSol  = (float) $order->details->sum('cantidad_solicitada');
+    $ocSumDesp = (float) $order->details->sum('cantidad_despachada');
+    $ocSumPend = max($ocSumSol - $ocSumDesp, 0);
+    $ocAvance  = $ocSumSol > 0 ? round(($ocSumDesp / $ocSumSol) * 100, 1) : 0;
+
+    $ocMaxNum = $paletas->keys()->map(fn($k) => (int) preg_replace('/\D/', '', (string) $k))->max() ?? 0;
+    $ocSiguientePaleta = 'P' . str_pad($ocMaxNum + 1, 2, '0', STR_PAD_LEFT);
+    $ocPrimeroSinPaleta = $sinPaleta->first()?->id;
+
+    $ocObs = $order->observaciones ?? $order->observacion ?? null;
+
+    $ocOctLabel = function ($k) {
+        $k = mb_strtolower((string) $k);
+        if (str_contains($k, 'azuc') || str_contains($k, 'azúc')) return ['ALTO EN', 'AZÚCAR'];
+        if (str_contains($k, 'sod'))                              return ['ALTO EN', 'SODIO'];
+        if (str_contains($k, 'satur'))                            return ['ALTO EN', 'GRAS.SAT.'];
+        if (str_contains($k, 'trans'))                            return ['ALTO EN', 'GRAS.TRANS'];
+        return ['', mb_strtoupper(mb_substr($k, 0, 10))];
+    };
+
+    $ocCsvRows = $order->details->map(function ($d) {
+        $v = $d->fecha_vencimiento ?? ($d->product->fecha_vencimiento ?? null);
+        return [
+            $d->product->sku ?? '',
+            $d->product->nombre ?? '',
+            (float) $d->cantidad_solicitada,
+            (float) $d->cantidad_despachada,
+            max((float) $d->cantidad_solicitada - (float) $d->cantidad_despachada, 0),
+            $d->lote ?? '',
+            $v ? \Carbon\Carbon::parse($v)->format('d/m/Y') : '',
+            $d->paleta ?? '',
+            round((float) $d->cantidad_despachada * (float) $d->precio_unitario, 2),
+        ];
+    })->values();
+@endphp
+
+{{-- Iconos (sprite) --}}
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <symbol id="oc-back" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></symbol>
+    <symbol id="oc-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
+    <symbol id="oc-printer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+    <symbol id="oc-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+    <symbol id="oc-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></symbol>
+    <symbol id="oc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
+    <symbol id="oc-dots" viewBox="0 0 24 24" fill="currentColor"><circle cx="5" cy="12" r="1.8"/><circle cx="12" cy="12" r="1.8"/><circle cx="19" cy="12" r="1.8"/></symbol>
+    <symbol id="oc-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 1.98-1.7L23 6H6"/></symbol>
+    <symbol id="oc-grid" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></symbol>
+    <symbol id="oc-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="oc-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+    <symbol id="oc-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></symbol>
+    <symbol id="oc-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="oc-history" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/><polyline points="12 7 12 12 15 14"/></symbol>
+    <symbol id="oc-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="oc-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+    <symbol id="oc-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
+    <symbol id="oc-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="oc-edit" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></symbol>
+    <symbol id="oc-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+    <symbol id="oc-scan" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="12" x2="17" y2="12"/></symbol>
+</defs></svg>
+
+<div class="oc">
+
+{{-- ══════════ CABECERA ══════════ --}}
+<div class="oc-head">
+    <div class="oc-head-l">
+        <a href="{{ url()->previous() }}" class="oc-back" title="Volver"><svg class="oc-i"><use href="#oc-back"/></svg></a>
+        <div>
+            <h1 class="oc-title">Control de la orden</h1>
+            <div class="oc-sub">Gestiona los productos, despachos y paletas de la orden</div>
+        </div>
+    </div>
+    <div class="oc-head-r">
+        <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="oc-btn"><svg class="oc-i"><use href="#oc-file"/></svg> Ver PDF</a>
+
+        @if($ocRutaEtiquetas)
+            <a href="{{ $ocRutaEtiquetas }}" target="_blank" class="oc-btn"><svg class="oc-i"><use href="#oc-printer"/></svg> Imprimir etiquetas</a>
+        @else
+            <button type="button" class="oc-btn is-off" disabled title="Ruta de impresión masiva sin configurar"><svg class="oc-i"><use href="#oc-printer"/></svg> Imprimir etiquetas</button>
+        @endif
+
+        @if($ocRutaGuia)
+            <a href="{{ $ocRutaGuia }}" class="oc-btn"><svg class="oc-i"><use href="#oc-truck"/></svg> Generar guía</a>
+        @else
+            <button type="button" class="oc-btn is-off" disabled title="Ruta de guía sin configurar"><svg class="oc-i"><use href="#oc-truck"/></svg> Generar guía</button>
+        @endif
+
+        <div class="oc-dd" id="ddExport">
+            <button type="button" class="oc-btn" onclick="ocDD('ddExport',event)"><svg class="oc-i"><use href="#oc-file"/></svg> Exportar <svg class="oc-i"><use href="#oc-chev"/></svg></button>
+            <div class="oc-dd-menu" onclick="event.stopPropagation()">
+                <button type="button" class="oc-dd-item" onclick="ocExportCSV()"><svg class="oc-i"><use href="#oc-download"/></svg> Excel (CSV)</button>
+                <a href="{{ route('orders.pdf',$order) }}" class="oc-dd-item"><svg class="oc-i"><use href="#oc-download"/></svg> PDF (descargar)</a>
             </div>
-            <div style="font-size:10px;color:#475569;text-align:right;white-space:nowrap;">Enter para<br>confirmar</div>
         </div>
 
-        {{-- Importar CSV --}}
-        <div class="section-card">
-            <div class="sec-title">📄 Importar pedido CSV</div>
-            <form action="{{ route('orders.import',$order) }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="import-row">
-                    <label class="file-label">
-                        📎 Seleccionar archivo .csv
-                        <input type="file" name="archivo" accept=".csv" required style="display:none;">
-                    </label>
-                    <button type="submit" class="btn btn-green">Importar</button>
-                </div>
-            </form>
+        <div class="oc-dd" id="ddMas">
+            <button type="button" class="oc-btn sq" onclick="ocDD('ddMas',event)" title="Más opciones"><svg class="oc-i"><use href="#oc-dots"/></svg></button>
+            <div class="oc-dd-menu" onclick="event.stopPropagation()">
+                <button type="button" class="oc-dd-item" onclick="abrirResumenOrden()"><svg class="oc-i"><use href="#oc-file"/></svg> Ver orden (resumen)</button>
+            </div>
         </div>
+    </div>
+</div>
 
-        {{-- Agregar producto --}}
-        <div class="section-card">
-            <div class="sec-title">➕ Agregar producto</div>
-            <form method="POST" action="{{ route('orders.addProduct',$order) }}">
-                @csrf
-                <div class="add-grid">
-                    <div>
-                        <label class="flabel">Producto</label>
-                        <select name="product_id" class="finput" required>
-                            <option value="">Seleccionar producto</option>
-                            @foreach($products as $product)
-                                <option value="{{ $product->id }}">{{ $product->nombre }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div>
-                        <label class="flabel">Cantidad</label>
-                        <input type="number" name="cantidad_solicitada" class="finput" placeholder="0" required>
-                    </div>
-                    <div>
-                        <label class="flabel">Precio</label>
-                        <input type="number" step="0.01" name="precio_unitario" class="finput" placeholder="0.00" required>
-                    </div>
-                    <button type="submit" class="btn btn-red" style="align-self:end;">Agregar</button>
-                </div>
-            </form>
+{{-- ══════════ FILA SUPERIOR: ORDEN · AVANCE · PALETAS ══════════ --}}
+<div class="oc-top">
+
+    {{-- Datos de la orden --}}
+    <div class="oc-card">
+        <div class="oc-ord-id">
+            <div class="oc-ord-ic"><svg class="oc-i"><use href="#oc-cart"/></svg></div>
+            <div class="oc-ord-num">{{ $order->numero_orden }}</div>
+            <span class="oc-chip" style="background:{{ $estadoColor }};color:#fff;">{{ $order->estado }}</span>
         </div>
+        <div class="oc-meta">
+            <div><label>Cliente</label><b>{{ $order->client?->razon_social ?? '—' }}</b></div>
+            <div><label>Tipo de orden</label>
+                <b><span class="oc-chip" style="background:#dcfce7;color:#15803d;padding:2px 9px;">{{ $order->tipo_orden ?? '—' }}</span></b></div>
+            <div><label>Fecha de pedido</label><b class="oc-num">{{ $ocFecha($order->fecha_pedido) }}</b></div>
+            <div><label>Fecha de entrega</label><b class="oc-num">{{ $ocFecha($order->fecha_entrega ?? null) }}</b></div>
+        </div>
+        <div class="oc-obs">
+            <svg class="oc-i" style="width:22px;height:22px;"><use href="#oc-file"/></svg>
+            <div><small>Observaciones</small><span>{{ $ocObs ?: 'Sin observaciones' }}</span></div>
+        </div>
+    </div>
 
-        {{-- Productos --}}
-        <div class="products-grid">
-            @foreach($order->details as $detail)
+    {{-- Avance --}}
+    <div class="oc-card">
+        <h3 class="oc-card-t">Avance de la orden</h3>
+        <div class="oc-donut-wrap">
+            <div class="oc-donut">
+                <svg width="132" height="132" viewBox="0 0 132 132">
+                    <circle cx="66" cy="66" r="52" fill="none" stroke="#e5e7eb" stroke-width="13"/>
+                    <circle cx="66" cy="66" r="52" fill="none" stroke="{{ $progColor }}" stroke-width="13" stroke-linecap="round"
+                            stroke-dasharray="{{ round($porcentaje * 3.2673, 1) }} 326.73"/>
+                </svg>
+                <div class="oc-donut-c"><b>{{ $porcentaje }}%</b><small>Progreso general</small></div>
+            </div>
+            <div class="oc-leg">
+                <div class="oc-leg-r"><span><i style="background:#22c55e;"></i>Completados</span><b>{{ $completados }}</b></div>
+                <div class="oc-leg-r"><span><i style="background:#2563eb;"></i>En proceso</span><b>{{ $ocParciales }}</b></div>
+                <div class="oc-leg-r"><span><i style="background:#f59e0b;"></i>Pendientes</span><b>{{ $ocPendientes }}</b></div>
+                <div class="oc-leg-r oc-leg-tot"><span>Total de productos</span><b>{{ $totalItems }}</b></div>
+            </div>
+        </div>
+    </div>
+
+    {{-- Paletas (mismo abrirPaleta() del mapa original) --}}
+    <div class="oc-card" id="ocPaletas">
+        <h3 class="oc-card-t">Paletas de la orden
+            <span style="font-size:11px;color:var(--oc-muted);font-weight:500;">{{ $paletas->count() }} paleta{{ $paletas->count() !== 1 ? 's' : '' }} · clic para ver detalle</span>
+        </h3>
+
+        <div class="oc-pals">
+            @foreach($paletas as $nombrePaleta => $items)
                 @php
-                    $s = $detail->estado_item;
-                    $bc = $s === 'COMPLETO' ? '#22c55e' : ($s === 'PARCIAL' ? '#f59e0b' : '#ef4444');
-                    $sc = $s === 'COMPLETO' ? '#15803d' : ($s === 'PARCIAL' ? '#b45309' : '#b91c1c');
-                    $bg = $s === 'COMPLETO' ? '#dcfce7' : ($s === 'PARCIAL' ? '#fef3c7' : '#fee2e2');
-                    $badgeCls = $s === 'COMPLETO' ? 'bc' : ($s === 'PARCIAL' ? 'bp' : 'bi');
-                    $pct = $detail->cantidad_solicitada > 0
-                        ? round(($detail->cantidad_despachada / $detail->cantidad_solicitada) * 100)
-                        : 0;
+                    $totUds = $items->sum('cantidad_solicitada');
+                    $despUds = $items->sum('cantidad_despachada');
+                    $pesoKg = $items->sum(fn($i) => ($i->product->peso ?? 0) * $i->cantidad_solicitada / 1000);
+                    $pctP = $totUds > 0 ? round(($despUds / $totUds) * 100) : 0;
+                    $todoC = $items->every(fn($i) => $i->estado_item === 'COMPLETO');
+                    $algunP = $items->contains(fn($i) => $i->estado_item === 'PARCIAL');
+                    $fillColor= $todoC ? '#22c55e' : ($algunP ? '#f59e0b' : '#ef4444');
+                    $llena = $items->count() >= $paletaMax;
+
+                    $cajasSolP = $items->sum(function ($i) { $c = $i->product->cantidad_por_caja ?? 1; return $c > 0 ? ceil($i->cantidad_solicitada / $c) : 0; });
+                    $cajasDespP = $items->sum(function ($i) { $c = $i->product->cantidad_por_caja ?? 1; return $c > 0 ? floor($i->cantidad_despachada / $c) : 0; });
+
+                    if ($todoC)               { $stTxt = 'Completa';   $stBg = '#dcfce7'; $stCl = '#15803d'; $barC = '#22c55e'; }
+                    elseif ($despUds > 0)     { $stTxt = 'En proceso'; $stBg = '#e0ecff'; $stCl = '#1d4ed8'; $barC = '#2563eb'; }
+                    else                      { $stTxt = 'Pendiente';  $stBg = '#fef3c7'; $stCl = '#b45309'; $barC = '#f59e0b'; }
+
+                    // Serializar items para el modal
+                    $itemsJson = $items->map(fn($i) => [
+                        'nombre' => $i->product->nombre ?? 'Producto',
+                        'sku' => $i->product->sku ?? '',
+                        'solicitada' => $i->cantidad_solicitada,
+                        'despachada' => $i->cantidad_despachada,
+                        'estado' => $i->estado_item,
+                        'precio' => $i->precio_unitario,
+                        'subtotal' => $i->subtotal,
+                        'peso' => number_format(($i->product->peso ?? 0) / 1000, 3),
+                        'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,
+                        'barcode' => $i->product->barcode,
+                        'box_barcode' => $i->product->box_barcode,
+                    ])->values()->toJson();
                 @endphp
 
-                <div class="prod-card"
-                    id="producto-{{ $detail->product->barcode }}"
-                    data-barcode="{{ $detail->product->barcode }}"
-                    data-box-barcode="{{ $detail->product->box_barcode }}">
-                    <div class="prod-top">
-                        <div>
-                            <div class="prod-name">📦 {{ $detail->product->nombre }}</div>
-                            <div class="prod-sku">SKU: {{ $detail->product->sku }}</div>
-                        </div>
-                        <span class="prod-badge {{ $badgeCls }}">{{ $s }}</span>
-                    </div>
+                <div class="oc-pal-card {{ $llena ? 'paleta-llena' : '' }}"
+                    onclick="abrirPaleta({{ json_encode($nombrePaleta) }}, {{ $items->count() }}, {{ $totUds }}, {{ $despUds }}, {{ round($pesoKg,1) }}, {{ $pctP }}, {{ json_encode($fillColor) }}, {{ $itemsJson }})">
+                    @if($llena)
+                        <span class="paleta-box-full-badge">LLENA</span>
+                    @endif
+                    <div class="oc-pal-ic"><svg class="oc-i"><use href="#oc-grid"/></svg></div>
+                    <div class="oc-pal-n">{{ $nombrePaleta }}</div>
+                    <span class="oc-pal-st" style="background:{{ $stBg }};color:{{ $stCl }};">{{ $stTxt }}</span>
+                    <div class="oc-pal-cj oc-num">{{ $todoC ? $cajasSolP.' cajas' : $cajasDespP.' / '.$cajasSolP.' cajas' }}</div>
+                    <div class="oc-pal-it">{{ $items->count() }}/{{ $paletaMax }} ítem{{ $items->count() > 1 ? 's' : '' }}</div>
+                    <div class="oc-pal-bar"><div style="width:{{ $pctP }}%;background:{{ $barC }};"></div></div>
+                </div>
+            @endforeach
+
+            <button type="button" class="oc-pal-new" id="ocNuevaPaleta"
+                    data-next="{{ $ocSiguientePaleta }}" data-first-sin="{{ $ocPrimeroSinPaleta }}"
+                    onclick="ocNuevaPaleta()">
+                <svg class="oc-i"><use href="#oc-plus"/></svg>
+                Nueva paleta
+            </button>
+        </div>
+
+        {{-- Sin paleta --}}
+        @if($sinPaleta->count())
+            @php
+                $spJson = $sinPaleta->map(fn($i) => [
+                    'nombre' => $i->product->nombre ?? 'Producto',
+                    'sku' => $i->product->sku ?? '',
+                    'solicitada' => $i->cantidad_solicitada,
+                    'despachada' => $i->cantidad_despachada,
+                    'estado' => $i->estado_item,
+                    'precio' => $i->precio_unitario,
+                    'subtotal' => $i->subtotal,
+                    'peso' => number_format(($i->product->peso ?? 0) / 1000, 3),
+                    'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,
+                    'barcode' => $i->product->barcode,
+                    'box_barcode' => $i->product->box_barcode,
+                ])->values()->toJson();
+            @endphp
+            <div class="oc-pal-sin"
+                onclick="abrirPaleta('Sin paleta', {{ $sinPaleta->count() }}, {{ $sinPaleta->sum('cantidad_solicitada') }}, {{ $sinPaleta->sum('cantidad_despachada') }}, 0, 0, '#94a3b8', {{ $spJson }})">
+                <span>⚠️ Sin paleta asignada</span>
+                <span style="font-weight:700;">{{ $sinPaleta->count() }} ítem{{ $sinPaleta->count() > 1 ? 's' : '' }} →</span>
+            </div>
+        @endif
+    </div>
+</div>
+
+{{-- ══════════ ESCÁNER (mismo id="scanner") ══════════ --}}
+<div class="oc-scan">
+    <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 1.5s infinite;"></div>
+    <div style="flex:1;">
+        <div class="scanner-label">📡 Escanear código de barras</div>
+        <input type="text" id="scanner" class="scanner-input" placeholder="Escanea o escribe el código...">
+    </div>
+    <div class="oc-scan-hint">Enter para<br>confirmar</div>
+</div>
+
+{{-- ══════════ IMPORTAR / AGREGAR (formularios originales, se abren desde "Acciones") ══════════ --}}
+<div class="oc-accpanel" id="ocAccPanel">
+    {{-- Importar CSV --}}
+    <div class="section-card">
+        <div class="sec-title">📄 Importar pedido CSV</div>
+        <form action="{{ route('orders.import',$order) }}" method="POST" enctype="multipart/form-data">
+            @csrf
+            <div class="import-row">
+                <label class="file-label">
+                    📎 Seleccionar archivo .csv
+                    <input type="file" name="archivo" accept=".csv" required style="display:none;">
+                </label>
+                <button type="submit" class="btn btn-green">Importar</button>
+            </div>
+        </form>
+    </div>
+
+    {{-- Agregar producto --}}
+    <div class="section-card">
+        <div class="sec-title">➕ Agregar producto</div>
+        <form method="POST" action="{{ route('orders.addProduct',$order) }}">
+            @csrf
+            <div class="add-grid">
+                <div>
+                    <label class="flabel">Producto</label>
+                    <select name="product_id" class="finput" required>
+                        <option value="">Seleccionar producto</option>
+                        @foreach($products as $product)
+                            <option value="{{ $product->id }}">{{ $product->nombre }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div>
+                    <label class="flabel">Cantidad</label>
+                    <input type="number" name="cantidad_solicitada" class="finput" placeholder="0" required>
+                </div>
+                <div>
+                    <label class="flabel">Precio</label>
+                    <input type="number" step="0.01" name="precio_unitario" class="finput" placeholder="0.00" required>
+                </div>
+                <button type="submit" class="btn btn-red" style="align-self:end;">Agregar</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{{-- ══════════ TARJETA PRINCIPAL: TABS + TABLA ══════════ --}}
+<div class="oc-main">
+
+    <div class="oc-tabsbar">
+        <div class="oc-tabs">
+            <button type="button" class="oc-tab on" onclick="ocTab('productos',this)"><svg class="oc-i"><use href="#oc-box"/></svg> Productos de la orden</button>
+            <button type="button" class="oc-tab" onclick="ocTab('historial',this)"><svg class="oc-i"><use href="#oc-history"/></svg> Historial de despachos</button>
+            <button type="button" class="oc-tab" onclick="ocTab('documentos',this)"><svg class="oc-i"><use href="#oc-file"/></svg> Documentos</button>
+        </div>
+
+        <div class="oc-tools" id="ocTools">
+            <div class="oc-search">
+                <svg class="oc-i"><use href="#oc-search"/></svg>
+                <input type="text" id="ocBuscar" placeholder="Buscar producto, SKU o lote..." oninput="ocFiltrar()">
+            </div>
+
+            <div class="oc-dd" id="ddFiltros">
+                <button type="button" class="oc-btn" style="color:#334155;" onclick="ocDD('ddFiltros',event)"><svg class="oc-i"><use href="#oc-filter"/></svg> Filtros</button>
+                <div class="oc-dd-menu" onclick="event.stopPropagation()">
+                    <span class="oc-dd-lbl">Estado</span>
+                    <select id="ocFEstado" class="oc-dd-sel" onchange="ocFiltrar()">
+                        <option value="">Todos</option>
+                        <option value="COMPLETO">Completo</option>
+                        <option value="PARCIAL">Parcial</option>
+                        <option value="INCOMPLETO">Incompleto</option>
+                    </select>
+                    <span class="oc-dd-lbl">Paleta</span>
+                    <select id="ocFPaleta" class="oc-dd-sel" onchange="ocFiltrar()">
+                        <option value="">Todas</option>
+                        @foreach($paletas->keys() as $kp)
+                            <option value="{{ strtoupper($kp) }}">{{ $kp }}</option>
+                        @endforeach
+                        <option value="__SIN__">Sin paleta</option>
+                    </select>
+                    <button type="button" class="oc-dd-item" style="margin-top:6px;color:var(--oc-blue);" onclick="ocLimpiar()">Limpiar filtros</button>
+                </div>
+            </div>
+
+            <button type="button" class="oc-btn" style="color:#334155;" onclick="ocTogglePanel()"><svg class="oc-i"><use href="#oc-sliders"/></svg> Acciones <svg class="oc-i"><use href="#oc-chev"/></svg></button>
+        </div>
+    </div>
+
+    {{-- ─── PANE: PRODUCTOS ─── --}}
+    <div class="oc-pane on" data-pane="productos">
+        <div class="oc-scroll">
+            <table class="oc-tbl" id="ocTabla">
+                <thead>
+                    <tr>
+                        <th style="width:34px;">#</th>
+                        <th>Producto</th>
+                        <th>SKU</th>
+                        <th class="c">Solicitado</th>
+                        <th class="c">Despachado</th>
+                        <th class="c">Pendiente</th>
+                        <th>Avance</th>
+                        <th>Lote</th>
+                        <th>Vencimiento</th>
+                        <th>Octógonos</th>
+                        <th class="c">Paleta</th>
+                        <th>Ubicación</th>
+                        <th>Últ. despacho</th>
+                        <th>Subtotal</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                @foreach($order->details as $detail)
                     @php
+                        $s = $detail->estado_item;
+                        $bc = $s === 'COMPLETO' ? '#22c55e' : ($s === 'PARCIAL' ? '#f59e0b' : '#ef4444');
+                        $sc = $s === 'COMPLETO' ? '#15803d' : ($s === 'PARCIAL' ? '#b45309' : '#b91c1c');
+                        $pct = $detail->cantidad_solicitada > 0
+                            ? round(($detail->cantidad_despachada / $detail->cantidad_solicitada) * 100)
+                            : 0;
+
                         $cpc = $detail->product->cantidad_por_caja ?? 1;
                         $cajasDesp = $cpc > 0 ? floor($detail->cantidad_despachada / $cpc) : 0;
                         $cajasSol = $cpc > 0 ? ceil($detail->cantidad_solicitada / $cpc) : 0;
                         $unidSueltas = $cpc > 0 ? ($detail->cantidad_despachada % $cpc) : 0;
+
+                        $ocSol  = (float) $detail->cantidad_solicitada;
+                        $ocDesp = (float) $detail->cantidad_despachada;
+                        $ocPend = max($ocSol - $ocDesp, 0);
+
+                        $ocVenc = $detail->fecha_vencimiento ?? ($detail->product->fecha_vencimiento ?? null);
+                        $ocVencado = $ocVenc && \Carbon\Carbon::parse($ocVenc)->isPast();
+
+                        $ocImg = $detail->product->imagen ?? $detail->product->image ?? $detail->product->foto ?? null;
+                        if ($ocImg && is_string($ocImg) && !preg_match('#^(https?:)?//#', $ocImg)) {
+                            $ocImg = asset('storage/' . ltrim($ocImg, '/'));
+                        }
+
+                        $ocOcts = [];
+                        $ocRaw = $detail->product->octogonos ?? null;
+                        if (is_string($ocRaw) && trim($ocRaw) !== '') {
+                            $dec = json_decode($ocRaw, true);
+                            $ocRaw = is_array($dec) ? $dec : array_map('trim', explode(',', $ocRaw));
+                        }
+                        if (is_array($ocRaw)) {
+                            foreach ($ocRaw as $o) { $ocOcts[] = mb_strtolower((string) $o); }
+                        }
+                        foreach (['azucar'=>'alto_azucar','sodio'=>'alto_sodio','grasas saturadas'=>'alto_grasas_saturadas','grasas trans'=>'alto_grasas_trans'] as $k => $col) {
+                            if (!empty($detail->product->{$col})) { $ocOcts[] = $k; }
+                        }
+                        $ocOcts = array_values(array_unique($ocOcts));
+
+                        $ocUbic = $detail->ubicacion ?? ($detail->product->ubicacion ?? null);
+                        $ocUlt  = $ocDesp > 0 ? $detail->updated_at : null;
                     @endphp
-                    <div class="info-strip" style="grid-template-columns:1fr 1fr;">
-                        <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
-                        <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
 
-                        {{-- Cajas solicitadas --}}
-                        <div class="info-item" style="grid-column:1/-1;">
-                            🗃 Cajas solicitadas:
-                            <span class="info-val" style="color:#2563eb;">
-                                {{ $cajasSol }} caja{{ $cajasSol !== 1 ? 's' : '' }}
-                            </span>
-                            <span style="font-size:10px;color:#94a3b8;margin-left:3px;">
-                                ({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)
-                            </span>
-                        </div>
+                    <tr class="oc-row"
+                        id="producto-{{ $detail->product->barcode }}"
+                        data-barcode="{{ $detail->product->barcode }}"
+                        data-box-barcode="{{ $detail->product->box_barcode }}"
+                        data-estado="{{ $s }}"
+                        data-paleta="{{ $detail->paleta }}"
+                        data-search="{{ mb_strtolower(($detail->product->nombre ?? '').' '.($detail->product->sku ?? '').' '.($detail->lote ?? '').' '.($detail->product->barcode ?? '')) }}">
 
-                        {{-- Cajas despachadas --}}
-                        <div class="info-item" style="grid-column:1/-1;">
-                            ✅ Cajas despachadas:
-                            <span class="info-val" style="color:{{ $bc }};">
-                                {{ $cajasDesp }} caja{{ $cajasDesp !== 1 ? 's' : '' }}
-                            </span>
-                            @if($unidSueltas > 0)
-                                <span style="font-size:10px;color:#f59e0b;margin-left:3px;">
-                                    + {{ $unidSueltas }} u. sueltas
-                                </span>
-                            @endif
-                        </div>
+                        <td class="oc-num">{{ $loop->iteration }}</td>
 
-                        {{-- Barra de progreso --}}
-                        <div class="info-item" style="grid-column:1/-1;gap:6px;">
-                            <span style="font-size:10px;color:#94a3b8;white-space:nowrap;">Despacho:</span>
-                            <div class="prog-mini" style="flex:1;">
-                                <div class="prog-mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div>
-                            </div>
-                            <span style="font-size:10px;font-weight:700;color:{{ $sc }};margin-left:2px;">{{ $pct }}%</span>
-                        </div>
-                    </div>
-                    <form method="POST" action="{{ route('orders.updateDetail',$detail) }}"
-                        data-detail-form
-                        data-original-paleta="{{ $detail->paleta }}">
-                        @csrf @method('PUT')
-                        <div class="fields-box">
-                            <div class="field-row">
-                                <div><label class="flabel">Solicitado</label>
-                                    <input type="number" step="0.01" name="cantidad_solicitada" class="finput" value="{{ $detail->cantidad_solicitada }}"></div>
-                                <div><label class="flabel">Despachado</label>
-                                    <input type="number" step="0.01" name="cantidad_despachada" id="despachado-{{ $detail->product->barcode }}" class="finput" value="{{ $detail->cantidad_despachada }}"></div>
-                            </div>
-                            <div><label class="flabel">Precio</label>
-                                <input type="number" step="0.01" name="precio_unitario" class="finput" value="{{ $detail->precio_unitario }}"></div>
-                            <hr class="dv">
-                            <div>
-                                <label class="flabel">Lote</label>
-                                <input
-                                    type="text"
-                                    name="lote"
-                                    class="finput"
-                                    value="{{ $detail->lote }}"
-                                    placeholder="Lote">
-                            </div>
-                            <div><label class="flabel">Vencimiento</label>
-                                <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}"></div>
-                        </div>
-                        <div style="margin-top:7px;">
-                            <label class="flabel">Paleta</label>
-                            <input type="text" name="paleta" class="paleta-input"
-                                value="{{ $detail->paleta }}" placeholder="P01"
-                                oninput="this.value=this.value.toUpperCase()">
-                        </div>
-                        <div class="subtotal-row" style="margin-top:7px;">
-                            <span style="font-size:11px;color:#64748b;">Subtotal</span>
-                            <span class="subtotal-val">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</span>
-                        </div>
-                        <div class="btn-row-prod" style="margin-top:7px;">
-                            <button type="submit" class="btn btn-blue" style="width:100%;">💾 Guardar</button>
-                        </div>
-                    </form>
-                    <button type="button" class="btn btn-gray" style="width:100%;margin-top:4px;"
-                        onclick="abrirEtiqueta({
-                            detailId: {{ $detail->id }},
-                            nombre: {{ Js::from($detail->product->nombre) }},
-                            cantidadPorCaja: {{ (int) ($detail->product->cantidad_por_caja ?? 1) }},
-                            codigo: {{ Js::from(
-                                in_array(strtoupper(trim($order->client->razon_social ?? '')), [
-                                    'HIPERMERCADOS TOTTUS ORIENTE SAC',
-                                    'HIPERMERCADOS TOTTUS S.A',
-                                ], true)
-                                    ? ($detail->product->barcode ?? '')
-                                    : ($detail->product->box_barcode ?? '')
-                            ) }},
-                            lote: {{ Js::from($detail->lote ?? '') }},
-                            fecha: {{ Js::from($detail->fecha_vencimiento
-                                ? \Carbon\Carbon::parse($detail->fecha_vencimiento)->format('d/m/Y')
-                                : ($detail->product->fecha_vencimiento
-                                    ? \Carbon\Carbon::parse($detail->product->fecha_vencimiento)->format('d/m/Y')
-                                    : '')) }},
-                            cantidadDespachada: {{ (float) $detail->cantidad_despachada }}
-                        })">
-    🏷️ Generar etiqueta
-</button>
-                    <form method="POST" action="{{ route('orders.details.destroy',$detail) }}"
-                        onsubmit="return confirm('¿Eliminar {{ $detail->product->nombre }}?')">
-                        @csrf @method('DELETE')
-                        <button type="submit" class="btn btn-red" style="width:100%;margin-top:4px;">🗑 Eliminar</button>
-                    </form>
-                </div>
-            @endforeach
-        </div>
-
-    </div>{{-- /.left-col --}}
-
-    {{-- ── Right col ── --}}
-    <div class="right-col">
-
-        {{-- ══════════════════════════════════════════
-             MAPA DE PALETAS
-        ══════════════════════════════════════════ --}}
-        <div class="paleta-map-card">
-            <div class="paleta-map-header">
-                <div class="paleta-map-title">
-                    🪵 Mapa de paletas
-                    <span style="background:#1e293b;color:#94a3b8;font-size:10px;padding:2px 8px;border-radius:99px;">
-                        {{ $paletas->count() }} paleta{{ $paletas->count() !== 1 ? 's' : '' }}
-                    </span>
-                </div>
-                <span style="font-size:10px;color:#475569;">Clic para ver detalle</span>
-            </div>
-
-            <div class="paleta-map-body">
-
-                @if($paletas->isEmpty() && $sinPaleta->isEmpty())
-                    <div style="text-align:center;padding:24px 0;color:#94a3b8;font-size:12px;">
-                        <div style="font-size:28px;margin-bottom:6px;">🪵</div>
-                        Sin paletas asignadas aún
-                    </div>
-                @else
-
-                    <div class="paleta-map-grid">
-                        @foreach($paletas as $nombrePaleta => $items)
-                            @php
-                                $totUds = $items->sum('cantidad_solicitada');
-                                $despUds = $items->sum('cantidad_despachada');
-                                $pesoKg = $items->sum(fn($i) => ($i->product->peso ?? 0) * $i->cantidad_solicitada / 1000);
-                                $pctP = $totUds > 0 ? round(($despUds / $totUds) * 100) : 0;
-                                $todoC = $items->every(fn($i) => $i->estado_item === 'COMPLETO');
-                                $algunP = $items->contains(fn($i) => $i->estado_item === 'PARCIAL');
-                                $estClass = $todoC ? 'estado-completo' : ($algunP ? 'estado-parcial' : 'estado-incompleto');
-                                $pctColor = $todoC ? '#15803d' : ($algunP ? '#b45309' : '#b91c1c');
-                                $fillColor= $todoC ? '#22c55e' : ($algunP ? '#f59e0b' : '#ef4444');
-                                $icon = $todoC ? '✅' : ($algunP ? '⏳' : '⚠️');
-                                $llena = $items->count() >= $paletaMax;
-
-                                // Serializar items para el modal
-                                $itemsJson = $items->map(fn($i) => [
-                                    'nombre' => $i->product->nombre ?? 'Producto',
-                                    'sku' => $i->product->sku ?? '',
-                                    'solicitada' => $i->cantidad_solicitada,
-                                    'despachada' => $i->cantidad_despachada,
-                                    'estado' => $i->estado_item,
-                                    'precio' => $i->precio_unitario,
-                                    'subtotal' => $i->subtotal,
-                                    'peso' => number_format(($i->product->peso ?? 0) / 1000, 3),
-                                    'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,
-                                    'barcode' => $i->product->barcode,
-                                    'box_barcode' => $i->product->box_barcode,
-                                ])->values()->toJson();
-                            @endphp
-
-                            <div class="paleta-box {{ $estClass }} {{ $llena ? 'paleta-llena' : '' }}"
-                                onclick="abrirPaleta({{ json_encode($nombrePaleta) }}, {{ $items->count() }}, {{ $totUds }}, {{ $despUds }}, {{ round($pesoKg,1) }}, {{ $pctP }}, {{ json_encode($fillColor) }}, {{ $itemsJson }})">
-                                @if($llena)
-                                    <span class="paleta-box-full-badge">LLENA</span>
-                                @endif
-                                <div class="paleta-box-icon">🪵</div>
-                                <div class="paleta-box-name">{{ $nombrePaleta }}</div>
-                                <div class="paleta-box-items">{{ $items->count() }}/{{ $paletaMax }} ítem{{ $items->count() > 1 ? 's' : '' }}</div>
-                                <div class="paleta-box-pct" style="color:{{ $pctColor }};">{{ $icon }} {{ $pctP }}%</div>
-                                <div class="paleta-box-bar">
-                                    <div class="paleta-box-fill" style="width:{{ $pctP }}%;background:{{ $fillColor }}"></div>
+                        <td>
+                            <div class="oc-prod">
+                                <div class="oc-thumb">@if($ocImg)<img src="{{ $ocImg }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">@else 📦 @endif</div>
+                                <div>
+                                    <div class="oc-pname">{{ $detail->product->nombre }}</div>
+                                    @if(!empty($detail->product->marca))<div class="oc-pmarca">Marca: {{ $detail->product->marca }}</div>@endif
                                 </div>
                             </div>
-                        @endforeach
-                    </div>
+                        </td>
 
-                    {{-- Sin paleta --}}
-                    @if($sinPaleta->count())
-                        @php
-                            $spJson = $sinPaleta->map(fn($i) => [
-                                'nombre' => $i->product->nombre ?? 'Producto',
-                                'sku' => $i->product->sku ?? '',
-                                'solicitada' => $i->cantidad_solicitada,
-                                'despachada' => $i->cantidad_despachada,
-                                'estado' => $i->estado_item,
-                                'precio' => $i->precio_unitario,
-                                'subtotal' => $i->subtotal,
-                                'peso' => number_format(($i->product->peso ?? 0) / 1000, 3),
-                                'cantidad_por_caja' => $i->product->cantidad_por_caja ?? 1,
-                                'barcode' => $i->product->barcode,
-                                'box_barcode' => $i->product->box_barcode,
-                            ])->values()->toJson();
-                        @endphp
-                        <div class="no-paleta-chip"
-                            onclick="abrirPaleta('Sin paleta', {{ $sinPaleta->count() }}, {{ $sinPaleta->sum('cantidad_solicitada') }}, {{ $sinPaleta->sum('cantidad_despachada') }}, 0, 0, '#94a3b8', {{ $spJson }})">
-                            <span>⚠️ Sin paleta asignada</span>
-                            <span style="font-weight:700;">{{ $sinPaleta->count() }} ítem{{ $sinPaleta->count() > 1 ? 's' : '' }} →</span>
-                        </div>
-                    @endif
+                        <td class="oc-num" style="color:#64748b;">{{ $detail->product->sku }}</td>
+                        <td class="c oc-num" style="font-weight:700;">{{ $ocN($ocSol) }}</td>
+                        <td class="c oc-num" style="font-weight:700;color:{{ $s === 'COMPLETO' ? '#16a34a' : '#0f172a' }};">{{ $ocN($ocDesp) }}</td>
+                        <td class="c oc-num" style="font-weight:700;color:{{ $ocPend > 0 ? '#f59e0b' : '#16a34a' }};">{{ $ocN($ocPend) }}</td>
 
-                @endif
-            </div>
+                        <td>
+                            <div class="oc-av">
+                                <div class="oc-av-bar"><div style="width:{{ min($pct,100) }}%;background:{{ $bc }};"></div></div>
+                                <b style="color:{{ $sc }};">{{ $pct }}%</b>
+                            </div>
+                        </td>
+
+                        <td class="oc-num">{{ $detail->lote ?: '—' }}</td>
+                        <td class="oc-num" @if($ocVencado) style="color:#dc2626;font-weight:700;" title="Vencido" @endif>{{ $ocFecha($ocVenc) }}</td>
+
+                        <td>
+                            @forelse($ocOcts as $o)
+                                @php $lb = $ocOctLabel($o); @endphp
+                                <span class="oc-oct" title="{{ trim($lb[0].' '.$lb[1]) }}"><span>{{ $lb[0] }}</span><span>{{ $lb[1] }}</span></span>
+                            @empty
+                                <span class="oc-dash">–</span>
+                            @endforelse
+                        </td>
+
+                        <td class="c">@if($detail->paleta)<span class="oc-pal">{{ $detail->paleta }}</span>@else<span class="oc-dash">—</span>@endif</td>
+                        <td class="oc-num">{{ $ocUbic ?: '—' }}</td>
+
+                        <td>
+                            @if($ocUlt)
+                                <div class="oc-ult oc-num">{{ $ocUlt->format('d/m H:i') }}</div>
+                            @else
+                                <span class="oc-dash">—</span>
+                            @endif
+                        </td>
+
+                        <td class="oc-num" style="font-weight:700;white-space:nowrap;">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</td>
+
+                        <td>
+                            <div class="oc-acts">
+                                <button type="button" class="oc-ic" title="Ver detalle" onclick="ocToggle({{ $detail->id }})"><svg class="oc-i"><use href="#oc-eye"/></svg></button>
+                                <button type="button" class="oc-ic" title="Editar" onclick="ocEditar({{ $detail->id }})"><svg class="oc-i"><use href="#oc-edit"/></svg></button>
+                                <button type="button" class="oc-ic" title="Generar etiqueta"
+                                    onclick="abrirEtiqueta({
+                                        detailId: {{ $detail->id }},
+                                        nombre: {{ Js::from($detail->product->nombre) }},
+                                        cantidadPorCaja: {{ (int) ($detail->product->cantidad_por_caja ?? 1) }},
+                                        codigo: {{ Js::from(
+                                            in_array(strtoupper(trim($order->client->razon_social ?? '')), [
+                                                'HIPERMERCADOS TOTTUS ORIENTE SAC',
+                                                'HIPERMERCADOS TOTTUS S.A',
+                                            ], true)
+                                                ? ($detail->product->barcode ?? '')
+                                                : ($detail->product->box_barcode ?? '')
+                                        ) }},
+                                        lote: {{ Js::from($detail->lote ?? '') }},
+                                        fecha: {{ Js::from($detail->fecha_vencimiento
+                                            ? \Carbon\Carbon::parse($detail->fecha_vencimiento)->format('d/m/Y')
+                                            : ($detail->product->fecha_vencimiento
+                                                ? \Carbon\Carbon::parse($detail->product->fecha_vencimiento)->format('d/m/Y')
+                                                : '')) }},
+                                        cantidadDespachada: {{ (float) $detail->cantidad_despachada }}
+                                    })"><svg class="oc-i"><use href="#oc-printer"/></svg></button>
+
+                                <form method="POST" action="{{ route('orders.details.destroy',$detail) }}"
+                                    onsubmit="return confirm('¿Eliminar {{ $detail->product->nombre }}?')">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="oc-ic del" title="Eliminar"><svg class="oc-i"><use href="#oc-trash"/></svg></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+
+                    {{-- Fila expandible: info del producto + formulario original de edición --}}
+                    <tr class="oc-detail" id="oc-det-{{ $detail->id }}">
+                        <td colspan="15">
+                            <div class="oc-panel">
+
+                                <div class="info-strip" style="grid-template-columns:1fr 1fr;">
+                                    <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
+                                    <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
+
+                                    {{-- Cajas solicitadas --}}
+                                    <div class="info-item" style="grid-column:1/-1;">
+                                        🗃 Cajas solicitadas:
+                                        <span class="info-val" style="color:#2563eb;">
+                                            {{ $cajasSol }} caja{{ $cajasSol !== 1 ? 's' : '' }}
+                                        </span>
+                                        <span style="font-size:10px;color:#94a3b8;margin-left:3px;">
+                                            ({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)
+                                        </span>
+                                    </div>
+
+                                    {{-- Cajas despachadas --}}
+                                    <div class="info-item" style="grid-column:1/-1;">
+                                        ✅ Cajas despachadas:
+                                        <span class="info-val" style="color:{{ $bc }};">
+                                            {{ $cajasDesp }} caja{{ $cajasDesp !== 1 ? 's' : '' }}
+                                        </span>
+                                        @if($unidSueltas > 0)
+                                            <span style="font-size:10px;color:#f59e0b;margin-left:3px;">
+                                                + {{ $unidSueltas }} u. sueltas
+                                            </span>
+                                        @endif
+                                    </div>
+
+                                    {{-- Barra de progreso --}}
+                                    <div class="info-item" style="grid-column:1/-1;gap:6px;">
+                                        <span style="font-size:10px;color:#94a3b8;white-space:nowrap;">Despacho:</span>
+                                        <div class="prog-mini" style="flex:1;">
+                                            <div class="prog-mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div>
+                                        </div>
+                                        <span style="font-size:10px;font-weight:700;color:{{ $sc }};margin-left:2px;">{{ $pct }}%</span>
+                                    </div>
+                                </div>
+
+                                <form method="POST" action="{{ route('orders.updateDetail',$detail) }}"
+                                    class="oc-form"
+                                    data-detail-form
+                                    data-original-paleta="{{ $detail->paleta }}">
+                                    @csrf @method('PUT')
+                                    <div class="fields-box">
+                                        <div class="field-row">
+                                            <div><label class="flabel">Solicitado</label>
+                                                <input type="number" step="0.01" name="cantidad_solicitada" class="finput" value="{{ $detail->cantidad_solicitada }}"></div>
+                                            <div><label class="flabel">Despachado</label>
+                                                <input type="number" step="0.01" name="cantidad_despachada" id="despachado-{{ $detail->product->barcode }}" class="finput" value="{{ $detail->cantidad_despachada }}"></div>
+                                        </div>
+                                        <div><label class="flabel">Precio</label>
+                                            <input type="number" step="0.01" name="precio_unitario" class="finput" value="{{ $detail->precio_unitario }}"></div>
+                                        <hr class="dv">
+                                        <div>
+                                            <label class="flabel">Lote</label>
+                                            <input
+                                                type="text"
+                                                name="lote"
+                                                class="finput"
+                                                value="{{ $detail->lote }}"
+                                                placeholder="Lote">
+                                        </div>
+                                        <div><label class="flabel">Vencimiento</label>
+                                            <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}"></div>
+                                    </div>
+                                    <div style="margin-top:7px;">
+                                        <label class="flabel">Paleta</label>
+                                        <input type="text" name="paleta" class="paleta-input"
+                                            value="{{ $detail->paleta }}" placeholder="P01"
+                                            oninput="this.value=this.value.toUpperCase()">
+                                    </div>
+                                    <div class="subtotal-row" style="margin-top:7px;">
+                                        <span style="font-size:11px;color:#64748b;">Subtotal</span>
+                                        <span class="subtotal-val">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</span>
+                                    </div>
+                                    <div class="btn-row-prod" style="margin-top:7px;">
+                                        <button type="submit" class="btn btn-blue" style="width:100%;">💾 Guardar</button>
+                                    </div>
+                                </form>
+
+                            </div>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
         </div>
+        <div class="oc-vacio" id="ocVacio">No hay productos que coincidan con la búsqueda o los filtros.</div>
+        <div class="oc-count"><span id="ocContador">{{ $totalItems }} de {{ $totalItems }}</span> productos</div>
+    </div>
 
-        {{-- Resumen financiero --}}
-        <div class="resumen-card">
-            <div class="sec-title">📊 Resumen</div>
-            <hr class="dv" style="margin-bottom:8px;">
-            <div class="resumen-row"><span>Productos</span><span class="resumen-val">{{ $order->details->count() }}</span></div>
-            <div class="resumen-row"><span>Subtotal</span><span class="resumen-val">S/ {{ number_format($order->subtotal,2) }}</span></div>
-            <div class="resumen-row"><span>IGV (18%)</span><span class="resumen-val">S/ {{ number_format($order->igv,2) }}</span></div>
-            <div class="resumen-total-row">
-                <span style="font-size:14px;font-weight:700;color:#0f172a;">Total</span>
-                <span style="font-size:18px;font-weight:700;color:#15803d;">S/ {{ number_format($order->total,2) }}</span>
-            </div>
+    {{-- ─── PANE: HISTORIAL (último despacho por producto, con datos existentes) ─── --}}
+    <div class="oc-pane" data-pane="historial">
+        <div class="oc-scroll">
+            <table class="oc-simple">
+                <thead><tr><th>Fecha / hora</th><th>Producto</th><th>SKU</th><th>Despachado</th><th>Paleta</th></tr></thead>
+                <tbody>
+                @forelse($order->details->filter(fn($d) => $d->cantidad_despachada > 0)->sortByDesc('updated_at') as $h)
+                    <tr>
+                        <td class="oc-num">{{ $h->updated_at ? $h->updated_at->format('d/m/Y H:i') : '—' }}</td>
+                        <td style="font-weight:600;">{{ $h->product->nombre ?? 'Producto' }}</td>
+                        <td class="oc-num" style="color:#64748b;">{{ $h->product->sku ?? '' }}</td>
+                        <td class="oc-num" style="font-weight:700;">{{ $ocN($h->cantidad_despachada) }} <span style="color:#94a3b8;font-weight:400;">/ {{ $ocN($h->cantidad_solicitada) }}</span></td>
+                        <td>@if($h->paleta)<span class="oc-pal">{{ $h->paleta }}</span>@else<span class="oc-dash">—</span>@endif</td>
+                    </tr>
+                @empty
+                    <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:26px;">Aún no hay despachos registrados.</td></tr>
+                @endforelse
+                </tbody>
+            </table>
         </div>
+        <div class="oc-count">Muestra la última actualización de despacho de cada producto.</div>
+    </div>
 
-        {{-- Progreso --}}
-        <div class="resumen-card">
-            <div class="sec-title">📈 Progreso de despacho</div>
-            <div class="prog-resumen">
-                <div class="prog-label"><span>Completado</span><span style="font-weight:700;color:{{ $progColor }};">{{ $porcentaje }}%</span></div>
-                <div class="prog-bar"><div class="prog-fill" style="width:{{ $porcentaje }}%;background:{{ $progColor }};"></div></div>
-                <div style="font-size:10px;color:#94a3b8;margin-top:3px;">{{ $completados }} de {{ $totalItems }} productos</div>
-            </div>
-            <hr class="dv" style="margin:8px 0;">
-            @php
-                $parciales2 = $order->details->where('estado_item','PARCIAL')->count();
-                $incompletos2 = $order->details->where('estado_item','INCOMPLETO')->count();
-            @endphp
-            <div class="legend">
-                <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#22c55e;"></span><span style="font-size:12px;color:#64748b;">Completo</span></div><span style="font-size:12px;font-weight:700;color:#15803d;">{{ $completados }}</span></div>
-                <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#f59e0b;"></span><span style="font-size:12px;color:#64748b;">Parcial</span></div><span style="font-size:12px;font-weight:700;color:#b45309;">{{ $parciales2 }}</span></div>
-                <div class="leg-row"><div style="display:flex;align-items:center;"><span class="leg-dot" style="background:#ef4444;"></span><span style="font-size:12px;color:#64748b;">Incompleto</span></div><span style="font-size:12px;font-weight:700;color:#b91c1c;">{{ $incompletos2 }}</span></div>
-            </div>
+    {{-- ─── PANE: DOCUMENTOS ─── --}}
+    <div class="oc-pane" data-pane="documentos">
+        <div class="oc-docs">
+            <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="oc-tile t-orange">
+                <svg class="oc-i"><use href="#oc-file"/></svg>
+                <span><b>Orden de pedido (PDF)</b><small>{{ $order->numero_orden }}</small></span>
+            </a>
+            <button type="button" class="oc-tile t-gray" onclick="abrirResumenOrden()">
+                <svg class="oc-i"><use href="#oc-file"/></svg>
+                <span><b>Resumen de armado</b><small>Estado de cada producto</small></span>
+            </button>
         </div>
+    </div>
 
-        {{-- Info orden --}}
-        <div class="resumen-card">
-            <div class="sec-title">ℹ️ Info de la orden</div>
-            <div class="resumen-row"><span>Fecha</span><span class="resumen-val">{{ \Carbon\Carbon::parse($order->fecha_pedido)->format('d M Y') }}</span></div>
-            <div class="resumen-row"><span>Tipo</span><span class="resumen-val">{{ $order->tipo_orden }}</span></div>
-            <div class="resumen-row"><span>Cliente</span><span class="resumen-val" style="font-size:11px;max-width:140px;text-align:right;">{{ $order->client?->razon_social }}</span></div>
-            <div class="resumen-row"><span>Estado</span><span style="font-size:11px;font-weight:700;color:{{ $estadoColor }};">{{ $order->estado }}</span></div>
+</div>{{-- /.oc-main --}}
+
+{{-- ══════════ INFERIOR: ACCIONES · RESUMEN · INFO ══════════ --}}
+<div class="oc-bottom">
+
+    <div class="oc-card">
+        <h3 class="oc-card-t">Acciones principales</h3>
+        <div class="oc-acc">
+            <button type="button" class="oc-tile t-blue" onclick="ocIrEscaner()">
+                <svg class="oc-i"><use href="#oc-truck"/></svg>
+                <span><b>Registrar despacho</b><small>Ingresar cantidades</small></span>
+            </button>
+
+            @if($ocRutaEtiquetas)
+                <a href="{{ $ocRutaEtiquetas }}" target="_blank" class="oc-tile t-green">
+            @else
+                <button type="button" class="oc-tile t-green is-off" disabled title="Ruta de impresión masiva sin configurar">
+            @endif
+                <svg class="oc-i"><use href="#oc-printer"/></svg>
+                <span><b>Imprimir etiquetas</b><small>Etiquetas por paleta o producto</small></span>
+            @if($ocRutaEtiquetas) </a> @else </button> @endif
+
+            <button type="button" class="oc-tile t-purple" onclick="document.getElementById('ocPaletas').scrollIntoView({behavior:'smooth',block:'center'})">
+                <svg class="oc-i"><use href="#oc-grid"/></svg>
+                <span><b>Gestionar paletas</b><small>Crear o editar paletas</small></span>
+            </button>
+
+            <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="oc-tile t-orange">
+                <svg class="oc-i"><use href="#oc-file"/></svg>
+                <span><b>Ver/Descargar PDF</b><small>Orden de pedido</small></span>
+            </a>
+
+            @if($ocRutaGuia)
+                <a href="{{ $ocRutaGuia }}" class="oc-tile t-sky">
+            @else
+                <button type="button" class="oc-tile t-sky is-off" disabled title="Ruta de guía sin configurar">
+            @endif
+                <svg class="oc-i"><use href="#oc-truck"/></svg>
+                <span><b>Generar guía</b><small>Documento de transporte</small></span>
+            @if($ocRutaGuia) </a> @else </button> @endif
+
+            <button type="button" class="oc-tile t-gray" onclick="ocExportCSV()">
+                <svg class="oc-i"><use href="#oc-file"/></svg>
+                <span><b>Exportar</b><small>Excel (CSV)</small></span>
+            </button>
         </div>
+    </div>
 
-    </div>{{-- /.right-col --}}
-</div>{{-- /.main-layout --}}
+    <div class="oc-card">
+        <h3 class="oc-card-t">Resumen de la orden</h3>
+        <div class="oc-kpi4">
+            <div class="oc-k"><div class="oc-k-ic" style="background:#eaf1ff;color:#2563eb;"><svg class="oc-i" style="width:20px;height:20px;"><use href="#oc-box"/></svg></div><b>{{ $ocN($ocSumSol) }}</b><small>Solicitado total</small></div>
+            <div class="oc-k"><div class="oc-k-ic" style="background:#dcfce7;color:#16a34a;"><svg class="oc-i" style="width:20px;height:20px;"><use href="#oc-check"/></svg></div><b>{{ $ocN($ocSumDesp) }}</b><small>Despachado</small></div>
+            <div class="oc-k"><div class="oc-k-ic" style="background:#fef3c7;color:#d97706;"><svg class="oc-i" style="width:20px;height:20px;"><use href="#oc-clock"/></svg></div><b>{{ $ocN($ocSumPend) }}</b><small>Pendiente</small></div>
+            <div class="oc-k"><div class="oc-k-ic" style="background:#eaf1ff;color:#2563eb;">%</div><b>{{ $ocAvance }}%</b><small>Avance general</small></div>
+        </div>
+        <div class="oc-fin">
+            <span>Subtotal <b>S/ {{ number_format($order->subtotal,2) }}</b></span>
+            <span>IGV (18%) <b>S/ {{ number_format($order->igv,2) }}</b></span>
+            <span class="tot">Total <b>S/ {{ number_format($order->total,2) }}</b></span>
+        </div>
+    </div>
+
+    <div class="oc-card">
+        <h3 class="oc-card-t">Información adicional</h3>
+        <div class="oc-info">
+            <div><span>Creado por</span><b>{{ $order->user->name ?? $order->creado_por ?? '—' }}</b></div>
+            <div><span>Estado</span><b><span class="oc-chip" style="background:{{ $estadoColor }}1a;color:{{ $estadoColor }};padding:2px 10px;">{{ $order->estado }}</span></b></div>
+            <div><span>Fecha de creación</span><b class="oc-num">{{ $ocFecha($order->created_at ?? null, 'd/m/Y H:i') }}</b></div>
+            <div><span>Prioridad</span><b>{{ $order->prioridad ?? 'Normal' }}</b></div>
+            <div><span>Última actualización</span><b class="oc-num">{{ $ocFecha($order->updated_at ?? null, 'd/m/Y H:i') }}</b></div>
+            <div><span>Almacén de salida</span><b>{{ $order->almacen ?? $order->almacen_salida ?? '—' }}</b></div>
+        </div>
+    </div>
+
+</div>{{-- /.oc-bottom --}}
+
+</div>{{-- /.oc --}}
 </div>{{-- /.pg --}}
 
 {{-- ══════════════════════════════
@@ -1645,2017 +2174,4 @@ function renderP3dProducts()
         const restantes =
             Math.max(
                 0,
-                totalCajas - colocadas
-            );
-
-        const porcentaje =
-            totalCajas > 0
-                ? Math.min(
-                    100,
-                    Math.round(
-                        (colocadas / totalCajas) * 100
-                    )
-                )
-                : 0;
-
-        const row =
-            document.createElement('div');
-
-        row.className =
-            'p3d-product-row';
-
-        row.draggable =
-            restantes > 0;
-
-        row.innerHTML = `
-            <div class="p3d-product-name">
-                📦 ${item.nombre}
-            </div>
-
-            <div class="p3d-product-meta">
-                Cajas totales:
-                <strong>
-                    ${totalCajas}
-                </strong>
-            </div>
-
-            <div class="p3d-product-meta">
-                Colocadas:
-                <strong>
-                    ${colocadas}
-                </strong>
-            </div>
-
-            <div class="p3d-product-meta">
-                Restantes:
-                <strong
-                    style="
-                        color:${restantes > 0
-                            ? '#2563eb'
-                            : '#15803d'};
-                    "
-                >
-                    ${restantes}
-                </strong>
-            </div>
-
-            <div
-                style="
-                    width:100%;
-                    height:5px;
-                    background:#e5e7eb;
-                    border-radius:99px;
-                    overflow:hidden;
-                    margin-top:6px;
-                "
-            >
-                <div
-                    style="
-                        width:${porcentaje}%;
-                        height:100%;
-                        background:${porcentaje >= 100
-                            ? '#22c55e'
-                            : '#2563eb'};
-                        border-radius:99px;
-                    "
-                ></div>
-            </div>
-
-            ${
-                restantes <= 0
-                    ? `
-                        <div
-                            style="
-                                font-size:9px;
-                                color:#15803d;
-                                font-weight:700;
-                                margin-top:5px;
-                            "
-                        >
-                            ✅ COMPLETO
-                        </div>
-                    `
-                    : `
-                        <div
-                            style="
-                                font-size:9px;
-                                color:#64748b;
-                                margin-top:5px;
-                            "
-                        >
-                            🖱️ Arrastra hacia la paleta
-                        </div>
-                    `
-            }
-        `;
-
-        /*
-         * ARRRASTRAR PRODUCTO
-         */
-        row.addEventListener(
-            'dragstart',
-            function(event)
-            {
-                if (restantes <= 0) {
-                    event.preventDefault();
-                    return;
-                }
-
-                event.dataTransfer.setData(
-                    'text/plain',
-                    String(index)
-                );
-
-                event.dataTransfer.effectAllowed =
-                    'copy';
-
-                row.classList.add(
-                    'selected'
-                );
-            }
-        );
-
-        row.addEventListener(
-            'dragend',
-            function()
-            {
-                row.classList.remove(
-                    'selected'
-                );
-            }
-        );
-
-        /*
-         * CLICK = SELECCIONAR
-         */
-        row.addEventListener(
-            'click',
-            function()
-            {
-                seleccionarProducto3D(
-                    index
-                );
-            }
-        );
-
-        contenedor.appendChild(row);
-    });
-}
-    
-/**
- * =========================================================
- * PALETA COMO ZONA DE DROP
- * =========================================================
- */
-const p3dStage =
-    document.getElementById('p3dStage');
-
-p3dStage?.addEventListener(
-    'dragover',
-    function(event)
-    {
-        event.preventDefault();
-
-        p3dStage.style.outline =
-            '3px dashed #2563eb';
-    }
-);
-
-p3dStage?.addEventListener(
-    'dragleave',
-    function(event)
-    {
-        if (
-            event.relatedTarget &&
-            p3dStage.contains(event.relatedTarget)
-        ) {
-            return;
-        }
-
-        p3dStage.style.outline = '';
-    }
-);
-
-p3dStage?.addEventListener(
-    'drop',
-    function(event)
-    {
-        event.preventDefault();
-
-        p3dStage.style.outline = '';
-
-        const index =
-            Number(
-                event.dataTransfer.getData(
-                    'text/plain'
-                )
-            );
-
-        if (
-            Number.isNaN(index) ||
-            !p3dData[index]
-        ) {
-            return;
-        }
-
-        const restante =
-            obtenerCajasRestantes(index);
-
-        if (restante <= 0) {
-            alert(
-                'Este producto ya tiene todas sus cajas asignadas.'
-            );
-
-            return;
-        }
-
-        /*
-         * Calcular posición aproximada
-         * dentro de la paleta.
-         */
-        const pallet =
-            document.getElementById('p3dPallet');
-
-        const rect =
-            pallet.getBoundingClientRect();
-
-        let x =
-            (
-                event.clientX -
-                rect.left
-            ) / (p3dZoom / 100);
-
-        let y =
-            (
-                event.clientY -
-                rect.top
-            ) / (p3dZoom / 100);
-
-        x = Math.max(
-            0,
-            Math.min(
-                PALLET_WIDTH - 75,
-                x
-            )
-        );
-
-        y = Math.max(
-            0,
-            Math.min(
-                PALLET_DEPTH - 55,
-                y
-            )
-        );
-
-        abrirCantidadBloque(
-            index,
-            x,
-            y
-        );
-    }
-);
-
-
-/**
- * =========================================================
- * CANTIDAD DE CAJAS
- * =========================================================
- */
-function abrirCantidadBloque(
-    productIndex,
-    x,
-    y
-)
-{
-    const item =
-        p3dData[productIndex];
-
-    const restantes =
-        obtenerCajasRestantes(productIndex);
-
-    const cantidad =
-        prompt(
-            `¿Cuántas cajas de "${item.nombre}" quieres colocar?\n\n` +
-            `Cajas restantes: ${restantes}`,
-            restantes
-        );
-
-    if (cantidad === null) {
-        return;
-    }
-
-    const cantidadNumero =
-        parseInt(cantidad);
-
-    if (
-        !Number.isInteger(cantidadNumero) ||
-        cantidadNumero <= 0
-    ) {
-        alert(
-            'Ingresa una cantidad válida.'
-        );
-
-        return;
-    }
-
-    if (
-        cantidadNumero > restantes
-    ) {
-        alert(
-            `Solo quedan ${restantes} cajas disponibles.`
-        );
-
-        return;
-    }
-
-    const nuevoBloque = {
-
-        id:
-            Date.now() +
-            Math.random(),
-
-        productIndex:
-            productIndex,
-
-        cantidad:
-            cantidadNumero,
-
-        x:
-            x,
-
-        y:
-            y,
-
-        width:
-            75,
-
-        depth:
-            55,
-
-        height:
-            18,
-
-        columnas:
-            1,
-
-        filas:
-            1,
-
-        niveles:
-            cantidadNumero,
-
-        rotation:
-            0
-    };
-
-    p3dBlocks.push(
-        nuevoBloque
-    );
-
-    p3dSelected =
-        p3dBlocks.length - 1;
-
-    renderPaleta3D();
-    renderP3dProducts();
-    actualizarEditor3D();
-}
-
-
-/**
- * =========================================================
- * CAJAS RESTANTES
- * =========================================================
- */
-function obtenerCajasRestantes(
-    productIndex
-)
-{
-    const item =
-        p3dData[productIndex];
-
-    const cpc =
-        Number(item.cantidad_por_caja) > 0
-            ? Number(item.cantidad_por_caja)
-            : 1;
-
-    const totalCajas =
-        Math.ceil(
-            Number(item.despachada || 0)
-            / cpc
-        );
-
-    const colocadas =
-        p3dBlocks
-            .filter(
-                block =>
-                    block.productIndex ===
-                    productIndex
-            )
-            .reduce(
-                (total, block) =>
-                    total +
-                    Number(block.cantidad),
-                0
-            );
-
-    return Math.max(
-        0,
-        totalCajas - colocadas
-    );
-}
-
-
-/**
- * =========================================================
- * RENDERIZAR PALETA
- * =========================================================
- */
-function renderPaleta3D()
-{
-    const pallet =
-        document.getElementById('p3dPallet');
-
-    pallet
-        .querySelectorAll(
-            '.p3d-product-group'
-        )
-        .forEach(
-            el => el.remove()
-        );
-
-    p3dBlocks.forEach(
-        (block, blockIndex) => {
-
-            const item =
-                p3dData[
-                    block.productIndex
-                ];
-
-            if (!item) {
-                return;
-            }
-
-            const columnas =
-                Math.max(
-                    1,
-                    Number(
-                        block.columnas || 1
-                    )
-                );
-
-            const filas =
-                Math.max(
-                    1,
-                    Number(
-                        block.filas || 1
-                    )
-                );
-
-            const niveles =
-                Math.max(
-                    1,
-                    Number(
-                        block.niveles || 1
-                    )
-                );
-
-            const groupWidth =
-                (
-                    columnas *
-                    block.width
-                ) +
-                (
-                    (columnas - 1) *
-                    BOX_GAP
-                );
-
-            const groupDepth =
-                (
-                    filas *
-                    block.depth
-                ) +
-                (
-                    (filas - 1) *
-                    BOX_GAP
-                );
-
-            const group =
-                document.createElement(
-                    'div'
-                );
-
-            group.className =
-                'p3d-product-group';
-
-            group.dataset.blockIndex =
-                blockIndex;
-
-            group.style.left =
-                block.x + 'px';
-
-            group.style.top =
-                block.y + 'px';
-
-            group.style.width =
-                groupWidth + 'px';
-
-            group.style.height =
-                groupDepth + 'px';
-
-            group.style.transform =
-                `rotateZ(${block.rotation}deg)`;
-
-            /*
-             * COLORES
-             */
-            const colores = [
-                ['#dbeafe','#2563eb','#1e3a8a'],
-                ['#dcfce7','#16a34a','#166534'],
-                ['#fef3c7','#f59e0b','#92400e'],
-                ['#fce7f3','#db2777','#9d174d'],
-                ['#ede9fe','#7c3aed','#5b21b6'],
-                ['#cffafe','#0891b2','#155e75']
-            ];
-
-            const color =
-                colores[
-                    block.productIndex %
-                    colores.length
-                ];
-
-            /*
-             * CREAR CAJAS
-             */
-            let cajaActual = 0;
-
-            for (
-                let nivel = 0;
-                nivel < niveles;
-                nivel++
-            ) {
-
-                for (
-                    let fila = 0;
-                    fila < filas;
-                    fila++
-                ) {
-
-                    for (
-                        let columna = 0;
-                        columna < columnas;
-                        columna++
-                    ) {
-
-                        if (
-                            cajaActual >=
-                            block.cantidad
-                        ) {
-                            break;
-                        }
-
-                        const caja =
-                            crearCaja3D(
-                                item,
-                                block,
-                                color,
-                                columna,
-                                fila,
-                                nivel
-                            );
-
-                        group.appendChild(
-                            caja
-                        );
-
-                        cajaActual++;
-                    }
-                }
-            }
-
-            configurarDragBloque(
-                group,
-                blockIndex
-            );
-
-            group.addEventListener(
-                'click',
-                function(event)
-                {
-                    event.stopPropagation();
-
-                    p3dSelected =
-                        blockIndex;
-
-                    seleccionarBloque3D(
-                        blockIndex
-                    );
-                }
-            );
-
-            pallet.appendChild(
-                group
-            );
-        }
-    );
-
-    actualizarEditor3D();
-}
-
-
-/**
- * =========================================================
- * CREAR UNA CAJA 3D REAL
- * =========================================================
- */
-function crearCaja3D(
-    item,
-    block,
-    color,
-    columna,
-    fila,
-    nivel
-)
-{
-    const caja =
-        document.createElement(
-            'div'
-        );
-
-    caja.className =
-        'p3d-box';
-caja.style.setProperty(
-    '--box-width',
-    block.width + 'px'
-);
-
-caja.style.setProperty(
-    '--box-depth',
-    block.depth + 'px'
-);
-
-caja.style.setProperty(
-    '--box-height',
-    block.height + 'px'
-);
-    caja.style.width =
-        block.width + 'px';
-
-    caja.style.height =
-        block.height + 'px';
-
-    caja.style.transform =
-        `
-        translate3d(
-            ${
-                columna *
-                (
-                    block.width +
-                    BOX_GAP
-                )
-            }px,
-            ${
-                fila *
-                (
-                    block.depth +
-                    BOX_GAP
-                )
-            }px,
-            ${
-                nivel *
-                block.height
-            }px
-        )
-        `;
-
-    /*
-     * FRENTE
-     */
-    const front =
-        document.createElement(
-            'div'
-        );
-
-    front.className =
-        'p3d-face p3d-front';
-
-    front.style.width =
-        block.width + 'px';
-
-    front.style.height =
-        block.height + 'px';
-
-    front.style.background =
-        color[0];
-
-    front.style.borderColor =
-        color[1];
-
-    front.style.color =
-        color[2];
-
-    front.textContent =
-        item.nombre;
-
-    /*
-     * ATRÁS
-     */
-    const back =
-        document.createElement(
-            'div'
-        );
-
-    back.className =
-        'p3d-face p3d-back';
-
-    back.style.width =
-        block.width + 'px';
-
-    back.style.height =
-        block.height + 'px';
-
-    back.style.background =
-        color[0];
-
-    back.style.borderColor =
-        color[1];
-
-    /*
-     * DERECHA
-     */
-    const right =
-        document.createElement(
-            'div'
-        );
-
-    right.className =
-        'p3d-face p3d-right';
-
-    right.style.width =
-        block.depth + 'px';
-
-    right.style.height =
-        block.height + 'px';
-
-    right.style.background =
-        color[1];
-
-    right.style.borderColor =
-        color[1];
-
-    /*
-     * IZQUIERDA
-     */
-    const left =
-        document.createElement(
-            'div'
-        );
-
-    left.className =
-        'p3d-face p3d-left';
-
-    left.style.width =
-        block.depth + 'px';
-
-    left.style.height =
-        block.height + 'px';
-
-    left.style.background =
-        color[1];
-
-    left.style.borderColor =
-        color[1];
-
-    /*
-     * ARRIBA
-     */
-    const top =
-        document.createElement(
-            'div'
-        );
-
-    top.className =
-        'p3d-face p3d-top';
-
-    top.style.width =
-        block.width + 'px';
-
-    top.style.height =
-        block.depth + 'px';
-
-    top.style.background =
-        color[0];
-
-    top.style.borderColor =
-        color[1];
-
-    /*
-     * ABAJO
-     */
-    const bottom =
-        document.createElement(
-            'div'
-        );
-
-    bottom.className =
-        'p3d-face p3d-bottom';
-
-    bottom.style.width =
-        block.width + 'px';
-
-    bottom.style.height =
-        block.depth + 'px';
-
-    bottom.style.background =
-        color[2];
-
-    /*
-     * AGREGAR CARAS
-     */
-    caja.appendChild(front);
-    caja.appendChild(back);
-    caja.appendChild(right);
-    caja.appendChild(left);
-    caja.appendChild(top);
-    caja.appendChild(bottom);
-
-    return caja;
-}
-
-
-/**
- * =========================================================
- * SELECCIONAR BLOQUE
- * =========================================================
- */
-function seleccionarBloque3D(
-    index
-)
-{
-    p3dSelected =
-        index;
-
-    document
-        .querySelectorAll(
-            '.p3d-product-group'
-        )
-        .forEach(
-            group => {
-
-                const seleccionado =
-                    Number(
-                        group.dataset.blockIndex
-                    ) === index;
-
-                group.style.filter =
-                    seleccionado
-                        ? 'brightness(1.12) drop-shadow(0 0 12px rgba(37,99,235,.65))'
-                        : '';
-            }
-        );
-
-    actualizarEditor3D();
-}
-
-
-/**
- * =========================================================
- * SELECCIONAR PRODUCTO
- * =========================================================
- */
-function seleccionarProducto3D(
-    productIndex
-)
-{
-    const blockIndex =
-        p3dBlocks.findIndex(
-            block =>
-                block.productIndex ===
-                productIndex
-        );
-
-    if (blockIndex >= 0) {
-        seleccionarBloque3D(
-            blockIndex
-        );
-    }
-}
-
-
-/**
- * =========================================================
- * ARRASTRAR BLOQUE SOBRE PALETA
- * =========================================================
- */
-function configurarDragBloque(
-    group,
-    blockIndex
-)
-{
-    let dragging = false;
-
-    let startX = 0;
-    let startY = 0;
-
-    let originalX = 0;
-    let originalY = 0;
-
-    group.addEventListener(
-        'mousedown',
-        function(event)
-        {
-            event.stopPropagation();
-
-            seleccionarBloque3D(
-                blockIndex
-            );
-
-            dragging = true;
-
-            startX =
-                event.clientX;
-
-            startY =
-                event.clientY;
-
-            originalX =
-                p3dBlocks[
-                    blockIndex
-                ].x;
-
-            originalY =
-                p3dBlocks[
-                    blockIndex
-                ].y;
-
-            group.classList.add(
-                'dragging'
-            );
-
-            document.body.style.userSelect =
-                'none';
-        }
-    );
-
-    window.addEventListener(
-        'mousemove',
-        function(event)
-        {
-            if (!dragging) {
-                return;
-            }
-
-            const block =
-                p3dBlocks[
-                    blockIndex
-                ];
-
-            const dx =
-                (
-                    event.clientX -
-                    startX
-                ) /
-                (p3dZoom / 100);
-
-            const dy =
-                (
-                    event.clientY -
-                    startY
-                ) /
-                (p3dZoom / 100);
-
-            const groupWidth =
-                (
-                    block.columnas *
-                    block.width
-                ) +
-                (
-                    (block.columnas - 1) *
-                    BOX_GAP
-                );
-
-            const groupDepth =
-                (
-                    block.filas *
-                    block.depth
-                ) +
-                (
-                    (block.filas - 1) *
-                    BOX_GAP
-                );
-
-            block.x =
-                Math.max(
-                    0,
-                    Math.min(
-                        PALLET_WIDTH -
-                        groupWidth,
-                        originalX + dx
-                    )
-                );
-
-            block.y =
-                Math.max(
-                    0,
-                    Math.min(
-                        PALLET_DEPTH -
-                        groupDepth,
-                        originalY + dy
-                    )
-                );
-
-            group.style.left =
-                block.x + 'px';
-
-            group.style.top =
-                block.y + 'px';
-
-            actualizarEstadoPosicion(
-                blockIndex
-            );
-        }
-    );
-
-    window.addEventListener(
-        'mouseup',
-        function()
-        {
-            if (!dragging) {
-                return;
-            }
-
-            dragging = false;
-
-            group.classList.remove(
-                'dragging'
-            );
-
-            document.body.style.userSelect =
-                '';
-        }
-    );
-}
-
-
-/**
- * =========================================================
- * EDITOR DEL BLOQUE
- * =========================================================
- */
-function actualizarEditor3D()
-{
-    const editor =
-        document.getElementById(
-            'p3dEditor'
-        );
-
-    if (!editor) {
-        return;
-    }
-
-    if (
-        p3dSelected === null ||
-        !p3dBlocks[
-            p3dSelected
-        ]
-    ) {
-        editor.innerHTML = `
-            <div
-                style="
-                    padding:10px;
-                    background:#f8fafc;
-                    border:1px dashed #cbd5e1;
-                    border-radius:7px;
-                    font-size:9px;
-                    color:#64748b;
-                    text-align:center;
-                "
-            >
-                Selecciona un bloque colocado
-                para editarlo.
-            </div>
-        `;
-
-        return;
-    }
-
-    const block =
-        p3dBlocks[
-            p3dSelected
-        ];
-
-    const item =
-        p3dData[
-            block.productIndex
-        ];
-
-    const restantes =
-        obtenerCajasRestantes(
-            block.productIndex
-        );
-
-    editor.innerHTML = `
-
-        <div class="p3d-edit-box">
-
-            <div class="p3d-edit-title">
-                ⚙️ ${item.nombre}
-            </div>
-
-            <div
-                style="
-                    font-size:10px;
-                    color:#64748b;
-                    margin-bottom:8px;
-                "
-            >
-                📦 Este bloque:
-                <strong>
-                    ${block.cantidad} cajas
-                </strong>
-            </div>
-
-            <div
-                class="p3d-edit-row"
-            >
-                <label>Columnas</label>
-                <strong>${block.columnas}</strong>
-
-                <input
-                    type="range"
-                    min="1"
-                    max="6"
-                    value="${block.columnas}"
-                    oninput="
-                        editarBloque3D(
-                            'columnas',
-                            this.value
-                        )
-                    "
-                >
-            </div>
-
-            <div
-                class="p3d-edit-row"
-            >
-                <label>Filas</label>
-                <strong>${block.filas}</strong>
-
-                <input
-                    type="range"
-                    min="1"
-                    max="6"
-                    value="${block.filas}"
-                    oninput="
-                        editarBloque3D(
-                            'filas',
-                            this.value
-                        )
-                    "
-                    >
-            </div>
-
-            <div
-                class="p3d-edit-row"
-            >
-                <label>Niveles</label>
-                <strong>${block.niveles}</strong>
-
-                <input
-                    type="range"
-                    min="1"
-                    max="10"
-                    value="${block.niveles}"
-                    oninput="
-                        editarBloque3D(
-                            'niveles',
-                            this.value
-                        )
-                    "
-                >
-            </div>
-
-            <div
-                class="p3d-edit-row"
-            >
-                <label>Ancho</label>
-                <strong>
-                    ${Math.round(block.width)} px
-                </strong>
-
-                <input
-                    type="range"
-                    min="40"
-                    max="140"
-                    value="${block.width}"
-                    oninput="
-                        editarBloque3D(
-                            'width',
-                            this.value
-                        )
-                    "
-                >
-            </div>
-
-            <div
-                class="p3d-edit-row"
-            >
-                <label>Profundidad</label>
-                <strong>
-                    ${Math.round(block.depth)} px
-                </strong>
-
-                <input
-                    type="range"
-                    min="35"
-                    max="120"
-                    value="${block.depth}"
-                    oninput="
-                        editarBloque3D(
-                            'depth',
-                            this.value
-                        )
-                    "
-                >
-            </div>
-
-            <div
-                class="p3d-edit-row"
-            >
-                <label>Altura</label>
-                <strong>
-                    ${Math.round(block.height)} px
-                </strong>
-
-                <input
-                    type="range"
-                    min="8"
-                    max="40"
-                    value="${block.height}"
-                    oninput="
-                        editarBloque3D(
-                            'height',
-                            this.value
-                        )
-                    "
-                >
-            </div>
-
-            <div
-                class="p3d-edit-row"
-            >
-                <label>Rotación</label>
-
-                <strong>
-                    ${Math.round(block.rotation)}°
-                </strong>
-
-                <input
-                    type="range"
-                    min="0"
-                    max="180"
-                    step="1"
-                    value="${block.rotation}"
-                    oninput="
-                        editarBloque3D(
-                            'rotation',
-                            this.value
-                        )
-                    "
-                >
-            </div>
-
-            <div
-                style="
-                    margin-top:8px;
-                    padding:6px;
-                    background:#eff6ff;
-                    color:#1d4ed8;
-                    border-radius:6px;
-                    font-size:9px;
-                    text-align:center;
-                "
-            >
-                🔄 Rotación:
-                ${Math.round(block.rotation)}°
-            </div>
-            <button
-    type="button"
-    onclick="eliminarBloque3D()"
-    style="
-        width:100%;
-        margin-top:10px;
-        padding:8px;
-        border:1px solid #fecaca;
-        background:#fef2f2;
-        color:#b91c1c;
-        border-radius:6px;
-        font-size:10px;
-        font-weight:700;
-        cursor:pointer;
-    "
->
-    🗑️ Eliminar este bloque
-</button>
-            <div
-                id="p3dPositionStatus"
-                style="
-                    margin-top:8px;
-                    font-size:9px;
-                    text-align:center;
-                    padding:5px;
-                    border-radius:6px;
-                "
-            ></div>
-
-        </div>
-    `;
-
-    actualizarEstadoPosicion(
-        p3dSelected
-    );
-}
-
-
-/**
- * =========================================================
- * EDITAR BLOQUE
- * =========================================================
- */
-function editarBloque3D(
-    propiedad,
-    valor
-)
-{
-    if (
-        p3dSelected === null ||
-        !p3dBlocks[
-            p3dSelected
-        ]
-    ) {
-        return;
-    }
-
-    const block =
-        p3dBlocks[
-            p3dSelected
-        ];
-
-    block[propiedad] =
-        Number(valor);
-
-    /*
-     * Si cambiamos la cantidad
-     * de posiciones, aseguramos
-     * que quepan las cajas.
-     */
-    if (
-        propiedad === 'columnas' ||
-        propiedad === 'filas' ||
-        propiedad === 'niveles'
-    ) {
-
-        const capacidad =
-            block.columnas *
-            block.filas *
-            block.niveles;
-
-        if (
-            capacidad <
-            block.cantidad
-        ) {
-
-            alert(
-                'La distribución seleccionada no alcanza para las ' +
-                block.cantidad +
-                ' cajas de este bloque.'
-            );
-
-            return;
-        }
-    }
-
-    renderPaleta3D();
-    seleccionarBloque3D(
-        p3dSelected
-    );
-
-    renderP3dProducts();
-}
-/**
- * =========================================================
- * ELIMINAR BLOQUE
- * =========================================================
- */
-function eliminarBloque3D()
-{
-    if (
-        p3dSelected === null ||
-        !p3dBlocks[p3dSelected]
-    ) {
-        return;
-    }
-
-    const block =
-        p3dBlocks[p3dSelected];
-
-    const item =
-        p3dData[block.productIndex];
-
-    const confirmar =
-        confirm(
-            `¿Eliminar el bloque de "${item.nombre}"?\n\n` +
-            `Se devolverán ${block.cantidad} cajas a las cajas restantes.`
-        );
-
-    if (!confirmar) {
-        return;
-    }
-
-    p3dBlocks.splice(
-        p3dSelected,
-        1
-    );
-
-    p3dSelected = null;
-
-    renderPaleta3D();
-    renderP3dProducts();
-    actualizarEditor3D();
-}
-
-/**
- * =========================================================
- * ESTADO DE POSICIÓN
- * =========================================================
- */
-function actualizarEstadoPosicion(
-    index
-)
-{
-    const status =
-        document.getElementById(
-            'p3dPositionStatus'
-        );
-
-    if (
-        !status ||
-        !p3dBlocks[index]
-    ) {
-        return;
-    }
-
-    const block =
-        p3dBlocks[index];
-
-    const groupWidth =
-        (
-            block.columnas *
-            block.width
-        ) +
-        (
-            (block.columnas - 1) *
-            BOX_GAP
-        );
-
-    const groupDepth =
-        (
-            block.filas *
-            block.depth
-        ) +
-        (
-            (block.filas - 1) *
-            BOX_GAP
-        );
-
-    const dentro =
-        block.x >= 0 &&
-        block.y >= 0 &&
-        block.x + groupWidth <= PALLET_WIDTH &&
-        block.y + groupDepth <= PALLET_DEPTH;
-
-    if (dentro) {
-
-        status.textContent =
-            '🟢 Bloque dentro de la paleta';
-
-        status.style.background =
-            '#dcfce7';
-
-        status.style.color =
-            '#15803d';
-
-    } else {
-
-        status.textContent =
-            '🔴 Bloque fuera de la paleta';
-
-        status.style.background =
-            '#fee2e2';
-
-        status.style.color =
-            '#b91c1c';
-    }
-}
-
-
-/**
- * =========================================================
- * TRANSFORMACIÓN DE CÁMARA
- * =========================================================
- */
-function actualizarP3dTransform()
-{
-    const world =
-        document.getElementById(
-            'p3dWorld'
-        );
-
-    if (!world) {
-        return;
-    }
-
-    world.style.transform = `
-        translate(-50%,-50%)
-        rotateX(${p3dRotX}deg)
-        rotateZ(${p3dRotY}deg)
-        scale(${p3dZoom / 100})
-    `;
-
-    document.getElementById(
-        'p3dZoomValue'
-    ).textContent =
-        p3dZoom + '%';
-
-    document.getElementById(
-        'p3dRotXValue'
-    ).textContent =
-        p3dRotX + '°';
-
-    document.getElementById(
-        'p3dRotYValue'
-    ).textContent =
-        p3dRotY + '°';
-}
-
-
-/**
- * =========================================================
- * CONTROLES DE CÁMARA
- * =========================================================
- */
-document.getElementById('p3dZoom')
-    ?.addEventListener(
-        'input',
-        function()
-        {
-            p3dZoom =
-                Number(this.value);
-
-            actualizarP3dTransform();
-        }
-    );
-
-document.getElementById('p3dRotX')
-    ?.addEventListener(
-        'input',
-        function()
-        {
-            p3dRotX =
-                Number(this.value);
-
-            actualizarP3dTransform();
-        }
-    );
-
-document.getElementById('p3dRotY')
-    ?.addEventListener(
-        'input',
-        function()
-        {
-            p3dRotY =
-                Number(this.value);
-
-            actualizarP3dTransform();
-        }
-    );
-
-
-/**
- * =========================================================
- * GIRAR CÁMARA CON EL RATÓN
- * =========================================================
- */
-p3dStage?.addEventListener(
-    'mousedown',
-    function(event)
-    {
-        if (
-            event.target.closest(
-                '.p3d-product-group'
-            )
-        ) {
-            return;
-        }
-
-        p3dDragging = true;
-
-        p3dStartX =
-            event.clientX;
-
-        p3dStartY =
-            event.clientY;
-
-        p3dStage.classList.add(
-            'dragging'
-        );
-    }
-);
-
-window.addEventListener(
-    'mousemove',
-    function(event)
-    {
-        if (!p3dDragging) {
-            return;
-        }
-
-        const dx =
-            event.clientX -
-            p3dStartX;
-
-        const dy =
-            event.clientY -
-            p3dStartY;
-
-        p3dRotY +=
-            dx * .5;
-
-        p3dRotX -=
-            dy * .3;
-
-        p3dRotX =
-            Math.max(
-                25,
-                Math.min(
-                    75,
-                    p3dRotX
-                )
-            );
-
-        p3dStartX =
-            event.clientX;
-
-        p3dStartY =
-            event.clientY;
-
-        document.getElementById(
-            'p3dRotX'
-        ).value =
-            p3dRotX;
-
-        document.getElementById(
-            'p3dRotY'
-        ).value =
-            p3dRotY;
-
-        actualizarP3dTransform();
-    }
-);
-
-window.addEventListener(
-    'mouseup',
-    function()
-    {
-        p3dDragging = false;
-
-        p3dStage?.classList.remove(
-            'dragging'
-        );
-    }
-);
-
-
-/**
- * =========================================================
- * ESC
- * =========================================================
- */
-document.addEventListener(
-    'keydown',
-    function(event)
-    {
-        if (
-            event.key === 'Escape' &&
-            document
-                .getElementById('p3dOverlay')
-                ?.classList.contains('open')
-        ) {
-            cerrarPaleta3D();
-        }
-    }
-);
-// ── Modal de etiqueta de producto ─────────────────────────────────────────
-function abrirEtiqueta(data) {
-    document.getElementById('etNombre').textContent = data.nombre;
-    document.getElementById('etCpc').textContent = data.cantidadPorCaja + ' unid. por caja';
-
-    const cpc = data.cantidadPorCaja > 0 ? data.cantidadPorCaja : 1;
-    const cajas = Math.floor(data.cantidadDespachada / cpc);
-    const sueltas = data.cantidadDespachada % cpc;
-
-    document.getElementById('etLote').textContent = data.lote || '—';
-    document.getElementById('etFecha').textContent = data.fecha || '—';
-    document.getElementById('etCajas').textContent = cajas;
-    document.getElementById('etUnidades').textContent =
-        data.cantidadDespachada + (sueltas > 0 ? ' (' + sueltas + ' sueltas)' : '');
-
-    const barcodeEl = document.getElementById('etBarcode');
-    barcodeEl.innerHTML = '';
-
-    const codigo = (data.codigo || '').toString().trim();
-
-    if (codigo) {
-        try {
-            JsBarcode(barcodeEl, codigo, {
-                format: "CODE128",
-                width: 2,
-                height: 60,
-                displayValue: true,
-                lineColor: "#000",
-                background: "#fff"
-            });
-        } catch (err) {
-            console.error('Código inválido:', codigo, err);
-            barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Código no válido: ' + codigo + '</div>';
-        }
-    } else {
-        barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Sin código registrado</div>';
-    }
-
-    const urlTemplate = document.querySelector('.et-actions').dataset.etiquetaUrlTemplate;
-    document.getElementById('etPdfLink').href = urlTemplate.replace('__ID__', data.detailId);
-
-    document.getElementById('etOverlay').classList.add('open');
-}
-</script>
-{{-- =========================================================
-     MODAL RESUMEN DE ORDEN
-========================================================= --}}
-
-<div id="modalResumenOrden"
-     style="
-        display:none;
-        position:fixed;
-        inset:0;
-        background:rgba(0,0,0,.55);
-        z-index:9999;
-        align-items:center;
-        justify-content:center;
-        padding:20px;
-     ">
-
-    <div style="
-        background:#fff;
-        width:min(1000px, 95vw);
-        max-height:90vh;
-        border-radius:10px;
-        box-shadow:0 20px 50px rgba(0,0,0,.25);
-        display:flex;
-        flex-direction:column;
-        overflow:hidden;
-    ">
-
-        {{-- CABECERA --}}
-        <div style="
-            padding:15px 18px;
-            border-bottom:1px solid #e5e7eb;
-            display:flex;
-            align-items:center;
-            justify-content:space-between;
-        ">
-
-            <div>
-                <div style="
-                    font-size:17px;
-                    font-weight:800;
-                    color:#111827;
-                ">
-                    📋 Resumen de orden
-                </div>
-
-                <div style="
-                    font-size:12px;
-                    color:#6b7280;
-                    margin-top:3px;
-                ">
-                    Orden #{{ $order->numero_orden }}
-                </div>
-            </div>
-
-            <button
-                type="button"
-                onclick="cerrarResumenOrden()"
-                style="
-                    border:0;
-                    background:#f3f4f6;
-                    width:32px;
-                    height:32px;
-                    border-radius:6px;
-                    font-size:18px;
-                    cursor:pointer;
-                ">
-                ×
-            </button>
-
-        </div>
-
-
-        {{-- TABLA --}}
-        <div style="
-            overflow:auto;
-            padding:15px;
-        ">
-
-            <table style="
-                width:100%;
-                border-collapse:collapse;
-                font-size:12px;
-            ">
-
-                <thead>
-
-                    <tr style="
-                        background:#f3f4f6;
-                        color:#374151;
-                    ">
-
-                        <th style="padding:9px;text-align:left;">
-                            Código
-                        </th>
-
-                        <th style="padding:9px;text-align:left;">
-                            Descripción
-                        </th>
-
-                        <th style="padding:9px;text-align:center;">
-                            Solicitado
-                        </th>
-
-                        <th style="padding:9px;text-align:center;">
-                            Despachado
-                        </th>
-
-                        <th style="padding:9px;text-align:center;">
-                            Estado
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody>
-
-                    @foreach($order->details as $detalle)
-
-                        @php
-                            $solicitado = (float) ($detalle->cantidad_solicitada ?? 0);
-                            $despachado = (float) ($detalle->cantidad_despachada ?? 0);
-
-                            if ($despachado >= $solicitado && $solicitado > 0) {
-                                $estado = 'ARMADO';
-                                $estadoColor = '#166534';
-                                $estadoBg = '#dcfce7';
-                            } elseif ($despachado > 0) {
-                                $estado = 'PARCIAL';
-                                $estadoColor = '#92400e';
-                                $estadoBg = '#fef3c7';
-                            } else {
-                                $estado = 'NO ARMADO';
-                                $estadoColor = '#991b1b';
-                                $estadoBg = '#fee2e2';
-                            }
-                        @endphp
-
-                        <tr style="border-bottom:1px solid #e5e7eb;">
-
-                            {{-- CÓDIGO --}}
-                            <td style="
-                                padding:9px;
-                                font-family:monospace;
-                                font-weight:700;
-                            ">
-                                {{ $detalle->product->sku
-                                    ?? $detalle->product->barcode
-                                    ?? '—' }}
-                            </td>
-
-                            {{-- DESCRIPCIÓN --}}
-                            <td style="
-                                padding:9px;
-                                font-weight:600;
-                            ">
-                                {{ $detalle->product->nombre ?? 'Producto' }}
-                            </td>
-
-                            {{-- SOLICITADO --}}
-                            <td style="
-                                padding:9px;
-                                text-align:center;
-                                font-family:monospace;
-                            ">
-                                {{ number_format($solicitado, 0) }}
-                            </td>
-
-                            {{-- DESPACHADO --}}
-                            <td style="
-                                padding:9px;
-                                text-align:center;
-                                font-family:monospace;
-                                font-weight:700;
-                            ">
-                                {{ number_format($despachado, 0) }}
-                            </td>
-
-                            {{-- ESTADO --}}
-                            <td style="
-                                padding:9px;
-                                text-align:center;
-                            ">
-
-                                <span style="
-                                    display:inline-block;
-                                    padding:4px 8px;
-                                    border-radius:999px;
-                                    background:{{ $estadoBg }};
-                                    color:{{ $estadoColor }};
-                                    font-size:10px;
-                                    font-weight:800;
-                                ">
-                                    {{ $estado }}
-                                </span>
-
-                            </td>
-
-                        </tr>
-
-                    @endforeach
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-
-        {{-- PIE --}}
-        <div style="
-            padding:10px 15px;
-            border-top:1px solid #e5e7eb;
-            text-align:right;
-        ">
-
-            <button
-                type="button"
-                onclick="cerrarResumenOrden()"
-                style="
-                    padding:7px 14px;
-                    border:1px solid #d1d5db;
-                    background:#fff;
-                    border-radius:6px;
-                    cursor:pointer;
-                ">
-                Cerrar
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-<script>
-function abrirResumenOrden() {
-    const modal = document.getElementById('modalResumenOrden');
-
-    modal.style.display = 'flex';
-
-    document.body.style.overflow = 'hidden';
-}
-
-function cerrarResumenOrden() {
-    const modal = document.getElementById('modalResumenOrden');
-
-    modal.style.display = 'none';
-
-    document.body.style.overflow = '';
-}
-
-// Cerrar haciendo clic fuera de la ventana
-document.getElementById('modalResumenOrden')?.addEventListener('click', function(e) {
-
-    if (e.target === this) {
-        cerrarResumenOrden();
-    }
-
-});
-</script>
-@endsection
+     

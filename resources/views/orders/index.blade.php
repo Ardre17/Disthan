@@ -300,8 +300,7 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
    {{-- Botones --}}
    <div class="btn-row">
        <a href="{{ route('orders.edit',$order) }}" class="btn btn-blue">✏️ Editar</a>
-       <a href="{{ route('orders.operario',$order) }}" class="btn btn-green">🚀 Validacion</a>
-       <a href="{{ route('preparation.show',$order) }}" class="btn btn-green"> 📦 Preparar </a>
+       <a href="{{ route('orders.operario',$order) }}" class="btn btn-green">🚀 Armado</a>
    </div>
 
 
