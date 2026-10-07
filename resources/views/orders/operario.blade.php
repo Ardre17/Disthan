@@ -87,7 +87,7 @@ html, body {
 *{box-sizing:border-box;}
 html,body{margin:0;background:var(--erp-bg);color:var(--erp-text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;}
 body{overflow-x:hidden;}
-.erp-shell{min-height:100vh;background:var(--erp-bg);display:flex;}
+.erp-shell{min-height:100vh;background:var(--erp-bg);display:block;}
 .erp-sidebar{width:224px;flex:0 0 224px;background:#fff;border-right:1px solid var(--erp-border);min-height:100vh;position:sticky;top:0;height:100vh;z-index:20;display:flex;flex-direction:column;}
 .erp-brand{height:68px;display:flex;align-items:center;gap:10px;padding:0 20px;border-bottom:1px solid #eef2f7;}
 .erp-brand-mark{width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,#2563eb,#60a5fa);color:#fff;display:grid;place-items:center;font-size:18px;box-shadow:0 5px 14px rgba(37,99,235,.22);}
@@ -100,6 +100,8 @@ body{overflow-x:hidden;}
 .erp-nav-icon{width:24px;text-align:center;font-size:16px;}
 .erp-sidebar-foot{margin-top:auto;padding:14px;border-top:1px solid #eef2f7;color:#94a3b8;font-size:10px;}
 .erp-main{min-width:0;flex:1;}
+.erp-main-standalone{width:100%;}
+.erp-main-standalone .pg{max-width:1180px;margin:0 auto;}
 .erp-topbar{height:68px;background:#fff;border-bottom:1px solid var(--erp-border);display:flex;align-items:center;justify-content:space-between;padding:0 26px;position:sticky;top:0;z-index:15;}
 .erp-crumb{font-size:12px;color:#94a3b8;display:flex;align-items:center;gap:8px;}
 .erp-crumb strong{color:#334155;}
@@ -137,7 +139,7 @@ body{overflow-x:hidden;}
 .prog-fill{height:100%;border-radius:99px;transition:width .5s ease;background:var(--erp-primary)!important;}
 .prog-labels{display:flex;justify-content:space-between;font-size:10px;color:#94a3b8;}
 .kpis{display:none;}
-.workflow-grid{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:16px;align-items:start;}
+.workflow-grid{display:block;}
 .workflow-main{min-width:0;}
 .scanner-wrap{background:#fff;border:1px solid var(--erp-border);border-radius:var(--erp-radius);padding:15px 16px;margin-bottom:16px;box-shadow:var(--erp-shadow);}
 .scanner-top{display:flex;align-items:center;gap:9px;margin-bottom:9px;}
@@ -207,35 +209,13 @@ body{overflow-x:hidden;}
 #modalOctogonos{background:rgba(15,23,42,.45)!important;backdrop-filter:blur(2px);}
 #modalOctogonos>div{border:1px solid #e2e8f0!important;box-shadow:0 24px 70px rgba(15,23,42,.18)!important}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.85)}}@keyframes toastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}@keyframes popup{from{transform:scale(.96);opacity:0}to{transform:scale(1);opacity:1}}
-@media(max-width:980px){.erp-sidebar{display:none}.erp-topbar{height:58px;padding:0 14px}.pg{padding:16px 14px 28px}.workflow-grid{grid-template-columns:1fr}.side-card{display:none}.order-summary{grid-template-columns:1fr 1fr 1fr 1fr}.order-summary-main{grid-column:1/-1;border-right:0;border-bottom:1px solid #edf1f5;padding:0 0 12px;margin-bottom:8px}.summary-kpi{border-right:1px solid #edf1f5}.summary-kpi:last-child{border-right:0}.page-title h1{font-size:21px}}
-@media(max-width:640px){.erp-topbar{position:relative}.erp-crumb{font-size:11px}.erp-user span{display:none}.pg{padding:12px 10px 24px}.page-title{margin-bottom:12px}.page-title-icon{width:38px;height:38px;font-size:19px}.page-title h1{font-size:19px}.page-title p{font-size:10px}.order-summary{grid-template-columns:repeat(2,1fr);padding:12px}.order-summary-main{padding-bottom:10px}.summary-kpi{padding:8px 7px}.kpi-icon{width:30px;height:30px;font-size:14px}.kpi-val{font-size:16px}.kpi-label{font-size:9px}.prog-card{padding:13px}.scanner-wrap{padding:13px}.scanner-input-row{flex-direction:column}.camera-btn{height:44px;padding:0 14px}.activo-box{padding:14px}.activo-fields,.active-extra-grid{grid-template-columns:1fr}.activo-name{font-size:17px}.activo-product-icon{width:52px;height:52px;font-size:23px}.prod-item{padding:11px}.prod-item-meta{flex-wrap:wrap}.toast{top:68px;right:10px;left:10px}.ready-card{padding:24px 16px}.modal-lote-box{max-width:100%}#camaraVisor{min-height:270px}.scan-frame{width:230px;height:135px}}
+@media(max-width:980px){.pg{padding:16px 14px 28px}.order-summary{grid-template-columns:1fr 1fr 1fr 1fr}.order-summary-main{grid-column:1/-1;border-right:0;border-bottom:1px solid #edf1f5;padding:0 0 12px;margin-bottom:8px}.summary-kpi{border-right:1px solid #edf1f5}.summary-kpi:last-child{border-right:0}.page-title h1{font-size:21px}}
+@media(max-width:640px){.pg{padding:12px 10px 24px}.page-title{margin-bottom:12px}.page-title-icon{width:38px;height:38px;font-size:19px}.page-title h1{font-size:19px}.page-title p{font-size:10px}.order-summary{grid-template-columns:repeat(2,1fr);padding:12px}.order-summary-main{padding-bottom:10px}.summary-kpi{padding:8px 7px}.kpi-icon{width:30px;height:30px;font-size:14px}.kpi-val{font-size:16px}.kpi-label{font-size:9px}.prog-card{padding:13px}.scanner-wrap{padding:13px}.scanner-input-row{flex-direction:column}.camera-btn{height:44px;padding:0 14px}.activo-box{padding:14px}.activo-fields,.active-extra-grid{grid-template-columns:1fr}.activo-name{font-size:17px}.activo-product-icon{width:52px;height:52px;font-size:23px}.prod-item{padding:11px}.prod-item-meta{flex-wrap:wrap}.toast{top:12px;right:10px;left:10px}.ready-card{padding:24px 16px}.modal-lote-box{max-width:100%}#camaraVisor{min-height:270px}.scan-frame{width:230px;height:135px}}
 </style>
 
 <div class="erp-shell">
-    <aside class="erp-sidebar">
-        <div class="erp-brand">
-            <div class="erp-brand-mark">📦</div>
-            <div class="erp-brand-text">DISTAN<span>ERP</span></div>
-        </div>
-        <nav class="erp-nav">
-            <a class="erp-nav-item" href="#"><span class="erp-nav-icon">⌂</span>Inicio</a>
-            <a class="erp-nav-item" href="#"><span class="erp-nav-icon">▣</span>Inventario</a>
-            <a class="erp-nav-item" href="#"><span class="erp-nav-icon">⚙</span>Producción</a>
-            <a class="erp-nav-item active" href="#"><span class="erp-nav-icon">🛒</span>Pedidos</a>
-            <a class="erp-nav-item" href="#"><span class="erp-nav-icon">▱</span>Encomiendas</a>
-            <a class="erp-nav-item" href="#"><span class="erp-nav-icon">♙</span>Clientes</a>
-            <a class="erp-nav-item" href="#"><span class="erp-nav-icon">▤</span>Kardex</a>
-            <a class="erp-nav-item" href="#"><span class="erp-nav-icon">▧</span>Reportes</a>
-            <a class="erp-nav-item" href="#"><span class="erp-nav-icon">⚙</span>Configuración</a>
-        </nav>
-        <div class="erp-sidebar-foot">DISTAN ERP · Preparación de pedidos</div>
-    </aside>
-    <div class="erp-main">
-        <header class="erp-topbar">
-            <div class="erp-crumb">Órdenes <span>›</span> <strong>Preparación de pedido</strong></div>
-            <div class="erp-user"><span>🔔</span><div class="erp-user-avatar">👤</div><span>Operario · Almacén</span></div>
-        </header>
-        <div class="pg">
+<div class="erp-main erp-main-standalone">
+<div class="pg">
 
 {{-- Toast --}}
 <div class="toast" id="toast"></div>
@@ -401,7 +381,7 @@ body{overflow-x:hidden;}
 </div>
 
 {{-- Lista productos --}}
-<div class="sec-title">📦 Productos de la orden</div>
+<div class="sec-title" style="justify-content:space-between;"><span>📦 Productos de la orden</span><span style="font-size:10px;color:#94a3b8;font-weight:700;">{{ $totalItems }} productos</span></div>
 <div class="prod-list">
 
 @foreach($order->details as $item)
@@ -514,6 +494,14 @@ body{overflow-x:hidden;}
 </div>
 @endforeach
 
+
+@if($order->details->count() === 0)
+<div style="background:#fff;border:1px dashed #cbd5e1;border-radius:12px;padding:24px;text-align:center;color:#64748b;">
+    <div style="font-size:32px;">📦</div>
+    <strong>No hay productos en esta orden</strong>
+</div>
+@endif
+
 </div>
 
 {{-- Cerrar orden --}}
@@ -523,18 +511,6 @@ body{overflow-x:hidden;}
 </form>
 
     </main>
-
-    <aside class="side-card">
-        <div class="side-card-head">🛒 Armado de pedido</div>
-        <div class="side-card-body">
-            <div class="side-cart-art">🛒</div>
-            <div class="side-status">Selecciona un producto para comenzar el despacho. El avance se actualiza automáticamente.</div>
-            <div class="side-progress">
-                <div class="side-progress-label"><span>Avance del pedido</span><strong id="sidePct">{{ number_format($porcentaje,0) }}%</strong></div>
-                <div class="side-progress-bar"><div class="side-progress-fill" id="sideProgressFill" style="width:{{ $porcentaje }}%;"></div></div>
-            </div>
-        </div>
-    </aside>
 </div>
 <div id="pedidoLoader" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,.88);backdrop-filter:blur(2px);z-index:20000;align-items:center;justify-content:center;">
     <div style="text-align:center;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:24px 30px;box-shadow:0 20px 60px rgba(15,23,42,.14);">
@@ -889,15 +865,11 @@ function actualizarBarra(){
     const topPct = document.getElementById('summaryPct');
     const ring = document.getElementById('progressRingMini');
     const ringText = document.getElementById('progressRingText');
-    const sidePct = document.getElementById('sidePct');
-    const sideFill = document.getElementById('sideProgressFill');
     if(topOk) topOk.textContent = ok;
     if(topPar) topPar.textContent = par + inc;
     if(topPct) topPct.textContent = Math.round(pct) + '%';
     if(ring) ring.style.background = 'conic-gradient(#2563eb ' + Math.min(pct,100) + '%,#e5e7eb 0)';
     if(ringText) ringText.textContent = Math.round(pct) + '%';
-    if(sidePct) sidePct.textContent = Math.round(pct) + '%';
-    if(sideFill) sideFill.style.width = Math.min(pct,100) + '%';
 }
 
 function mostrarActivo(item){
@@ -1175,31 +1147,42 @@ function escapeHtml(value){
 (function(){
     let lectorCamara = null;
     let procesando = false;
+    let pruebaStream = null;
 
     const modal = document.getElementById('camaraModal');
     const btnAbrir = document.getElementById('btnAbrirCamara');
     const btnCerrar = document.getElementById('btnCerrarCamara');
     const resultado = document.getElementById('camaraResult');
 
-    function mostrarErrorCamara(error){
-        console.error('Error cámara:', error);
+    function mostrarResultado(html){
+        if(resultado) resultado.innerHTML = html;
+    }
+
+    function mostrarErrorCamara(error, etapa){
+        console.error('Cámara:', etapa, error);
 
         let mensaje = '⚠️ No se pudo iniciar la cámara.';
 
         if(!window.isSecureContext){
-            mensaje = '⚠️ Chrome bloquea la cámara porque esta página no está en HTTPS.';
+            mensaje = '🔒 Esta página necesita HTTPS para usar la cámara.';
         }else if(error && (error.name === 'NotAllowedError' || error.name === 'PermissionDeniedError')){
-            mensaje = '⚠️ Chrome no autorizó la cámara para este sitio. Revisa el permiso de Cámara del sitio.';
+            mensaje = '🔐 Chrome rechazó el acceso a la cámara. Revisa el permiso de este sitio.';
         }else if(error && error.name === 'NotFoundError'){
-            mensaje = '⚠️ No se encontró una cámara disponible.';
+            mensaje = '📷 No se encontró una cámara disponible.';
         }else if(error && error.name === 'NotReadableError'){
-            mensaje = '⚠️ La cámara está siendo utilizada por otra aplicación.';
+            mensaje = '⚠️ La cámara está siendo usada por otra aplicación.';
+        }else if(etapa === 'lector'){
+            mensaje = '⚠️ El permiso de cámara está concedido, pero el lector no pudo iniciar. Intenta cerrar otras aplicaciones que usen la cámara.';
         }
 
-        if(resultado){
-            resultado.innerHTML =
-                '<span style="color:#ef4444;">' + escapeHtml(mensaje) + '</span>';
-        }
+        mostrarResultado(
+            '<span style="color:#dc2626;font-weight:700;">' +
+            escapeHtml(mensaje) +
+            '</span>' +
+            '<div style="margin-top:5px;font-size:10px;color:#94a3b8;">' +
+            'Estado: ' + (error?.name || 'desconocido') +
+            '</div>'
+        );
     }
 
     async function detenerLector(){
@@ -1209,6 +1192,11 @@ function escapeHtml(value){
         if(lector){
             try { await lector.stop(); } catch(e){}
             try { lector.clear(); } catch(e){}
+        }
+
+        if(pruebaStream){
+            pruebaStream.getTracks().forEach(track => track.stop());
+            pruebaStream = null;
         }
     }
 
@@ -1228,39 +1216,51 @@ function escapeHtml(value){
         modal.classList.add('open');
         procesando = false;
 
-        if(resultado){
-            resultado.innerHTML = '🔐 Comprobando permiso de cámara...';
-        }
+        mostrarResultado('🔐 Verificando acceso a la cámara...');
 
-        // Chrome exige un contexto seguro (HTTPS o localhost) para getUserMedia.
         if(!window.isSecureContext || !navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
-            mostrarErrorCamara({ name:'SecurityError' });
+            mostrarErrorCamara({name:'SecurityError'}, 'seguridad');
             return;
         }
 
-        let pruebaStream = null;
-
         try{
-            // Solicitamos explícitamente el permiso al navegador.
+            /*
+             * Primero pedimos permiso con video:true.
+             * Esto evita falsos "sin permisos" por restricciones de facingMode.
+             */
             pruebaStream = await navigator.mediaDevices.getUserMedia({
-                video: { facingMode: { ideal: 'environment' } },
+                video: true,
                 audio: false
             });
 
-            // Ya tenemos permiso. Liberamos esta prueba y dejamos que
-            // html5-qrcode abra la cámara que usará para escanear.
             pruebaStream.getTracks().forEach(track => track.stop());
             pruebaStream = null;
 
-            if(resultado){
-                resultado.innerHTML = '📷 Cámara autorizada · apunta al código...';
-            }
+            mostrarResultado('📷 Permiso concedido · buscando cámara trasera...');
 
             const visor = document.getElementById('camaraVisor');
             if(visor){
                 visor.innerHTML =
                     '<div class="scan-frame"><div class="scan-line"></div></div>';
             }
+
+            /*
+             * Ahora obtenemos las cámaras reales disponibles y elegimos
+             * preferentemente la trasera. Esto es más estable en Android
+             * que iniciar directamente con facingMode.
+             */
+            const cameras = await Html5Qrcode.getCameras();
+
+            if(!cameras || !cameras.length){
+                mostrarErrorCamara({name:'NotFoundError'}, 'dispositivos');
+                return;
+            }
+
+            const trasera = cameras.find(c =>
+                /back|rear|environment|trasera|posterior/i.test(c.label || '')
+            );
+
+            const cameraId = (trasera || cameras[0]).id;
 
             lectorCamara = new Html5Qrcode('camaraVisor', {
                 formatsToSupport: [
@@ -1271,11 +1271,12 @@ function escapeHtml(value){
                     Html5QrcodeSupportedFormats.UPC_A,
                     Html5QrcodeSupportedFormats.UPC_E,
                     Html5QrcodeSupportedFormats.QR_CODE
-                ]
+                ],
+                verbose: false
             });
 
             await lectorCamara.start(
-                { facingMode: { ideal: 'environment' } },
+                cameraId,
                 {
                     fps: 10,
                     qrbox: { width: 260, height: 150 },
@@ -1289,18 +1290,16 @@ function escapeHtml(value){
 
                     procesando = true;
 
-                    if(resultado){
-                        resultado.innerHTML =
-                            '<span class="camara-result-code">✅ ' +
-                            escapeHtml(codigo) +
-                            '</span>';
-                    }
+                    mostrarResultado(
+                        '<span class="camara-result-code">✅ ' +
+                        escapeHtml(codigo) +
+                        '</span>'
+                    );
 
                     if(navigator.vibrate){
                         navigator.vibrate(80);
                     }
 
-                    // Procesamos el código sin devolver el foco al scanner.
                     try{
                         scanner.value = codigo;
                         procesarCodigo(codigo);
@@ -1320,13 +1319,16 @@ function escapeHtml(value){
                 function(){}
             );
 
+            mostrarResultado('📷 Cámara activa · apunta al código de barras');
+
         }catch(error){
             if(pruebaStream){
                 pruebaStream.getTracks().forEach(track => track.stop());
+                pruebaStream = null;
             }
 
             await detenerLector();
-            mostrarErrorCamara(error);
+            mostrarErrorCamara(error, 'lector');
         }
     }
 
@@ -1352,7 +1354,6 @@ function escapeHtml(value){
         });
     }
 })();
-
 
 function confirmarCierre(){
     const faltantes = detalles.filter(d =>
