@@ -376,7 +376,7 @@ body{overflow-x:hidden;}
         </svg>
     </div>
     <div class="ready-title">Listo para armar el pedido</div>
-    <div class="ready-text">Escanea un producto y aquí aparecerán sus datos para registrar el despacho.</div>
+    <div class="ready-text">La orden completa está abajo. Escanea o toca cualquier producto para comenzar el despacho.</div>
     <div class="ready-flow">
         <span>📦 Escanear</span><b>→</b><span>✏️ Registrar</span><b>→</b><span>✓ Despachar</span>
     </div>
@@ -508,118 +508,129 @@ body{overflow-x:hidden;}
 @foreach($order->details as $item)
 @php
     $pct2 = $item->cantidad_solicitada > 0
-           ? ($item->cantidad_despachada / $item->cantidad_solicitada) * 100
-           : 0;
-    $lc  = $item->cantidad_despachada >= $item->cantidad_solicitada ? '#22c55e'
-          : ($item->cantidad_despachada > 0 ? '#f59e0b' : '#ef4444');
-    $badgeCls = $item->cantidad_despachada >= $item->cantidad_solicitada ? 'bc'
-              : ($item->cantidad_despachada > 0 ? 'bp' : 'bi');
-    $badgeLbl = $item->cantidad_despachada >= $item->cantidad_solicitada ? 'COMPLETO'
-              : ($item->cantidad_despachada > 0 ? 'PARCIAL' : 'INCOMPLETO');
-@endphp
-<div class="prod-item" id="item-{{ $item->id }}" style="border-left-color:{{ $lc }};">
-    <div class="prod-item-top">
-        <div>
-            <div class="prod-item-name">{{ $item->product->nombre }}</div>
-            <div class="prod-item-sku">
-                SKU: {{ $item->product->sku }}
-                @if($item->paleta) · {{ $item->paleta }}@endif
-                @if($item->ubicacion) · {{ $item->ubicacion }}@endif
-            </div>
-        </div>
-        <span class="prod-item-badge {{ $badgeCls }}">{{ $badgeLbl }}</span>
-    </div>
-    @php
+        ? ($item->cantidad_despachada / $item->cantidad_solicitada) * 100
+        : 0;
+
+    $lc = $item->cantidad_despachada >= $item->cantidad_solicitada
+        ? '#16a34a'
+        : ($item->cantidad_despachada > 0 ? '#d97706' : '#dc2626');
+
+    $badgeCls = $item->cantidad_despachada >= $item->cantidad_solicitada
+        ? 'bc'
+        : ($item->cantidad_despachada > 0 ? 'bp' : 'bi');
+
+    $badgeLbl = $item->cantidad_despachada >= $item->cantidad_solicitada
+        ? 'COMPLETO'
+        : ($item->cantidad_despachada > 0 ? 'EN PROCESO' : 'PENDIENTE');
+
     $porCaja = (int) ($item->product->cantidad_por_caja ?? 0);
+    $cajasSolicitadas = $porCaja > 0 ? intdiv((int)$item->cantidad_solicitada, $porCaja) : 0;
+    $cajasDespachadas = $porCaja > 0 ? intdiv((int)$item->cantidad_despachada, $porCaja) : 0;
+    $pendiente = max(0, (float)$item->cantidad_solicitada - (float)$item->cantidad_despachada);
 
-    $cajasSolicitadas = $porCaja > 0
-        ? intdiv((int) $item->cantidad_solicitada, $porCaja)
-        : 0;
-
-    $sueltasSolicitadas = $porCaja > 0
-        ? ((int) $item->cantidad_solicitada % $porCaja)
-        : 0;
-
-    $cajasDespachadas = $porCaja > 0
-        ? intdiv((int) $item->cantidad_despachada, $porCaja)
-        : 0;
-
-    $sueltasDespachadas = $porCaja > 0
-        ? ((int) $item->cantidad_despachada % $porCaja)
-        : 0;
+    $imagen = $item->product->imagen ?? null;
 @endphp
 
-<div class="prod-item-meta" style="flex-wrap:wrap;gap:6px;">
-    <span>
-        Solicitado:
-        <strong style="color:#334155;">{{ $item->cantidad_solicitada }}</strong>
-        @if($porCaja > 0)
-            <small style="color:#64748b;">
-                · <span id="cajas-solicitadas-{{ $item->id }}">{{ $cajasSolicitadas }}</span>
-                caja<span id="cajas-solicitadas-plural-{{ $item->id }}">{{ $cajasSolicitadas != 1 ? 's' : '' }}</span>
-                <span id="sueltas-solicitadas-wrap-{{ $item->id }}">
-                    @if($sueltasSolicitadas > 0)
-                        + {{ $sueltasSolicitadas }} suelta{{ $sueltasSolicitadas != 1 ? 's' : '' }}
-                    @endif
-                </span>
-            </small>
-        @endif
-    </span>
+<div class="order-row"
+     id="item-{{ $item->id }}"
+     data-detail-id="{{ $item->id }}"
+     onclick="seleccionarProductoLista({{ $item->id }})"
+     style="--row-accent:{{ $lc }};">
 
-    <span>
-        Despachado:
-        <strong id="despachado-{{ $item->id }}" style="color:{{ $lc }};">{{ $item->cantidad_despachada }}</strong>
-        @if($porCaja > 0)
-            <small style="color:#64748b;">
-                · <span id="cajas-despachadas-{{ $item->id }}">{{ $cajasDespachadas }}</span>
-                caja<span id="cajas-despachadas-plural-{{ $item->id }}">{{ $cajasDespachadas != 1 ? 's' : '' }}</span>
-                <span id="sueltas-despachadas-wrap-{{ $item->id }}">
-                    @if($sueltasDespachadas > 0)
-                        + {{ $sueltasDespachadas }} suelta{{ $sueltasDespachadas != 1 ? 's' : '' }}
-                    @endif
-                </span>
-            </small>
-        @endif
-    </span>
+    <div class="order-row-number">
+        <span>{{ $loop->iteration }}</span>
+    </div>
 
-    <span style="font-weight:700;color:{{ $lc }};" id="pct-{{ $item->id }}">
-        {{ number_format($pct2,0) }}%
-    </span>
-</div>
-
-    <div class="item-detail-box">
-        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;">
-            <div>🏷️ Lote: <strong style="color:#334155;">{{ $item->lote ?: '—' }}</strong></div>
-            <div>📅 Vence: <strong style="color:#334155;">{{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : '—' }}</strong></div>
-        </div>
-        @if(strtoupper(trim($order->tipo_orden ?? '')) === 'SUPERMERCADO')
-        <div style="margin-top:4px;">🪵 Paleta: <strong id="paleta-{{ $item->id }}" style="color:#334155;">{{ $item->paleta ?: '—' }}</strong></div>
-        @endif
-        @if(!empty($item->personal_despacho))
-            <div id="personal-{{ $item->id }}" style="margin-top:4px;">👤 Retiró: <strong style="color:#334155;">{{ $item->personal_despacho }}</strong></div>
+    <div class="order-row-thumb">
+        @if($imagen)
+            <img src="{{ \Illuminate\Support\Str::startsWith($imagen, ['http://','https://']) ? $imagen : asset('storage/'.$imagen) }}"
+                 alt="{{ $item->product->nombre }}"
+                 loading="lazy"
+                 onerror="this.style.display='none';this.nextElementSibling.style.display='grid';">
+            <div class="order-row-thumb-fallback" style="display:none;">📦</div>
         @else
-            <div id="personal-{{ $item->id }}" style="display:none;margin-top:4px;"></div>
+            <div class="order-row-thumb-fallback">📦</div>
         @endif
-        <button type="button" onclick="abrirModalLote(
-            {{ $item->id }},
-            @js($item->lote),
-            @js($item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('Y-m-d') : '')
-        )" class="item-edit-btn">
-            ✏️ Modificar lote / vencimiento
-        </button>
     </div>
 
-    <div class="prod-mini-bar">
-        <div class="prod-mini-fill" id="bar-{{ $item->id }}" style="width:{{ $pct2 }}%;background:{{ $lc }};"></div>
+    <div class="order-row-main">
+        <div class="order-row-name">{{ $item->product->nombre }}</div>
+        <div class="order-row-sku">SKU: {{ $item->product->sku ?: '—' }}</div>
+
+        <div class="order-row-tags">
+            @if($item->paleta)
+                <span>🪵 {{ $item->paleta }}</span>
+            @endif
+            @if($item->ubicacion)
+                <span>📍 {{ $item->ubicacion }}</span>
+            @endif
+            @if($item->lote)
+                <span>🏷️ {{ $item->lote }}</span>
+            @endif
+        </div>
     </div>
+
+    <div class="order-row-stat">
+        <span class="row-stat-label">Solicitado</span>
+        <strong>{{ number_format($item->cantidad_solicitada, 2) }}</strong>
+        @if($porCaja > 0)
+            <small>{{ $cajasSolicitadas }} caja{{ $cajasSolicitadas != 1 ? 's' : '' }}</small>
+        @endif
+    </div>
+
+    <div class="order-row-stat">
+        <span class="row-stat-label">Despachado</span>
+        <strong id="despachado-{{ $item->id }}" style="color:{{ $lc }};">
+            {{ number_format($item->cantidad_despachada, 2) }}
+        </strong>
+        @if($porCaja > 0)
+            <small id="cajas-despachadas-{{ $item->id }}">
+                {{ $cajasDespachadas }} caja{{ $cajasDespachadas != 1 ? 's' : '' }}
+            </small>
+        @endif
+    </div>
+
+    <div class="order-row-stat pending">
+        <span class="row-stat-label">Pendiente</span>
+        <strong id="pendiente-{{ $item->id }}">{{ number_format($pendiente, 2) }}</strong>
+    </div>
+
+    <div class="order-row-progress">
+        <div class="row-progress-top">
+            <span>Avance</span>
+            <strong id="pct-{{ $item->id }}" style="color:{{ $lc }};">{{ number_format($pct2,0) }}%</strong>
+        </div>
+        <div class="row-progress-track">
+            <div class="row-progress-fill"
+                 id="bar-{{ $item->id }}"
+                 style="width:{{ min(100,$pct2) }}%;background:{{ $lc }};"></div>
+        </div>
+    </div>
+
+    <div class="order-row-status">
+        <span class="prod-item-badge {{ $badgeCls }}" id="badge-{{ $item->id }}">{{ $badgeLbl }}</span>
+        <div class="row-last">
+            @if($item->personal_despacho)
+                👤 {{ $item->personal_despacho }}
+            @else
+                Último despacho: —
+            @endif
+        </div>
+    </div>
+
+    <div class="order-row-arrow">›</div>
+
+    {{-- Hidden data for existing update logic --}}
+    <div id="paleta-{{ $item->id }}" style="display:none;">{{ $item->paleta }}</div>
+    <div id="personal-{{ $item->id }}" style="display:none;">{{ $item->personal_despacho }}</div>
 </div>
 @endforeach
 
-
 @if($order->details->count() === 0)
-<div style="background:#fff;border:1px dashed #cbd5e1;border-radius:12px;padding:24px;text-align:center;color:#64748b;">
-    <div style="font-size:32px;">📦</div>
+<div class="empty-order-list">
+    <div class="empty-order-icon">📦</div>
     <strong>No hay productos en esta orden</strong>
+    <span>La orden todavía no contiene productos.</span>
 </div>
 @endif
 
@@ -1006,6 +1017,11 @@ function actualizarBarra(){
 
 function mostrarActivo(item){
     activoActual = item;
+    const ready = document.getElementById('readyCard');
+    if(ready) ready.style.display = 'none';
+    document.querySelectorAll('.order-row.selected').forEach(el => el.classList.remove('selected'));
+    const selectedCard = document.getElementById('item-' + item.id);
+    if(selectedCard) selectedCard.classList.add('selected');
     const pct = item.cantidad_solicitada > 0
         ? (item.cantidad_despachada / item.cantidad_solicitada) * 100 : 0;
     const color = pct >= 100 ? '#22c55e' : (pct > 0 ? '#f59e0b' : '#ef4444');
@@ -1050,7 +1066,6 @@ function mostrarActivo(item){
     document.getElementById('activoBarFill').style.background = color;
     document.getElementById('activoPctLabel').textContent = Math.round(pct) + '%';
     document.getElementById('activoPctLabel').style.color = color;
-    const pctKpi = document.getElementById('activoPctKpi');
     if(pctKpi) { pctKpi.textContent = Math.round(pct) + '%'; pctKpi.style.color = color; }
 
     document.getElementById('activoBox').style.display = 'block';
@@ -1099,26 +1114,51 @@ function actualizarCajasUI(item){
 function actualizarItemUI(item){
     const pct = item.cantidad_solicitada > 0
         ? (item.cantidad_despachada / item.cantidad_solicitada) * 100 : 0;
-    const color = pct >= 100 ? '#22c55e' : (pct > 0 ? '#f59e0b' : '#ef4444');
-
+    const color = pct >= 100 ? '#16a34a' : (pct > 0 ? '#d97706' : '#dc2626');
     const card = document.getElementById('item-' + item.id);
     if(!card) return;
-    card.style.borderLeftColor = color;
+
+    card.style.setProperty('--row-accent', color);
 
     const span = document.getElementById('despachado-' + item.id);
-    if(span){ span.textContent = item.cantidad_despachada; span.style.color = color; }
+    if(span){ span.textContent = Number(item.cantidad_despachada).toFixed(2); span.style.color = color; }
+
+    const pendienteEl = document.getElementById('pendiente-' + item.id);
+    if(pendienteEl){
+        pendienteEl.textContent = Math.max(0, Number(item.cantidad_solicitada) - Number(item.cantidad_despachada)).toFixed(2);
+    }
 
     const pctEl = document.getElementById('pct-' + item.id);
     if(pctEl){ pctEl.textContent = Math.round(pct) + '%'; pctEl.style.color = color; }
 
     const barEl = document.getElementById('bar-' + item.id);
-    if(barEl){ barEl.style.width = pct + '%'; barEl.style.background = color; }
+    if(barEl){ barEl.style.width = Math.min(100,pct) + '%'; barEl.style.background = color; }
 
-    const badge = card.querySelector('.prod-item-badge');
+    const badge = document.getElementById('badge-' + item.id);
     if(badge){
         badge.className = 'prod-item-badge ' + (pct >= 100 ? 'bc' : (pct > 0 ? 'bp' : 'bi'));
-        badge.textContent = pct >= 100 ? 'COMPLETO' : (pct > 0 ? 'PARCIAL' : 'INCOMPLETO');
+        badge.textContent = pct >= 100 ? 'COMPLETO' : (pct > 0 ? 'EN PROCESO' : 'PENDIENTE');
     }
+
+    const personalEl = document.getElementById('personal-' + item.id);
+    if(personalEl) personalEl.textContent = item.personal_despacho || '';
+
+    const paletaEl = document.getElementById('paleta-' + item.id);
+    if(paletaEl) paletaEl.textContent = item.paleta || '';
+}
+
+function seleccionarProductoLista(id){
+    const item = detalles.find(d => Number(d.id) === Number(id));
+    if(!item) return;
+
+    document.querySelectorAll('.order-row.selected').forEach(el => el.classList.remove('selected'));
+
+    const card = document.getElementById('item-' + id);
+    if(card) card.classList.add('selected');
+
+    mostrarActivo(item);
+    showToast('✔ ' + item.product.nombre, 'tok');
+    beep();
 }
 
 // Procesar un código tanto desde lector físico como desde cámara
@@ -1169,35 +1209,19 @@ scanner.addEventListener('keydown', function(e){
     procesarCodigo(this.value);
 });
 
-const btnGuardarDespacho = document.getElementById('btnGuardarDespacho');
-if(btnGuardarDespacho){
-    btnGuardarDespacho.addEventListener('click', function(){
-        const campo = document.getElementById('activoCantidad');
-        if(campo){ campo.dispatchEvent(new KeyboardEvent('keydown', {key:'Enter', bubbles:true})); }
-    });
-}
+let guardandoDespacho = false;
 
-const btnLimpiarActivo = document.getElementById('btnLimpiarActivo');
-if(btnLimpiarActivo){
-    btnLimpiarActivo.addEventListener('click', function(){
-        activoActual = null;
-        const box = document.getElementById('activoBox');
-        const ready = document.getElementById('readyCard');
-        if(box) box.style.display = 'none';
-        if(ready) ready.style.display = 'block';
-    });
-}
+function guardarDespacho(){
+    if(guardandoDespacho || !activoActual) return;
 
-// Guardar desde campo cantidad
-document.getElementById('activoCantidad').addEventListener('keydown', function(e){
-    if(e.key !== 'Enter' || !activoActual) return;
-    e.preventDefault();
+    const campo = document.getElementById('activoCantidad');
+    const cantidad = parseFloat(campo ? campo.value : '');
 
-    const cantidad = parseFloat(this.value);
     if(isNaN(cantidad) || cantidad < 0){
         showToast('⚠ Cantidad inválida', 'twk');
         return;
     }
+
     if(cantidad > activoActual.cantidad_solicitada){
         showToast('⚠ Supera la cantidad solicitada (' + activoActual.cantidad_solicitada + ')', 'twk');
         return;
@@ -1205,6 +1229,7 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
 
     const personalInput = document.getElementById('activoPersonal');
     const personal = personalInput ? personalInput.value.trim() : '';
+
     if(!personal){
         showToast('⚠ Debes indicar quién retiró el producto', 'twk');
         if(personalInput) personalInput.focus();
@@ -1219,14 +1244,13 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
     formData.append('cantidad_solicitada', activoActual.cantidad_solicitada);
     formData.append('precio_unitario', activoActual.precio_unitario || 0);
     formData.append('personal_despacho', personal);
-    if(paletaInput){
-        formData.append('paleta', paleta);
-    }
+    if(paletaInput) formData.append('paleta', paleta);
     formData.append('_method', 'PUT');
     formData.append('_token', '{{ csrf_token() }}');
 
     const loader = document.getElementById('pedidoLoader');
     if(loader) loader.style.display = 'flex';
+    guardandoDespacho = true;
 
     fetch(`/order-details/${activoActual.id}`, {
         method:'POST',
@@ -1235,35 +1259,32 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
     })
     .then(async res => {
         const texto = await res.text();
-        if(!res.ok){
-            throw new Error('HTTP ' + res.status + ': ' + texto);
-        }
+        if(!res.ok) throw new Error('HTTP ' + res.status + ': ' + texto);
         try { return JSON.parse(texto); } catch(e) { return {}; }
     })
     .then(() => {
         if(loader) loader.style.display = 'none';
+
         activoActual.cantidad_despachada = cantidad;
         activoActual.personal_despacho = personal;
+        if(paletaInput) activoActual.paleta = paleta;
 
         const despachadoKpi = document.getElementById('activoDespachadoKpi');
         const pendienteKpi = document.getElementById('activoPendienteKpi');
         const pctKpi = document.getElementById('activoPctKpi');
+
         if(despachadoKpi) despachadoKpi.textContent = cantidad;
         if(pendienteKpi) pendienteKpi.textContent = Math.max(0, parseFloat(activoActual.cantidad_solicitada) - cantidad);
         if(pctKpi) pctKpi.textContent = Math.round((cantidad / activoActual.cantidad_solicitada) * 100) + '%';
-        if(paletaInput){ activoActual.paleta = paleta; }
 
         actualizarItemUI(activoActual);
         actualizarBarra();
 
         const personalEl = document.getElementById('personal-' + activoActual.id);
-        if(personalEl){
-            personalEl.style.display = 'block';
-            personalEl.innerHTML = `👤 Retiró: <strong style="color:#334155;">${escapeHtml(personal)}</strong>`;
-        }
+        if(personalEl) personalEl.textContent = personal;
 
         const paletaEl = document.getElementById('paleta-' + activoActual.id);
-        if(paletaEl){ paletaEl.textContent = paleta || '—'; }
+        if(paletaEl) paletaEl.textContent = paleta;
 
         const pct = activoActual.cantidad_solicitada > 0
             ? (cantidad / activoActual.cantidad_solicitada) * 100 : 0;
@@ -1273,21 +1294,44 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
             document.getElementById('activoBox').style.display = 'none';
             const ready = document.getElementById('readyCard');
             if(ready) ready.style.display = 'block';
-        } else {
+        }else{
             showToast('💾 Guardado: ' + cantidad + ' de ' + activoActual.cantidad_solicitada, 'tok');
-            document.getElementById('activoBarFill').style.width  = pct + '%';
-            document.getElementById('activoBarFill').style.background = '#f59e0b';
+            document.getElementById('activoBarFill').style.width = pct + '%';
+            document.getElementById('activoBarFill').style.background = '#d97706';
             document.getElementById('activoPctLabel').textContent = Math.round(pct) + '%';
         }
 
         beep();
-        activoActual = null;
+        guardandoDespacho = false;
     })
     .catch(error => {
         if(loader) loader.style.display = 'none';
+        guardandoDespacho = false;
         console.error('❌ ERROR AL GUARDAR:', error);
-        showToast('❌ Error al guardar. Revisa la consola.', 'ter');
+        showToast('❌ Error al guardar el despacho', 'ter');
     });
+}
+
+const btnGuardarDespacho = document.getElementById('btnGuardarDespacho');
+if(btnGuardarDespacho) btnGuardarDespacho.addEventListener('click', guardarDespacho);
+
+const btnLimpiarActivo = document.getElementById('btnLimpiarActivo');
+if(btnLimpiarActivo){
+    btnLimpiarActivo.addEventListener('click', function(){
+        activoActual = null;
+        document.querySelectorAll('.order-row.selected').forEach(el => el.classList.remove('selected'));
+        const box = document.getElementById('activoBox');
+        const ready = document.getElementById('readyCard');
+        if(box) box.style.display = 'none';
+        if(ready) ready.style.display = 'block';
+    });
+}
+
+// Guardar desde campo cantidad con Enter
+document.getElementById('activoCantidad').addEventListener('keydown', function(e){
+    if(e.key !== 'Enter') return;
+    e.preventDefault();
+    guardarDespacho();
 });
 
 function escapeHtml(value){
