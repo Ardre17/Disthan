@@ -243,10 +243,10 @@ opacity:1;
     <div class="scanner-top">
         <div class="scanner-pulse"></div>
         <div class="scanner-label">📡 Escanear código de barras</div>
-        <button type="button" class="camera-btn" id="btnAbrirCamara">📷 Usar Cámara</button>
+        <button type="button" class="camera-btn" id="btnAbrirCamara">📷 Cámara</button>
     </div>
     <input type="text" id="scanner" class="scanner-input"
-           placeholder="Escanea o escribe el código y presiona Enter..." autofocus>
+           placeholder="Escanea o escribe el código y presiona Enter..." >
     <div class="scanner-hint">⌨ Presiona <strong style="color:#94a3b8;">Enter</strong> para confirmar · También puedes usar la cámara</div>
 </div>
 
@@ -817,7 +817,6 @@ function procesarCodigo(codigo){
     if(!item){
         showToast('❌ Producto no pertenece a esta orden', 'ter');
         scanner.value = '';
-        scanner.focus();
         return;
     }
 
@@ -828,7 +827,6 @@ function procesarCodigo(codigo){
     if(pct >= 100){
         showToast('⚠ ' + item.product.nombre + ' ya está completo', 'twk');
         scanner.value = '';
-        scanner.focus();
         return;
     }
 
@@ -932,12 +930,10 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
 
         beep();
         activoActual = null;
-        scanner.focus();
     })
     .catch(error => {
         console.error('❌ ERROR AL GUARDAR:', error);
         showToast('❌ Error al guardar. Revisa la consola.', 'ter');
-        scanner.focus();
     });
 });
 
@@ -947,100 +943,168 @@ function escapeHtml(value){
     return div.innerHTML;
 }
 
-// Mantener foco
-setInterval(() => {
-    if(document.activeElement !== scanner &&
-       document.activeElement !== document.getElementById('activoCantidad')){
-        scanner.focus();
-    }
-}, 800);
-
+// Foco manual: no se fuerza el regreso al campo de escaneo.
 // ================================
 // ESCÁNER DE CÁMARA
 // ================================
 (function(){
-    let html5QrCode = null;
-    let cooldown = false;
+    let lectorCamara = null;
+    let procesando = false;
+
     const modal = document.getElementById('camaraModal');
-    const resultBox = document.getElementById('camaraResult');
-    const btnOpen = document.getElementById('btnAbrirCamara');
-    const btnClose = document.getElementById('btnCerrarCamara');
-
-    if(!btnOpen || !modal || typeof Html5Qrcode === 'undefined') return;
-
-    btnOpen.addEventListener('click', function(){
-        modal.classList.add('open');
-        cooldown = false;
-        resultBox.innerHTML = '📷 Apunta al código de barras...';
-        startCamera();
-    });
-
-    btnClose.addEventListener('click', cerrarCamara);
-    modal.addEventListener('click', function(e){
-        if(e.target === modal) cerrarCamara();
-    });
-
-    function startCamera(){
-        if(html5QrCode) return;
-
-        html5QrCode = new Html5Qrcode('camaraVisor', {
-            formatsToSupport: [
-                Html5QrcodeSupportedFormats.EAN_13,
-                Html5QrcodeSupportedFormats.EAN_8,
-                Html5QrcodeSupportedFormats.CODE_128,
-                Html5QrcodeSupportedFormats.CODE_39,
-                Html5QrcodeSupportedFormats.UPC_A,
-                Html5QrcodeSupportedFormats.UPC_E,
-                Html5QrcodeSupportedFormats.QR_CODE
-            ]
-        });
-
-        html5QrCode.start(
-            { facingMode: 'environment' },
-            { fps: 12, qrbox: { width: 260, height: 150 }, aspectRatio: 1.777 },
-            onScanSuccess,
-            function(){}
-        ).catch(function(err){
-            console.error('Cámara:', err);
-            resultBox.innerHTML = '⚠️ No se pudo acceder a la cámara. Verifica los permisos del navegador.';
-        });
-    }
-
-    function onScanSuccess(code){
-        if(cooldown) return;
-        cooldown = true;
-
-        resultBox.innerHTML = '<span class="camara-result-code">✅ ' + escapeHtml(code) + '</span>';
-        if(navigator.vibrate) navigator.vibrate(80);
-
-        // Procesar directamente: no simulamos KeyboardEvent.
-        procesarCodigo(code);
-
-        // Cerramos la interfaz inmediatamente y detenemos la cámara en segundo plano..
-        modal.classList.remove('open');
-        stopCamera().finally(function(){
-            scanner.focus();
-            cooldown = false;
-        });
-    }
-
-    function stopCamera(){
-        const lector = html5QrCode;
-        html5QrCode = null;
-        if(!lector) return Promise.resolve();
-
-        return lector.stop()
-            .catch(function(){})
-            .then(function(){
-                try { lector.clear(); } catch(e) {}
-            });
-    }
+    const btnAbrir = document.getElementById('btnAbrirCamara');
+    const btnCerrar = document.getElementById('btnCerrarCamara');
+    const resultado = document.getElementById('camaraResult');
 
     function cerrarCamara(){
-        modal.classList.remove('open');
-        stopCamera().finally(function(){
-            scanner.focus();
-            cooldown = false;
+        const lector = lectorCamara;
+        lectorCamara = null;
+
+        if(lector){
+            lector.stop()
+                .catch(() => {})
+                .finally(() => {
+                    try { lector.clear(); } catch(e) {}
+                });
+        }
+
+        if(modal){
+            modal.classList.remove('open');
+        }
+
+        procesando = false;
+        // IMPORTANTE: no hacemos foco automático
+    }
+
+    async function abrirCamara(){
+        if(!modal || !btnAbrir) return;
+        if(lectorCamara) return;
+
+        modal.classList.add('open');
+        procesando = false;
+
+        if(resultado){
+            resultado.innerHTML =
+                '<span class="camara-result-placeholder">📷 Apunta al código de barras...</span>';
+        }
+
+        // Limpiar visor antes de crear un lector nuevo.
+        const visor = document.getElementById('camaraVisor');
+        if(visor){
+            visor.innerHTML = '<div class="scan-frame"><div class="scan-line"></div></div>';
+        }
+
+        try{
+            lectorCamara = new Html5Qrcode('camaraVisor', {
+                formatsToSupport: [
+                    Html5QrcodeSupportedFormats.EAN_13,
+                    Html5QrcodeSupportedFormats.EAN_8,
+                    Html5QrcodeSupportedFormats.CODE_128,
+                    Html5QrcodeSupportedFormats.CODE_39,
+                    Html5QrcodeSupportedFormats.UPC_A,
+                    Html5QrcodeSupportedFormats.UPC_E,
+                    Html5QrcodeSupportedFormats.QR_CODE
+                ]
+            });
+
+            await lectorCamara.start(
+                { facingMode: { ideal: 'environment' } },
+                {
+                    fps: 10,
+                    qrbox: { width: 260, height: 150 },
+                    aspectRatio: 1.777
+                },
+                async function(codigo){
+                    if(procesando) return;
+                    procesando = true;
+
+                    codigo = String(codigo || '').trim();
+
+                    if(!codigo){
+                        procesando = false;
+                        return;
+                    }
+
+                    if(resultado){
+                        resultado.innerHTML =
+                            '<span class="camara-result-code">✅ ' +
+                            escapeHtml(codigo) +
+                            '</span>';
+                    }
+
+                    if(navigator.vibrate){
+                        navigator.vibrate(80);
+                    }
+
+                    // Guardamos el código en el mismo input para que quede visible.
+                    scanner.value = codigo;
+
+                    // Procesamos DIRECTAMENTE el código.
+                    procesarCodigo(codigo);
+
+                    // Cerramos después de procesarlo.
+                    const lector = lectorCamara;
+                    lectorCamara = null;
+
+                    if(lector){
+                        try{
+                            await lector.stop();
+                        }catch(e){}
+
+                        try{
+                            lector.clear();
+                        }catch(e){}
+                    }
+
+                    modal.classList.remove('open');
+
+                    // IMPORTANTE:
+                    // NO foco automático
+                    // NO setInterval()
+                    // NO regreso automático al escáner
+
+                    procesando = false;
+                },
+                function(){}
+            );
+
+        }catch(error){
+            console.error('Error cámara:', error);
+
+            if(resultado){
+                resultado.innerHTML =
+                    '<span style="color:#ef4444;">⚠️ No se pudo iniciar la cámara. Revisa los permisos.</span>';
+            }
+
+            const lector = lectorCamara;
+            lectorCamara = null;
+
+            if(lector){
+                try { await lector.stop(); } catch(e){}
+                try { lector.clear(); } catch(e){}
+            }
+        }
+    }
+
+    if(btnAbrir){
+        btnAbrir.addEventListener('click', function(e){
+            e.preventDefault();
+            abrirCamara();
+        });
+    }
+
+    if(btnCerrar){
+        btnCerrar.addEventListener('click', function(e){
+            e.preventDefault();
+            cerrarCamara();
+        });
+    }
+
+    if(modal){
+        modal.addEventListener('click', function(e){
+            if(e.target === modal){
+                cerrarCamara();
+            }
         });
     }
 })();
@@ -1060,7 +1124,6 @@ function confirmarCierre(){
 }
 
 window.onload = () => {
-    scanner.focus();
     actualizarBarra();
 };
 </script>
