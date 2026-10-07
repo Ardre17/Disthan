@@ -53,6 +53,98 @@
 .prog-mini-fill{height:100%;border-radius:99px;}
 .fields-box{background:#f8fafc;border-radius:8px;padding:9px 10px;display:flex;flex-direction:column;gap:7px;}
 .field-row{display:grid;grid-template-columns:1fr 1fr;gap:7px;}
+
+/* Edición compacta en dos columnas */
+.oc-info-grid{
+    grid-template-columns:1fr 1fr !important;
+    gap:6px;
+    margin-bottom:8px;
+}
+.oc-info-card{
+    min-height:34px;
+    padding:7px 9px;
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:7px;
+    display:grid;
+    grid-template-columns:auto 1fr;
+    align-items:center;
+    column-gap:6px;
+}
+.oc-info-card .info-val{
+    justify-self:end;
+}
+.oc-info-card small{
+    grid-column:1 / -1;
+    color:#94a3b8;
+    font-size:9px;
+    margin-top:1px;
+}
+.oc-info-progress{
+    grid-column:1 / -1;
+    padding:7px 9px;
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:7px;
+    display:grid;
+    grid-template-columns:auto 1fr auto;
+    align-items:center;
+    gap:7px;
+}
+.oc-info-progress .prog-mini{min-width:0;}
+.oc-extra-units{color:#f59e0b !important;}
+
+.oc-fields-grid{
+    display:grid !important;
+    grid-template-columns:1fr 1fr;
+    gap:8px;
+    align-items:end;
+}
+.oc-fields-grid > div{
+    min-width:0;
+}
+.oc-fields-grid .finput{
+    width:100%;
+    box-sizing:border-box;
+}
+.oc-fields-grid .paleta-input{
+    text-align:left;
+    letter-spacing:1px;
+}
+.oc-form-subtotal{
+    min-height:38px;
+    padding:8px 10px;
+    background:#fff;
+    border:1px solid #e2e8f0;
+    border-radius:8px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    box-sizing:border-box;
+}
+.oc-form-subtotal span{
+    font-size:11px;
+    color:#64748b;
+}
+.oc-form-subtotal strong{
+    font-size:13px;
+    color:#0f172a;
+}
+.oc-form-save{
+    display:flex;
+    align-items:stretch;
+}
+.oc-form-save .btn{
+    width:100%;
+    min-height:38px;
+}
+@media(max-width:700px){
+    .oc-info-grid,
+    .oc-fields-grid{
+        grid-template-columns:1fr 1fr !important;
+    }
+}
+
 .paleta-input{width:100%;padding:10px 14px;font-size:17px;border:2px solid #2563eb;border-radius:9px;text-align:center;font-weight:700;letter-spacing:3px;outline:none;background:#fff;transition:box-shadow .15s;}
 .paleta-input:focus{box-shadow:0 0 0 3px rgba(37,99,235,.1);}
 .subtotal-row{display:flex;justify-content:space-between;align-items:center;}
@@ -814,6 +906,8 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .oc-av b{font-family:var(--oc-mono);font-size:12px;min-width:38px;text-align:right;}
 .oc-pal{display:inline-block;padding:3px 9px;border-radius:7px;background:var(--oc-blue-soft);color:var(--oc-blue);font-weight:700;font-size:12px;font-family:var(--oc-mono);}
 .oc-dash{color:#94a3b8;}
+.oc-octos-imgs{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;min-width:72px;max-width:105px;}
+.oc-oct-img{width:34px;height:34px;object-fit:contain;display:block;border-radius:3px;}
 .oc-oct{width:38px;height:38px;background:#111;color:#fff;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:6.5px;font-weight:800;line-height:1.1;text-align:center;margin-right:3px;}
 .oc-ult{font-size:12px;line-height:1.35;}
 .oc-ult small{color:var(--oc-muted);display:block;}
@@ -1590,12 +1684,38 @@ html, body {
                         <td class="oc-num" @if($ocVencado) style="color:#dc2626;font-weight:700;" title="Vencido" @endif>{{ $ocFecha($ocVenc) }}</td>
 
                         <td>
-                            @forelse($ocOcts as $o)
-                                @php $lb = $ocOctLabel($o); @endphp
-                                <span class="oc-oct" title="{{ trim($lb[0].' '.$lb[1]) }}"><span>{{ $lb[0] }}</span><span>{{ $lb[1] }}</span></span>
-                            @empty
-                                <span class="oc-dash">–</span>
-                            @endforelse
+                            <div class="oc-octos-imgs">
+                                @forelse($ocOcts as $o)
+                                    @php
+                                        $oNorm = mb_strtolower(trim((string) $o));
+                                        $lb = $ocOctLabel($o);
+
+                                        $octImg = null;
+                                        if (str_contains($oNorm, 'azucar') || str_contains($oNorm, 'azúcar')) {
+                                            $octImg = 'https://pbs.twimg.com/media/F-6D6zQWEAMPN7d.png';
+                                        } elseif (str_contains($oNorm, 'sodio')) {
+                                            $octImg = 'https://blogs.ucontinental.edu.pe/wp-content/uploads/2019/06/Octogono-sodio.png';
+                                        } elseif (str_contains($oNorm, 'grasas saturadas') || str_contains($oNorm, 'grasas')) {
+                                            $octImg = 'https://dolcezzaperu.pe/wp-content/uploads/2023/06/MicrosoftTeams-image-2.png';
+                                        }
+                                    @endphp
+
+                                    @if($octImg)
+                                        <img
+                                            src="{{ $octImg }}"
+                                            class="oc-oct-img"
+                                            alt="{{ trim($lb[0].' '.$lb[1]) }}"
+                                            title="{{ trim($lb[0].' '.$lb[1]) }}"
+                                            loading="lazy"
+                                            onerror="this.style.display='none'"
+                                        >
+                                    @else
+                                        <span class="oc-oct" title="{{ trim($lb[0].' '.$lb[1]) }}"><span>{{ $lb[0] }}</span><span>{{ $lb[1] }}</span></span>
+                                    @endif
+                                @empty
+                                    <span class="oc-dash">–</span>
+                                @endforelse
+                            </div>
                         </td>
 
                         <td class="c">@if($detail->paleta)<span class="oc-pal">{{ $detail->paleta }}</span>@else<span class="oc-dash">—</span>@endif</td>
@@ -1659,86 +1779,95 @@ html, body {
 
                     {{-- Fila expandible: info del producto + formulario original de edición --}}
                     <tr class="oc-detail" id="oc-det-{{ $detail->id }}">
-                        <td colspan="15">
+                        <td colspan="16">
                             <div class="oc-panel">
 
-                                <div class="info-strip" style="grid-template-columns:1fr 1fr;">
-                                    <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
-                                    <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
+                                <div class="info-strip oc-info-grid">
+                                    <div class="info-item oc-info-card">
+                                        <span>📦 Stock</span>
+                                        <span class="info-val">{{ $detail->product->stock }}</span>
+                                    </div>
 
-                                    {{-- Cajas solicitadas --}}
-                                    <div class="info-item" style="grid-column:1/-1;">
-                                        🗃 Cajas solicitadas:
+                                    <div class="info-item oc-info-card">
+                                        <span>⚖ Peso</span>
+                                        <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span>
+                                    </div>
+
+                                    <div class="info-item oc-info-card">
+                                        <span>🗃 Cajas solicitadas</span>
                                         <span class="info-val" style="color:#2563eb;">
                                             {{ $cajasSol }} caja{{ $cajasSol !== 1 ? 's' : '' }}
                                         </span>
-                                        <span style="font-size:10px;color:#94a3b8;margin-left:3px;">
-                                            ({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)
-                                        </span>
+                                        <small>({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)</small>
                                     </div>
 
-                                    {{-- Cajas despachadas --}}
-                                    <div class="info-item" style="grid-column:1/-1;">
-                                        ✅ Cajas despachadas:
+                                    <div class="info-item oc-info-card">
+                                        <span>✅ Cajas despachadas</span>
                                         <span class="info-val" style="color:{{ $bc }};">
                                             {{ $cajasDesp }} caja{{ $cajasDesp !== 1 ? 's' : '' }}
                                         </span>
                                         @if($unidSueltas > 0)
-                                            <span style="font-size:10px;color:#f59e0b;margin-left:3px;">
-                                                + {{ $unidSueltas }} u. sueltas
-                                            </span>
+                                            <small class="oc-extra-units">+ {{ $unidSueltas }} u. sueltas</small>
                                         @endif
                                     </div>
 
-                                    {{-- Barra de progreso --}}
-                                    <div class="info-item" style="grid-column:1/-1;gap:6px;">
-                                        <span style="font-size:10px;color:#94a3b8;white-space:nowrap;">Despacho:</span>
-                                        <div class="prog-mini" style="flex:1;">
+                                    <div class="info-item oc-info-progress">
+                                        <span>Despacho</span>
+                                        <div class="prog-mini">
                                             <div class="prog-mini-fill" style="width:{{ $pct }}%;background:{{ $bc }};"></div>
                                         </div>
-                                        <span style="font-size:10px;font-weight:700;color:{{ $sc }};margin-left:2px;">{{ $pct }}%</span>
+                                        <strong style="color:{{ $sc }};">{{ $pct }}%</strong>
                                     </div>
                                 </div>
 
-                                <form method="POST" action="{{ route('orders.updateDetail',$detail) }}" class="distan-loader-form" data-loader-title="Guardando cambios..."
-                                    class="oc-form"
+                                <form method="POST" action="{{ route('orders.updateDetail',$detail) }}"
+                                    class="distan-loader-form oc-form"
+                                    data-loader-title="Guardando cambios..."
                                     data-detail-form
                                     data-original-paleta="{{ $detail->paleta }}">
                                     @csrf @method('PUT')
-                                    <div class="fields-box">
-                                        <div class="field-row">
-                                            <div><label class="flabel">Solicitado</label>
-                                                <input type="number" step="0.01" name="cantidad_solicitada" class="finput" value="{{ $detail->cantidad_solicitada }}"></div>
-                                            <div><label class="flabel">Despachado</label>
-                                                <input type="number" step="0.01" name="cantidad_despachada" id="despachado-{{ $detail->product->barcode }}" class="finput" value="{{ $detail->cantidad_despachada }}"></div>
+
+                                    <div class="fields-box oc-fields-grid">
+                                        <div>
+                                            <label class="flabel">Solicitado</label>
+                                            <input type="number" step="0.01" name="cantidad_solicitada" class="finput" value="{{ $detail->cantidad_solicitada }}">
                                         </div>
-                                        <div><label class="flabel">Precio</label>
-                                            <input type="number" step="0.01" name="precio_unitario" class="finput" value="{{ $detail->precio_unitario }}"></div>
-                                        <hr class="dv">
+
+                                        <div>
+                                            <label class="flabel">Despachado</label>
+                                            <input type="number" step="0.01" name="cantidad_despachada" id="despachado-{{ $detail->product->barcode }}" class="finput" value="{{ $detail->cantidad_despachada }}">
+                                        </div>
+
+                                        <div>
+                                            <label class="flabel">Precio</label>
+                                            <input type="number" step="0.01" name="precio_unitario" class="finput" value="{{ $detail->precio_unitario }}">
+                                        </div>
+
                                         <div>
                                             <label class="flabel">Lote</label>
-                                            <input
-                                                type="text"
-                                                name="lote"
-                                                class="finput"
-                                                value="{{ $detail->lote }}"
-                                                placeholder="Lote">
+                                            <input type="text" name="lote" class="finput" value="{{ $detail->lote }}" placeholder="Lote">
                                         </div>
-                                        <div><label class="flabel">Vencimiento</label>
-                                            <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}"></div>
-                                    </div>
-                                    <div style="margin-top:7px;">
-                                        <label class="flabel">Paleta</label>
-                                        <input type="text" name="paleta" class="paleta-input"
-                                            value="{{ $detail->paleta }}" placeholder="P01"
-                                            oninput="this.value=this.value.toUpperCase()">
-                                    </div>
-                                    <div class="subtotal-row" style="margin-top:7px;">
-                                        <span style="font-size:11px;color:#64748b;">Subtotal</span>
-                                        <span class="subtotal-val">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</span>
-                                    </div>
-                                    <div class="btn-row-prod" style="margin-top:7px;">
-                                        <button type="submit" class="btn btn-blue" style="width:100%;">💾 Guardar</button>
+
+                                        <div>
+                                            <label class="flabel">Vencimiento</label>
+                                            <input type="date" name="fecha_vencimiento" class="finput" value="{{ $detail->fecha_vencimiento ?? $detail->product->fecha_vencimiento }}">
+                                        </div>
+
+                                        <div>
+                                            <label class="flabel">Paleta</label>
+                                            <input type="text" name="paleta" class="finput paleta-input"
+                                                value="{{ $detail->paleta }}" placeholder="P01"
+                                                oninput="this.value=this.value.toUpperCase()">
+                                        </div>
+
+                                        <div class="oc-form-subtotal">
+                                            <span>Subtotal</span>
+                                            <strong>S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</strong>
+                                        </div>
+
+                                        <div class="oc-form-save">
+                                            <button type="submit" class="btn btn-blue">💾 Guardar cambios</button>
+                                        </div>
                                     </div>
                                 </form>
 
@@ -4474,7 +4603,7 @@ function ocNuevaPaleta(){
     if(first){
         const row=document.getElementById('oc-det-'+first);
         const input=row?.querySelector('[name="paleta"]');
-        if(row&&input){row.classList.add('open');input.value=name;row.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{input.focus();input.select();},250);return;}
+        if(row&&input){row.classList.add('open');input.value=name;setTimeout(()=>{input.focus();input.select();},80);return;}
     }
     document.getElementById('ocPaletas')?.scrollIntoView({behavior:'smooth',block:'center'});
 }
