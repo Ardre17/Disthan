@@ -231,7 +231,6 @@ class PedidoPdfParser
         );
     }
 
-
     /**
      * Buscar texto por posición.
      */
@@ -271,36 +270,36 @@ class PedidoPdfParser
 
         foreach ($items as $item) {
 
-            /*
-             * En esta plantilla las líneas
-             * de productos están alrededor
-             * de estas coordenadas.
-             */
-            if (
-                $item['y'] < 540
-                ||
-                $item['y'] > 580
-            ) {
-                continue;
-            }
+    /*
+     * En esta plantilla las líneas de productos
+     * ocupan aproximadamente desde y=290 hasta y=580.
+     */
+    if (
+        $item['y'] < 290
+        ||
+        $item['y'] > 580
+    ) {
+        continue;
+    }
 
-            if (
-                $item['x'] < 30
-                ||
-                $item['x'] > 570
-            ) {
-                continue;
-            }
+    if (
+        $item['x'] < 30
+        ||
+        $item['x'] > 570
+    ) {
+        continue;
+    }
 
-            $key = number_format(
-                $item['y'],
-                2,
-                '.',
-                ''
-            );
+    $key = number_format(
+        $item['y'],
+        2,
+        '.',
+        ''
+    );
 
-            $rows[$key][] = $item;
-        }
+    $rows[$key][] = $item;
+}
+                
 
 
         /*
