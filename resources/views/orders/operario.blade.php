@@ -36,6 +36,37 @@
 .activo-input{width:100%;padding:10px 12px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#f8fafc;font-size:15px;outline:none;transition:border-color .2s;}
 .activo-input:focus{border-color:#3b82f6;}
 .activo-input.big{font-size:22px;font-weight:700;text-align:center;padding:12px;}
+.modal-lote-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:10001;align-items:center;justify-content:center;padding:16px;}
+.modal-lote-box{width:100%;max-width:430px;background:#1e293b;border:1px solid #475569;border-radius:14px;box-shadow:0 20px 50px rgba(0,0,0,.5);overflow:hidden;}
+.modal-lote-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid #334155;color:#f8fafc;font-weight:700;}
+.modal-lote-head button{background:transparent;border:none;color:#94a3b8;font-size:20px;cursor:pointer;}
+.modal-lote-body{padding:16px;}
+.modal-lote-warn{background:#422006;border:1px solid #92400e;color:#fde68a;border-radius:10px;padding:10px 12px;font-size:11px;line-height:1.45;margin-bottom:14px;}
+.modal-lote-label{display:block;font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:.05em;margin:0 0 4px;}
+.modal-lote-input{width:100%;padding:11px 12px;border-radius:8px;border:1px solid #334155;background:#0f172a;color:#f8fafc;font-size:15px;outline:none;margin-bottom:12px;}
+.modal-lote-input:focus{border-color:#3b82f6;}
+.modal-lote-actions{display:flex;justify-content:flex-end;gap:8px;}
+.modal-lote-btn{border:none;border-radius:8px;padding:10px 14px;font-weight:700;cursor:pointer;}
+.modal-lote-cancel{background:#334155;color:#e2e8f0;}
+.modal-lote-save{background:#2563eb;color:#fff;}
+.camera-btn{margin-left:auto;background:#2563eb;color:#fff;border:none;border-radius:9px;padding:9px 12px;font-size:11px;font-weight:700;cursor:pointer;}
+.camera-btn:hover{background:#1d4ed8;}
+#camaraModal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.78);z-index:10000;align-items:center;justify-content:center;padding:12px;}
+#camaraModal.open{display:flex;}
+.camara-dialog{width:100%;max-width:520px;background:#0f172a;border:1px solid #334155;border-radius:14px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.55);}
+.camara-hdr{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid #334155;}
+.camara-hdr-title{font-size:13px;font-weight:700;color:#f8fafc;display:flex;align-items:center;gap:8px;}
+.camara-hdr-pulse{width:8px;height:8px;border-radius:50%;background:#22c55e;animation:pulse 1.4s infinite;}
+.btn-camara-cerrar{background:transparent;border:none;color:#94a3b8;font-size:20px;cursor:pointer;}
+#camaraVisor{position:relative;background:#000;min-height:300px;overflow:hidden;}
+#camaraVisor video{width:100%!important;height:auto!important;display:block;}
+.scan-frame{position:absolute;z-index:3;inset:50% auto auto 50%;width:260px;height:150px;transform:translate(-50%,-50%);pointer-events:none;border:2px solid #3b82f6;border-radius:10px;box-shadow:0 0 0 9999px rgba(0,0,0,.28);}
+.scan-line{position:absolute;left:8px;right:8px;top:50%;height:2px;background:#22c55e;box-shadow:0 0 8px #22c55e;animation:scanAnim 1.8s ease-in-out infinite;}
+@keyframes scanAnim{0%,100%{transform:translateY(-55px)}50%{transform:translateY(55px)}}
+.camara-result{padding:10px 14px;text-align:center;border-top:1px solid #334155;min-height:42px;color:#94a3b8;font-size:12px;}
+.camara-result-code{font-family:monospace;color:#22c55e;font-size:15px;font-weight:700;}
+.camara-hint{padding:0 14px 13px;text-align:center;color:#475569;font-size:10px;}
+@media(max-width:520px){.kpis{grid-template-columns:repeat(2,1fr);}.scan-frame{width:230px;height:135px;}}
 .activo-bar-track{width:100%;height:8px;background:#0f172a;border-radius:99px;overflow:hidden;margin:.5rem 0;}
 .toast{position:fixed;top:16px;right:16px;z-index:999;padding:10px 16px;border-radius:10px;font-size:13px;font-weight:600;display:none;align-items:center;gap:8px;box-shadow:0 4px 20px rgba(0,0,0,.4);}
 .toast.show{display:flex;animation:toastIn .2s;}
@@ -71,271 +102,6 @@ to{
 transform:scale(1);
 opacity:1;
 }}
-.btn-etiqueta{
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    gap:6px;
-    width:100%;
-    margin-top:10px;
-    padding:9px 12px;
-    border:1px solid #475569;
-    border-radius:8px;
-    background:#0f172a;
-    color:#f8fafc;
-    text-decoration:none;
-    font-size:11px;
-    font-weight:700;
-    cursor:pointer;
-    transition:.15s;
-}
-
-.btn-etiqueta:hover{
-    background:#334155;
-    border-color:#64748b;
-}
-
-.btn-etiqueta:active{
-    transform:scale(.98);
-}
-
-/* ═══════════════════════════════════════════════════
-   MOBILE — pantallas ≤ 480px (celulares normales)
-═══════════════════════════════════════════════════ */
-@media(max-width:480px){
-
-    /* KPIs: 2 columnas en vez de 4 para que los números se lean bien */
-    .kpis{
-        grid-template-columns:repeat(2,1fr);
-        gap:6px;
-    }
-
-    .kpi-val{ font-size:22px; }
-    .kpi-label{ font-size:10px; }
-
-    /* Porcentaje más compacto en progreso */
-    .prog-pct{ font-size:26px; }
-
-    /* Scanner: input más alto y fuente más grande para tipear fácil */
-    .scanner-input{
-        padding:16px;
-        font-size:20px;
-        min-height:58px;
-    }
-
-    /* Producto activo: campos apilados en una sola columna */
-    .activo-fields{
-        grid-template-columns:1fr;
-    }
-
-    /* Input de cantidad más grande (fácil de tocar) */
-    .activo-input.big{
-        font-size:28px;
-        padding:16px;
-        min-height:64px;
-    }
-
-    .activo-input{
-        min-height:48px;
-        font-size:15px;
-    }
-
-    /* Botón cerrar orden más alto para tocar con dedo */
-    .btn-cerrar{
-        padding:18px;
-        font-size:16px;
-        min-height:58px;
-    }
-
-    /* Botón etiqueta más alto */
-    .btn-etiqueta{
-        padding:13px;
-        font-size:12px;
-        min-height:46px;
-    }
-
-    /* Producto: texto más legible */
-    .prod-item-name{ font-size:14px; }
-    .prod-item-sku{  font-size:11px; }
-
-    /* Toast en la parte de abajo para no tapar el contenido */
-    .toast{
-        top:auto;
-        bottom:16px;
-        right:50%;
-        transform:translateX(50%);
-        white-space:nowrap;
-    }
-
-    /* Título de sección más visible */
-    .sec-title{ font-size:13px; margin-bottom:.85rem; }
-}
-
-/* ═══════════════════════════════════════════════════
-   MOBILE PEQUEÑO — pantallas ≤ 360px (teléfonos chicos)
-═══════════════════════════════════════════════════ */
-@media(max-width:360px){
-
-    .pg{ padding:.65rem; }
-
-    .prog-pct{ font-size:22px; }
-
-    /* Barra de progreso más delgada para ahorrar espacio */
-    .prog-track{ height:14px; }
-
-    .kpi-val{ font-size:20px; }
-
-    .order-title{ font-size:14px; }
-
-    .activo-name{ font-size:14px; }
-
-    /* Meta del activo apilada verticalmente */
-    .activo-meta{
-        flex-direction:column;
-        gap:3px;
-    }
-
-    .activo-input.big{
-        font-size:32px;
-        padding:18px;
-    }
-
-    /* Badges más compactos */
-    .prod-item-badge{
-        font-size:9px;
-        padding:2px 6px;
-    }
-}
-
-/* ═══════════════════════════════════════════════════
-   TABLET — pantallas entre 481px y 680px
-═══════════════════════════════════════════════════ */
-@media(min-width:481px) and (max-width:680px){
-    .kpis{ grid-template-columns:repeat(4,1fr); }
-    .scanner-input{ font-size:20px; padding:14px 16px; }
-    .btn-cerrar{ padding:16px; font-size:15px; }
-}
-
-
-/* ═══════════════════════════════════════════
-   CÁMARA SCANNER
-═══════════════════════════════════════════ */
-.btn-camara{
-    width:100%;margin-top:8px;
-    padding:13px;border-radius:10px;
-    border:2px solid #334155;
-    background:#0f172a;color:#7eb8f7;
-    font-size:13px;font-weight:700;
-    cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:8px;
-    transition:background .15s,border-color .15s;
-}
-.btn-camara:hover{ background:#1e293b; border-color:#3b82f6; color:#93c5fd; }
-.btn-camara:active{ transform:scale(.99); }
-
-/* Modal de cámara */
-#camaraModal{
-    display:none;
-    position:fixed;inset:0;
-    background:rgba(0,0,0,.92);
-    z-index:10000;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    padding:16px;
-}
-#camaraModal.open{ display:flex; }
-
-.camara-dialog{
-    background:#1e293b;
-    border:1px solid #334155;
-    border-radius:16px;
-    overflow:hidden;
-    width:100%;
-    max-width:420px;
-    box-shadow:0 20px 60px rgba(0,0,0,.6);
-    animation:popup .2s ease;
-}
-.camara-hdr{
-    padding:14px 18px;
-    background:#0f172a;
-    border-bottom:1px solid #334155;
-    display:flex;align-items:center;justify-content:space-between;
-}
-.camara-hdr-title{
-    font-size:14px;font-weight:700;color:#f8fafc;
-    display:flex;align-items:center;gap:8px;
-}
-.camara-hdr-pulse{
-    width:8px;height:8px;border-radius:50%;background:#22c55e;
-    animation:pulse 1.4s infinite;flex-shrink:0;
-}
-.btn-camara-cerrar{
-    background:rgba(255,255,255,.08);border:1px solid #475569;
-    border-radius:7px;color:#94a3b8;
-    width:32px;height:32px;cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-    font-size:16px;transition:background .15s;
-}
-.btn-camara-cerrar:hover{ background:rgba(255,255,255,.16); color:#f8fafc; }
-
-/* Visor */
-#camaraVisor{
-    width:100%;
-    aspect-ratio:4/3;
-    background:#000;
-    position:relative;
-    overflow:hidden;
-}
-#camaraVisor video{ width:100% !important; height:100% !important; object-fit:cover; }
-
-/* Marco de escaneo */
-.scan-frame{
-    position:absolute;inset:0;
-    display:flex;align-items:center;justify-content:center;
-    pointer-events:none;
-}
-.scan-frame-inner{
-    width:65%;aspect-ratio:1;
-    border:3px solid #3b82f6;
-    border-radius:14px;
-    box-shadow:0 0 0 4000px rgba(0,0,0,.35);
-    position:relative;
-}
-.scan-line{
-    position:absolute;left:6px;right:6px;height:2px;
-    background:linear-gradient(90deg,transparent,#3b82f6,transparent);
-    border-radius:99px;
-    animation:scanLine 1.8s ease-in-out infinite;
-    top:50%;
-}
-@keyframes scanLine{
-    0%  { top:10%; opacity:.7; }
-    50% { top:88%; opacity:1;  }
-    100%{ top:10%; opacity:.7; }
-}
-
-/* Resultado detectado */
-.camara-result{
-    padding:12px 18px;
-    display:flex;align-items:center;gap:10px;
-    border-top:1px solid #334155;
-    min-height:52px;
-}
-.camara-result-code{
-    font-family:'Consolas',monospace;font-size:15px;font-weight:700;
-    color:#7eb8f7;flex:1;word-break:break-all;
-}
-.camara-result-placeholder{ color:#475569;font-size:12px;flex:1; }
-.camara-result-icon{ font-size:18px;flex-shrink:0; }
-
-/* Hint inferior */
-.camara-hint{
-    padding:10px 18px;text-align:center;
-    font-size:11px;color:#475569;border-top:1px solid #1e293b;
-    background:#0f172a;
-}
-
 </style>
 
 {{-- Fondo oscuro para toda la página --}}
@@ -414,13 +180,11 @@ opacity:1;
     <div class="scanner-top">
         <div class="scanner-pulse"></div>
         <div class="scanner-label">📡 Escanear código de barras</div>
+        <button type="button" class="camera-btn" id="btnAbrirCamara">📷 Cámara</button>
     </div>
     <input type="text" id="scanner" class="scanner-input"
            placeholder="Escanea o escribe el código y presiona Enter..." autofocus>
-    <div class="scanner-hint">⌨ Presiona <strong style="color:#94a3b8;">Enter</strong> para confirmar · El foco regresa automáticamente</div>
-    <button type="button" class="btn-camara" id="btnAbrirCamara">
-        📷 Escanear con cámara
-    </button>
+    <div class="scanner-hint">⌨ Presiona <strong style="color:#94a3b8;">Enter</strong> para confirmar · También puedes usar la cámara</div>
 </div>
 
 {{-- Producto activo --}}
@@ -431,46 +195,31 @@ opacity:1;
         <span>Stock: <strong id="activoStock" style="color:#94a3b8;">—</strong></span>
         <span>Peso: <strong id="activoPeso" style="color:#94a3b8;">—</strong></span>
     </div>
+
+    @if(strtoupper(trim($order->tipo_orden ?? '')) === 'SUPERMERCADO')
     <div style="margin-bottom:.75rem;">
-    <label class="activo-label">
-        👤 Personal que retiró el producto
-    </label>
+        <label class="activo-label">🪵 Paleta</label>
+        <input type="text" class="activo-input" id="activoPaletaInput" maxlength="50"
+               placeholder="Ej: P01" autocomplete="off"
+               style="text-transform:uppercase;">
+    </div>
+    @endif
 
-    <input
-        type="text"
-        class="activo-input"
-        id="activoPersonal"
-        placeholder="Escribe el nombre del personal..."
-        maxlength="100"
-        autocomplete="off"
-    >
-</div>
-
-<div class="activo-fields">
-
-    <div>
-        <label class="activo-label">Solicitado</label>
-
-        <input
-            type="number"
-            class="activo-input"
-            id="activoSolicitado"
-            readonly
-            style="color:#64748b;"
-        >
+    <div style="margin-bottom:.75rem;">
+        <label class="activo-label">👤 Personal que retiró el producto</label>
+        <input type="text" class="activo-input" id="activoPersonal"
+               placeholder="Escribe el nombre del personal..." maxlength="100" autocomplete="off">
     </div>
 
-    <div>
-        <label class="activo-label">Despachado ✏️</label>
-
-        <input
-            type="number"
-            class="activo-input big"
-            id="activoCantidad"
-            placeholder="0"
-        >
-    </div>
-
+    <div class="activo-fields">
+        <div>
+            <label class="activo-label">Solicitado</label>
+            <input type="number" class="activo-input" id="activoSolicitado" readonly style="color:#64748b;">
+        </div>
+        <div>
+            <label class="activo-label">Despachado ✏️</label>
+            <input type="number" class="activo-input big" id="activoCantidad" id="cantidad" placeholder="0">
+        </div>
     </div>
     <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:3px;">
         <span>Progreso ítem</span>
@@ -480,8 +229,10 @@ opacity:1;
         <div id="activoBarFill" style="height:100%;border-radius:99px;background:#3b82f6;width:0%;transition:width .3s;"></div>
     </div>
     <div style="font-size:11px;color:#475569;margin-top:4px;">
-        Paleta: <strong id="activoPaleta" style="color:#94a3b8;">—</strong>
-        · Ubicación: <strong id="activoUbicacion" style="color:#94a3b8;">—</strong>
+        @if(strtoupper(trim($order->tipo_orden ?? '')) !== 'SUPERMERCADO')
+            Paleta: <strong id="activoPaleta" style="color:#94a3b8;">—</strong> ·
+        @endif
+        Ubicación: <strong id="activoUbicacion" style="color:#94a3b8;">—</strong>
         · Vence: <strong id="activoVence" style="color:#94a3b8;">—</strong>
     </div>
 </div>
@@ -571,60 +322,32 @@ opacity:1;
         {{ number_format($pct2,0) }}%
     </span>
 </div>
-@if(!empty($item->personal_despacho))
 
-    <div
-        id="personal-{{ $item->id }}"
-        style="
-            margin-top:6px;
-            padding:5px 7px;
-            background:#0f172a;
-            border:1px solid #334155;
-            border-radius:6px;
-            font-size:10px;
-            color:#94a3b8;
-        "
-    >
-        👤 Retiró:
-        <strong style="color:#f8fafc;">
-            {{ $item->personal_despacho }}
-        </strong>
+    <div style="margin-top:8px;padding:8px;background:#0f172a;border:1px solid #334155;border-radius:8px;font-size:10px;">
+        <div style="display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap;">
+            <div>🏷️ Lote: <strong style="color:#f8fafc;">{{ $item->lote ?: '—' }}</strong></div>
+            <div>📅 Vence: <strong style="color:#f8fafc;">{{ $item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('d/m/Y') : '—' }}</strong></div>
+        </div>
+        @if(strtoupper(trim($order->tipo_orden ?? '')) === 'SUPERMERCADO')
+        <div style="margin-top:4px;">🪵 Paleta: <strong id="paleta-{{ $item->id }}" style="color:#f8fafc;">{{ $item->paleta ?: '—' }}</strong></div>
+        @endif
+        @if(!empty($item->personal_despacho))
+            <div id="personal-{{ $item->id }}" style="margin-top:4px;">👤 Retiró: <strong style="color:#f8fafc;">{{ $item->personal_despacho }}</strong></div>
+        @else
+            <div id="personal-{{ $item->id }}" style="display:none;margin-top:4px;"></div>
+        @endif
+        <button type="button" onclick="abrirModalLote(
+            {{ $item->id }},
+            @js($item->lote),
+            @js($item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('Y-m-d') : '')
+        )" style="margin-top:7px;width:100%;background:#1e293b;color:#93c5fd;border:1px solid #334155;border-radius:7px;padding:7px 9px;font-size:10px;font-weight:700;cursor:pointer;">
+            ✏️ Modificar lote / vencimiento
+        </button>
     </div>
 
-@else
-
-    <div
-        id="personal-{{ $item->id }}"
-        style="display:none;"
-    ></div>
-
-@endif
     <div class="prod-mini-bar">
-    <div class="prod-mini-fill"
-         id="bar-{{ $item->id }}"
-         style="width:{{ $pct2 }}%;background:{{ $lc }};">
+        <div class="prod-mini-fill" id="bar-{{ $item->id }}" style="width:{{ $pct2 }}%;background:{{ $lc }};"></div>
     </div>
-</div>
-
-{{-- IMPRIMIR ETIQUETA --}}
-@if(strtoupper(trim($order->tipo_orden)) === 'LOCAL')
-
-    <a href="{{ route('orders.etiqueta.local', $item) }}"
-       target="_blank"
-       class="btn-etiqueta">
-        🖨️ Imprimir Etiqueta
-    </a>
-
-@else
-
-    <a href="{{ route('orders.details.etiqueta', $item) }}"
-       target="_blank"
-       class="btn-etiqueta">
-        🖨️ Imprimir Codigo de Barras
-    </a>
-
-@endif
-
 </div>
 @endforeach
 
@@ -731,6 +454,51 @@ font-weight:bold;
 </div>
 
 
+{{-- Modal editar lote / vencimiento --}}
+<div id="modalLote" class="modal-lote-overlay">
+    <div class="modal-lote-box">
+        <div class="modal-lote-head">
+            <span>🏷️ Editar lote y vencimiento</span>
+            <button type="button" onclick="cerrarModalLote()">✕</button>
+        </div>
+        <div class="modal-lote-body">
+            <div class="modal-lote-warn">
+                ⚠️ <strong>Esta edición es para casos extraordinarios.</strong><br>
+                Si el dato está mal en el producto, corrígelo también en <strong>Productos</strong> para mantener la información actualizada.
+            </div>
+            <form id="formLote" method="POST" action="">
+                @csrf
+                @method('PUT')
+                <label class="modal-lote-label">Lote</label>
+                <input type="text" name="lote" id="loteInput" class="modal-lote-input" maxlength="100" placeholder="Ej: L-2026-045">
+                <label class="modal-lote-label">Fecha de vencimiento</label>
+                <input type="date" name="fecha_vencimiento" id="fechaVencInput" class="modal-lote-input">
+                <div class="modal-lote-actions">
+                    <button type="button" class="modal-lote-btn modal-lote-cancel" onclick="cerrarModalLote()">Cancelar</button>
+                    <button type="submit" class="modal-lote-btn modal-lote-save">💾 Guardar</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Modal escáner de cámara --}}
+<div id="camaraModal">
+    <div class="camara-dialog">
+        <div class="camara-hdr">
+            <div class="camara-hdr-title"><span class="camara-hdr-pulse"></span> Escáner de cámara</div>
+            <button type="button" class="btn-camara-cerrar" id="btnCerrarCamara">✕</button>
+        </div>
+        <div id="camaraVisor">
+            <div class="scan-frame"><div class="scan-line"></div></div>
+        </div>
+        <div class="camara-result" id="camaraResult">📷 Apunta al código de barras...</div>
+        <div class="camara-hint">Encuadra el código en el marco · Se detecta automáticamente</div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+
 <script>
 let detalles = @json($order->details->load('product'));
 let scanner  = document.getElementById('scanner');
@@ -758,6 +526,21 @@ function beep(){
         o.stop(ctx.currentTime + 0.15);
     } catch(e){}
 }
+
+function abrirModalLote(id, lote, fecha){
+    document.getElementById('formLote').action = '/order-details/' + id + '/lote';
+    document.getElementById('loteInput').value = lote || '';
+    document.getElementById('fechaVencInput').value = fecha || '';
+    document.getElementById('modalLote').style.display = 'flex';
+}
+
+function cerrarModalLote(){
+    document.getElementById('modalLote').style.display = 'none';
+}
+
+document.getElementById('modalLote').addEventListener('click', function(e){
+    if(e.target === this) cerrarModalLote();
+});
 // =====================================
 // MODAL ADVERTENCIAS
 // =====================================
@@ -821,14 +604,11 @@ function mostrarModalAdvertencias(item){
 
     setTimeout(function(){
 
-    const personalInput =
-        document.getElementById("activoPersonal");
+        document.getElementById("activoCantidad").focus();
 
-    if(personalInput){
-        personalInput.focus();
-    }
+        document.getElementById("activoCantidad").select();
 
-},100);
+    },100);
 
 });
 
@@ -860,83 +640,77 @@ function actualizarBarra(){
 }
 
 function mostrarActivo(item){
-
     activoActual = item;
-
-    // Cargar datos del producto
-    document.getElementById('activoNombre').textContent =
-        item.product.nombre || '—';
-
-    document.getElementById('activoSku').textContent =
-        item.product.sku || '—';
-
-    document.getElementById('activoStock').textContent =
-        item.product.stock ?? '—';
-
-    document.getElementById('activoPeso').textContent =
-        item.product.peso ?? '—';
-
-    document.getElementById('activoSolicitado').value =
-        item.cantidad_solicitada;
-
-    document.getElementById('activoCantidad').value =
-        item.cantidad_despachada ?? 0;
-
-    // 👤 Personal que retiró el producto
-    const personalInput =
-        document.getElementById('activoPersonal');
-
-    if (personalInput) {
-        personalInput.value =
-            item.personal_despacho || '';
-    }
-
-    // Datos adicionales
-    document.getElementById('activoPaleta').textContent =
-        item.paleta || '—';
-
-    document.getElementById('activoUbicacion').textContent =
-        item.ubicacion || '—';
-
-    document.getElementById('activoVence').textContent =
-        item.product.fecha_vencimiento || '—';
-
-    // Progreso del producto
     const pct = item.cantidad_solicitada > 0
-        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100
-        : 0;
+        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100 : 0;
+    const color = pct >= 100 ? '#22c55e' : (pct > 0 ? '#f59e0b' : '#ef4444');
 
-    const pctLimitado = Math.min(pct, 100);
+    document.getElementById('activoNombre').textContent   = item.product.nombre;
+    document.getElementById('activoSku').textContent      = item.product.sku ?? '—';
+    document.getElementById('activoStock').textContent    = item.product.stock ?? '—';
+    document.getElementById('activoPeso').textContent     = item.product.peso
+        ? (item.product.peso / 1000).toFixed(3) + ' kg' : '—';
+    document.getElementById('activoSolicitado').value     = item.cantidad_solicitada;
+    document.getElementById('activoCantidad').value       = item.cantidad_despachada || '';
+    document.getElementById('activoPaleta').textContent   = item.paleta    || '—';
+    document.getElementById('activoUbicacion').textContent= item.ubicacion || '—';
+    const paletaInput = document.getElementById('activoPaletaInput');
+    if(paletaInput){
+        paletaInput.value = item.paleta || '';
+    }
+    const personalInput = document.getElementById('activoPersonal');
+    if(personalInput){
+        personalInput.value = item.personal_despacho || '';
+    }
+    const paletaText = document.getElementById('activoPaleta');
+    if(paletaText){
+        paletaText.textContent = item.paleta || '—';
+    }
+    document.getElementById('activoVence').textContent = item.fecha_vencimiento || item.product?.fecha_vencimiento || '—';
+    document.getElementById('activoBarFill').style.width  = pct + '%';
+    document.getElementById('activoBarFill').style.background = color;
+    document.getElementById('activoPctLabel').textContent = Math.round(pct) + '%';
+    document.getElementById('activoPctLabel').style.color = color;
 
-    document.getElementById('activoPctLabel').textContent =
-        Math.round(pctLimitado) + '%';
-
-    document.getElementById('activoBarFill').style.width =
-        pctLimitado + '%';
-
-    document.getElementById('activoBarFill').style.background =
-        pctLimitado >= 100
-            ? '#22c55e'
-            : (pctLimitado > 0 ? '#f59e0b' : '#3b82f6');
-
-    // Mostrar producto activo
+    document.getElementById('activoBox').style.display = 'block';
     document.getElementById('activoBox').style.display = 'block';
 
-    // Si tiene advertencias, mostrar modal
-    if (item.product.advertencias) {
+// =====================================
+// VERIFICAR ADVERTENCIAS NUTRICIONALES
+// =====================================
 
-        mostrarModalAdvertencias(item);
+if(item.product.advertencias){
 
-    } else {
+    mostrarModalAdvertencias(item);
 
-        setTimeout(function(){
+}else{
 
-            if (personalInput) {
-                personalInput.focus();
-            }
+    document.getElementById('activoCantidad').focus();
+    document.getElementById('activoCantidad').select();
 
-        }, 100);
+}
+}
 
+// Update mini bar en lista
+function actualizarCajasUI(item){
+    const porCaja = parseInt(item.product?.cantidad_por_caja || 0, 10);
+    if(!porCaja || porCaja <= 0) return;
+
+    const cantidad = Math.max(0, Math.floor(parseFloat(item.cantidad_despachada) || 0));
+    const cajas = Math.floor(cantidad / porCaja);
+    const sueltas = cantidad % porCaja;
+
+    const cajasEl = document.getElementById('cajas-despachadas-' + item.id);
+    if(cajasEl) cajasEl.textContent = cajas;
+
+    const pluralEl = document.getElementById('cajas-despachadas-plural-' + item.id);
+    if(pluralEl) pluralEl.textContent = cajas !== 1 ? 's' : '';
+
+    const sueltasWrap = document.getElementById('sueltas-despachadas-wrap-' + item.id);
+    if(sueltasWrap){
+        sueltasWrap.textContent = sueltas > 0
+            ? `+ ${sueltas} suelta${sueltas !== 1 ? 's' : ''}`
+            : '';
     }
 }
 
@@ -951,75 +725,6 @@ function actualizarItemUI(item){
     const span = document.getElementById('despachado-' + item.id);
     if(span){ span.textContent = item.cantidad_despachada; span.style.color = color; }
 
-    function actualizarItemUI(item){
-
-    const pct = item.cantidad_solicitada > 0
-        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100
-        : 0;
-
-    const color =
-        pct >= 100
-            ? '#22c55e'
-            : (pct > 0 ? '#f59e0b' : '#ef4444');
-
-    const card =
-        document.getElementById('item-' + item.id);
-
-    if(card){
-        card.style.borderLeftColor = color;
-    }
-
-    const span =
-        document.getElementById('despachado-' + item.id);
-
-    if(span){
-        span.textContent = item.cantidad_despachada;
-        span.style.color = color;
-    }
-
-    const pctEl =
-        document.getElementById('pct-' + item.id);
-
-    if(pctEl){
-        pctEl.textContent =
-            Math.round(pct) + '%';
-
-        pctEl.style.color = color;
-    }
-
-    const barEl =
-        document.getElementById('bar-' + item.id);
-
-    if(barEl){
-        barEl.style.width =
-            Math.min(pct, 100) + '%';
-
-        barEl.style.background =
-            color;
-    }
-
-    const badge =
-        card
-            ? card.querySelector('.prod-item-badge')
-            : null;
-
-    if(badge){
-
-        badge.className =
-            'prod-item-badge ' +
-            (
-                pct >= 100
-                    ? 'bc'
-                    : (pct > 0 ? 'bp' : 'bi')
-            );
-
-        badge.textContent =
-            pct >= 100
-                ? 'COMPLETO'
-                : (pct > 0 ? 'PARCIAL' : 'INCOMPLETO');
-    }
-}
-
     const pctEl = document.getElementById('pct-' + item.id);
     if(pctEl){ pctEl.textContent = Math.round(pct) + '%'; pctEl.style.color = color; }
 
@@ -1033,38 +738,54 @@ function actualizarItemUI(item){
     }
 }
 
-// Scanner principal
-scanner.addEventListener('keydown', function(e){
-    if(e.key !== 'Enter') return;
-    e.preventDefault();
-    const codigo = this.value.trim();
+// Procesar un código tanto desde lector físico como desde cámara
+function procesarCodigo(codigo){
+    codigo = String(codigo || '').trim();
     if(!codigo) return;
 
-    const item = detalles.find(d => d.product.barcode == codigo);
+    const item = detalles.find(d =>
+        d.product && (
+            String(d.product.barcode || '') === codigo ||
+            String(d.product.box_barcode || '') === codigo ||
+            String(d.product.sku || '') === codigo
+        )
+    );
+
     if(!item){
         showToast('❌ Producto no pertenece a esta orden', 'ter');
-        this.value = '';
+        scanner.value = '';
+        scanner.focus();
         return;
     }
 
     const pct = item.cantidad_solicitada > 0
-        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100 : 0;
+        ? (item.cantidad_despachada / item.cantidad_solicitada) * 100
+        : 0;
+
     if(pct >= 100){
         showToast('⚠ ' + item.product.nombre + ' ya está completo', 'twk');
-        this.value = '';
+        scanner.value = '';
+        scanner.focus();
         return;
     }
 
-    // Scroll y highlight en lista
     const card = document.getElementById('item-' + item.id);
-    card.scrollIntoView({ behavior:'smooth', block:'center' });
-    card.style.boxShadow = '0 0 0 2px #3b82f6';
-    setTimeout(() => { card.style.boxShadow = ''; }, 1500);
+    if(card){
+        card.scrollIntoView({ behavior:'smooth', block:'center' });
+        card.style.boxShadow = '0 0 0 2px #3b82f6';
+        setTimeout(() => { card.style.boxShadow = ''; }, 1500);
+    }
 
     mostrarActivo(item);
     showToast('✔ ' + item.product.nombre, 'tok');
     beep();
-    this.value = '';
+    scanner.value = '';
+}
+
+scanner.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter') return;
+    e.preventDefault();
+    procesarCodigo(this.value);
 });
 
 // Guardar desde campo cantidad
@@ -1082,50 +803,25 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
         return;
     }
 
-    const formData = new FormData();
-    const personalInput =
-    document.getElementById('activoPersonal');
-
-const personal =
-    personalInput
-        ? personalInput.value.trim()
-        : '';
-
-if (!personal) {
-
-    showToast(
-        '⚠ Debes indicar quién retiró el producto',
-        'twk'
-    );
-
-    if (personalInput) {
-        personalInput.focus();
+    const personalInput = document.getElementById('activoPersonal');
+    const personal = personalInput ? personalInput.value.trim() : '';
+    if(!personal){
+        showToast('⚠ Debes indicar quién retiró el producto', 'twk');
+        if(personalInput) personalInput.focus();
+        return;
     }
 
-    return;
-}
+    const paletaInput = document.getElementById('activoPaletaInput');
+    const paleta = paletaInput ? paletaInput.value.trim().toUpperCase() : '';
 
-
-formData.append(
-    'cantidad_despachada',
-    cantidad
-);
-
-formData.append(
-    'cantidad_solicitada',
-    activoActual.cantidad_solicitada
-);
-
-formData.append(
-    'precio_unitario',
-    activoActual.precio_unitario
-);
-
-formData.append(
-    'personal_despacho',
-    personal
-);
-
+    const formData = new FormData();
+    formData.append('cantidad_despachada', cantidad);
+    formData.append('cantidad_solicitada', activoActual.cantidad_solicitada);
+    formData.append('precio_unitario', activoActual.precio_unitario || 0);
+    formData.append('personal_despacho', personal);
+    if(paletaInput){
+        formData.append('paleta', paleta);
+    }
     formData.append('_method', 'PUT');
     formData.append('_token', '{{ csrf_token() }}');
 
@@ -1134,30 +830,29 @@ formData.append(
         headers:{ 'Accept':'application/json' },
         body: formData
     })
-    .then(res => res.json())
+    .then(async res => {
+        const texto = await res.text();
+        if(!res.ok){
+            throw new Error('HTTP ' + res.status + ': ' + texto);
+        }
+        try { return JSON.parse(texto); } catch(e) { return {}; }
+    })
     .then(() => {
         activoActual.cantidad_despachada = cantidad;
         activoActual.personal_despacho = personal;
-
-        const personalEl =
-    document.getElementById(
-        'personal-' + activoActual.id
-    );
-
-if (personalEl) {
-
-    personalEl.style.display = 'block';
-
-    personalEl.innerHTML = `
-        👤 Retiró:
-        <strong style="color:#f8fafc;">
-            ${personal}
-        </strong>
-    `;
-}
+        if(paletaInput){ activoActual.paleta = paleta; }
 
         actualizarItemUI(activoActual);
         actualizarBarra();
+
+        const personalEl = document.getElementById('personal-' + activoActual.id);
+        if(personalEl){
+            personalEl.style.display = 'block';
+            personalEl.innerHTML = `👤 Retiró: <strong style="color:#f8fafc;">${escapeHtml(personal)}</strong>`;
+        }
+
+        const paletaEl = document.getElementById('paleta-' + activoActual.id);
+        if(paletaEl){ paletaEl.textContent = paleta || '—'; }
 
         const pct = activoActual.cantidad_solicitada > 0
             ? (cantidad / activoActual.cantidad_solicitada) * 100 : 0;
@@ -1167,181 +862,43 @@ if (personalEl) {
             document.getElementById('activoBox').style.display = 'none';
         } else {
             showToast('💾 Guardado: ' + cantidad + ' de ' + activoActual.cantidad_solicitada, 'tok');
-            const color = '#f59e0b';
             document.getElementById('activoBarFill').style.width  = pct + '%';
-            document.getElementById('activoBarFill').style.background = color;
+            document.getElementById('activoBarFill').style.background = '#f59e0b';
             document.getElementById('activoPctLabel').textContent = Math.round(pct) + '%';
         }
 
         beep();
-
         activoActual = null;
-
-        const personalInput =
-            document.getElementById('activoPersonal');
-
-        if(personalInput){
-            personalInput.value = '';
-        }
+        scanner.focus();
     })
-    .catch(() => {
-        showToast('❌ Error al guardar', 'ter');
+    .catch(error => {
+        console.error('❌ ERROR AL GUARDAR:', error);
+        showToast('❌ Error al guardar. Revisa la consola.', 'ter');
         scanner.focus();
     });
 });
 
-function confirmarCierre(){
-    const faltantes = detalles.filter(d =>
-        parseFloat(d.cantidad_despachada) < parseFloat(d.cantidad_solicitada)
-    );
-    if(faltantes.length === 0){
-        return confirm('✅ Todos los productos están completos.\n\n¿Deseas cerrar la orden?');
-    }
-    const lista = faltantes.map(d => {
-        const f = d.cantidad_solicitada - d.cantidad_despachada;
-        return `• ${d.product.nombre} (faltan ${f})`;
-    }).join('\n');
-    return confirm('⚠️ Hay productos incompletos:\n\n' + lista + '\n\n¿Deseas cerrar la orden de todas formas?');
+function escapeHtml(value){
+    const div = document.createElement('div');
+    div.textContent = value == null ? '' : String(value);
+    return div.innerHTML;
 }
 
-window.onload = () => {
-    scanner.focus();
-    actualizarBarra();
-};
-</script>
+// Mantener foco
+setInterval(() => {
+    if(document.activeElement !== scanner &&
+       document.activeElement !== document.getElementById('activoCantidad')){
+        scanner.focus();
+    }
+}, 800);
 
-
-
-<!-- ═══════════════════════════════════════════
-     MODAL CÁMARA SCANNER
-═══════════════════════════════════════════ -->
-<div id="camaraModal">
-    <div class="camara-dialog">
-
-        <div class="camara-hdr">
-            <div class="camara-hdr-title">
-                <span class="camara-hdr-pulse"></span>
-                Escáner de cámara
-            </div>
-            <button class="btn-camara-cerrar" id="btnCerrarCamara">✕</button>
-        </div>
-
-        <div id="camaraVisor">
-            <!-- html5-qrcode monta el video aquí -->
-            <div class="scan-frame">
-                <div class="scan-frame-inner">
-                    <div class="scan-line"></div>
-                </div>
-            </div>
-        </div>
-
-        <div class="camara-result" id="camaraResult">
-            <span class="camara-result-icon">📷</span>
-            <span class="camara-result-placeholder">Apunta al código de barras...</span>
-        </div>
-
-        <div class="camara-hint">
-            Encuadra el código en el marco azul · Se detecta automáticamente
-        </div>
-
-    </div>
-</div>
-
-<!-- Librería html5-qrcode (solo lectura de códigos de barras + QR) -->
-<script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-<script>
+// ================================
+// ESCÁNER DE CÁMARA
+// ================================
 (function(){
-    var html5QrCode = null;
-    var scannerInput = document.getElementById('scanner');
-    var modal        = document.getElementById('camaraModal');
-    var resultBox    = document.getElementById('camaraResult');
-    var lastCode     = '';
-    var cooldown     = false;
-
-    // Abrir modal y arrancar cámara
-    document.getElementById('btnAbrirCamara').addEventListener('click', function(){
-        modal.classList.add('open');
-        lastCode = '';
-        resultBox.innerHTML = '<span class="camara-result-icon">📷</span><span class="camara-result-placeholder">Apunta al código de barras...</span>';
-        startCamera();
-    });
-
-    // Cerrar
-    document.getElementById('btnCerrarCamara').addEventListener('click', function(){
-        stopCamera();
-        modal.classList.remove('open');
-        scannerInput.focus();
-    });
-
-    // Cerrar tocando el fondo oscuro
-    modal.addEventListener('click', function(e){
-        if(e.target === modal){
-            stopCamera();
-            modal.classList.remove('open');
-            scannerInput.focus();
-        }
-    });
-
-    function startCamera(){
-        if(html5QrCode) return;
-
-        html5QrCode = new Html5Qrcode('camaraVisor', { formatsToSupport: [
-            Html5QrcodeSupportedFormats.EAN_13,
-            Html5QrcodeSupportedFormats.EAN_8,
-            Html5QrcodeSupportedFormats.CODE_128,
-            Html5QrcodeSupportedFormats.CODE_39,
-            Html5QrcodeSupportedFormats.UPC_A,
-            Html5QrcodeSupportedFormats.UPC_E,
-            Html5QrcodeSupportedFormats.QR_CODE
-        ]});
-
-        html5QrCode.start(
-            { facingMode: 'environment' },   // cámara trasera
-            { fps: 12, qrbox: { width: 260, height: 260 }, aspectRatio: 1.333 },
-            onScanSuccess,
-            function(){}  // errores de frame — ignorar
-        ).catch(function(err){
-            resultBox.innerHTML = '<span class="camara-result-icon">⚠️</span><span class="camara-result-placeholder" style="color:#f87171;">No se pudo acceder a la cámara. Verifica los permisos.</span>';
-        });
-    }
-
-    function stopCamera(){
-        if(html5QrCode){
-            html5QrCode.stop().catch(function(){});
-            html5QrCode.clear();
-            html5QrCode = null;
-        }
-    }
-
-    function onScanSuccess(code){
-        if(cooldown || code === lastCode) return;
-        cooldown = true;
-        lastCode = code;
-
-        // Mostrar código detectado en el modal
-        resultBox.innerHTML =
-            '<span class="camara-result-icon">✅</span>' +
-            '<span class="camara-result-code">' + code + '</span>';
-
-        // Vibrar si el dispositivo lo soporta
-        if(navigator.vibrate) navigator.vibrate(80);
-
-        // Inyectar en el input del scanner existente y disparar Enter
-        scannerInput.value = code;
-        scannerInput.dispatchEvent(
-            new KeyboardEvent('keydown', { key:'Enter', bubbles:true, cancelable:true })
-        );
-
-        // Cerrar modal y devolver foco al scanner
-        setTimeout(function(){
-            stopCamera();
-            modal.classList.remove('open');
-            scannerInput.focus();
-            cooldown = false;
-        }, 600);
-    }
-
-})();
-</script>
-
-@endsection
+    let html5QrCode = null;
+    let cooldown = false;
+    const modal = document.getElementById('camaraModal');
+    const resultBox = document.getElementById('camaraResult');
+    const btnOpen = document.getElementById('btnAbrirCamara');
+    const btnClose = document.getElementById
