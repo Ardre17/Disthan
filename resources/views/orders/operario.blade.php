@@ -1400,8 +1400,21 @@ byId('activoCantidad').addEventListener('keydown', function(e){
             quitarLoaderCamara();
 
             if(resultado){
+                const nombre = (error && (error.name || '')) + ' ' + String(error || '');
+                let motivo = 'No se pudo iniciar la cámara.';
+                if(!window.isSecureContext){
+                    motivo = 'La cámara solo funciona en una página HTTPS.';
+                } else if(window.self !== window.top){
+                    motivo = 'La página está dentro de un iframe (vista previa). Ábrela en una pestaña normal del navegador.';
+                } else if(/NotAllowed|Permission|denied/i.test(nombre)){
+                    motivo = 'Permiso de cámara bloqueado. Toca el candado junto a la dirección, permite la Cámara y recarga la página.';
+                } else if(/NotFound|DevicesNotFound/i.test(nombre)){
+                    motivo = 'No se encontró ninguna cámara en este dispositivo.';
+                } else if(/NotReadable|TrackStart|Could not start/i.test(nombre)){
+                    motivo = 'La cámara está siendo usada por otra app o pestaña. Ciérrala e intenta de nuevo.';
+                }
                 resultado.innerHTML =
-                    '<span style="color:#ef4444;">⚠️ No se pudo iniciar la cámara. Revisa los permisos.</span>';
+                    '<span style="color:#ef4444;">⚠️ ' + escapeHtml(motivo) + '</span>';
             }
 
             const lector = lectorCamara;
