@@ -39,20 +39,28 @@ use App\Http\Controllers\ProductionOutputController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplyOrderController;
 
-Route::post(
-    '/supply-orders/{supplyOrder}/dispatch',
-    [SupplyOrderController::class, 'storeDispatch']
-)->name('supply-orders.dispatch.store');
-
 Route::get(
-    '/supply-orders/{supplyOrder}/dispatch',
-    [SupplyOrderController::class, 'createDispatch']
-)->name('supply-orders.dispatch.create');
+    '/supply-orders',
+    [SupplyOrderController::class, 'index']
+)->name('supply-orders.index');
 
 Route::get(
     '/supply-orders/create',
     [SupplyOrderController::class, 'create']
 )->name('supply-orders.create');
+
+/*
+|--------------------------------------------------------------------------
+| ABASTECIMIENTO A PLANTAS
+|--------------------------------------------------------------------------
+| IMPORTANTE: materials debe ir antes de {supplyOrder}.
+| Los parámetros dinámicos se restringen a IDs numéricos.
+|--------------------------------------------------------------------------
+*/
+Route::get(
+    '/supply-orders/materials',
+    [SupplyOrderController::class, 'materials']
+)->name('supply-orders.materials');
 
 Route::post(
     '/supply-orders',
@@ -60,23 +68,28 @@ Route::post(
 )->name('supply-orders.store');
 
 Route::get(
-    '/supply-orders',
-    [SupplyOrderController::class, 'index']
-)->name('supply-orders.index');
+    '/supply-orders/{supplyOrder}/dispatch',
+    [SupplyOrderController::class, 'createDispatch']
+)->whereNumber('supplyOrder')
+  ->name('supply-orders.dispatch.create');
+
+Route::post(
+    '/supply-orders/{supplyOrder}/dispatch',
+    [SupplyOrderController::class, 'storeDispatch']
+)->whereNumber('supplyOrder')
+  ->name('supply-orders.dispatch.store');
+
 Route::get(
     '/supply-orders/{supplyOrder}',
     [SupplyOrderController::class, 'show']
-)->name('supply-orders.show');
+)->whereNumber('supplyOrder')
+  ->name('supply-orders.show');
 
 Route::delete(
     '/supply-orders/{supplyOrder}',
     [SupplyOrderController::class, 'destroy']
-)->name('supply-orders.destroy');
-
-Route::get(
-    '/supply-orders/materials',
-    [SupplyOrderController::class, 'materials']
-)->name('supply-orders.materials');
+)->whereNumber('supplyOrder')
+  ->name('supply-orders.destroy');
 
 Route::get(
     '/orders/import-pdf/product-search',
@@ -237,16 +250,6 @@ Route::get('orders/{order}/carta-calidad', [OrderController::class, 'cartaCalida
      ->name('orders.cartaCalidad');
 
 Route::middleware(['auth'])->group(function () {
-
-    Route::get(
-        '/supply-orders/materials',
-        [SupplyOrderController::class, 'materials']
-    )->name('supply-orders.materials');
-
-    Route::get(
-        '/supply-orders/create',
-        [SupplyOrderController::class, 'create']
-    )->name('supply-orders.create');
 
     Route::get('/reportes/movimientos', [ReportController::class, 'movimientos'])
     ->name('reports.movimientos');
