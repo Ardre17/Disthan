@@ -78,9 +78,9 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .leg-row{display:flex;justify-content:space-between;align-items:center;font-size:12px;}
 .leg-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-right:5px;display:inline-block;}
 
-/* ══════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MAPA DE PALETAS
-══════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .paleta-map-card {
     background:#fff; border:1px solid #e2e8f0;
     border-radius:12px; overflow:hidden;
@@ -142,9 +142,9 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 }
 .no-paleta-chip:hover { background:#fef3e2; }
 
-/* ══════════════════════════════
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
    MODAL DE DETALLE
-══════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .pm-overlay {
     display:none; position:fixed; inset:0;
     background:rgba(0,0,0,.45); z-index:1000;
@@ -279,7 +279,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     }
 }
 
-/* Área donde gira la paleta */
+/* Ãrea donde gira la paleta */
 
 .p3d-stage {
     position:relative;
@@ -478,7 +478,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         );
 }
 
-/* ATRÁS */
+/* ATRÃS */
 .p3d-back {
     transform:
         rotateY(180deg)
@@ -542,7 +542,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 }
 /*
 |--------------------------------------------------------------------------
-| PANEL DE EDICIÓN
+| PANEL DE EDICIÃ“N
 |--------------------------------------------------------------------------
 */
 
@@ -677,10 +677,10 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     line-height:1.5;
 }
 
-/* ══════════════════════════════════════════════════════════
-   CONTROL DE LA ORDEN · rediseño ERP (prefijo oc-)
+/* â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+   CONTROL DE LA ORDEN Â· rediseÃ±o ERP (prefijo oc-)
    Todo es aditivo: no pisa las clases anteriores.
-══════════════════════════════════════════════════════════ */
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• */
 .oc{
     --oc-navy:#1e3a5f; --oc-blue:#2563eb; --oc-blue-soft:#eaf1ff;
     --oc-green:#16a34a; --oc-green-soft:#dcfce7;
@@ -770,7 +770,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .oc-pal-sin{display:flex;align-items:center;justify-content:space-between;background:#fff8f0;border:1px dashed #fed7aa;border-radius:8px;padding:8px 12px;font-size:12px;color:#92400e;margin-top:10px;cursor:pointer;}
 .oc-pal-sin:hover{background:#fef3e2;}
 
-/* Escáner */
+/* EscÃ¡ner */
 .oc-scan{display:flex;align-items:center;gap:14px;background:var(--oc-navy);border-radius:12px;padding:10px 16px;margin-bottom:14px;}
 .oc-scan .scanner-label{margin:0 0 4px;}
 .oc-scan-hint{font-size:10px;color:#93a4bd;text-align:right;white-space:nowrap;}
@@ -825,7 +825,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .oc-ic.del:hover{background:#fee2e2;}
 .oc-vacio{display:none;text-align:center;padding:26px;color:var(--oc-muted);font-size:13px;}
 
-/* Fila expandible (info + formulario original de edición) */
+/* Fila expandible (info + formulario original de ediciÃ³n) */
 .oc-detail{display:none;}
 .oc-detail.open{display:table-row;}
 .oc-detail > td{background:#f8fafc;padding:14px 16px !important;border-bottom:1px solid var(--oc-line);}
@@ -879,9 +879,9 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .oc-info b{font-weight:600;text-align:right;}
 
 /* =========================================================
-   DISTAN — CONTROL DE LA ORDEN
-   Integración con layouts.app / sidebar existente
-   No crea un segundo menú ni una segunda "ventana" de aplicación.
+   DISTAN â€” CONTROL DE LA ORDEN
+   IntegraciÃ³n con layouts.app / sidebar existente
+   No crea un segundo menÃº ni una segunda "ventana" de aplicaciÃ³n.
    ========================================================= */
 html, body {
     margin: 0 !important;
@@ -904,7 +904,7 @@ html, body {
     background: #f1f5f9 !important;
 }
 
-/* El contenido interno es el que debe tener límites visuales,
+/* El contenido interno es el que debe tener lÃ­mites visuales,
    no el layout completo. */
 #mainContent .oc-head,
 #mainContent .oc-top,
@@ -929,7 +929,7 @@ html, body {
     min-width: 1180px;
 }
 
-/* Evita que cards del layout de la aplicación se aniden dentro de la vista. */
+/* Evita que cards del layout de la aplicaciÃ³n se aniden dentro de la vista. */
 #mainContent .pg > .card,
 #mainContent .pg > .container,
 #mainContent .pg > .max-w-7xl {
@@ -950,7 +950,7 @@ html, body {
 }
 
 
-/* ─────────────── RESPONSABLE DE ARMADO ─────────────── */
+/* â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ RESPONSABLE DE ARMADO â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 .oc-armado-card{
     background:#fff;
     border:1px solid #dbe5f0;
@@ -1050,115 +1050,11 @@ html, body {
     .oc-back-orders span{display:inline;}
 }
 
-
-/* =========================================================
-   LOADER PROFESIONAL — DISTAN ERP
-   ========================================================= */
-.distan-order-loader{
-    position:fixed;
-    inset:0;
-    z-index:99999;
-    display:none;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
-    background:rgba(241,245,249,.78);
-    backdrop-filter:blur(4px);
-    -webkit-backdrop-filter:blur(4px);
-}
-.distan-order-loader.open{
-    display:flex;
-}
-.distan-loader-card{
-    width:min(340px,92vw);
-    background:#fff;
-    border:1px solid #dbe5f0;
-    border-radius:20px;
-    padding:28px 26px 24px;
-    text-align:center;
-    box-shadow:0 24px 70px rgba(15,23,42,.18);
-}
-.distan-loader-visual{
-    position:relative;
-    width:112px;
-    height:112px;
-    margin:0 auto 12px;
-    display:grid;
-    place-items:center;
-}
-.distan-loader-glow{
-    position:absolute;
-    inset:8px;
-    border-radius:32px;
-    background:#eff6ff;
-    box-shadow:inset 0 0 0 1px #dbeafe;
-    animation:distanGlow 1.6s ease-in-out infinite;
-}
-.distan-cart{
-    position:relative;
-    z-index:2;
-    width:78px;
-    height:78px;
-    animation:distanCart 1.25s ease-in-out infinite;
-}
-.distan-loader-ring{
-    position:absolute;
-    inset:0;
-    border:2px solid transparent;
-    border-top-color:#2563eb;
-    border-right-color:#93c5fd;
-    border-radius:50%;
-    animation:distanSpin 1.15s linear infinite;
-}
-.distan-loader-title{
-    color:#0f172a;
-    font-size:17px;
-    font-weight:850;
-    line-height:1.2;
-}
-.distan-loader-text{
-    color:#94a3b8;
-    font-size:11px;
-    margin-top:5px;
-}
-.distan-loader-progress{
-    display:flex;
-    justify-content:center;
-    gap:6px;
-    margin-top:15px;
-}
-.distan-loader-progress span{
-    width:7px;
-    height:7px;
-    border-radius:50%;
-    background:#2563eb;
-    animation:distanDot 1s ease-in-out infinite;
-}
-.distan-loader-progress span:nth-child(2){animation-delay:.15s}
-.distan-loader-progress span:nth-child(3){animation-delay:.30s}
-
-@keyframes distanCart{
-    0%,100%{transform:translateX(0) translateY(0) rotate(0deg)}
-    35%{transform:translateX(3px) translateY(-4px) rotate(-2deg)}
-    70%{transform:translateX(-2px) translateY(0) rotate(2deg)}
-}
-@keyframes distanGlow{
-    0%,100%{transform:scale(.96);opacity:.75}
-    50%{transform:scale(1.04);opacity:1}
-}
-@keyframes distanSpin{
-    to{transform:rotate(360deg)}
-}
-@keyframes distanDot{
-    0%,80%,100%{transform:scale(.65);opacity:.35}
-    40%{transform:scale(1);opacity:1}
-}
-
 </style>
 
 <div class="pg">
 
-{{-- ── Datos base (SIN CAMBIOS respecto al original) ── --}}
+{{-- â”€â”€ Datos base (SIN CAMBIOS respecto al original) â”€â”€ --}}
 @php
     $estadoColor = $order->estado === 'COMPLETO' ? '#15803d'
         : ($order->estado === 'PARCIAL' ? '#b45309' : '#b91c1c');
@@ -1176,7 +1072,7 @@ html, body {
     $porcentaje = $totalItems > 0 ? round(($completados / $totalItems) * 100) : 0;
     $progColor = $porcentaje === 100 ? '#22c55e' : ($porcentaje > 40 ? '#f59e0b' : '#ef4444');
 
-    // ── Preparar datos de paletas para el mapa ──────────────────────────
+    // â”€â”€ Preparar datos de paletas para el mapa â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $paletas = $order->details
         ->filter(fn($d) => !empty($d->paleta))
         ->groupBy('paleta')
@@ -1184,19 +1080,19 @@ html, body {
 
     $sinPaleta = $order->details->filter(fn($d) => empty($d->paleta));
 
-    // ── Límite de ítems por paleta ──────────────────────────────────────
+    // â”€â”€ LÃ­mite de Ã­tems por paleta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     $paletaMax = 10;
     $paletaCounts = $paletas->map->count();
 @endphp
 
-{{-- ── Datos adicionales para el rediseño (solo lectura, no tocan lógica) ── --}}
+{{-- â”€â”€ Datos adicionales para el rediseÃ±o (solo lectura, no tocan lÃ³gica) â”€â”€ --}}
 @php
     // Rutas opcionales: si las defines, los botones se activan solos.
     // Ej: $ocRutaEtiquetas = route('orders.etiquetas', $order);
     $ocRutaEtiquetas = null;
     $ocRutaGuia      = null;
 
-    $ocFecha = fn($v, $f = 'd/m/Y') => $v ? \Carbon\Carbon::parse($v)->format($f) : '—';
+    $ocFecha = fn($v, $f = 'd/m/Y') => $v ? \Carbon\Carbon::parse($v)->format($f) : 'â€”';
     $ocN     = fn($n) => rtrim(rtrim(number_format((float) $n, 2, '.', ''), '0'), '.');
 
     $ocParciales  = $order->details->where('estado_item','PARCIAL')->count();
@@ -1215,7 +1111,7 @@ html, body {
 
     $ocOctLabel = function ($k) {
         $k = mb_strtolower((string) $k);
-        if (str_contains($k, 'azuc') || str_contains($k, 'azúc')) return ['ALTO EN', 'AZÚCAR'];
+        if (str_contains($k, 'azuc') || str_contains($k, 'azÃºc')) return ['ALTO EN', 'AZÃšCAR'];
         if (str_contains($k, 'sod'))                              return ['ALTO EN', 'SODIO'];
         if (str_contains($k, 'satur'))                            return ['ALTO EN', 'GRAS.SAT.'];
         if (str_contains($k, 'trans'))                            return ['ALTO EN', 'GRAS.TRANS'];
@@ -1265,9 +1161,41 @@ html, body {
 
 <div class="oc">
 
-{{-- ══════════ CABECERA ══════════ --}}
+{{-- LOADER PROFESIONAL AISLADO: no intercepta enlaces ni clicks globales --}}
+<style>
+#distanOrderLoader{display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;background:rgba(248,250,252,.72);backdrop-filter:blur(2px);pointer-events:none}
+#distanOrderLoader.is-active{display:flex;pointer-events:auto}
+.distan-loader-card{width:min(330px,90vw);padding:26px 24px;background:#fff;border:1px solid #e2e8f0;border-radius:18px;box-shadow:0 20px 55px rgba(15,23,42,.16);text-align:center}
+.distan-cart-wrap{position:relative;width:64px;height:64px;margin:0 auto 14px;display:flex;align-items:center;justify-content:center}
+.distan-cart{width:48px;height:48px;color:#2563eb;animation:distanCartFloat 1.2s ease-in-out infinite}
+.distan-spinner{position:absolute;inset:0;border:3px solid #dbeafe;border-top-color:#2563eb;border-radius:50%;animation:distanSpin .85s linear infinite}
+.distan-loader-title{font-size:15px;font-weight:800;color:#0f172a}.distan-loader-text{margin-top:5px;font-size:12px;color:#64748b}
+.distan-dots span{display:inline-block;animation:distanDots 1.2s infinite;margin-left:2px}.distan-dots span:nth-child(2){animation-delay:.15s}.distan-dots span:nth-child(3){animation-delay:.3s}
+@keyframes distanSpin{to{transform:rotate(360deg)}}@keyframes distanCartFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}@keyframes distanDots{0%,60%,100%{opacity:.2}30%{opacity:1}}
+</style>
+<div id="distanOrderLoader" aria-hidden="true">
+  <div class="distan-loader-card">
+    <div class="distan-cart-wrap"><div class="distan-spinner"></div><svg class="distan-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="20" r="1.5"/><circle cx="18" cy="20" r="1.5"/><path d="M3 4h2l2.2 10.2a2 2 0 0 0 2 1.6h7.9a2 2 0 0 0 1.9-1.4L21 8H6"/><path d="M10 9.5l1.8 1.8L15 8.1"/></svg></div>
+    <div class="distan-loader-title" id="distanOrderLoaderTitle">Procesando...</div>
+    <div class="distan-loader-text">Espera un momento<span class="distan-dots"><span>.</span><span>.</span><span>.</span></span></div>
+  </div>
+</div>
+<script>
+(function(){
+  window.distanShowOrderLoader=function(title){const l=document.getElementById('distanOrderLoader'),t=document.getElementById('distanOrderLoaderTitle');if(!l)return;if(t)t.textContent=title||'Procesando...';l.classList.add('is-active');l.setAttribute('aria-hidden','false')};
+  window.distanHideOrderLoader=function(){const l=document.getElementById('distanOrderLoader');if(!l)return;l.classList.remove('is-active');l.setAttribute('aria-hidden','true')};
+  document.querySelectorAll('form.distan-loader-form').forEach(function(f){f.addEventListener('submit',function(){window.distanShowOrderLoader(f.dataset.loaderTitle)})});
+})();
+</script>
+
+
+{{-- â•â•â•â•â•â•â•â•â•â• CABECERA â•â•â•â•â•â•â•â•â•â• --}}
 <div class="oc-head">
     <div class="oc-head-l">
+        <a href="{{ route('pedidos.index') }}" class="oc-back oc-back-orders" title="Volver a Ã³rdenes">
+            <svg class="oc-i"><use href="#oc-back"/></svg>
+            <span>Volver a Ã³rdenes</span>
+        </a>
         <div>
             <h1 class="oc-title">Control de la orden</h1>
             <div class="oc-sub">Gestiona los productos, despachos y paletas de la orden</div>
@@ -1279,13 +1207,13 @@ html, body {
         @if($ocRutaEtiquetas)
             <a href="{{ $ocRutaEtiquetas }}" target="_blank" class="oc-btn"><svg class="oc-i"><use href="#oc-printer"/></svg> Imprimir etiquetas</a>
         @else
-            <button type="button" class="oc-btn is-off" disabled title="Ruta de impresión masiva sin configurar"><svg class="oc-i"><use href="#oc-printer"/></svg> Imprimir etiquetas</button>
+            <button type="button" class="oc-btn is-off" disabled title="Ruta de impresiÃ³n masiva sin configurar"><svg class="oc-i"><use href="#oc-printer"/></svg> Imprimir etiquetas</button>
         @endif
 
         @if($ocRutaGuia)
-            <a href="{{ $ocRutaGuia }}" class="oc-btn"><svg class="oc-i"><use href="#oc-truck"/></svg> Generar guía</a>
+            <a href="{{ $ocRutaGuia }}" class="oc-btn"><svg class="oc-i"><use href="#oc-truck"/></svg> Generar guÃ­a</a>
         @else
-            <button type="button" class="oc-btn is-off" disabled title="Ruta de guía sin configurar"><svg class="oc-i"><use href="#oc-truck"/></svg> Generar guía</button>
+            <button type="button" class="oc-btn is-off" disabled title="Ruta de guÃ­a sin configurar"><svg class="oc-i"><use href="#oc-truck"/></svg> Generar guÃ­a</button>
         @endif
 
         <div class="oc-dd" id="ddExport">
@@ -1297,7 +1225,7 @@ html, body {
         </div>
 
         <div class="oc-dd" id="ddMas">
-            <button type="button" class="oc-btn sq" onclick="ocDD('ddMas',event)" title="Más opciones"><svg class="oc-i"><use href="#oc-dots"/></svg></button>
+            <button type="button" class="oc-btn sq" onclick="ocDD('ddMas',event)" title="MÃ¡s opciones"><svg class="oc-i"><use href="#oc-dots"/></svg></button>
             <div class="oc-dd-menu" onclick="event.stopPropagation()">
                 <button type="button" class="oc-dd-item" onclick="abrirResumenOrden()"><svg class="oc-i"><use href="#oc-file"/></svg> Ver orden (resumen)</button>
             </div>
@@ -1305,7 +1233,7 @@ html, body {
     </div>
 </div>
 
-{{-- ══════════ FILA SUPERIOR: ORDEN · AVANCE · PALETAS ══════════ --}}
+{{-- â•â•â•â•â•â•â•â•â•â• FILA SUPERIOR: ORDEN Â· AVANCE Â· PALETAS â•â•â•â•â•â•â•â•â•â• --}}
 <div class="oc-top">
 
     {{-- Datos de la orden --}}
@@ -1316,9 +1244,9 @@ html, body {
             <span class="oc-chip" style="background:{{ $estadoColor }};color:#fff;">{{ $order->estado }}</span>
         </div>
         <div class="oc-meta">
-            <div><label>Cliente</label><b>{{ $order->client?->razon_social ?? '—' }}</b></div>
+            <div><label>Cliente</label><b>{{ $order->client?->razon_social ?? 'â€”' }}</b></div>
             <div><label>Tipo de orden</label>
-                <b><span class="oc-chip" style="background:#dcfce7;color:#15803d;padding:2px 9px;">{{ $order->tipo_orden ?? '—' }}</span></b></div>
+                <b><span class="oc-chip" style="background:#dcfce7;color:#15803d;padding:2px 9px;">{{ $order->tipo_orden ?? 'â€”' }}</span></b></div>
             <div><label>Fecha de pedido</label><b class="oc-num">{{ $ocFecha($order->fecha_pedido) }}</b></div>
             <div><label>Fecha de entrega</label><b class="oc-num">{{ $ocFecha($order->fecha_entrega ?? null) }}</b></div>
         </div>
@@ -1352,7 +1280,7 @@ html, body {
     {{-- Paletas (mismo abrirPaleta() del mapa original) --}}
     <div class="oc-card" id="ocPaletas">
         <h3 class="oc-card-t">Paletas de la orden
-            <span style="font-size:11px;color:var(--oc-muted);font-weight:500;">{{ $paletas->count() }} paleta{{ $paletas->count() !== 1 ? 's' : '' }} · clic para ver detalle</span>
+            <span style="font-size:11px;color:var(--oc-muted);font-weight:500;">{{ $paletas->count() }} paleta{{ $paletas->count() !== 1 ? 's' : '' }} Â· clic para ver detalle</span>
         </h3>
 
         <div class="oc-pals">
@@ -1399,7 +1327,7 @@ html, body {
                     <div class="oc-pal-n">{{ $nombrePaleta }}</div>
                     <span class="oc-pal-st" style="background:{{ $stBg }};color:{{ $stCl }};">{{ $stTxt }}</span>
                     <div class="oc-pal-cj oc-num">{{ $todoC ? $cajasSolP.' cajas' : $cajasDespP.' / '.$cajasSolP.' cajas' }}</div>
-                    <div class="oc-pal-it">{{ $items->count() }}/{{ $paletaMax }} ítem{{ $items->count() > 1 ? 's' : '' }}</div>
+                    <div class="oc-pal-it">{{ $items->count() }}/{{ $paletaMax }} Ã­tem{{ $items->count() > 1 ? 's' : '' }}</div>
                     <div class="oc-pal-bar"><div style="width:{{ $pctP }}%;background:{{ $barC }};"></div></div>
                 </div>
             @endforeach
@@ -1431,33 +1359,33 @@ html, body {
             @endphp
             <div class="oc-pal-sin"
                 onclick="abrirPaleta('Sin paleta', {{ $sinPaleta->count() }}, {{ $sinPaleta->sum('cantidad_solicitada') }}, {{ $sinPaleta->sum('cantidad_despachada') }}, 0, 0, '#94a3b8', {{ $spJson }})">
-                <span>⚠️ Sin paleta asignada</span>
-                <span style="font-weight:700;">{{ $sinPaleta->count() }} ítem{{ $sinPaleta->count() > 1 ? 's' : '' }} →</span>
+                <span>âš ï¸ Sin paleta asignada</span>
+                <span style="font-weight:700;">{{ $sinPaleta->count() }} Ã­tem{{ $sinPaleta->count() > 1 ? 's' : '' }} â†’</span>
             </div>
         @endif
     </div>
 </div>
 
-{{-- ══════════ ESCÁNER (mismo id="scanner") ══════════ --}}
+{{-- â•â•â•â•â•â•â•â•â•â• ESCÃNER (mismo id="scanner") â•â•â•â•â•â•â•â•â•â• --}}
 <div class="oc-scan">
     <div style="width:10px;height:10px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse 1.5s infinite;"></div>
     <div style="flex:1;">
-        <div class="scanner-label">📡 Escanear código de barras</div>
-        <input type="text" id="scanner" class="scanner-input" placeholder="Escanea o escribe el código...">
+        <div class="scanner-label">ðŸ“¡ Escanear cÃ³digo de barras</div>
+        <input type="text" id="scanner" class="scanner-input" placeholder="Escanea o escribe el cÃ³digo...">
     </div>
     <div class="oc-scan-hint">Enter para<br>confirmar</div>
 </div>
 
-{{-- ══════════ IMPORTAR / AGREGAR (formularios originales, se abren desde "Acciones") ══════════ --}}
+{{-- â•â•â•â•â•â•â•â•â•â• IMPORTAR / AGREGAR (formularios originales, se abren desde "Acciones") â•â•â•â•â•â•â•â•â•â• --}}
 <div class="oc-accpanel" id="ocAccPanel">
     {{-- Importar CSV --}}
     <div class="section-card">
-        <div class="sec-title">📄 Importar pedido CSV</div>
-        <form action="{{ route('orders.import',$order) }}" method="POST" enctype="multipart/form-data">
+        <div class="sec-title">ðŸ“„ Importar pedido CSV</div>
+        <form action="{{ route('orders.import',$order) }}" method="POST" enctype="multipart/form-data" class="distan-loader-form" data-loader-title="Importando productos...">
             @csrf
             <div class="import-row">
                 <label class="file-label">
-                    📎 Seleccionar archivo .csv
+                    ðŸ“Ž Seleccionar archivo .csv
                     <input type="file" name="archivo" accept=".csv" required style="display:none;">
                 </label>
                 <button type="submit" class="btn btn-green">Importar</button>
@@ -1467,8 +1395,8 @@ html, body {
 
     {{-- Agregar producto --}}
     <div class="section-card">
-        <div class="sec-title">➕ Agregar producto</div>
-        <form method="POST" action="{{ route('orders.addProduct',$order) }}">
+        <div class="sec-title">âž• Agregar producto</div>
+        <form method="POST" action="{{ route('orders.addProduct',$order) }}" class="distan-loader-form" data-loader-title="Agregando producto...">
             @csrf
             <div class="add-grid">
                 <div>
@@ -1494,20 +1422,20 @@ html, body {
     </div>
 </div>
 
-{{-- ─────────────── ARMADO DE LA ORDEN ─────────────── --}}
+{{-- â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ ARMADO DE LA ORDEN â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ --}}
 <div class="oc-armado-card" id="ocArmadoresResumen">
-    <div class="oc-armado-icon">👤</div>
+    <div class="oc-armado-icon">ðŸ‘¤</div>
     <div class="oc-armado-body">
-        <div class="oc-armado-label">Personal que armó la orden</div>
+        <div class="oc-armado-label">Personal que armÃ³ la orden</div>
         @if($armadoresOrden->count() === 0)
-            <div class="oc-armado-name muted">Aún no registrado</div>
-            <div class="oc-armado-help">Se mostrará cuando se registre un despacho.</div>
+            <div class="oc-armado-name muted">AÃºn no registrado</div>
+            <div class="oc-armado-help">Se mostrarÃ¡ cuando se registre un despacho.</div>
         @elseif($armadoresOrden->count() === 1)
             <div class="oc-armado-name">{{ $armadorPrincipal }}</div>
             <div class="oc-armado-help">Responsable registrado en los productos despachados.</div>
         @else
             <div class="oc-armado-name">{{ $armadoresOrden->count() }} personas</div>
-            <div class="oc-armado-help">{{ $armadoresOrden->implode(' · ') }}</div>
+            <div class="oc-armado-help">{{ $armadoresOrden->implode(' Â· ') }}</div>
         @endif
     </div>
     <div class="oc-armado-status">
@@ -1515,7 +1443,7 @@ html, body {
     </div>
 </div>
 
-{{-- ══════════ TARJETA PRINCIPAL: TABS + TABLA ══════════ --}}
+{{-- â•â•â•â•â•â•â•â•â•â• TARJETA PRINCIPAL: TABS + TABLA â•â•â•â•â•â•â•â•â•â• --}}
 <div class="oc-main">
 
     <div class="oc-tabsbar">
@@ -1557,7 +1485,7 @@ html, body {
         </div>
     </div>
 
-    {{-- ─── PANE: PRODUCTOS ─── --}}
+    {{-- â”€â”€â”€ PANE: PRODUCTOS â”€â”€â”€ --}}
     <div class="oc-pane on" data-pane="productos">
         <div class="oc-scroll">
             <table class="oc-tbl" id="ocTabla">
@@ -1572,11 +1500,11 @@ html, body {
                         <th>Avance</th>
                         <th>Lote</th>
                         <th>Vencimiento</th>
-                        <th>Octógonos</th>
+                        <th>OctÃ³gonos</th>
                         <th class="c">Paleta</th>
-                        <th>Ubicación</th>
-                        <th>Últ. despacho</th>
-                        <th>Armó</th>
+                        <th>UbicaciÃ³n</th>
+                        <th>Ãšlt. despacho</th>
+                        <th>ArmÃ³</th>
                         <th>Subtotal</th>
                         <th>Acciones</th>
                     </tr>
@@ -1638,7 +1566,7 @@ html, body {
 
                         <td>
                             <div class="oc-prod">
-                                <div class="oc-thumb">@if($ocImg)<img src="{{ $ocImg }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">@else 📦 @endif</div>
+                                <div class="oc-thumb">@if($ocImg)<img src="{{ $ocImg }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('ðŸ“¦'))">@else ðŸ“¦ @endif</div>
                                 <div>
                                     <div class="oc-pname">{{ $detail->product->nombre }}</div>
                                     @if(!empty($detail->product->marca))<div class="oc-pmarca">Marca: {{ $detail->product->marca }}</div>@endif
@@ -1658,7 +1586,7 @@ html, body {
                             </div>
                         </td>
 
-                        <td class="oc-num">{{ $detail->lote ?: '—' }}</td>
+                        <td class="oc-num">{{ $detail->lote ?: 'â€”' }}</td>
                         <td class="oc-num" @if($ocVencado) style="color:#dc2626;font-weight:700;" title="Vencido" @endif>{{ $ocFecha($ocVenc) }}</td>
 
                         <td>
@@ -1666,25 +1594,25 @@ html, body {
                                 @php $lb = $ocOctLabel($o); @endphp
                                 <span class="oc-oct" title="{{ trim($lb[0].' '.$lb[1]) }}"><span>{{ $lb[0] }}</span><span>{{ $lb[1] }}</span></span>
                             @empty
-                                <span class="oc-dash">–</span>
+                                <span class="oc-dash">â€“</span>
                             @endforelse
                         </td>
 
-                        <td class="c">@if($detail->paleta)<span class="oc-pal">{{ $detail->paleta }}</span>@else<span class="oc-dash">—</span>@endif</td>
-                        <td class="oc-num">{{ $ocUbic ?: '—' }}</td>
+                        <td class="c">@if($detail->paleta)<span class="oc-pal">{{ $detail->paleta }}</span>@else<span class="oc-dash">â€”</span>@endif</td>
+                        <td class="oc-num">{{ $ocUbic ?: 'â€”' }}</td>
 
                         <td>
                             @if($ocUlt)
                                 <div class="oc-ult oc-num">{{ $ocUlt->format('d/m H:i') }}</div>
                             @else
-                                <span class="oc-dash">—</span>
+                                <span class="oc-dash">â€”</span>
                             @endif
                         </td>
 
                         <td class="oc-armador-cell">
                             @if(trim((string)($detail->personal_despacho ?? '')) !== '')
                                 <span class="oc-persona">
-                                    <span class="oc-persona-icon">👤</span>
+                                    <span class="oc-persona-icon">ðŸ‘¤</span>
                                     <span>{{ $detail->personal_despacho }}</span>
                                 </span>
                             @else
@@ -1720,8 +1648,8 @@ html, body {
                                         cantidadDespachada: {{ (float) $detail->cantidad_despachada }}
                                     })"><svg class="oc-i"><use href="#oc-printer"/></svg></button>
 
-                                <form method="POST" action="{{ route('orders.details.destroy',$detail) }}"
-                                    onsubmit="return confirm('¿Eliminar {{ $detail->product->nombre }}?')">
+                                <form method="POST" action="{{ route('orders.details.destroy',$detail) }}" class="distan-loader-form" data-loader-title="Eliminando producto..."
+                                    onsubmit="return confirm('Â¿Eliminar {{ $detail->product->nombre }}?')">
                                     @csrf @method('DELETE')
                                     <button type="submit" class="oc-ic del" title="Eliminar"><svg class="oc-i"><use href="#oc-trash"/></svg></button>
                                 </form>
@@ -1729,29 +1657,29 @@ html, body {
                         </td>
                     </tr>
 
-                    {{-- Fila expandible: info del producto + formulario original de edición --}}
+                    {{-- Fila expandible: info del producto + formulario original de ediciÃ³n --}}
                     <tr class="oc-detail" id="oc-det-{{ $detail->id }}">
                         <td colspan="15">
                             <div class="oc-panel">
 
                                 <div class="info-strip" style="grid-template-columns:1fr 1fr;">
-                                    <div class="info-item">📦 Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
-                                    <div class="info-item">⚖ <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
+                                    <div class="info-item">ðŸ“¦ Stock: <span class="info-val">{{ $detail->product->stock }}</span></div>
+                                    <div class="info-item">âš– <span class="info-val">{{ number_format($detail->product->peso/1000,3) }} kg</span></div>
 
                                     {{-- Cajas solicitadas --}}
                                     <div class="info-item" style="grid-column:1/-1;">
-                                        🗃 Cajas solicitadas:
+                                        ðŸ—ƒ Cajas solicitadas:
                                         <span class="info-val" style="color:#2563eb;">
                                             {{ $cajasSol }} caja{{ $cajasSol !== 1 ? 's' : '' }}
                                         </span>
                                         <span style="font-size:10px;color:#94a3b8;margin-left:3px;">
-                                            ({{ $detail->cantidad_solicitada }} u · {{ $cpc }} u/caja)
+                                            ({{ $detail->cantidad_solicitada }} u Â· {{ $cpc }} u/caja)
                                         </span>
                                     </div>
 
                                     {{-- Cajas despachadas --}}
                                     <div class="info-item" style="grid-column:1/-1;">
-                                        ✅ Cajas despachadas:
+                                        âœ… Cajas despachadas:
                                         <span class="info-val" style="color:{{ $bc }};">
                                             {{ $cajasDesp }} caja{{ $cajasDesp !== 1 ? 's' : '' }}
                                         </span>
@@ -1772,7 +1700,7 @@ html, body {
                                     </div>
                                 </div>
 
-                                <form method="POST" action="{{ route('orders.updateDetail',$detail) }}"
+                                <form method="POST" action="{{ route('orders.updateDetail',$detail) }}" class="distan-loader-form" data-loader-title="Guardando cambios..."
                                     class="oc-form"
                                     data-detail-form
                                     data-original-paleta="{{ $detail->paleta }}">
@@ -1810,7 +1738,7 @@ html, body {
                                         <span class="subtotal-val">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</span>
                                     </div>
                                     <div class="btn-row-prod" style="margin-top:7px;">
-                                        <button type="submit" class="btn btn-blue" style="width:100%;">💾 Guardar</button>
+                                        <button type="submit" class="btn btn-blue" style="width:100%;">ðŸ’¾ Guardar</button>
                                     </div>
                                 </form>
 
@@ -1821,11 +1749,11 @@ html, body {
                 </tbody>
             </table>
         </div>
-        <div class="oc-vacio" id="ocVacio">No hay productos que coincidan con la búsqueda o los filtros.</div>
+        <div class="oc-vacio" id="ocVacio">No hay productos que coincidan con la bÃºsqueda o los filtros.</div>
         <div class="oc-count"><span id="ocContador">{{ $totalItems }} de {{ $totalItems }}</span> productos</div>
     </div>
 
-    {{-- ─── PANE: HISTORIAL (último despacho por producto, con datos existentes) ─── --}}
+    {{-- â”€â”€â”€ PANE: HISTORIAL (Ãºltimo despacho por producto, con datos existentes) â”€â”€â”€ --}}
     <div class="oc-pane" data-pane="historial">
         <div class="oc-scroll">
             <table class="oc-simple">
@@ -1833,22 +1761,22 @@ html, body {
                 <tbody>
                 @forelse($order->details->filter(fn($d) => $d->cantidad_despachada > 0)->sortByDesc('updated_at') as $h)
                     <tr>
-                        <td class="oc-num">{{ $h->updated_at ? $h->updated_at->format('d/m/Y H:i') : '—' }}</td>
+                        <td class="oc-num">{{ $h->updated_at ? $h->updated_at->format('d/m/Y H:i') : 'â€”' }}</td>
                         <td style="font-weight:600;">{{ $h->product->nombre ?? 'Producto' }}</td>
                         <td class="oc-num" style="color:#64748b;">{{ $h->product->sku ?? '' }}</td>
                         <td class="oc-num" style="font-weight:700;">{{ $ocN($h->cantidad_despachada) }} <span style="color:#94a3b8;font-weight:400;">/ {{ $ocN($h->cantidad_solicitada) }}</span></td>
-                        <td>@if($h->paleta)<span class="oc-pal">{{ $h->paleta }}</span>@else<span class="oc-dash">—</span>@endif</td>
+                        <td>@if($h->paleta)<span class="oc-pal">{{ $h->paleta }}</span>@else<span class="oc-dash">â€”</span>@endif</td>
                     </tr>
                 @empty
-                    <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:26px;">Aún no hay despachos registrados.</td></tr>
+                    <tr><td colspan="5" style="text-align:center;color:#94a3b8;padding:26px;">AÃºn no hay despachos registrados.</td></tr>
                 @endforelse
                 </tbody>
             </table>
         </div>
-        <div class="oc-count">Muestra la última actualización de despacho de cada producto.</div>
+        <div class="oc-count">Muestra la Ãºltima actualizaciÃ³n de despacho de cada producto.</div>
     </div>
 
-    {{-- ─── PANE: DOCUMENTOS ─── --}}
+    {{-- â”€â”€â”€ PANE: DOCUMENTOS â”€â”€â”€ --}}
     <div class="oc-pane" data-pane="documentos">
         <div class="oc-docs">
             <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="oc-tile t-orange">
@@ -1864,7 +1792,7 @@ html, body {
 
 </div>{{-- /.oc-main --}}
 
-{{-- ══════════ INFERIOR: ACCIONES · RESUMEN · INFO ══════════ --}}
+{{-- â•â•â•â•â•â•â•â•â•â• INFERIOR: ACCIONES Â· RESUMEN Â· INFO â•â•â•â•â•â•â•â•â•â• --}}
 <div class="oc-bottom">
 
     <div class="oc-card">
@@ -1878,7 +1806,7 @@ html, body {
             @if($ocRutaEtiquetas)
                 <a href="{{ $ocRutaEtiquetas }}" target="_blank" class="oc-tile t-green">
             @else
-                <button type="button" class="oc-tile t-green is-off" disabled title="Ruta de impresión masiva sin configurar">
+                <button type="button" class="oc-tile t-green is-off" disabled title="Ruta de impresiÃ³n masiva sin configurar">
             @endif
                 <svg class="oc-i"><use href="#oc-printer"/></svg>
                 <span><b>Imprimir etiquetas</b><small>Etiquetas por paleta o producto</small></span>
@@ -1897,10 +1825,10 @@ html, body {
             @if($ocRutaGuia)
                 <a href="{{ $ocRutaGuia }}" class="oc-tile t-sky">
             @else
-                <button type="button" class="oc-tile t-sky is-off" disabled title="Ruta de guía sin configurar">
+                <button type="button" class="oc-tile t-sky is-off" disabled title="Ruta de guÃ­a sin configurar">
             @endif
                 <svg class="oc-i"><use href="#oc-truck"/></svg>
-                <span><b>Generar guía</b><small>Documento de transporte</small></span>
+                <span><b>Generar guÃ­a</b><small>Documento de transporte</small></span>
             @if($ocRutaGuia) </a> @else </button> @endif
 
             <button type="button" class="oc-tile t-gray" onclick="ocExportCSV()">
@@ -1926,14 +1854,14 @@ html, body {
     </div>
 
     <div class="oc-card">
-        <h3 class="oc-card-t">Información adicional</h3>
+        <h3 class="oc-card-t">InformaciÃ³n adicional</h3>
         <div class="oc-info">
-            <div><span>Creado por</span><b>{{ $order->user->name ?? $order->creado_por ?? '—' }}</b></div>
+            <div><span>Creado por</span><b>{{ $order->user->name ?? $order->creado_por ?? 'â€”' }}</b></div>
             <div><span>Estado</span><b><span class="oc-chip" style="background:{{ $estadoColor }}1a;color:{{ $estadoColor }};padding:2px 10px;">{{ $order->estado }}</span></b></div>
-            <div><span>Fecha de creación</span><b class="oc-num">{{ $ocFecha($order->created_at ?? null, 'd/m/Y H:i') }}</b></div>
+            <div><span>Fecha de creaciÃ³n</span><b class="oc-num">{{ $ocFecha($order->created_at ?? null, 'd/m/Y H:i') }}</b></div>
             <div><span>Prioridad</span><b>{{ $order->prioridad ?? 'Normal' }}</b></div>
-            <div><span>Última actualización</span><b class="oc-num">{{ $ocFecha($order->updated_at ?? null, 'd/m/Y H:i') }}</b></div>
-            <div><span>Almacén de salida</span><b>{{ $order->almacen ?? $order->almacen_salida ?? '—' }}</b></div>
+            <div><span>Ãšltima actualizaciÃ³n</span><b class="oc-num">{{ $ocFecha($order->updated_at ?? null, 'd/m/Y H:i') }}</b></div>
+            <div><span>AlmacÃ©n de salida</span><b>{{ $order->almacen ?? $order->almacen_salida ?? 'â€”' }}</b></div>
         </div>
     </div>
 
@@ -1942,9 +1870,9 @@ html, body {
 </div>{{-- /.oc --}}
 </div>{{-- /.pg --}}
 
-{{-- ══════════════════════════════
+{{-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      MODAL DETALLE DE PALETA
-══════════════════════════════ --}}
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• --}}
 <div class="pm-overlay" id="pmOverlay" onclick="cerrarPaleta(event)">
     <div class="pm-modal">
         <div class="pm-header">
@@ -1952,14 +1880,14 @@ html, body {
                 <div class="pm-title" id="pmTitle"></div>
                 <div class="pm-sub" id="pmSub"></div>
             </div>
-            <button class="pm-close" onclick="document.getElementById('pmOverlay').classList.remove('open')">✕</button>
+            <button class="pm-close" onclick="document.getElementById('pmOverlay').classList.remove('open')">âœ•</button>
         </div>
         <div class="pm-body">
 
             {{-- Mini KPIs --}}
             <div class="pm-kpis">
                 <div class="pm-kpi">
-                    <div class="pm-kpi-label">Ítems</div>
+                    <div class="pm-kpi-label">Ãtems</div>
                     <div class="pm-kpi-val" id="pmItems"></div>
                 </div>
                 <div class="pm-kpi">
@@ -1992,9 +1920,9 @@ html, body {
     </div>
 </div>
 
-{{-- ══════════════════════════════
+{{-- â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
      MODAL ETIQUETA DE PRODUCTO
-══════════════════════════════ --}}
+â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â• --}}
 <div class="et-overlay" id="etOverlay" onclick="cerrarEtiqueta(event)">
     <div class="et-modal" onclick="event.stopPropagation()">
         <div class="et-label" id="etLabel">
@@ -2009,7 +1937,7 @@ html, body {
             </div>
         </div>
         <div class="et-actions" data-etiqueta-url-template="{{ route('orders.details.etiqueta', ['item' => '__ID__']) }}">
-            <a id="etPdfLink" href="#" target="_blank" class="btn btn-gray">🖨 Generar PDF</a>
+            <a id="etPdfLink" href="#" target="_blank" class="btn btn-gray">ðŸ–¨ Generar PDF</a>
             <button type="button" class="btn btn-gray" onclick="document.getElementById('etOverlay').classList.remove('open')">Cerrar</button>
         </div>
     </div>
@@ -2052,7 +1980,7 @@ html, body {
                     font-weight:800;
                     color:#111827;
                 ">
-                    📋 Resumen de orden
+                    ðŸ“‹ Resumen de orden
                 </div>
 
                 <div style="
@@ -2076,7 +2004,7 @@ html, body {
                     font-size:18px;
                     cursor:pointer;
                 ">
-                ×
+                Ã—
             </button>
 
         </div>
@@ -2102,11 +2030,11 @@ html, body {
                     ">
 
                         <th style="padding:9px;text-align:left;">
-                            Código
+                            CÃ³digo
                         </th>
 
                         <th style="padding:9px;text-align:left;">
-                            Descripción
+                            DescripciÃ³n
                         </th>
 
                         <th style="padding:9px;text-align:center;">
@@ -2150,7 +2078,7 @@ html, body {
 
                         <tr style="border-bottom:1px solid #e5e7eb;">
 
-                            {{-- CÓDIGO --}}
+                            {{-- CÃ“DIGO --}}
                             <td style="
                                 padding:9px;
                                 font-family:monospace;
@@ -2158,10 +2086,10 @@ html, body {
                             ">
                                 {{ $detalle->product->sku
                                     ?? $detalle->product->barcode
-                                    ?? '—' }}
+                                    ?? 'â€”' }}
                             </td>
 
-                            {{-- DESCRIPCIÓN --}}
+                            {{-- DESCRIPCIÃ“N --}}
                             <td style="
                                 padding:9px;
                                 font-weight:600;
@@ -2270,7 +2198,7 @@ html, body {
                     class="p3d-title"
                     id="p3dTitle"
                 >
-                    🧊 Paleta
+                    ðŸ§Š Paleta
                 </div>
 
                 <div
@@ -2287,7 +2215,7 @@ html, body {
                 class="p3d-close"
                 onclick="cerrarPaleta3D()"
             >
-                ✕
+                âœ•
             </button>
 
         </div>
@@ -2333,12 +2261,12 @@ html, body {
             <div class="p3d-panel">
 
                 <div class="p3d-panel-title">
-                    📦 Productos de la paleta
+                    ðŸ“¦ Productos de la paleta
                 </div>
 <div id="p3dControls" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0 10px;padding:9px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;">
                     <label style="font-size:10px;color:#64748b;font-weight:700;">Zoom <span id="p3dZoomValue">85%</span><input id="p3dZoom" type="range" min="50" max="140" value="85" style="width:100%;"></label>
-                    <label style="font-size:10px;color:#64748b;font-weight:700;">Inclinación <span id="p3dRotXValue">58°</span><input id="p3dRotX" type="range" min="20" max="80" value="58" style="width:100%;"></label>
-                    <label style="font-size:10px;color:#64748b;font-weight:700;">Rotación <span id="p3dRotYValue">-28°</span><input id="p3dRotY" type="range" min="-180" max="180" value="-28" style="width:100%;"></label>
+                    <label style="font-size:10px;color:#64748b;font-weight:700;">InclinaciÃ³n <span id="p3dRotXValue">58Â°</span><input id="p3dRotX" type="range" min="20" max="80" value="58" style="width:100%;"></label>
+                    <label style="font-size:10px;color:#64748b;font-weight:700;">RotaciÃ³n <span id="p3dRotYValue">-28Â°</span><input id="p3dRotY" type="range" min="-180" max="180" value="-28" style="width:100%;"></label>
                 </div>
             <div id="p3dProducts"></div>
 
@@ -2356,9 +2284,9 @@ html, body {
         line-height:1.5;
     "
 >
-    🖱️ Arrastra un producto hacia la paleta.<br>
-    📦 Al soltarlo podrás indicar cuántas cajas colocar.<br>
-    🔄 Cada bloque puede moverse, redimensionarse y girarse.
+    ðŸ–±ï¸ Arrastra un producto hacia la paleta.<br>
+    ðŸ“¦ Al soltarlo podrÃ¡s indicar cuÃ¡ntas cajas colocar.<br>
+    ðŸ”„ Cada bloque puede moverse, redimensionarse y girarse.
 </div>
 
                 </div>
@@ -2371,47 +2299,8 @@ html, body {
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-
-<!-- Loader profesional DISTAN -->
-<div id="distanOrderLoader" class="distan-order-loader" aria-hidden="true">
-    <div class="distan-loader-card">
-        <div class="distan-loader-visual">
-            <div class="distan-loader-glow"></div>
-            <svg class="distan-cart" viewBox="0 0 120 120" fill="none" aria-hidden="true">
-                <path d="M15 20h13l9 52h55l12-38H34"
-                      stroke="#2563eb" stroke-width="7" stroke-linecap="round"
-                      stroke-linejoin="round"/>
-                <circle cx="51" cy="92" r="8" fill="#2563eb"/>
-                <circle cx="91" cy="92" r="8" fill="#2563eb"/>
-                <rect x="45" y="36" width="35" height="30" rx="5"
-                      fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
-                <path d="M52 45h21M52 53h16M52 61h20"
-                      stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
-                <path d="M91 28l6 6 12-15"
-                      stroke="#16a34a" stroke-width="6" stroke-linecap="round"
-                      stroke-linejoin="round"/>
-            </svg>
-            <span class="distan-loader-ring"></span>
-        </div>
-
-        <div class="distan-loader-title" id="distanLoaderTitle">
-            Actualizando la orden...
-        </div>
-
-        <div class="distan-loader-text" id="distanLoaderText">
-            Guardando los cambios
-        </div>
-
-        <div class="distan-loader-progress">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </div>
-</div>
-
 <script>
-// ── Scanner ──────────────────────────────────────────────────────────────
+// â”€â”€ Scanner â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 let scanner = document.getElementById('scanner');
 scanner.addEventListener('keydown', function(e){
     if(e.key !== 'Enter') return;
@@ -2442,7 +2331,7 @@ scanner.addEventListener('keydown', function(e){
     this.value = '';
 });
 
-// ── Límite de ítems por paleta ─────────────────────────────────────────
+// â”€â”€ LÃ­mite de Ã­tems por paleta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 const paletaCounts = {!! $paletaCounts->toJson() !!};
 const PALETA_MAX = {{ $paletaMax }};
 
@@ -2454,21 +2343,21 @@ document.querySelectorAll('form[data-detail-form]').forEach(form => {
         const nueva = paletaInput.value.trim().toUpperCase();
         const original = (form.dataset.originalPaleta || '').trim().toUpperCase();
 
-        // Solo valida si está cambiando a una paleta distinta (o asignando una nueva)
+        // Solo valida si estÃ¡ cambiando a una paleta distinta (o asignando una nueva)
         if (nueva && nueva !== original) {
             const countActual = paletaCounts[nueva] || 0;
             if (countActual >= PALETA_MAX) {
                 e.preventDefault();
-                alert(`⚠️ La paleta ${nueva} ya tiene ${countActual} ítems (máximo ${PALETA_MAX}). No se pueden agregar más productos a esta paleta.`);
+                alert(`âš ï¸ La paleta ${nueva} ya tiene ${countActual} Ã­tems (mÃ¡ximo ${PALETA_MAX}). No se pueden agregar mÃ¡s productos a esta paleta.`);
             }
         }
     });
 });
 
-// ── Modal de paleta ──────────────────────────────────────────────────────
+// â”€â”€ Modal de paleta â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, items) {
-    document.getElementById('pmTitle').textContent = '🪵 ' + nombre;
-    document.getElementById('pmSub').textContent = 'Detalle de contenido · ' + nItems + ' ítem' + (nItems !== 1 ? 's' : '');
+    document.getElementById('pmTitle').textContent = 'ðŸªµ ' + nombre;
+    document.getElementById('pmSub').textContent = 'Detalle de contenido Â· ' + nItems + ' Ã­tem' + (nItems !== 1 ? 's' : '');
     document.getElementById('pmItems').textContent = nItems;
     document.getElementById('pmUds').textContent = totUds;
     document.getElementById('pmPeso').textContent = pesoKg + ' kg';
@@ -2489,7 +2378,7 @@ function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, it
         const ec = estadoColors[item.estado] ?? { bg:'#f1f5f9', color:'#64748b', dot:'#94a3b8' };
         const itemPct = item.solicitada > 0 ? Math.round((item.despachada / item.solicitada) * 100) : 0;
 
-        // ── Cálculo de cajas ──
+        // â”€â”€ CÃ¡lculo de cajas â”€â”€
         const cpc = item.cantidad_por_caja > 0 ? item.cantidad_por_caja : 1;
         const cajasSol = Math.ceil(item.solicitada / cpc);
         const cajasDesp = Math.floor(item.despachada / cpc);
@@ -2505,10 +2394,10 @@ function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, it
             <div class="pm-item-name">
                 <div style="font-weight:600;">${item.nombre}</div>
                 <div style="font-size:10px;color:#94a3b8;">
-                    ${item.sku ? 'SKU: '+item.sku+' · ' : ''}${item.peso} kg · S/ ${parseFloat(item.precio).toFixed(2)}
+                    ${item.sku ? 'SKU: '+item.sku+' Â· ' : ''}${item.peso} kg Â· S/ ${parseFloat(item.precio).toFixed(2)}
                 </div>
 
-                {{-- Línea de cajas --}}
+                {{-- LÃ­nea de cajas --}}
                 <div style="
                     display:inline-flex;align-items:center;gap:4px;
                     margin-top:3px;
@@ -2516,7 +2405,7 @@ function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, it
                     border-radius:4px;padding:2px 7px;
                     font-size:10px;font-weight:700;color:#1d4ed8;
                 ">
-                    🗃 ${cajasLabel}
+                    ðŸ—ƒ ${cajasLabel}
                 </div>
                 ${sueltasHtml}
 
@@ -2531,7 +2420,7 @@ function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, it
         </div>`;
     });
 
-    // Número de la paleta
+    // NÃºmero de la paleta
     let numeroPaleta = nombre.replace(/\D/g,'');
     if(numeroPaleta === '')
         numeroPaleta = '0';
@@ -2540,16 +2429,16 @@ function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, it
     // SSCC
     let sscc = '50000014373324' + numeroPaleta;
 
-    // Tabla logística
+    // Tabla logÃ­stica
     let tabla = `
     <hr style="margin:18px 0">
-    <h4 style="margin-bottom:10px;">📋 Hoja logística</h4>
+    <h4 style="margin-bottom:10px;">ðŸ“‹ Hoja logÃ­stica</h4>
     <table style="width:100%;border-collapse:collapse;font-size:11px;">
         <thead>
             <tr style="background:#f1f5f9;">
                 <th style="padding:6px;border:1px solid #ddd;">DUM13</th>
                 <th style="padding:6px;border:1px solid #ddd;">DUM14</th>
-                <th style="padding:6px;border:1px solid #ddd;">DESCRIPCIÓN</th>
+                <th style="padding:6px;border:1px solid #ddd;">DESCRIPCIÃ“N</th>
                 <th style="padding:6px;border:1px solid #ddd;">UXB</th>
                 <th style="padding:6px;border:1px solid #ddd;">BULTOS</th>
             </tr>
@@ -2595,7 +2484,7 @@ function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, it
         class="btn btn-blue"
         style="width:100%;"
     >
-        🖨 Generar Hoja Logística
+        ðŸ–¨ Generar Hoja LogÃ­stica
     </a>
 
     <button
@@ -2611,7 +2500,7 @@ function abrirPaleta(nombre, nItems, totUds, despUds, pesoKg, pct, fillColor, it
             ${JSON.stringify(items)}
         )'
     >
-        🧊 Ver paleta en 3D
+        ðŸ§Š Ver paleta en 3D
     </button>
 
 </div>
@@ -2635,7 +2524,7 @@ function cerrarPaleta(e) {
     }
 }
 // =========================================================
-// VISOR 3D DE PALETA — ARMADO MANUAL
+// VISOR 3D DE PALETA â€” ARMADO MANUAL
 // =========================================================
 
 let p3dData = [];
@@ -2665,19 +2554,19 @@ function abrirPaleta3D(nombre, items)
 {
     p3dData = items || [];
 
-    // La paleta comienza VACÍA
+    // La paleta comienza VACÃA
     p3dBlocks = [];
 
     p3dSelected = null;
 
     document.getElementById('p3dTitle').textContent =
-        '🧊 Paleta ' + nombre;
+        'ðŸ§Š Paleta ' + nombre;
 
     document.getElementById('p3dSubtitle').textContent =
         p3dData.length +
         ' producto' +
         (p3dData.length !== 1 ? 's' : '') +
-        ' · máximo {{ $paletaMax }} productos';
+        ' Â· mÃ¡ximo {{ $paletaMax }} productos';
 
     document.getElementById('p3dOverlay')
         .classList.add('open');
@@ -2790,7 +2679,7 @@ function renderP3dProducts()
 
         row.innerHTML = `
             <div class="p3d-product-name">
-                📦 ${item.nombre}
+                ðŸ“¦ ${item.nombre}
             </div>
 
             <div class="p3d-product-meta">
@@ -2853,7 +2742,7 @@ function renderP3dProducts()
                                 margin-top:5px;
                             "
                         >
-                            ✅ COMPLETO
+                            âœ… COMPLETO
                         </div>
                     `
                     : `
@@ -2864,7 +2753,7 @@ function renderP3dProducts()
                                 margin-top:5px;
                             "
                         >
-                            🖱️ Arrastra hacia la paleta
+                            ðŸ–±ï¸ Arrastra hacia la paleta
                         </div>
                     `
             }
@@ -2991,7 +2880,7 @@ p3dStage?.addEventListener(
         }
 
         /*
-         * Calcular posición aproximada
+         * Calcular posiciÃ³n aproximada
          * dentro de la paleta.
          */
         const pallet =
@@ -3056,7 +2945,7 @@ function abrirCantidadBloque(
 
     const cantidad =
         prompt(
-            `¿Cuántas cajas de "${item.nombre}" quieres colocar?\n\n` +
+            `Â¿CuÃ¡ntas cajas de "${item.nombre}" quieres colocar?\n\n` +
             `Cajas restantes: ${restantes}`,
             restantes
         );
@@ -3073,7 +2962,7 @@ function abrirCantidadBloque(
         cantidadNumero <= 0
     ) {
         alert(
-            'Ingresa una cantidad válida.'
+            'Ingresa una cantidad vÃ¡lida.'
         );
 
         return;
@@ -3478,7 +3367,7 @@ caja.style.setProperty(
         item.nombre;
 
     /*
-     * ATRÁS
+     * ATRÃS
      */
     const back =
         document.createElement(
@@ -3879,7 +3768,7 @@ function actualizarEditor3D()
         <div class="p3d-edit-box">
 
             <div class="p3d-edit-title">
-                ⚙️ ${item.nombre}
+                âš™ï¸ ${item.nombre}
             </div>
 
             <div
@@ -3889,7 +3778,7 @@ function actualizarEditor3D()
                     margin-bottom:8px;
                 "
             >
-                📦 Este bloque:
+                ðŸ“¦ Este bloque:
                 <strong>
                     ${block.cantidad} cajas
                 </strong>
@@ -4024,10 +3913,10 @@ function actualizarEditor3D()
             <div
                 class="p3d-edit-row"
             >
-                <label>Rotación</label>
+                <label>RotaciÃ³n</label>
 
                 <strong>
-                    ${Math.round(block.rotation)}°
+                    ${Math.round(block.rotation)}Â°
                 </strong>
 
                 <input
@@ -4056,8 +3945,8 @@ function actualizarEditor3D()
                     text-align:center;
                 "
             >
-                🔄 Rotación:
-                ${Math.round(block.rotation)}°
+                ðŸ”„ RotaciÃ³n:
+                ${Math.round(block.rotation)}Â°
             </div>
             <button
     type="button"
@@ -4075,7 +3964,7 @@ function actualizarEditor3D()
         cursor:pointer;
     "
 >
-    🗑️ Eliminar este bloque
+    ðŸ—‘ï¸ Eliminar este bloque
 </button>
             <div
                 id="p3dPositionStatus"
@@ -4146,7 +4035,7 @@ function editarBloque3D(
         ) {
 
             alert(
-                'La distribución seleccionada no alcanza para las ' +
+                'La distribuciÃ³n seleccionada no alcanza para las ' +
                 block.cantidad +
                 ' cajas de este bloque.'
             );
@@ -4184,8 +4073,8 @@ function eliminarBloque3D()
 
     const confirmar =
         confirm(
-            `¿Eliminar el bloque de "${item.nombre}"?\n\n` +
-            `Se devolverán ${block.cantidad} cajas a las cajas restantes.`
+            `Â¿Eliminar el bloque de "${item.nombre}"?\n\n` +
+            `Se devolverÃ¡n ${block.cantidad} cajas a las cajas restantes.`
         );
 
     if (!confirmar) {
@@ -4206,7 +4095,7 @@ function eliminarBloque3D()
 
 /**
  * =========================================================
- * ESTADO DE POSICIÓN
+ * ESTADO DE POSICIÃ“N
  * =========================================================
  */
 function actualizarEstadoPosicion(
@@ -4257,7 +4146,7 @@ function actualizarEstadoPosicion(
     if (dentro) {
 
         status.textContent =
-            '🟢 Bloque dentro de la paleta';
+            'ðŸŸ¢ Bloque dentro de la paleta';
 
         status.style.background =
             '#dcfce7';
@@ -4268,7 +4157,7 @@ function actualizarEstadoPosicion(
     } else {
 
         status.textContent =
-            '🔴 Bloque fuera de la paleta';
+            'ðŸ”´ Bloque fuera de la paleta';
 
         status.style.background =
             '#fee2e2';
@@ -4281,7 +4170,7 @@ function actualizarEstadoPosicion(
 
 /**
  * =========================================================
- * TRANSFORMACIÓN DE CÁMARA
+ * TRANSFORMACIÃ“N DE CÃMARA
  * =========================================================
  */
 function actualizarP3dTransform()
@@ -4310,18 +4199,18 @@ function actualizarP3dTransform()
     document.getElementById(
         'p3dRotXValue'
     ).textContent =
-        p3dRotX + '°';
+        p3dRotX + 'Â°';
 
     document.getElementById(
         'p3dRotYValue'
     ).textContent =
-        p3dRotY + '°';
+        p3dRotY + 'Â°';
 }
 
 
 /**
  * =========================================================
- * CONTROLES DE CÁMARA
+ * CONTROLES DE CÃMARA
  * =========================================================
  */
 document.getElementById('p3dZoom')
@@ -4363,7 +4252,7 @@ document.getElementById('p3dRotY')
 
 /**
  * =========================================================
- * GIRAR CÁMARA CON EL RATÓN
+ * GIRAR CÃMARA CON EL RATÃ“N
  * =========================================================
  */
 p3dStage?.addEventListener(
@@ -4475,7 +4364,7 @@ document.addEventListener(
         }
     }
 );
-// ── Modal de etiqueta de producto ─────────────────────────────────────────
+// â”€â”€ Modal de etiqueta de producto â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 function cerrarEtiqueta(e){
     if(e && e.target && e.target.id !== 'etOverlay') return;
     const overlay=document.getElementById('etOverlay');
@@ -4490,8 +4379,8 @@ function abrirEtiqueta(data) {
     const cajas = Math.floor(data.cantidadDespachada / cpc);
     const sueltas = data.cantidadDespachada % cpc;
 
-    document.getElementById('etLote').textContent = data.lote || '—';
-    document.getElementById('etFecha').textContent = data.fecha || '—';
+    document.getElementById('etLote').textContent = data.lote || 'â€”';
+    document.getElementById('etFecha').textContent = data.fecha || 'â€”';
     document.getElementById('etCajas').textContent = cajas;
     document.getElementById('etUnidades').textContent =
         data.cantidadDespachada + (sueltas > 0 ? ' (' + sueltas + ' sueltas)' : '');
@@ -4512,11 +4401,11 @@ function abrirEtiqueta(data) {
                 background: "#fff"
             });
         } catch (err) {
-            console.error('Código inválido:', codigo, err);
-            barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Código no válido: ' + codigo + '</div>';
+            console.error('CÃ³digo invÃ¡lido:', codigo, err);
+            barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">CÃ³digo no vÃ¡lido: ' + codigo + '</div>';
         }
     } else {
-        barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Sin código registrado</div>';
+        barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Sin cÃ³digo registrado</div>';
     }
 
     const urlTemplate = document.querySelector('.et-actions').dataset.etiquetaUrlTemplate;
@@ -4527,7 +4416,7 @@ function abrirEtiqueta(data) {
 
 
 // =========================================================
-// FUNCIONES DEL REDISEÑO ERP
+// FUNCIONES DEL REDISEÃ‘O ERP
 // =========================================================
 function ocDD(id,event){
     if(event) event.stopPropagation();
@@ -4590,7 +4479,7 @@ function ocNuevaPaleta(){
     document.getElementById('ocPaletas')?.scrollIntoView({behavior:'smooth',block:'center'});
 }
 function ocExportCSV(){
-    const rows=[['#','Producto','SKU','Solicitado','Despachado','Pendiente','Avance','Lote','Vencimiento','Paleta','Ubicación','Últ. despacho','Armó','Subtotal']];
+    const rows=[['#','Producto','SKU','Solicitado','Despachado','Pendiente','Avance','Lote','Vencimiento','Paleta','UbicaciÃ³n','Ãšlt. despacho','ArmÃ³','Subtotal']];
     document.querySelectorAll('#ocTabla tbody tr.oc-row').forEach(tr=>{
         if(tr.style.display==='none')return;const c=tr.children;if(!c||c.length<16)return;
         rows.push([0,1,2,3,4,5,6,7,8,10,11,12,13,14].map(i=>(c[i]?.innerText||'').replace(/\s+/g,' ').trim()));
@@ -4625,80 +4514,6 @@ document.getElementById('modalResumenOrden')?.addEventListener('click', function
     }
 
 });
-
-
-<script>
-/* Loader global de Control de la orden */
-window.distanShowOrderLoader = function(title, message){
-    const loader = document.getElementById('distanOrderLoader');
-    if(!loader) return;
-
-    const titleEl = document.getElementById('distanLoaderTitle');
-    const textEl = document.getElementById('distanLoaderText');
-
-    if(titleEl) titleEl.textContent = title || 'Actualizando la orden...';
-    if(textEl) textEl.textContent = message || 'Guardando los cambios';
-
-    loader.classList.add('open');
-    loader.setAttribute('aria-hidden','false');
-};
-
-window.distanHideOrderLoader = function(){
-    const loader = document.getElementById('distanOrderLoader');
-    if(!loader) return;
-    loader.classList.remove('open');
-    loader.setAttribute('aria-hidden','true');
-};
-
-/* Formularios: mostrar loader solo cuando realmente se envían. */
-document.addEventListener('submit', function(e){
-    const form = e.target;
-    if(!(form instanceof HTMLFormElement)) return;
-
-    if(form.dataset.noDistanLoader === 'true') return;
-
-    const submitter = e.submitter;
-    const texto = submitter ? (submitter.innerText || '').trim().toLowerCase() : '';
-
-    let title = 'Actualizando la orden...';
-    let message = 'Guardando los cambios';
-
-    if(texto.includes('eliminar')){
-        title = 'Actualizando la orden...';
-        message = 'Eliminando el producto';
-    }else if(texto.includes('agregar')){
-        title = 'Agregando producto...';
-        message = 'Actualizando la lista de la orden';
-    }else if(texto.includes('guardar') || texto.includes('actualizar')){
-        title = 'Guardando cambios...';
-        message = 'Actualizando la información';
-    }else if(texto.includes('paleta')){
-        title = 'Actualizando paleta...';
-        message = 'Guardando la distribución';
-    }
-
-    window.distanShowOrderLoader(title, message);
-});
-
-/* Enlaces que realizan acciones dentro de la orden. */
-document.addEventListener('click', function(e){
-    const a = e.target.closest('a');
-    if(!a) return;
-
-    if(a.target === '_blank') return;
-
-    const href = a.getAttribute('href') || '';
-    if(!href || href.startsWith('#') || href.startsWith('javascript:')) return;
-
-    if(
-        href.includes('/orders/') &&
-        !href.includes('/pdf') &&
-        !href.includes('/edit')
-    ){
-        window.distanShowOrderLoader('Cargando...', 'Preparando la información');
-    }
-});
-</script>
 
 </script>
 @endsection
