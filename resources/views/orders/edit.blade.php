@@ -1050,6 +1050,110 @@ html, body {
     .oc-back-orders span{display:inline;}
 }
 
+
+/* =========================================================
+   LOADER PROFESIONAL — DISTAN ERP
+   ========================================================= */
+.distan-order-loader{
+    position:fixed;
+    inset:0;
+    z-index:99999;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+    background:rgba(241,245,249,.78);
+    backdrop-filter:blur(4px);
+    -webkit-backdrop-filter:blur(4px);
+}
+.distan-order-loader.open{
+    display:flex;
+}
+.distan-loader-card{
+    width:min(340px,92vw);
+    background:#fff;
+    border:1px solid #dbe5f0;
+    border-radius:20px;
+    padding:28px 26px 24px;
+    text-align:center;
+    box-shadow:0 24px 70px rgba(15,23,42,.18);
+}
+.distan-loader-visual{
+    position:relative;
+    width:112px;
+    height:112px;
+    margin:0 auto 12px;
+    display:grid;
+    place-items:center;
+}
+.distan-loader-glow{
+    position:absolute;
+    inset:8px;
+    border-radius:32px;
+    background:#eff6ff;
+    box-shadow:inset 0 0 0 1px #dbeafe;
+    animation:distanGlow 1.6s ease-in-out infinite;
+}
+.distan-cart{
+    position:relative;
+    z-index:2;
+    width:78px;
+    height:78px;
+    animation:distanCart 1.25s ease-in-out infinite;
+}
+.distan-loader-ring{
+    position:absolute;
+    inset:0;
+    border:2px solid transparent;
+    border-top-color:#2563eb;
+    border-right-color:#93c5fd;
+    border-radius:50%;
+    animation:distanSpin 1.15s linear infinite;
+}
+.distan-loader-title{
+    color:#0f172a;
+    font-size:17px;
+    font-weight:850;
+    line-height:1.2;
+}
+.distan-loader-text{
+    color:#94a3b8;
+    font-size:11px;
+    margin-top:5px;
+}
+.distan-loader-progress{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin-top:15px;
+}
+.distan-loader-progress span{
+    width:7px;
+    height:7px;
+    border-radius:50%;
+    background:#2563eb;
+    animation:distanDot 1s ease-in-out infinite;
+}
+.distan-loader-progress span:nth-child(2){animation-delay:.15s}
+.distan-loader-progress span:nth-child(3){animation-delay:.30s}
+
+@keyframes distanCart{
+    0%,100%{transform:translateX(0) translateY(0) rotate(0deg)}
+    35%{transform:translateX(3px) translateY(-4px) rotate(-2deg)}
+    70%{transform:translateX(-2px) translateY(0) rotate(2deg)}
+}
+@keyframes distanGlow{
+    0%,100%{transform:scale(.96);opacity:.75}
+    50%{transform:scale(1.04);opacity:1}
+}
+@keyframes distanSpin{
+    to{transform:rotate(360deg)}
+}
+@keyframes distanDot{
+    0%,80%,100%{transform:scale(.65);opacity:.35}
+    40%{transform:scale(1);opacity:1}
+}
+
 </style>
 
 <div class="pg">
@@ -1164,10 +1268,6 @@ html, body {
 {{-- ══════════ CABECERA ══════════ --}}
 <div class="oc-head">
     <div class="oc-head-l">
-        <a href="{{ route('pedidos.index') }}" class="oc-back oc-back-orders" title="Volver a órdenes">
-            <svg class="oc-i"><use href="#oc-back"/></svg>
-            <span>Volver a órdenes</span>
-        </a>
         <div>
             <h1 class="oc-title">Control de la orden</h1>
             <div class="oc-sub">Gestiona los productos, despachos y paletas de la orden</div>
@@ -2271,6 +2371,45 @@ html, body {
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+
+<!-- Loader profesional DISTAN -->
+<div id="distanOrderLoader" class="distan-order-loader" aria-hidden="true">
+    <div class="distan-loader-card">
+        <div class="distan-loader-visual">
+            <div class="distan-loader-glow"></div>
+            <svg class="distan-cart" viewBox="0 0 120 120" fill="none" aria-hidden="true">
+                <path d="M15 20h13l9 52h55l12-38H34"
+                      stroke="#2563eb" stroke-width="7" stroke-linecap="round"
+                      stroke-linejoin="round"/>
+                <circle cx="51" cy="92" r="8" fill="#2563eb"/>
+                <circle cx="91" cy="92" r="8" fill="#2563eb"/>
+                <rect x="45" y="36" width="35" height="30" rx="5"
+                      fill="#dbeafe" stroke="#2563eb" stroke-width="3"/>
+                <path d="M52 45h21M52 53h16M52 61h20"
+                      stroke="#2563eb" stroke-width="3" stroke-linecap="round"/>
+                <path d="M91 28l6 6 12-15"
+                      stroke="#16a34a" stroke-width="6" stroke-linecap="round"
+                      stroke-linejoin="round"/>
+            </svg>
+            <span class="distan-loader-ring"></span>
+        </div>
+
+        <div class="distan-loader-title" id="distanLoaderTitle">
+            Actualizando la orden...
+        </div>
+
+        <div class="distan-loader-text" id="distanLoaderText">
+            Guardando los cambios
+        </div>
+
+        <div class="distan-loader-progress">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </div>
+</div>
+
 <script>
 // ── Scanner ──────────────────────────────────────────────────────────────
 let scanner = document.getElementById('scanner');
@@ -4486,6 +4625,80 @@ document.getElementById('modalResumenOrden')?.addEventListener('click', function
     }
 
 });
+
+
+<script>
+/* Loader global de Control de la orden */
+window.distanShowOrderLoader = function(title, message){
+    const loader = document.getElementById('distanOrderLoader');
+    if(!loader) return;
+
+    const titleEl = document.getElementById('distanLoaderTitle');
+    const textEl = document.getElementById('distanLoaderText');
+
+    if(titleEl) titleEl.textContent = title || 'Actualizando la orden...';
+    if(textEl) textEl.textContent = message || 'Guardando los cambios';
+
+    loader.classList.add('open');
+    loader.setAttribute('aria-hidden','false');
+};
+
+window.distanHideOrderLoader = function(){
+    const loader = document.getElementById('distanOrderLoader');
+    if(!loader) return;
+    loader.classList.remove('open');
+    loader.setAttribute('aria-hidden','true');
+};
+
+/* Formularios: mostrar loader solo cuando realmente se envían. */
+document.addEventListener('submit', function(e){
+    const form = e.target;
+    if(!(form instanceof HTMLFormElement)) return;
+
+    if(form.dataset.noDistanLoader === 'true') return;
+
+    const submitter = e.submitter;
+    const texto = submitter ? (submitter.innerText || '').trim().toLowerCase() : '';
+
+    let title = 'Actualizando la orden...';
+    let message = 'Guardando los cambios';
+
+    if(texto.includes('eliminar')){
+        title = 'Actualizando la orden...';
+        message = 'Eliminando el producto';
+    }else if(texto.includes('agregar')){
+        title = 'Agregando producto...';
+        message = 'Actualizando la lista de la orden';
+    }else if(texto.includes('guardar') || texto.includes('actualizar')){
+        title = 'Guardando cambios...';
+        message = 'Actualizando la información';
+    }else if(texto.includes('paleta')){
+        title = 'Actualizando paleta...';
+        message = 'Guardando la distribución';
+    }
+
+    window.distanShowOrderLoader(title, message);
+});
+
+/* Enlaces que realizan acciones dentro de la orden. */
+document.addEventListener('click', function(e){
+    const a = e.target.closest('a');
+    if(!a) return;
+
+    if(a.target === '_blank') return;
+
+    const href = a.getAttribute('href') || '';
+    if(!href || href.startsWith('#') || href.startsWith('javascript:')) return;
+
+    if(
+        href.includes('/orders/') &&
+        !href.includes('/pdf') &&
+        !href.includes('/edit')
+    ){
+        window.distanShowOrderLoader('Cargando...', 'Preparando la información');
+    }
+});
+</script>
 
 </script>
 @endsection
