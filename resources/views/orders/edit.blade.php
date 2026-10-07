@@ -1,6 +1,94 @@
-@extends('layouts.app')
 
-@section('content')
+<style id="distan-control-order-shell-fix">
+:root{
+    --oc-blue:#2563eb;
+    --oc-blue-soft:#eff6ff;
+    --oc-bg:#f5f7fb;
+}
+html,body{margin:0!important;padding:0!important;background:var(--oc-bg)!important;}
+body{min-width:0;overflow-x:hidden;}
+/* The parent ERP layout owns the sidebar/menu. This view owns only the content. */
+.oc-page,
+.oc-shell,
+.oc-wrap,
+.oc-app,
+.oc-layout,
+.oc-content{
+    box-sizing:border-box;
+}
+.oc-page{
+    width:100%!important;
+    max-width:none!important;
+    margin:0!important;
+    padding:18px 22px 30px!important;
+    background:var(--oc-bg)!important;
+}
+.oc-page > .oc-shell,
+.oc-page > .oc-wrap,
+.oc-page > .oc-app,
+.oc-page > .oc-layout{
+    width:100%!important;
+    max-width:1440px!important;
+    margin:0 auto!important;
+}
+.oc-head{
+    width:100%!important;
+    box-sizing:border-box!important;
+}
+.oc-top{
+    width:100%!important;
+    box-sizing:border-box!important;
+}
+.oc-work,
+.oc-card,
+.oc-tabs,
+.oc-pane,
+.oc-bottom{
+    width:100%!important;
+    box-sizing:border-box!important;
+}
+.oc-scroll{
+    width:100%!important;
+    overflow-x:auto!important;
+}
+.oc-tbl{
+    width:100%!important;
+    min-width:1180px!important;
+}
+.oc-top{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.45fr) minmax(250px,.8fr) minmax(390px,1.15fr)!important;
+    gap:14px!important;
+    align-items:stretch!important;
+}
+.oc-head{
+    display:flex!important;
+    justify-content:space-between!important;
+    align-items:center!important;
+    gap:16px!important;
+    margin-bottom:14px!important;
+}
+.oc-head-r{
+    display:flex!important;
+    align-items:center!important;
+    justify-content:flex-end!important;
+    flex-wrap:wrap!important;
+    gap:7px!important;
+}
+@media(max-width:1200px){
+    .oc-top{grid-template-columns:1fr 1fr!important;}
+    .oc-top > :last-child{grid-column:1/-1;}
+}
+@media(max-width:820px){
+    .oc-page{padding:12px 10px 24px!important;}
+    .oc-head{align-items:flex-start!important;flex-direction:column!important;}
+    .oc-head-r{width:100%!important;justify-content:flex-start!important;}
+    .oc-top{grid-template-columns:1fr!important;}
+    .oc-top > :last-child{grid-column:auto!important;}
+}
+</style>
+<div class="oc-page">
+
 
 <style>
 *{box-sizing:border-box;}
@@ -1697,6 +1785,237 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         </div>
     </div>
 </div>
+<div id="modalResumenOrden"
+     style="
+        display:none;
+        position:fixed;
+        inset:0;
+        background:rgba(0,0,0,.55);
+        z-index:9999;
+        align-items:center;
+        justify-content:center;
+        padding:20px;
+     ">
+
+    <div style="
+        background:#fff;
+        width:min(1000px, 95vw);
+        max-height:90vh;
+        border-radius:10px;
+        box-shadow:0 20px 50px rgba(0,0,0,.25);
+        display:flex;
+        flex-direction:column;
+        overflow:hidden;
+    ">
+
+        {{-- CABECERA --}}
+        <div style="
+            padding:15px 18px;
+            border-bottom:1px solid #e5e7eb;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+        ">
+
+            <div>
+                <div style="
+                    font-size:17px;
+                    font-weight:800;
+                    color:#111827;
+                ">
+                    📋 Resumen de orden
+                </div>
+
+                <div style="
+                    font-size:12px;
+                    color:#6b7280;
+                    margin-top:3px;
+                ">
+                    Orden #{{ $order->numero_orden }}
+                </div>
+            </div>
+
+            <button
+                type="button"
+                onclick="cerrarResumenOrden()"
+                style="
+                    border:0;
+                    background:#f3f4f6;
+                    width:32px;
+                    height:32px;
+                    border-radius:6px;
+                    font-size:18px;
+                    cursor:pointer;
+                ">
+                ×
+            </button>
+
+        </div>
+
+
+        {{-- TABLA --}}
+        <div style="
+            overflow:auto;
+            padding:15px;
+        ">
+
+            <table style="
+                width:100%;
+                border-collapse:collapse;
+                font-size:12px;
+            ">
+
+                <thead>
+
+                    <tr style="
+                        background:#f3f4f6;
+                        color:#374151;
+                    ">
+
+                        <th style="padding:9px;text-align:left;">
+                            Código
+                        </th>
+
+                        <th style="padding:9px;text-align:left;">
+                            Descripción
+                        </th>
+
+                        <th style="padding:9px;text-align:center;">
+                            Solicitado
+                        </th>
+
+                        <th style="padding:9px;text-align:center;">
+                            Despachado
+                        </th>
+
+                        <th style="padding:9px;text-align:center;">
+                            Estado
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach($order->details as $detalle)
+
+                        @php
+                            $solicitado = (float) ($detalle->cantidad_solicitada ?? 0);
+                            $despachado = (float) ($detalle->cantidad_despachada ?? 0);
+
+                            if ($despachado >= $solicitado && $solicitado > 0) {
+                                $estado = 'ARMADO';
+                                $estadoColor = '#166534';
+                                $estadoBg = '#dcfce7';
+                            } elseif ($despachado > 0) {
+                                $estado = 'PARCIAL';
+                                $estadoColor = '#92400e';
+                                $estadoBg = '#fef3c7';
+                            } else {
+                                $estado = 'NO ARMADO';
+                                $estadoColor = '#991b1b';
+                                $estadoBg = '#fee2e2';
+                            }
+                        @endphp
+
+                        <tr style="border-bottom:1px solid #e5e7eb;">
+
+                            {{-- CÓDIGO --}}
+                            <td style="
+                                padding:9px;
+                                font-family:monospace;
+                                font-weight:700;
+                            ">
+                                {{ $detalle->product->sku
+                                    ?? $detalle->product->barcode
+                                    ?? '—' }}
+                            </td>
+
+                            {{-- DESCRIPCIÓN --}}
+                            <td style="
+                                padding:9px;
+                                font-weight:600;
+                            ">
+                                {{ $detalle->product->nombre ?? 'Producto' }}
+                            </td>
+
+                            {{-- SOLICITADO --}}
+                            <td style="
+                                padding:9px;
+                                text-align:center;
+                                font-family:monospace;
+                            ">
+                                {{ number_format($solicitado, 0) }}
+                            </td>
+
+                            {{-- DESPACHADO --}}
+                            <td style="
+                                padding:9px;
+                                text-align:center;
+                                font-family:monospace;
+                                font-weight:700;
+                            ">
+                                {{ number_format($despachado, 0) }}
+                            </td>
+
+                            {{-- ESTADO --}}
+                            <td style="
+                                padding:9px;
+                                text-align:center;
+                            ">
+
+                                <span style="
+                                    display:inline-block;
+                                    padding:4px 8px;
+                                    border-radius:999px;
+                                    background:{{ $estadoBg }};
+                                    color:{{ $estadoColor }};
+                                    font-size:10px;
+                                    font-weight:800;
+                                ">
+                                    {{ $estado }}
+                                </span>
+
+                            </td>
+
+                        </tr>
+
+                    @endforeach
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+
+        {{-- PIE --}}
+        <div style="
+            padding:10px 15px;
+            border-top:1px solid #e5e7eb;
+            text-align:right;
+        ">
+
+            <button
+                type="button"
+                onclick="cerrarResumenOrden()"
+                style="
+                    padding:7px 14px;
+                    border:1px solid #d1d5db;
+                    background:#fff;
+                    border-radius:6px;
+                    cursor:pointer;
+                ">
+                Cerrar
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
 {{-- =========================================================
      VISOR 3D DE PALETA
 ========================================================= --}}
@@ -1787,6 +2106,11 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                 <div class="p3d-panel-title">
                     📦 Productos de la paleta
                 </div>
+<div id="p3dControls" style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:8px 0 10px;padding:9px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:9px;">
+                    <label style="font-size:10px;color:#64748b;font-weight:700;">Zoom <span id="p3dZoomValue">85%</span><input id="p3dZoom" type="range" min="50" max="140" value="85" style="width:100%;"></label>
+                    <label style="font-size:10px;color:#64748b;font-weight:700;">Inclinación <span id="p3dRotXValue">58°</span><input id="p3dRotX" type="range" min="20" max="80" value="58" style="width:100%;"></label>
+                    <label style="font-size:10px;color:#64748b;font-weight:700;">Rotación <span id="p3dRotYValue">-28°</span><input id="p3dRotY" type="range" min="-180" max="180" value="-28" style="width:100%;"></label>
+                </div>
             <div id="p3dProducts"></div>
 
 <div id="p3dEditor"></div>
@@ -1815,6 +2139,8 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         </div>
 
     </div>
+
+</div>
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
@@ -2174,4 +2500,1864 @@ function renderP3dProducts()
         const restantes =
             Math.max(
                 0,
-     
+                totalCajas - colocadas
+            );
+
+        const porcentaje =
+            totalCajas > 0
+                ? Math.min(
+                    100,
+                    Math.round(
+                        (colocadas / totalCajas) * 100
+                    )
+                )
+                : 0;
+
+        const row =
+            document.createElement('div');
+
+        row.className =
+            'p3d-product-row';
+
+        row.draggable =
+            restantes > 0;
+
+        row.innerHTML = `
+            <div class="p3d-product-name">
+                📦 ${item.nombre}
+            </div>
+
+            <div class="p3d-product-meta">
+                Cajas totales:
+                <strong>
+                    ${totalCajas}
+                </strong>
+            </div>
+
+            <div class="p3d-product-meta">
+                Colocadas:
+                <strong>
+                    ${colocadas}
+                </strong>
+            </div>
+
+            <div class="p3d-product-meta">
+                Restantes:
+                <strong
+                    style="
+                        color:${restantes > 0
+                            ? '#2563eb'
+                            : '#15803d'};
+                    "
+                >
+                    ${restantes}
+                </strong>
+            </div>
+
+            <div
+                style="
+                    width:100%;
+                    height:5px;
+                    background:#e5e7eb;
+                    border-radius:99px;
+                    overflow:hidden;
+                    margin-top:6px;
+                "
+            >
+                <div
+                    style="
+                        width:${porcentaje}%;
+                        height:100%;
+                        background:${porcentaje >= 100
+                            ? '#22c55e'
+                            : '#2563eb'};
+                        border-radius:99px;
+                    "
+                ></div>
+            </div>
+
+            ${
+                restantes <= 0
+                    ? `
+                        <div
+                            style="
+                                font-size:9px;
+                                color:#15803d;
+                                font-weight:700;
+                                margin-top:5px;
+                            "
+                        >
+                            ✅ COMPLETO
+                        </div>
+                    `
+                    : `
+                        <div
+                            style="
+                                font-size:9px;
+                                color:#64748b;
+                                margin-top:5px;
+                            "
+                        >
+                            🖱️ Arrastra hacia la paleta
+                        </div>
+                    `
+            }
+        `;
+
+        /*
+         * ARRRASTRAR PRODUCTO
+         */
+        row.addEventListener(
+            'dragstart',
+            function(event)
+            {
+                if (restantes <= 0) {
+                    event.preventDefault();
+                    return;
+                }
+
+                event.dataTransfer.setData(
+                    'text/plain',
+                    String(index)
+                );
+
+                event.dataTransfer.effectAllowed =
+                    'copy';
+
+                row.classList.add(
+                    'selected'
+                );
+            }
+        );
+
+        row.addEventListener(
+            'dragend',
+            function()
+            {
+                row.classList.remove(
+                    'selected'
+                );
+            }
+        );
+
+        /*
+         * CLICK = SELECCIONAR
+         */
+        row.addEventListener(
+            'click',
+            function()
+            {
+                seleccionarProducto3D(
+                    index
+                );
+            }
+        );
+
+        contenedor.appendChild(row);
+    });
+}
+    
+/**
+ * =========================================================
+ * PALETA COMO ZONA DE DROP
+ * =========================================================
+ */
+const p3dStage =
+    document.getElementById('p3dStage');
+
+p3dStage?.addEventListener(
+    'dragover',
+    function(event)
+    {
+        event.preventDefault();
+
+        p3dStage.style.outline =
+            '3px dashed #2563eb';
+    }
+);
+
+p3dStage?.addEventListener(
+    'dragleave',
+    function(event)
+    {
+        if (
+            event.relatedTarget &&
+            p3dStage.contains(event.relatedTarget)
+        ) {
+            return;
+        }
+
+        p3dStage.style.outline = '';
+    }
+);
+
+p3dStage?.addEventListener(
+    'drop',
+    function(event)
+    {
+        event.preventDefault();
+
+        p3dStage.style.outline = '';
+
+        const index =
+            Number(
+                event.dataTransfer.getData(
+                    'text/plain'
+                )
+            );
+
+        if (
+            Number.isNaN(index) ||
+            !p3dData[index]
+        ) {
+            return;
+        }
+
+        const restante =
+            obtenerCajasRestantes(index);
+
+        if (restante <= 0) {
+            alert(
+                'Este producto ya tiene todas sus cajas asignadas.'
+            );
+
+            return;
+        }
+
+        /*
+         * Calcular posición aproximada
+         * dentro de la paleta.
+         */
+        const pallet =
+            document.getElementById('p3dPallet');
+
+        const rect =
+            pallet.getBoundingClientRect();
+
+        let x =
+            (
+                event.clientX -
+                rect.left
+            ) / (p3dZoom / 100);
+
+        let y =
+            (
+                event.clientY -
+                rect.top
+            ) / (p3dZoom / 100);
+
+        x = Math.max(
+            0,
+            Math.min(
+                PALLET_WIDTH - 75,
+                x
+            )
+        );
+
+        y = Math.max(
+            0,
+            Math.min(
+                PALLET_DEPTH - 55,
+                y
+            )
+        );
+
+        abrirCantidadBloque(
+            index,
+            x,
+            y
+        );
+    }
+);
+
+
+/**
+ * =========================================================
+ * CANTIDAD DE CAJAS
+ * =========================================================
+ */
+function abrirCantidadBloque(
+    productIndex,
+    x,
+    y
+)
+{
+    const item =
+        p3dData[productIndex];
+
+    const restantes =
+        obtenerCajasRestantes(productIndex);
+
+    const cantidad =
+        prompt(
+            `¿Cuántas cajas de "${item.nombre}" quieres colocar?\n\n` +
+            `Cajas restantes: ${restantes}`,
+            restantes
+        );
+
+    if (cantidad === null) {
+        return;
+    }
+
+    const cantidadNumero =
+        parseInt(cantidad);
+
+    if (
+        !Number.isInteger(cantidadNumero) ||
+        cantidadNumero <= 0
+    ) {
+        alert(
+            'Ingresa una cantidad válida.'
+        );
+
+        return;
+    }
+
+    if (
+        cantidadNumero > restantes
+    ) {
+        alert(
+            `Solo quedan ${restantes} cajas disponibles.`
+        );
+
+        return;
+    }
+
+    const nuevoBloque = {
+
+        id:
+            Date.now() +
+            Math.random(),
+
+        productIndex:
+            productIndex,
+
+        cantidad:
+            cantidadNumero,
+
+        x:
+            x,
+
+        y:
+            y,
+
+        width:
+            75,
+
+        depth:
+            55,
+
+        height:
+            18,
+
+        columnas:
+            1,
+
+        filas:
+            1,
+
+        niveles:
+            cantidadNumero,
+
+        rotation:
+            0
+    };
+
+    p3dBlocks.push(
+        nuevoBloque
+    );
+
+    p3dSelected =
+        p3dBlocks.length - 1;
+
+    renderPaleta3D();
+    renderP3dProducts();
+    actualizarEditor3D();
+}
+
+
+/**
+ * =========================================================
+ * CAJAS RESTANTES
+ * =========================================================
+ */
+function obtenerCajasRestantes(
+    productIndex
+)
+{
+    const item =
+        p3dData[productIndex];
+
+    const cpc =
+        Number(item.cantidad_por_caja) > 0
+            ? Number(item.cantidad_por_caja)
+            : 1;
+
+    const totalCajas =
+        Math.ceil(
+            Number(item.despachada || 0)
+            / cpc
+        );
+
+    const colocadas =
+        p3dBlocks
+            .filter(
+                block =>
+                    block.productIndex ===
+                    productIndex
+            )
+            .reduce(
+                (total, block) =>
+                    total +
+                    Number(block.cantidad),
+                0
+            );
+
+    return Math.max(
+        0,
+        totalCajas - colocadas
+    );
+}
+
+
+/**
+ * =========================================================
+ * RENDERIZAR PALETA
+ * =========================================================
+ */
+function renderPaleta3D()
+{
+    const pallet =
+        document.getElementById('p3dPallet');
+
+    pallet
+        .querySelectorAll(
+            '.p3d-product-group'
+        )
+        .forEach(
+            el => el.remove()
+        );
+
+    p3dBlocks.forEach(
+        (block, blockIndex) => {
+
+            const item =
+                p3dData[
+                    block.productIndex
+                ];
+
+            if (!item) {
+                return;
+            }
+
+            const columnas =
+                Math.max(
+                    1,
+                    Number(
+                        block.columnas || 1
+                    )
+                );
+
+            const filas =
+                Math.max(
+                    1,
+                    Number(
+                        block.filas || 1
+                    )
+                );
+
+            const niveles =
+                Math.max(
+                    1,
+                    Number(
+                        block.niveles || 1
+                    )
+                );
+
+            const groupWidth =
+                (
+                    columnas *
+                    block.width
+                ) +
+                (
+                    (columnas - 1) *
+                    BOX_GAP
+                );
+
+            const groupDepth =
+                (
+                    filas *
+                    block.depth
+                ) +
+                (
+                    (filas - 1) *
+                    BOX_GAP
+                );
+
+            const group =
+                document.createElement(
+                    'div'
+                );
+
+            group.className =
+                'p3d-product-group';
+
+            group.dataset.blockIndex =
+                blockIndex;
+
+            group.style.left =
+                block.x + 'px';
+
+            group.style.top =
+                block.y + 'px';
+
+            group.style.width =
+                groupWidth + 'px';
+
+            group.style.height =
+                groupDepth + 'px';
+
+            group.style.transform =
+                `rotateZ(${block.rotation}deg)`;
+
+            /*
+             * COLORES
+             */
+            const colores = [
+                ['#dbeafe','#2563eb','#1e3a8a'],
+                ['#dcfce7','#16a34a','#166534'],
+                ['#fef3c7','#f59e0b','#92400e'],
+                ['#fce7f3','#db2777','#9d174d'],
+                ['#ede9fe','#7c3aed','#5b21b6'],
+                ['#cffafe','#0891b2','#155e75']
+            ];
+
+            const color =
+                colores[
+                    block.productIndex %
+                    colores.length
+                ];
+
+            /*
+             * CREAR CAJAS
+             */
+            let cajaActual = 0;
+
+            for (
+                let nivel = 0;
+                nivel < niveles;
+                nivel++
+            ) {
+
+                for (
+                    let fila = 0;
+                    fila < filas;
+                    fila++
+                ) {
+
+                    for (
+                        let columna = 0;
+                        columna < columnas;
+                        columna++
+                    ) {
+
+                        if (
+                            cajaActual >=
+                            block.cantidad
+                        ) {
+                            break;
+                        }
+
+                        const caja =
+                            crearCaja3D(
+                                item,
+                                block,
+                                color,
+                                columna,
+                                fila,
+                                nivel
+                            );
+
+                        group.appendChild(
+                            caja
+                        );
+
+                        cajaActual++;
+                    }
+                }
+            }
+
+            configurarDragBloque(
+                group,
+                blockIndex
+            );
+
+            group.addEventListener(
+                'click',
+                function(event)
+                {
+                    event.stopPropagation();
+
+                    p3dSelected =
+                        blockIndex;
+
+                    seleccionarBloque3D(
+                        blockIndex
+                    );
+                }
+            );
+
+            pallet.appendChild(
+                group
+            );
+        }
+    );
+
+    actualizarEditor3D();
+}
+
+
+/**
+ * =========================================================
+ * CREAR UNA CAJA 3D REAL
+ * =========================================================
+ */
+function crearCaja3D(
+    item,
+    block,
+    color,
+    columna,
+    fila,
+    nivel
+)
+{
+    const caja =
+        document.createElement(
+            'div'
+        );
+
+    caja.className =
+        'p3d-box';
+caja.style.setProperty(
+    '--box-width',
+    block.width + 'px'
+);
+
+caja.style.setProperty(
+    '--box-depth',
+    block.depth + 'px'
+);
+
+caja.style.setProperty(
+    '--box-height',
+    block.height + 'px'
+);
+    caja.style.width =
+        block.width + 'px';
+
+    caja.style.height =
+        block.height + 'px';
+
+    caja.style.transform =
+        `
+        translate3d(
+            ${
+                columna *
+                (
+                    block.width +
+                    BOX_GAP
+                )
+            }px,
+            ${
+                fila *
+                (
+                    block.depth +
+                    BOX_GAP
+                )
+            }px,
+            ${
+                nivel *
+                block.height
+            }px
+        )
+        `;
+
+    /*
+     * FRENTE
+     */
+    const front =
+        document.createElement(
+            'div'
+        );
+
+    front.className =
+        'p3d-face p3d-front';
+
+    front.style.width =
+        block.width + 'px';
+
+    front.style.height =
+        block.height + 'px';
+
+    front.style.background =
+        color[0];
+
+    front.style.borderColor =
+        color[1];
+
+    front.style.color =
+        color[2];
+
+    front.textContent =
+        item.nombre;
+
+    /*
+     * ATRÁS
+     */
+    const back =
+        document.createElement(
+            'div'
+        );
+
+    back.className =
+        'p3d-face p3d-back';
+
+    back.style.width =
+        block.width + 'px';
+
+    back.style.height =
+        block.height + 'px';
+
+    back.style.background =
+        color[0];
+
+    back.style.borderColor =
+        color[1];
+
+    /*
+     * DERECHA
+     */
+    const right =
+        document.createElement(
+            'div'
+        );
+
+    right.className =
+        'p3d-face p3d-right';
+
+    right.style.width =
+        block.depth + 'px';
+
+    right.style.height =
+        block.height + 'px';
+
+    right.style.background =
+        color[1];
+
+    right.style.borderColor =
+        color[1];
+
+    /*
+     * IZQUIERDA
+     */
+    const left =
+        document.createElement(
+            'div'
+        );
+
+    left.className =
+        'p3d-face p3d-left';
+
+    left.style.width =
+        block.depth + 'px';
+
+    left.style.height =
+        block.height + 'px';
+
+    left.style.background =
+        color[1];
+
+    left.style.borderColor =
+        color[1];
+
+    /*
+     * ARRIBA
+     */
+    const top =
+        document.createElement(
+            'div'
+        );
+
+    top.className =
+        'p3d-face p3d-top';
+
+    top.style.width =
+        block.width + 'px';
+
+    top.style.height =
+        block.depth + 'px';
+
+    top.style.background =
+        color[0];
+
+    top.style.borderColor =
+        color[1];
+
+    /*
+     * ABAJO
+     */
+    const bottom =
+        document.createElement(
+            'div'
+        );
+
+    bottom.className =
+        'p3d-face p3d-bottom';
+
+    bottom.style.width =
+        block.width + 'px';
+
+    bottom.style.height =
+        block.depth + 'px';
+
+    bottom.style.background =
+        color[2];
+
+    /*
+     * AGREGAR CARAS
+     */
+    caja.appendChild(front);
+    caja.appendChild(back);
+    caja.appendChild(right);
+    caja.appendChild(left);
+    caja.appendChild(top);
+    caja.appendChild(bottom);
+
+    return caja;
+}
+
+
+/**
+ * =========================================================
+ * SELECCIONAR BLOQUE
+ * =========================================================
+ */
+function seleccionarBloque3D(
+    index
+)
+{
+    p3dSelected =
+        index;
+
+    document
+        .querySelectorAll(
+            '.p3d-product-group'
+        )
+        .forEach(
+            group => {
+
+                const seleccionado =
+                    Number(
+                        group.dataset.blockIndex
+                    ) === index;
+
+                group.style.filter =
+                    seleccionado
+                        ? 'brightness(1.12) drop-shadow(0 0 12px rgba(37,99,235,.65))'
+                        : '';
+            }
+        );
+
+    actualizarEditor3D();
+}
+
+
+/**
+ * =========================================================
+ * SELECCIONAR PRODUCTO
+ * =========================================================
+ */
+function seleccionarProducto3D(
+    productIndex
+)
+{
+    const blockIndex =
+        p3dBlocks.findIndex(
+            block =>
+                block.productIndex ===
+                productIndex
+        );
+
+    if (blockIndex >= 0) {
+        seleccionarBloque3D(
+            blockIndex
+        );
+    }
+}
+
+
+/**
+ * =========================================================
+ * ARRASTRAR BLOQUE SOBRE PALETA
+ * =========================================================
+ */
+function configurarDragBloque(
+    group,
+    blockIndex
+)
+{
+    let dragging = false;
+
+    let startX = 0;
+    let startY = 0;
+
+    let originalX = 0;
+    let originalY = 0;
+
+    group.addEventListener(
+        'mousedown',
+        function(event)
+        {
+            event.stopPropagation();
+
+            seleccionarBloque3D(
+                blockIndex
+            );
+
+            dragging = true;
+
+            startX =
+                event.clientX;
+
+            startY =
+                event.clientY;
+
+            originalX =
+                p3dBlocks[
+                    blockIndex
+                ].x;
+
+            originalY =
+                p3dBlocks[
+                    blockIndex
+                ].y;
+
+            group.classList.add(
+                'dragging'
+            );
+
+            document.body.style.userSelect =
+                'none';
+        }
+    );
+
+    window.addEventListener(
+        'mousemove',
+        function(event)
+        {
+            if (!dragging) {
+                return;
+            }
+
+            const block =
+                p3dBlocks[
+                    blockIndex
+                ];
+
+            const dx =
+                (
+                    event.clientX -
+                    startX
+                ) /
+                (p3dZoom / 100);
+
+            const dy =
+                (
+                    event.clientY -
+                    startY
+                ) /
+                (p3dZoom / 100);
+
+            const groupWidth =
+                (
+                    block.columnas *
+                    block.width
+                ) +
+                (
+                    (block.columnas - 1) *
+                    BOX_GAP
+                );
+
+            const groupDepth =
+                (
+                    block.filas *
+                    block.depth
+                ) +
+                (
+                    (block.filas - 1) *
+                    BOX_GAP
+                );
+
+            block.x =
+                Math.max(
+                    0,
+                    Math.min(
+                        PALLET_WIDTH -
+                        groupWidth,
+                        originalX + dx
+                    )
+                );
+
+            block.y =
+                Math.max(
+                    0,
+                    Math.min(
+                        PALLET_DEPTH -
+                        groupDepth,
+                        originalY + dy
+                    )
+                );
+
+            group.style.left =
+                block.x + 'px';
+
+            group.style.top =
+                block.y + 'px';
+
+            actualizarEstadoPosicion(
+                blockIndex
+            );
+        }
+    );
+
+    window.addEventListener(
+        'mouseup',
+        function()
+        {
+            if (!dragging) {
+                return;
+            }
+
+            dragging = false;
+
+            group.classList.remove(
+                'dragging'
+            );
+
+            document.body.style.userSelect =
+                '';
+        }
+    );
+}
+
+
+/**
+ * =========================================================
+ * EDITOR DEL BLOQUE
+ * =========================================================
+ */
+function actualizarEditor3D()
+{
+    const editor =
+        document.getElementById(
+            'p3dEditor'
+        );
+
+    if (!editor) {
+        return;
+    }
+
+    if (
+        p3dSelected === null ||
+        !p3dBlocks[
+            p3dSelected
+        ]
+    ) {
+        editor.innerHTML = `
+            <div
+                style="
+                    padding:10px;
+                    background:#f8fafc;
+                    border:1px dashed #cbd5e1;
+                    border-radius:7px;
+                    font-size:9px;
+                    color:#64748b;
+                    text-align:center;
+                "
+            >
+                Selecciona un bloque colocado
+                para editarlo.
+            </div>
+        `;
+
+        return;
+    }
+
+    const block =
+        p3dBlocks[
+            p3dSelected
+        ];
+
+    const item =
+        p3dData[
+            block.productIndex
+        ];
+
+    const restantes =
+        obtenerCajasRestantes(
+            block.productIndex
+        );
+
+    editor.innerHTML = `
+
+        <div class="p3d-edit-box">
+
+            <div class="p3d-edit-title">
+                ⚙️ ${item.nombre}
+            </div>
+
+            <div
+                style="
+                    font-size:10px;
+                    color:#64748b;
+                    margin-bottom:8px;
+                "
+            >
+                📦 Este bloque:
+                <strong>
+                    ${block.cantidad} cajas
+                </strong>
+            </div>
+
+            <div
+                class="p3d-edit-row"
+            >
+                <label>Columnas</label>
+                <strong>${block.columnas}</strong>
+
+                <input
+                    type="range"
+                    min="1"
+                    max="6"
+                    value="${block.columnas}"
+                    oninput="
+                        editarBloque3D(
+                            'columnas',
+                            this.value
+                        )
+                    "
+                >
+            </div>
+
+            <div
+                class="p3d-edit-row"
+            >
+                <label>Filas</label>
+                <strong>${block.filas}</strong>
+
+                <input
+                    type="range"
+                    min="1"
+                    max="6"
+                    value="${block.filas}"
+                    oninput="
+                        editarBloque3D(
+                            'filas',
+                            this.value
+                        )
+                    "
+                    >
+            </div>
+
+            <div
+                class="p3d-edit-row"
+            >
+                <label>Niveles</label>
+                <strong>${block.niveles}</strong>
+
+                <input
+                    type="range"
+                    min="1"
+                    max="10"
+                    value="${block.niveles}"
+                    oninput="
+                        editarBloque3D(
+                            'niveles',
+                            this.value
+                        )
+                    "
+                >
+            </div>
+
+            <div
+                class="p3d-edit-row"
+            >
+                <label>Ancho</label>
+                <strong>
+                    ${Math.round(block.width)} px
+                </strong>
+
+                <input
+                    type="range"
+                    min="40"
+                    max="140"
+                    value="${block.width}"
+                    oninput="
+                        editarBloque3D(
+                            'width',
+                            this.value
+                        )
+                    "
+                >
+            </div>
+
+            <div
+                class="p3d-edit-row"
+            >
+                <label>Profundidad</label>
+                <strong>
+                    ${Math.round(block.depth)} px
+                </strong>
+
+                <input
+                    type="range"
+                    min="35"
+                    max="120"
+                    value="${block.depth}"
+                    oninput="
+                        editarBloque3D(
+                            'depth',
+                            this.value
+                        )
+                    "
+                >
+            </div>
+
+            <div
+                class="p3d-edit-row"
+            >
+                <label>Altura</label>
+                <strong>
+                    ${Math.round(block.height)} px
+                </strong>
+
+                <input
+                    type="range"
+                    min="8"
+                    max="40"
+                    value="${block.height}"
+                    oninput="
+                        editarBloque3D(
+                            'height',
+                            this.value
+                        )
+                    "
+                >
+            </div>
+
+            <div
+                class="p3d-edit-row"
+            >
+                <label>Rotación</label>
+
+                <strong>
+                    ${Math.round(block.rotation)}°
+                </strong>
+
+                <input
+                    type="range"
+                    min="0"
+                    max="180"
+                    step="1"
+                    value="${block.rotation}"
+                    oninput="
+                        editarBloque3D(
+                            'rotation',
+                            this.value
+                        )
+                    "
+                >
+            </div>
+
+            <div
+                style="
+                    margin-top:8px;
+                    padding:6px;
+                    background:#eff6ff;
+                    color:#1d4ed8;
+                    border-radius:6px;
+                    font-size:9px;
+                    text-align:center;
+                "
+            >
+                🔄 Rotación:
+                ${Math.round(block.rotation)}°
+            </div>
+            <button
+    type="button"
+    onclick="eliminarBloque3D()"
+    style="
+        width:100%;
+        margin-top:10px;
+        padding:8px;
+        border:1px solid #fecaca;
+        background:#fef2f2;
+        color:#b91c1c;
+        border-radius:6px;
+        font-size:10px;
+        font-weight:700;
+        cursor:pointer;
+    "
+>
+    🗑️ Eliminar este bloque
+</button>
+            <div
+                id="p3dPositionStatus"
+                style="
+                    margin-top:8px;
+                    font-size:9px;
+                    text-align:center;
+                    padding:5px;
+                    border-radius:6px;
+                "
+            ></div>
+
+        </div>
+    `;
+
+    actualizarEstadoPosicion(
+        p3dSelected
+    );
+}
+
+
+/**
+ * =========================================================
+ * EDITAR BLOQUE
+ * =========================================================
+ */
+function editarBloque3D(
+    propiedad,
+    valor
+)
+{
+    if (
+        p3dSelected === null ||
+        !p3dBlocks[
+            p3dSelected
+        ]
+    ) {
+        return;
+    }
+
+    const block =
+        p3dBlocks[
+            p3dSelected
+        ];
+
+    block[propiedad] =
+        Number(valor);
+
+    /*
+     * Si cambiamos la cantidad
+     * de posiciones, aseguramos
+     * que quepan las cajas.
+     */
+    if (
+        propiedad === 'columnas' ||
+        propiedad === 'filas' ||
+        propiedad === 'niveles'
+    ) {
+
+        const capacidad =
+            block.columnas *
+            block.filas *
+            block.niveles;
+
+        if (
+            capacidad <
+            block.cantidad
+        ) {
+
+            alert(
+                'La distribución seleccionada no alcanza para las ' +
+                block.cantidad +
+                ' cajas de este bloque.'
+            );
+
+            return;
+        }
+    }
+
+    renderPaleta3D();
+    seleccionarBloque3D(
+        p3dSelected
+    );
+
+    renderP3dProducts();
+}
+/**
+ * =========================================================
+ * ELIMINAR BLOQUE
+ * =========================================================
+ */
+function eliminarBloque3D()
+{
+    if (
+        p3dSelected === null ||
+        !p3dBlocks[p3dSelected]
+    ) {
+        return;
+    }
+
+    const block =
+        p3dBlocks[p3dSelected];
+
+    const item =
+        p3dData[block.productIndex];
+
+    const confirmar =
+        confirm(
+            `¿Eliminar el bloque de "${item.nombre}"?\n\n` +
+            `Se devolverán ${block.cantidad} cajas a las cajas restantes.`
+        );
+
+    if (!confirmar) {
+        return;
+    }
+
+    p3dBlocks.splice(
+        p3dSelected,
+        1
+    );
+
+    p3dSelected = null;
+
+    renderPaleta3D();
+    renderP3dProducts();
+    actualizarEditor3D();
+}
+
+/**
+ * =========================================================
+ * ESTADO DE POSICIÓN
+ * =========================================================
+ */
+function actualizarEstadoPosicion(
+    index
+)
+{
+    const status =
+        document.getElementById(
+            'p3dPositionStatus'
+        );
+
+    if (
+        !status ||
+        !p3dBlocks[index]
+    ) {
+        return;
+    }
+
+    const block =
+        p3dBlocks[index];
+
+    const groupWidth =
+        (
+            block.columnas *
+            block.width
+        ) +
+        (
+            (block.columnas - 1) *
+            BOX_GAP
+        );
+
+    const groupDepth =
+        (
+            block.filas *
+            block.depth
+        ) +
+        (
+            (block.filas - 1) *
+            BOX_GAP
+        );
+
+    const dentro =
+        block.x >= 0 &&
+        block.y >= 0 &&
+        block.x + groupWidth <= PALLET_WIDTH &&
+        block.y + groupDepth <= PALLET_DEPTH;
+
+    if (dentro) {
+
+        status.textContent =
+            '🟢 Bloque dentro de la paleta';
+
+        status.style.background =
+            '#dcfce7';
+
+        status.style.color =
+            '#15803d';
+
+    } else {
+
+        status.textContent =
+            '🔴 Bloque fuera de la paleta';
+
+        status.style.background =
+            '#fee2e2';
+
+        status.style.color =
+            '#b91c1c';
+    }
+}
+
+
+/**
+ * =========================================================
+ * TRANSFORMACIÓN DE CÁMARA
+ * =========================================================
+ */
+function actualizarP3dTransform()
+{
+    const world =
+        document.getElementById(
+            'p3dWorld'
+        );
+
+    if (!world) {
+        return;
+    }
+
+    world.style.transform = `
+        translate(-50%,-50%)
+        rotateX(${p3dRotX}deg)
+        rotateZ(${p3dRotY}deg)
+        scale(${p3dZoom / 100})
+    `;
+
+    document.getElementById(
+        'p3dZoomValue'
+    ).textContent =
+        p3dZoom + '%';
+
+    document.getElementById(
+        'p3dRotXValue'
+    ).textContent =
+        p3dRotX + '°';
+
+    document.getElementById(
+        'p3dRotYValue'
+    ).textContent =
+        p3dRotY + '°';
+}
+
+
+/**
+ * =========================================================
+ * CONTROLES DE CÁMARA
+ * =========================================================
+ */
+document.getElementById('p3dZoom')
+    ?.addEventListener(
+        'input',
+        function()
+        {
+            p3dZoom =
+                Number(this.value);
+
+            actualizarP3dTransform();
+        }
+    );
+
+document.getElementById('p3dRotX')
+    ?.addEventListener(
+        'input',
+        function()
+        {
+            p3dRotX =
+                Number(this.value);
+
+            actualizarP3dTransform();
+        }
+    );
+
+document.getElementById('p3dRotY')
+    ?.addEventListener(
+        'input',
+        function()
+        {
+            p3dRotY =
+                Number(this.value);
+
+            actualizarP3dTransform();
+        }
+    );
+
+
+/**
+ * =========================================================
+ * GIRAR CÁMARA CON EL RATÓN
+ * =========================================================
+ */
+p3dStage?.addEventListener(
+    'mousedown',
+    function(event)
+    {
+        if (
+            event.target.closest(
+                '.p3d-product-group'
+            )
+        ) {
+            return;
+        }
+
+        p3dDragging = true;
+
+        p3dStartX =
+            event.clientX;
+
+        p3dStartY =
+            event.clientY;
+
+        p3dStage.classList.add(
+            'dragging'
+        );
+    }
+);
+
+window.addEventListener(
+    'mousemove',
+    function(event)
+    {
+        if (!p3dDragging) {
+            return;
+        }
+
+        const dx =
+            event.clientX -
+            p3dStartX;
+
+        const dy =
+            event.clientY -
+            p3dStartY;
+
+        p3dRotY +=
+            dx * .5;
+
+        p3dRotX -=
+            dy * .3;
+
+        p3dRotX =
+            Math.max(
+                25,
+                Math.min(
+                    75,
+                    p3dRotX
+                )
+            );
+
+        p3dStartX =
+            event.clientX;
+
+        p3dStartY =
+            event.clientY;
+
+        document.getElementById(
+            'p3dRotX'
+        ).value =
+            p3dRotX;
+
+        document.getElementById(
+            'p3dRotY'
+        ).value =
+            p3dRotY;
+
+        actualizarP3dTransform();
+    }
+);
+
+window.addEventListener(
+    'mouseup',
+    function()
+    {
+        p3dDragging = false;
+
+        p3dStage?.classList.remove(
+            'dragging'
+        );
+    }
+);
+
+
+/**
+ * =========================================================
+ * ESC
+ * =========================================================
+ */
+document.addEventListener(
+    'keydown',
+    function(event)
+    {
+        if (
+            event.key === 'Escape' &&
+            document
+                .getElementById('p3dOverlay')
+                ?.classList.contains('open')
+        ) {
+            cerrarPaleta3D();
+        }
+    }
+);
+// ── Modal de etiqueta de producto ─────────────────────────────────────────
+function cerrarEtiqueta(e){
+    if(e && e.target && e.target.id !== 'etOverlay') return;
+    const overlay=document.getElementById('etOverlay');
+    if(overlay) overlay.classList.remove('open');
+}
+
+function abrirEtiqueta(data) {
+    document.getElementById('etNombre').textContent = data.nombre;
+    document.getElementById('etCpc').textContent = data.cantidadPorCaja + ' unid. por caja';
+
+    const cpc = data.cantidadPorCaja > 0 ? data.cantidadPorCaja : 1;
+    const cajas = Math.floor(data.cantidadDespachada / cpc);
+    const sueltas = data.cantidadDespachada % cpc;
+
+    document.getElementById('etLote').textContent = data.lote || '—';
+    document.getElementById('etFecha').textContent = data.fecha || '—';
+    document.getElementById('etCajas').textContent = cajas;
+    document.getElementById('etUnidades').textContent =
+        data.cantidadDespachada + (sueltas > 0 ? ' (' + sueltas + ' sueltas)' : '');
+
+    const barcodeEl = document.getElementById('etBarcode');
+    barcodeEl.innerHTML = '';
+
+    const codigo = (data.codigo || '').toString().trim();
+
+    if (codigo) {
+        try {
+            JsBarcode(barcodeEl, codigo, {
+                format: "CODE128",
+                width: 2,
+                height: 60,
+                displayValue: true,
+                lineColor: "#000",
+                background: "#fff"
+            });
+        } catch (err) {
+            console.error('Código inválido:', codigo, err);
+            barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Código no válido: ' + codigo + '</div>';
+        }
+    } else {
+        barcodeEl.outerHTML = '<div id="etBarcode" style="font-size:11px;color:#b91c1c;">Sin código registrado</div>';
+    }
+
+    const urlTemplate = document.querySelector('.et-actions').dataset.etiquetaUrlTemplate;
+    document.getElementById('etPdfLink').href = urlTemplate.replace('__ID__', data.detailId);
+
+    document.getElementById('etOverlay').classList.add('open');
+}
+
+
+// =========================================================
+// FUNCIONES DEL REDISEÑO ERP
+// =========================================================
+function ocDD(id,event){
+    if(event) event.stopPropagation();
+    document.querySelectorAll('.oc-dd.open').forEach(el=>{ if(el.id!==id) el.classList.remove('open'); });
+    document.getElementById(id)?.classList.toggle('open');
+}
+document.addEventListener('click',()=>document.querySelectorAll('.oc-dd.open').forEach(el=>el.classList.remove('open')));
+
+function ocTab(name,btn){
+    document.querySelectorAll('.oc-tab').forEach(b=>b.classList.remove('on'));
+    document.querySelectorAll('.oc-pane').forEach(p=>p.classList.remove('on'));
+    btn?.classList.add('on');
+    document.querySelector('.oc-pane[data-pane="'+name+'"]')?.classList.add('on');
+}
+
+function ocToggle(id){ document.getElementById('oc-det-'+id)?.classList.toggle('open'); }
+function ocEditar(id){
+    const row=document.getElementById('oc-det-'+id); if(!row)return;
+    row.classList.add('open');
+    row.scrollIntoView({behavior:'smooth',block:'center'});
+    const input=row.querySelector('[name="cantidad_despachada"]');
+    if(input)setTimeout(()=>{input.focus();input.select();},250);
+}
+function ocFiltrar(){
+    const q=(document.getElementById('ocBuscar')?.value||'').trim().toLowerCase();
+    const e=(document.getElementById('ocFEstado')?.value||'').trim().toUpperCase();
+    const p=(document.getElementById('ocFPaleta')?.value||'').trim().toUpperCase();
+    const rows=document.querySelectorAll('#ocTabla tbody tr.oc-row'); let n=0;
+    rows.forEach(row=>{
+        const s=(row.dataset.search||'').toLowerCase();
+        const st=(row.dataset.estado||'').toUpperCase();
+        const pa=(row.dataset.paleta||'').trim().toUpperCase();
+        const ok=(!q||s.includes(q))&&(!e||st===e)&&(!p||(p==='__SIN__'?!pa:pa===p));
+        row.style.display=ok?'':'none';
+        const id=(row.id||'').replace('producto-','');
+        const d=id?document.getElementById('oc-det-'+id):null;
+        if(d&&!ok)d.style.display='none';
+        if(ok)n++;
+    });
+    const v=document.getElementById('ocVacio');if(v)v.style.display=n?'none':'block';
+    const c=document.getElementById('ocContador');if(c)c.textContent=n+' de '+rows.length;
+}
+function ocLimpiar(){
+    ['ocBuscar','ocFEstado','ocFPaleta'].forEach((id,i)=>{const el=document.getElementById(id);if(el)el.value='';});
+    ocFiltrar();
+}
+function ocTogglePanel(){ document.getElementById('ocAccPanel')?.classList.toggle('open'); }
+function ocIrEscaner(){
+    const el=document.getElementById('scanner');
+    if(el){el.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>el.focus(),300);}
+}
+function ocNuevaPaleta(){
+    const b=document.getElementById('ocNuevaPaleta');
+    const name=b?.dataset.next||'P01', first=b?.dataset.firstSin;
+    if(first){
+        const row=document.getElementById('oc-det-'+first);
+        const input=row?.querySelector('[name="paleta"]');
+        if(row&&input){row.classList.add('open');input.value=name;row.scrollIntoView({behavior:'smooth',block:'center'});setTimeout(()=>{input.focus();input.select();},250);return;}
+    }
+    document.getElementById('ocPaletas')?.scrollIntoView({behavior:'smooth',block:'center'});
+}
+function ocExportCSV(){
+    const rows=[['#','Producto','SKU','Solicitado','Despachado','Pendiente','Avance','Lote','Vencimiento','Paleta','Ubicación','Subtotal']];
+    document.querySelectorAll('#ocTabla tbody tr.oc-row').forEach(tr=>{
+        if(tr.style.display==='none')return;const c=tr.children;if(!c||c.length<15)return;
+        rows.push([0,1,2,3,4,5,6,7,8,10,11,13].map(i=>(c[i] ? c[i].innerText : ''||'').replace(/\s+/g,' ').trim()));
+    });
+    const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
+    const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8;'});
+    const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='orden-{{ $order->numero_orden }}.csv';document.body.appendChild(a);a.click();a.remove();
+}
+
+
+function abrirResumenOrden() {
+    const modal = document.getElementById('modalResumenOrden');
+
+    modal.style.display = 'flex';
+
+    document.body.style.overflow = 'hidden';
+}
+
+function cerrarResumenOrden() {
+    const modal = document.getElementById('modalResumenOrden');
+
+    modal.style.display = 'none';
+
+    document.body.style.overflow = '';
+}
+
+// Cerrar haciendo clic fuera de la ventana
+document.getElementById('modalResumenOrden')?.addEventListener('click', function(e) {
+
+    if (e.target === this) {
+        cerrarResumenOrden();
+    }
+
+});
+
+</script>
