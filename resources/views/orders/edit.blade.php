@@ -1,94 +1,6 @@
+@extends('layouts.app')
 
-<style id="distan-control-order-shell-fix">
-:root{
-    --oc-blue:#2563eb;
-    --oc-blue-soft:#eff6ff;
-    --oc-bg:#f5f7fb;
-}
-html,body{margin:0!important;padding:0!important;background:var(--oc-bg)!important;}
-body{min-width:0;overflow-x:hidden;}
-/* The parent ERP layout owns the sidebar/menu. This view owns only the content. */
-.oc-page,
-.oc-shell,
-.oc-wrap,
-.oc-app,
-.oc-layout,
-.oc-content{
-    box-sizing:border-box;
-}
-.oc-page{
-    width:100%!important;
-    max-width:none!important;
-    margin:0!important;
-    padding:18px 22px 30px!important;
-    background:var(--oc-bg)!important;
-}
-.oc-page > .oc-shell,
-.oc-page > .oc-wrap,
-.oc-page > .oc-app,
-.oc-page > .oc-layout{
-    width:100%!important;
-    max-width:1440px!important;
-    margin:0 auto!important;
-}
-.oc-head{
-    width:100%!important;
-    box-sizing:border-box!important;
-}
-.oc-top{
-    width:100%!important;
-    box-sizing:border-box!important;
-}
-.oc-work,
-.oc-card,
-.oc-tabs,
-.oc-pane,
-.oc-bottom{
-    width:100%!important;
-    box-sizing:border-box!important;
-}
-.oc-scroll{
-    width:100%!important;
-    overflow-x:auto!important;
-}
-.oc-tbl{
-    width:100%!important;
-    min-width:1180px!important;
-}
-.oc-top{
-    display:grid!important;
-    grid-template-columns:minmax(0,1.45fr) minmax(250px,.8fr) minmax(390px,1.15fr)!important;
-    gap:14px!important;
-    align-items:stretch!important;
-}
-.oc-head{
-    display:flex!important;
-    justify-content:space-between!important;
-    align-items:center!important;
-    gap:16px!important;
-    margin-bottom:14px!important;
-}
-.oc-head-r{
-    display:flex!important;
-    align-items:center!important;
-    justify-content:flex-end!important;
-    flex-wrap:wrap!important;
-    gap:7px!important;
-}
-@media(max-width:1200px){
-    .oc-top{grid-template-columns:1fr 1fr!important;}
-    .oc-top > :last-child{grid-column:1/-1;}
-}
-@media(max-width:820px){
-    .oc-page{padding:12px 10px 24px!important;}
-    .oc-head{align-items:flex-start!important;flex-direction:column!important;}
-    .oc-head-r{width:100%!important;justify-content:flex-start!important;}
-    .oc-top{grid-template-columns:1fr!important;}
-    .oc-top > :last-child{grid-column:auto!important;}
-}
-</style>
-<div class="oc-page">
-
+@section('content')
 
 <style>
 *{box-sizing:border-box;}
@@ -965,6 +877,179 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .oc-info > div{display:flex;justify-content:space-between;gap:8px;padding:10px 8px;border-bottom:1px solid #eef2f7;font-size:12.5px;}
 .oc-info span{color:var(--oc-muted);}
 .oc-info b{font-weight:600;text-align:right;}
+
+/* =========================================================
+   DISTAN — CONTROL DE LA ORDEN
+   Integración con layouts.app / sidebar existente
+   No crea un segundo menú ni una segunda "ventana" de aplicación.
+   ========================================================= */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+#mainContent.main-content {
+    width: auto !important;
+    max-width: none !important;
+    padding: 0 !important;
+    overflow-x: hidden;
+}
+
+#mainContent.main-content > .pg {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 20px 22px 30px !important;
+    min-height: 100vh !important;
+    background: #f1f5f9 !important;
+}
+
+/* El contenido interno es el que debe tener límites visuales,
+   no el layout completo. */
+#mainContent .oc-head,
+#mainContent .oc-top,
+#mainContent .oc-main,
+#mainContent .oc-bottom,
+#mainContent .oc-actions,
+#mainContent .oc-info,
+#mainContent .oc-wrap-inner {
+    max-width: none;
+}
+
+/* La tabla ocupa todo el ancho disponible y se desplaza horizontalmente
+   solo cuando la pantalla realmente no alcanza. */
+#mainContent .oc-scroll {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+#mainContent .oc-tbl {
+    width: 100%;
+    min-width: 1180px;
+}
+
+/* Evita que cards del layout de la aplicación se aniden dentro de la vista. */
+#mainContent .pg > .card,
+#mainContent .pg > .container,
+#mainContent .pg > .max-w-7xl {
+    max-width: none !important;
+}
+
+/* Responsive */
+@media (max-width: 1100px) {
+    #mainContent.main-content > .pg {
+        padding: 16px !important;
+    }
+}
+
+@media (max-width: 768px) {
+    #mainContent.main-content > .pg {
+        padding: 12px 10px 24px !important;
+    }
+}
+
+
+/* ─────────────── RESPONSABLE DE ARMADO ─────────────── */
+.oc-armado-card{
+    background:#fff;
+    border:1px solid #dbe5f0;
+    border-radius:14px;
+    margin:0 0 14px;
+    padding:12px 15px;
+    display:flex;
+    align-items:center;
+    gap:12px;
+    box-shadow:0 1px 2px rgba(15,23,42,.04);
+}
+.oc-armado-icon{
+    width:42px;
+    height:42px;
+    border-radius:11px;
+    display:grid;
+    place-items:center;
+    background:#eff6ff;
+    font-size:20px;
+    flex:0 0 auto;
+}
+.oc-armado-body{min-width:0;flex:1;}
+.oc-armado-label{
+    font-size:9px;
+    color:#64748b;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+}
+.oc-armado-name{
+    color:#0f172a;
+    font-size:14px;
+    font-weight:850;
+    margin-top:2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.oc-armado-name.muted{color:#94a3b8;}
+.oc-armado-help{
+    font-size:10px;
+    color:#94a3b8;
+    margin-top:2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+.oc-armado-status{
+    background:#f8fafc;
+    border:1px solid #e2e8f0;
+    color:#475569;
+    border-radius:999px;
+    padding:6px 10px;
+    font-size:10px;
+    font-weight:800;
+    white-space:nowrap;
+}
+.oc-armador-cell{min-width:125px;}
+.oc-persona{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    color:#334155;
+    font-size:10px;
+    font-weight:700;
+    max-width:145px;
+}
+.oc-persona-icon{font-size:12px;}
+@media(max-width:700px){
+    .oc-armado-card{align-items:flex-start;}
+    .oc-armado-status{margin-left:auto;}
+}
+@media(max-width:520px){
+    .oc-armado-card{flex-wrap:wrap;}
+    .oc-armado-status{width:100%;text-align:center;}
+}
+
+
+.oc-back-orders{
+    display:inline-flex !important;
+    align-items:center;
+    gap:7px;
+    text-decoration:none !important;
+    white-space:nowrap;
+}
+.oc-back-orders span{
+    font-size:11px;
+    font-weight:800;
+    color:#334155;
+}
+.oc-back-orders:hover{
+    border-color:#93c5fd !important;
+    background:#eff6ff !important;
+    color:#2563eb !important;
+}
+@media(max-width:600px){
+    .oc-back-orders span{display:inline;}
+}
+
 </style>
 
 <div class="pg">
@@ -974,6 +1059,14 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     $estadoColor = $order->estado === 'COMPLETO' ? '#15803d'
         : ($order->estado === 'PARCIAL' ? '#b45309' : '#b91c1c');
     $totalItems = $order->details->count();
+    $armadoresOrden = $order->details
+        ->pluck('personal_despacho')
+        ->filter(fn($nombre) => trim((string) $nombre) !== '')
+        ->map(fn($nombre) => trim((string) $nombre))
+        ->unique()
+        ->values();
+    $armadorPrincipal = $armadoresOrden->count() === 1 ? $armadoresOrden->first() : null;
+
     $completados = $order->details->where('estado_item','COMPLETO')->count();
     $faltantes = $totalItems - $completados;
     $porcentaje = $totalItems > 0 ? round(($completados / $totalItems) * 100) : 0;
@@ -1071,7 +1164,10 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 {{-- ══════════ CABECERA ══════════ --}}
 <div class="oc-head">
     <div class="oc-head-l">
-        <a href="{{ url()->previous() }}" class="oc-back" title="Volver"><svg class="oc-i"><use href="#oc-back"/></svg></a>
+        <a href="{{ route('pedidos.index') }}" class="oc-back oc-back-orders" title="Volver a órdenes">
+            <svg class="oc-i"><use href="#oc-back"/></svg>
+            <span>Volver a órdenes</span>
+        </a>
         <div>
             <h1 class="oc-title">Control de la orden</h1>
             <div class="oc-sub">Gestiona los productos, despachos y paletas de la orden</div>
@@ -1298,6 +1394,27 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
     </div>
 </div>
 
+{{-- ─────────────── ARMADO DE LA ORDEN ─────────────── --}}
+<div class="oc-armado-card" id="ocArmadoresResumen">
+    <div class="oc-armado-icon">👤</div>
+    <div class="oc-armado-body">
+        <div class="oc-armado-label">Personal que armó la orden</div>
+        @if($armadoresOrden->count() === 0)
+            <div class="oc-armado-name muted">Aún no registrado</div>
+            <div class="oc-armado-help">Se mostrará cuando se registre un despacho.</div>
+        @elseif($armadoresOrden->count() === 1)
+            <div class="oc-armado-name">{{ $armadorPrincipal }}</div>
+            <div class="oc-armado-help">Responsable registrado en los productos despachados.</div>
+        @else
+            <div class="oc-armado-name">{{ $armadoresOrden->count() }} personas</div>
+            <div class="oc-armado-help">{{ $armadoresOrden->implode(' · ') }}</div>
+        @endif
+    </div>
+    <div class="oc-armado-status">
+        <span>{{ $completados }} / {{ $totalItems }} productos completos</span>
+    </div>
+</div>
+
 {{-- ══════════ TARJETA PRINCIPAL: TABS + TABLA ══════════ --}}
 <div class="oc-main">
 
@@ -1359,6 +1476,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                         <th class="c">Paleta</th>
                         <th>Ubicación</th>
                         <th>Últ. despacho</th>
+                        <th>Armó</th>
                         <th>Subtotal</th>
                         <th>Acciones</th>
                     </tr>
@@ -1460,6 +1578,17 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
                                 <div class="oc-ult oc-num">{{ $ocUlt->format('d/m H:i') }}</div>
                             @else
                                 <span class="oc-dash">—</span>
+                            @endif
+                        </td>
+
+                        <td class="oc-armador-cell">
+                            @if(trim((string)($detail->personal_despacho ?? '')) !== '')
+                                <span class="oc-persona">
+                                    <span class="oc-persona-icon">👤</span>
+                                    <span>{{ $detail->personal_despacho }}</span>
+                                </span>
+                            @else
+                                <span class="oc-dash">Sin registrar</span>
                             @endif
                         </td>
 
@@ -2139,8 +2268,6 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
         </div>
 
     </div>
-
-</div>
 
 </div>
 <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
@@ -4324,10 +4451,10 @@ function ocNuevaPaleta(){
     document.getElementById('ocPaletas')?.scrollIntoView({behavior:'smooth',block:'center'});
 }
 function ocExportCSV(){
-    const rows=[['#','Producto','SKU','Solicitado','Despachado','Pendiente','Avance','Lote','Vencimiento','Paleta','Ubicación','Subtotal']];
+    const rows=[['#','Producto','SKU','Solicitado','Despachado','Pendiente','Avance','Lote','Vencimiento','Paleta','Ubicación','Últ. despacho','Armó','Subtotal']];
     document.querySelectorAll('#ocTabla tbody tr.oc-row').forEach(tr=>{
-        if(tr.style.display==='none')return;const c=tr.children;if(!c||c.length<15)return;
-        rows.push([0,1,2,3,4,5,6,7,8,10,11,13].map(i=>(c[i] ? c[i].innerText : ''||'').replace(/\s+/g,' ').trim()));
+        if(tr.style.display==='none')return;const c=tr.children;if(!c||c.length<16)return;
+        rows.push([0,1,2,3,4,5,6,7,8,10,11,12,13,14].map(i=>(c[i]?.innerText||'').replace(/\s+/g,' ').trim()));
     });
     const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
     const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8;'});
@@ -4361,3 +4488,4 @@ document.getElementById('modalResumenOrden')?.addEventListener('click', function
 });
 
 </script>
+@endsection
