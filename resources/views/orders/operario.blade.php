@@ -1333,7 +1333,7 @@ byId('activoCantidad').addEventListener('keydown', function(e){
             });
 
             await lectorCamara.start(
-                { facingMode: { ideal: 'environment' } },
+                { facingMode: 'environment' },
                 {
                     fps: 10,
                     qrbox: { width: 260, height: 150 },
