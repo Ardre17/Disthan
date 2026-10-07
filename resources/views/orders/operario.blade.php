@@ -1,3 +1,66 @@
+
+<style id="operario-responsive-fix">
+html, body {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: hidden;
+    -webkit-text-size-adjust: 100%;
+}
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+.pg {
+    width: 100%;
+    max-width: 100%;
+}
+@media (max-width: 900px) {
+    .pg {
+        padding: 10px !important;
+    }
+    .prod-list,
+    .sec-card,
+    .activo-box,
+    .order-header,
+    .kpi-grid {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+    .prod-item {
+        min-width: 0 !important;
+    }
+    .prod-item-top {
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+}
+@media (max-width: 640px) {
+    .pg {
+        padding: 8px !important;
+    }
+    .activo-fields {
+        grid-template-columns: 1fr !important;
+    }
+    .kpi-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    .prod-item {
+        padding: 10px !important;
+    }
+    .prod-item-name {
+        font-size: 13px !important;
+        word-break: break-word;
+    }
+    #camaraModal {
+        padding: 8px !important;
+    }
+    #camaraModal > div {
+        width: 100% !important;
+        max-height: 96vh !important;
+        border-radius: 12px !important;
+    }
+}
+</style>
+
 @extends('layouts.app')
 
 @section('content')
@@ -901,4 +964,105 @@ setInterval(() => {
     const modal = document.getElementById('camaraModal');
     const resultBox = document.getElementById('camaraResult');
     const btnOpen = document.getElementById('btnAbrirCamara');
-    const btnClose = document.getElementById
+    const btnClose = document.getElementById('btnCerrarCamara');
+
+    if(!btnOpen || !modal || typeof Html5Qrcode === 'undefined') return;
+
+    btnOpen.addEventListener('click', function(){
+        modal.classList.add('open');
+        cooldown = false;
+        resultBox.innerHTML = '📷 Apunta al código de barras...';
+        startCamera();
+    });
+
+    btnClose.addEventListener('click', cerrarCamara);
+    modal.addEventListener('click', function(e){
+        if(e.target === modal) cerrarCamara();
+    });
+
+    function startCamera(){
+        if(html5QrCode) return;
+
+        html5QrCode = new Html5Qrcode('camaraVisor', {
+            formatsToSupport: [
+                Html5QrcodeSupportedFormats.EAN_13,
+                Html5QrcodeSupportedFormats.EAN_8,
+                Html5QrcodeSupportedFormats.CODE_128,
+                Html5QrcodeSupportedFormats.CODE_39,
+                Html5QrcodeSupportedFormats.UPC_A,
+                Html5QrcodeSupportedFormats.UPC_E,
+                Html5QrcodeSupportedFormats.QR_CODE
+            ]
+        });
+
+        html5QrCode.start(
+            { facingMode: 'environment' },
+            { fps: 12, qrbox: { width: 260, height: 150 }, aspectRatio: 1.777 },
+            onScanSuccess,
+            function(){}
+        ).catch(function(err){
+            console.error('Cámara:', err);
+            resultBox.innerHTML = '⚠️ No se pudo acceder a la cámara. Verifica los permisos del navegador.';
+        });
+    }
+
+    function onScanSuccess(code){
+        if(cooldown) return;
+        cooldown = true;
+
+        resultBox.innerHTML = '<span class="camara-result-code">✅ ' + escapeHtml(code) + '</span>';
+        if(navigator.vibrate) navigator.vibrate(80);
+
+        // Procesar directamente: no simulamos KeyboardEvent.
+        procesarCodigo(code);
+
+        // Cerramos la interfaz inmediatamente y detenemos la cámara en segundo plano.
+        modal.classList.remove('open');
+        stopCamera().finally(function(){
+            scanner.focus();
+            cooldown = false;
+        });
+    }
+
+    function stopCamera(){
+        const lector = html5QrCode;
+        html5QrCode = null;
+        if(!lector) return Promise.resolve();
+
+        return lector.stop()
+            .catch(function(){})
+            .then(function(){
+                try { lector.clear(); } catch(e) {}
+            });
+    }
+
+    function cerrarCamara(){
+        modal.classList.remove('open');
+        stopCamera().finally(function(){
+            scanner.focus();
+            cooldown = false;
+        });
+    }
+})();
+
+function confirmarCierre(){
+    const faltantes = detalles.filter(d =>
+        parseFloat(d.cantidad_despachada) < parseFloat(d.cantidad_solicitada)
+    );
+    if(faltantes.length === 0){
+        return confirm('✅ Todos los productos están completos.\n\n¿Deseas cerrar la orden?');
+    }
+    const lista = faltantes.map(d => {
+        const f = d.cantidad_solicitada - d.cantidad_despachada;
+        return `• ${d.product.nombre} (faltan ${f})`;
+    }).join('\n');
+    return confirm('⚠️ Hay productos incompletos:\n\n' + lista + '\n\n¿Deseas cerrar la orden de todas formas?');
+}
+
+window.onload = () => {
+    scanner.focus();
+    actualizarBarra();
+};
+</script>
+
+@endsection
