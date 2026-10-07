@@ -243,7 +243,7 @@ opacity:1;
     <div class="scanner-top">
         <div class="scanner-pulse"></div>
         <div class="scanner-label">📡 Escanear código de barras</div>
-        <button type="button" class="camera-btn" id="btnAbrirCamara">📷 Cámara</button>
+        <button type="button" class="camera-btn" id="btnAbrirCamara">📷 Usar Cámara</button>
     </div>
     <input type="text" id="scanner" class="scanner-input"
            placeholder="Escanea o escribe el código y presiona Enter..." autofocus>
@@ -1016,7 +1016,7 @@ setInterval(() => {
         // Procesar directamente: no simulamos KeyboardEvent.
         procesarCodigo(code);
 
-        // Cerramos la interfaz inmediatamente y detenemos la cámara en segundo plano.
+        // Cerramos la interfaz inmediatamente y detenemos la cámara en segundo plano..
         modal.classList.remove('open');
         stopCamera().finally(function(){
             scanner.focus();
