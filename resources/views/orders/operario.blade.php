@@ -153,17 +153,65 @@ body{overflow-x:hidden;}
 .camera-btn{flex:0 0 auto;background:var(--erp-primary);color:#fff;border:none;border-radius:10px;padding:0 18px;font-size:12px;font-weight:800;cursor:pointer;box-shadow:0 5px 14px rgba(37,99,235,.18);}
 .camera-btn:hover{background:var(--erp-primary-dark);}
 .ready-card{background:#fff;border:1px dashed #cbd5e1;border-radius:var(--erp-radius);padding:28px 20px;text-align:center;margin-bottom:16px;box-shadow:var(--erp-shadow);}
-.ready-cart{width:68px;height:68px;margin:0 auto 10px;border-radius:20px;background:#eff6ff;color:#2563eb;display:grid;place-items:center;font-size:34px;animation:cartFloat 2.2s ease-in-out infinite;}
+.ready-cart{width:92px;height:92px;margin:0 auto 12px;border-radius:24px;background:#eff6ff;color:#2563eb;display:grid;place-items:center;animation:cartFloat 2.2s ease-in-out infinite;box-shadow:inset 0 0 0 1px #dbeafe;}.ready-cart svg{width:66px;height:66px;}.ready-flow{display:flex;justify-content:center;align-items:center;gap:8px;flex-wrap:wrap;margin-top:13px;font-size:10px;font-weight:800;color:#64748b;}.ready-flow span{background:#f8fafc;border:1px solid #e2e8f0;border-radius:999px;padding:5px 8px;}.ready-flow b{color:#2563eb;}
 .ready-title{font-size:15px;font-weight:800;color:#1e293b;}
 .ready-text{font-size:11px;color:#94a3b8;margin-top:4px;}
 @keyframes cartFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+.pedido-loader-card{background:#fff;border:1px solid #e2e8f0;border-radius:20px;padding:26px 30px;text-align:center;box-shadow:0 24px 70px rgba(15,23,42,.16);min-width:280px;}
+.pedido-loader-art{width:92px;height:92px;margin:0 auto 8px;border-radius:24px;background:#eff6ff;display:grid;place-items:center;animation:cartFloat 1.1s ease-in-out infinite;}
+.pedido-loader-art svg{width:70px;height:70px;}
+.pedido-loader-title{font-size:16px;font-weight:850;color:#172033;}
+.pedido-loader-text{font-size:11px;color:#94a3b8;margin-top:4px;}
+.pedido-loader-dots{display:flex;justify-content:center;gap:5px;margin-top:12px;}
+.pedido-loader-dots span{width:6px;height:6px;border-radius:50%;background:#2563eb;animation:loaderDot 1s infinite ease-in-out;}
+.pedido-loader-dots span:nth-child(2){animation-delay:.15s}.pedido-loader-dots span:nth-child(3){animation-delay:.3s}
+@keyframes loaderDot{0%,80%,100%{transform:scale(.6);opacity:.45}40%{transform:scale(1);opacity:1}}
 .activo-box{background:#fff;border:1px solid #bfdbfe;border-top:3px solid var(--erp-primary);border-radius:var(--erp-radius);padding:18px;margin-bottom:16px;display:none;box-shadow:0 10px 30px rgba(37,99,235,.08);}
-.activo-head{display:flex;align-items:flex-start;gap:13px;margin-bottom:15px;}
-.activo-product-icon{width:62px;height:62px;border-radius:12px;background:#f1f5f9;color:#64748b;display:grid;place-items:center;font-size:28px;flex:0 0 auto;}
-.activo-name{font-size:19px;font-weight:800;color:#172033;margin-bottom:4px;}
-.activo-meta{font-size:11px;color:#64748b;margin-bottom:0;display:flex;gap:12px;flex-wrap:wrap;}
-.activo-meta strong{color:#334155!important;}
-.activo-fields{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.activo-head{display:flex;align-items:flex-start;gap:14px;margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid #edf1f5;}
+.activo-product-icon{width:64px;height:64px;border-radius:14px;background:#eff6ff;color:#2563eb;display:grid;place-items:center;flex:0 0 auto;overflow:hidden;}
+.activo-product-icon svg{width:38px;height:38px;}
+.activo-head-info{min-width:0;flex:1;}
+.activo-name{font-size:20px;font-weight:800;color:#172033;line-height:1.2;margin-bottom:5px;word-break:break-word;}
+.activo-meta{font-size:11px;color:#64748b;display:flex;gap:12px;flex-wrap:wrap;}
+
+.active-kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px;margin-bottom:14px;}
+.active-kpi{background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:10px;text-align:center;min-width:0;}
+.active-kpi-label{font-size:9px;color:#64748b;text-transform:uppercase;font-weight:800;letter-spacing:.04em;}
+.active-kpi-value{font-size:18px;font-weight:850;color:#172033;margin-top:3px;}
+.active-kpi-green .active-kpi-value{color:#16a34a;}
+.active-kpi-yellow .active-kpi-value{color:#d97706;}
+.active-kpi-blue .active-kpi-value{color:#2563eb;}
+.active-form-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:10px;}
+.active-form-full{grid-column:1/-1;}
+.active-form-field{min-width:0;}
+.active-extra-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+.active-extra-grid .active-form-field{min-width:0;}
+.active-actions{display:flex;gap:9px;margin-top:12px;}
+.active-save-btn{flex:1;background:var(--erp-primary);color:#fff;border:0;border-radius:9px;padding:12px;font-size:13px;font-weight:800;cursor:pointer;box-shadow:0 5px 14px rgba(37,99,235,.18);}
+.active-clear-btn{background:#fff;color:#475569;border:1px solid #cbd5e1;border-radius:9px;padding:12px 16px;font-weight:700;cursor:pointer;}
+@media(max-width:760px){
+    .active-kpis{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .active-form-grid{grid-template-columns:1fr 1fr;}
+}
+@media(max-width:560px){
+    .activo-box{padding:13px;}
+    .activo-head{gap:10px;}
+    .activo-product-icon{width:52px;height:52px;border-radius:12px;}
+    .activo-product-icon svg{width:31px;height:31px;}
+    .activo-name{font-size:17px;}
+    .active-kpis{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .active-form-grid,.active-extra-grid{grid-template-columns:1fr;}
+    .active-form-full{grid-column:auto;}
+    .active-actions{flex-direction:column;}
+    .active-clear-btn{width:100%;}
+}
+
+
+
+
+
+
+
 .activo-label{font-size:10px;color:#64748b;text-transform:uppercase;letter-spacing:.05em;display:block;margin-bottom:5px;font-weight:800;}
 .activo-input{width:100%;padding:10px 12px;border-radius:9px;border:1px solid #cbd5e1;background:#fff;color:#172033;font-size:14px;outline:none;transition:border-color .2s,box-shadow .2s;}
 .activo-input:focus{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(37,99,235,.08);}
@@ -174,7 +222,7 @@ body{overflow-x:hidden;}
 .active-clear-btn{background:#fff;color:#475569;border:1px solid #cbd5e1;border-radius:9px;padding:12px 16px;font-weight:700;cursor:pointer;}
 .activo-bar-track{width:100%;height:8px;background:#e8eef6;border-radius:99px;overflow:hidden;margin:.5rem 0;}
 .sec-title{font-size:13px;font-weight:800;color:#1e293b;margin:2px 0 9px;display:flex;align-items:center;gap:6px;}
-.prod-list{display:flex;flex-direction:column;gap:8px;}
+.list-header{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin:3px 0 9px;padding:0 2px;}.list-subtitle{font-size:10px;color:#94a3b8;margin-top:2px;}.list-count{font-size:10px;color:#2563eb;font-weight:800;background:#eff6ff;border:1px solid #dbeafe;border-radius:999px;padding:5px 9px;white-space:nowrap;}.prod-list{display:flex;flex-direction:column;gap:8px;}
 .prod-item{background:#fff;border:1px solid var(--erp-border);border-left:4px solid;border-radius:11px;padding:12px 13px;transition:box-shadow .15s,transform .15s;box-shadow:0 3px 12px rgba(15,23,42,.035);}
 .prod-item:hover{transform:translateY(-1px);box-shadow:0 8px 20px rgba(15,23,42,.06);}
 .prod-item-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:7px;gap:10px;}
@@ -317,71 +365,144 @@ body{overflow-x:hidden;}
 </div>
 
 <div class="ready-card" id="readyCard">
-    <div class="ready-cart">🛒</div>
-    <div class="ready-title">Escanea un producto para comenzar</div>
-    <div class="ready-text">Usa el lector, escribe el código o abre la cámara del celular.</div>
+    <div class="ready-cart" aria-hidden="true">
+        <svg viewBox="0 0 96 96" fill="none">
+            <path d="M13 18h10l7 39h43l9-29H28" stroke="#2563EB" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            <circle cx="39" cy="74" r="6" fill="#2563EB"/>
+            <circle cx="68" cy="74" r="6" fill="#2563EB"/>
+            <rect x="38" y="27" width="27" height="22" rx="4" fill="#DBEAFE"/>
+            <path d="M43 32h17M43 38h12M43 44h15" stroke="#2563EB" stroke-width="2.5" stroke-linecap="round"/>
+            <path d="M73 17l4 4 8-9" stroke="#16A34A" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+    </div>
+    <div class="ready-title">Listo para armar el pedido</div>
+    <div class="ready-text">Escanea un producto y aquí aparecerán sus datos para registrar el despacho.</div>
+    <div class="ready-flow">
+        <span>📦 Escanear</span><b>→</b><span>✏️ Registrar</span><b>→</b><span>✓ Despachar</span>
+    </div>
 </div>
 
 {{-- Producto activo --}}
 <div class="activo-box" id="activoBox">
+
     <div class="activo-head">
-        <div class="activo-product-icon">📦</div>
-        <div style="min-width:0;flex:1;">
+        <div class="activo-product-icon" aria-hidden="true">
+            <svg viewBox="0 0 64 64" fill="none">
+                <rect x="12" y="15" width="40" height="36" rx="7" fill="#DBEAFE"/>
+                <path d="M20 25h24M20 33h24M20 41h14" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>
+                <circle cx="45" cy="44" r="7" fill="#16A34A"/>
+                <path d="m42 44 2 2 4-5" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+
+        <div class="activo-head-info">
             <div class="activo-name" id="activoNombre">—</div>
-    <div class="activo-meta">
-        <span>SKU: <strong id="activoSku" style="color:#64748b;">—</strong></span>
-        <span>Stock: <strong id="activoStock" style="color:#64748b;">—</strong></span>
-        <span>Peso: <strong id="activoPeso" style="color:#64748b;">—</strong></span>
+            <div class="activo-meta">
+                <span>SKU: <strong id="activoSku">—</strong></span>
+                <span>Stock: <strong id="activoStock">—</strong></span>
+                <span>Peso: <strong id="activoPeso">—</strong></span>
+            </div>
         </div>
     </div>
 
-    @if(strtoupper(trim($order->tipo_orden ?? '')) === 'SUPERMERCADO')
-    <div style="margin-bottom:.75rem;">
-        <label class="activo-label">🪵 Paleta</label>
-        <input type="text" class="activo-input" id="activoPaletaInput" maxlength="50"
-               placeholder="Ej: P01" autocomplete="off"
-               style="text-transform:uppercase;">
-    </div>
-    @endif
-
-    <div style="margin-bottom:.75rem;">
-        <label class="activo-label">👤 Personal que retiró el producto</label>
-        <input type="text" class="activo-input" id="activoPersonal"
-               placeholder="Escribe el nombre del personal..." maxlength="100" autocomplete="off">
-    </div>
-
-    <div class="activo-fields">
-        <div>
-            <label class="activo-label">Solicitado</label>
-            <input type="number" class="activo-input" id="activoSolicitado" readonly style="color:#64748b;">
+    <div class="active-kpis">
+        <div class="active-kpi active-kpi-blue">
+            <div class="active-kpi-label">Solicitado</div>
+            <div class="active-kpi-value" id="activoSolicitadoKpi">—</div>
         </div>
-        <div>
-            <label class="activo-label">Despachado ✏️</label>
-            <input type="number" class="activo-input big" id="activoCantidad" placeholder="0">
+        <div class="active-kpi active-kpi-green">
+            <div class="active-kpi-label">Despachado</div>
+            <div class="active-kpi-value" id="activoDespachadoKpi">—</div>
+        </div>
+        <div class="active-kpi active-kpi-yellow">
+            <div class="active-kpi-label">Pendiente</div>
+            <div class="active-kpi-value" id="activoPendienteKpi">—</div>
+        </div>
+        <div class="active-kpi">
+            <div class="active-kpi-label">Avance</div>
+            <div class="active-kpi-value" id="activoPctKpi">0%</div>
         </div>
     </div>
-    <div style="display:flex;justify-content:space-between;font-size:11px;color:#64748b;margin-bottom:3px;">
-        <span>Progreso ítem</span>
-        <span id="activoPctLabel" style="font-weight:700;color:#94a3b8;">—</span>
-    </div>
-    <div class="activo-bar-track">
-        <div id="activoBarFill" style="height:100%;border-radius:99px;background:#3b82f6;width:0%;transition:width .3s;"></div>
-    </div>
-    <div style="font-size:11px;color:#475569;margin-top:4px;">
-        @if(strtoupper(trim($order->tipo_orden ?? '')) !== 'SUPERMERCADO')
-            Paleta: <strong id="activoPaleta" style="color:#64748b;">—</strong> ·
+
+    {{-- Campo oculto funcional: se conserva para el JS y validaciones existentes --}}
+    <input type="hidden" id="activoSolicitado">
+
+    <div class="active-form-grid">
+
+        <div class="active-form-field">
+            <label class="activo-label">📦 Cantidad a despachar</label>
+            <input type="number"
+                   class="activo-input big"
+                   id="activoCantidad"
+                   placeholder="0"
+                   min="0"
+                   step="0.01">
+        </div>
+
+        <div class="active-form-field">
+            <label class="activo-label">👤 Personal que retiró</label>
+            <input type="text"
+                   class="activo-input"
+                   id="activoPersonal"
+                   placeholder="Nombre del personal..."
+                   maxlength="100"
+                   autocomplete="off">
+        </div>
+
+        @if(strtoupper(trim($order->tipo_orden ?? '')) === 'SUPERMERCADO')
+        <div class="active-form-field">
+            <label class="activo-label">🪵 Paleta</label>
+            <input type="text"
+                   class="activo-input"
+                   id="activoPaletaInput"
+                   maxlength="50"
+                   placeholder="Ej: P01"
+                   autocomplete="off"
+                   style="text-transform:uppercase;">
+        </div>
         @endif
-        Ubicación: <strong id="activoUbicacion" style="color:#64748b;">—</strong>
-        · Vence: <strong id="activoVence" style="color:#64748b;">—</strong>
+
     </div>
+
+    <div class="active-extra-grid">
+
+        <div class="active-form-field">
+            <label class="activo-label">📍 Ubicación</label>
+            <div class="activo-input" id="activoUbicacion" style="min-height:41px;display:flex;align-items:center;color:#64748b;">—</div>
+        </div>
+
+        <div class="active-form-field">
+            <label class="activo-label">📅 Vencimiento</label>
+            <div class="activo-input" id="activoVence" style="min-height:41px;display:flex;align-items:center;color:#64748b;">—</div>
+        </div>
+
+    </div>
+
+    <div style="display:flex;justify-content:space-between;font-size:10px;color:#64748b;margin-bottom:4px;">
+        <span>Progreso del producto</span>
+        <strong id="activoPctLabel" style="color:#2563eb;">0%</strong>
+    </div>
+
+    <div class="activo-bar-track">
+        <div id="activoBarFill" style="height:100%;border-radius:99px;background:#2563eb;width:0%;transition:width .3s;"></div>
+    </div>
+
+    <div style="font-size:10px;color:#64748b;margin-top:7px;">
+        @if(strtoupper(trim($order->tipo_orden ?? '')) !== 'SUPERMERCADO')
+            Paleta: <strong id="activoPaleta" style="color:#334155;">—</strong> ·
+        @endif
+        Vence: <strong id="activoVenceTexto" style="color:#334155;">—</strong>
+    </div>
+
     <div class="active-actions">
         <button type="button" class="active-save-btn" id="btnGuardarDespacho">✓ Guardar despacho</button>
         <button type="button" class="active-clear-btn" id="btnLimpiarActivo">Limpiar</button>
     </div>
+
 </div>
 
 {{-- Lista productos --}}
-<div class="sec-title" style="justify-content:space-between;"><span>📦 Productos de la orden</span><span style="font-size:10px;color:#94a3b8;font-weight:700;">{{ $totalItems }} productos</span></div>
+<div class="list-header"><div><div class="sec-title" style="margin:0;">📦 Productos de la orden</div><div class="list-subtitle">Selecciona cualquier producto de la lista o escanéalo para comenzar.</div></div><span class="list-count">{{ $totalItems }} productos</span></div>
 <div class="prod-list">
 
 @foreach($order->details as $item)
@@ -512,12 +633,23 @@ body{overflow-x:hidden;}
 
     </main>
 </div>
-<div id="pedidoLoader" style="display:none;position:fixed;inset:0;background:rgba(255,255,255,.88);backdrop-filter:blur(2px);z-index:20000;align-items:center;justify-content:center;">
-    <div style="text-align:center;background:#fff;border:1px solid #e2e8f0;border-radius:18px;padding:24px 30px;box-shadow:0 20px 60px rgba(15,23,42,.14);">
-        <div style="font-size:48px;animation:cartFloat 1.1s ease-in-out infinite;">🛒</div>
-        <div style="font-size:15px;font-weight:800;color:#172033;margin-top:8px;">Guardando despacho...</div>
-        <div style="font-size:11px;color:#94a3b8;margin-top:4px;">Actualizando el pedido</div>
+<div id="pedidoLoader" style="display:none;position:fixed;inset:0;background:rgba(248,250,252,.88);backdrop-filter:blur(3px);z-index:20000;align-items:center;justify-content:center;padding:20px;">
+    <div class="pedido-loader-card">
+        <div class="pedido-loader-art">
+            <svg viewBox="0 0 120 120" fill="none">
+                <path d="M16 25h13l9 51h55l12-37H33" stroke="#2563EB" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="53" cy="94" r="8" fill="#2563EB"/>
+                <circle cx="91" cy="94" r="8" fill="#2563EB"/>
+                <rect x="47" y="37" width="34" height="29" rx="5" fill="#DBEAFE"/>
+                <path d="M53 45h22M53 53h16M53 61h19" stroke="#2563EB" stroke-width="3" stroke-linecap="round"/>
+                <path d="M91 25l6 6 12-14" stroke="#16A34A" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </div>
+        <div class="pedido-loader-title">Armando el despacho...</div>
+        <div class="pedido-loader-text">Guardando la cantidad y actualizando el pedido</div>
+        <div class="pedido-loader-dots"><span></span><span></span><span></span></div>
     </div>
+</div>
 </div>
 
 <!-- =========================================
@@ -883,9 +1015,24 @@ function mostrarActivo(item){
     document.getElementById('activoStock').textContent    = item.product.stock ?? '—';
     document.getElementById('activoPeso').textContent     = item.product.peso
         ? (item.product.peso / 1000).toFixed(3) + ' kg' : '—';
-    document.getElementById('activoSolicitado').value     = item.cantidad_solicitada;
-    document.getElementById('activoCantidad').value       = item.cantidad_despachada || '';
-    document.getElementById('activoUbicacion').textContent= item.ubicacion || '—';
+    const solicitado = parseFloat(item.cantidad_solicitada) || 0;
+    const despachado = parseFloat(item.cantidad_despachada) || 0;
+    const pendiente = Math.max(0, solicitado - despachado);
+
+    document.getElementById('activoSolicitado').value = solicitado;
+    document.getElementById('activoCantidad').value = item.cantidad_despachada || '';
+
+    const solicitadoKpi = document.getElementById('activoSolicitadoKpi');
+    const despachadoKpi = document.getElementById('activoDespachadoKpi');
+    const pendienteKpi = document.getElementById('activoPendienteKpi');
+    const pctKpi = document.getElementById('activoPctKpi');
+
+    if(solicitadoKpi) solicitadoKpi.textContent = solicitado;
+    if(despachadoKpi) despachadoKpi.textContent = despachado;
+    if(pendienteKpi) pendienteKpi.textContent = pendiente;
+    if(pctKpi) pctKpi.textContent = Math.round(pct) + '%';
+
+    document.getElementById('activoUbicacion').textContent = item.ubicacion || '—';
     const paletaInput = document.getElementById('activoPaletaInput');
     if(paletaInput){
         paletaInput.value = item.paleta || '';
@@ -903,6 +1050,8 @@ function mostrarActivo(item){
     document.getElementById('activoBarFill').style.background = color;
     document.getElementById('activoPctLabel').textContent = Math.round(pct) + '%';
     document.getElementById('activoPctLabel').style.color = color;
+    const pctKpi = document.getElementById('activoPctKpi');
+    if(pctKpi) { pctKpi.textContent = Math.round(pct) + '%'; pctKpi.style.color = color; }
 
     document.getElementById('activoBox').style.display = 'block';
     const readyCard = document.getElementById('readyCard');
@@ -1095,6 +1244,13 @@ document.getElementById('activoCantidad').addEventListener('keydown', function(e
         if(loader) loader.style.display = 'none';
         activoActual.cantidad_despachada = cantidad;
         activoActual.personal_despacho = personal;
+
+        const despachadoKpi = document.getElementById('activoDespachadoKpi');
+        const pendienteKpi = document.getElementById('activoPendienteKpi');
+        const pctKpi = document.getElementById('activoPctKpi');
+        if(despachadoKpi) despachadoKpi.textContent = cantidad;
+        if(pendienteKpi) pendienteKpi.textContent = Math.max(0, parseFloat(activoActual.cantidad_solicitada) - cantidad);
+        if(pctKpi) pctKpi.textContent = Math.round((cantidad / activoActual.cantidad_solicitada) * 100) + '%';
         if(paletaInput){ activoActual.paleta = paleta; }
 
         actualizarItemUI(activoActual);
