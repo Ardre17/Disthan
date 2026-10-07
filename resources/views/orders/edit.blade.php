@@ -3964,7 +3964,7 @@ function actualizarEditor3D()
         cursor:pointer;
     "
 >
-    ðŸ—‘ï¸ Eliminar este bloque
+    ðŸ—‘ï¸ Elimina este bloque
 </button>
             <div
                 id="p3dPositionStatus"
