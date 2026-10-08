@@ -1,206 +1,1075 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DISTAN ERP — Acceso al sistema</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-:root{
-    --blue:#1473ea;
-    --text:#172554;
-    --muted:#71809d;
-    --line:#dce3ef;
-    --font:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
-}
-html,body{width:100%;min-height:100%;font-family:var(--font);background:#07152f}
-body{overflow:hidden}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-/* La ilustración aprobada ocupa TODA la pantalla. */
-.login-page{
-    position:relative;
-    min-height:100vh;
-    width:100%;
-    display:flex;
-    align-items:center;
-    justify-content:flex-end;
-    padding:clamp(18px,3.2vw,46px) clamp(18px,5vw,82px);
-    overflow:hidden;
-    background:#07152f url('/images/login/login-background-octubre.png') center center / cover no-repeat;
-}
+    <title>DISTAN ERP — Acceso al sistema</title>
 
-/* Capa suave para que el formulario se lea sin perder el almacén del fondo. */
-.login-page::after{
-    content:'';
-    position:absolute;
-    inset:0;
-    pointer-events:none;
-    background:linear-gradient(90deg,rgba(2,8,24,.02) 0%,rgba(2,8,24,.02) 48%,rgba(2,8,24,.16) 100%);
-}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-.login-side{
-    position:relative;
-    z-index:3;
-    width:min(480px,38vw);
-    min-width:420px;
-    display:flex;
-    justify-content:center;
-}
+        :root {
+            --blue: #1675ed;
+            --blue-dark: #0864d5;
+            --navy: #10284b;
+            --text: #182b4d;
+            --muted: #7d8ba5;
+            --border: #d7dfec;
+            --white: #ffffff;
+        }
 
-.login-card{
-    width:100%;
-    max-height:calc(100vh - 42px);
-    overflow:hidden;
-    background:rgba(255,255,255,.985);
-    border-radius:24px;
-    box-shadow:0 28px 75px rgba(0,0,0,.40),0 0 0 1px rgba(255,255,255,.55);
-    animation:cardIn .5s cubic-bezier(.16,1,.3,1) both;
-}
-@keyframes cardIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
 
-.form-content{padding:31px 38px 0}
-.brand-logo{display:block;width:245px;max-width:78%;height:auto;margin:0 auto 18px}
-.welcome{color:var(--text);font-size:30px;line-height:1.1;font-weight:800;letter-spacing:-.035em}
-.subtitle{margin-top:5px;margin-bottom:22px;color:var(--muted);font-size:14px}
+        body {
+            font-family:
+                "Segoe UI",
+                -apple-system,
+                BlinkMacSystemFont,
+                sans-serif;
 
-.error-box{background:#fff1f2;border:1px solid #fecdd3;border-left:4px solid #ef4444;border-radius:10px;color:#be123c;padding:10px 12px;margin-bottom:14px;font-size:13px}
-.field{margin-bottom:13px}.field-wrap{position:relative}
-.field-icon{position:absolute;left:16px;top:50%;transform:translateY(-50%);color:#60708f;pointer-events:none;z-index:2;font-size:17px}
-.field-input{width:100%;height:54px;border:1px solid var(--line);border-radius:12px;background:#fff;color:#172554;font-size:14px;padding:0 47px 0 45px;outline:none;transition:.2s;box-shadow:0 2px 7px rgba(15,23,42,.025)}
-.field-input::placeholder{color:#9aa6bb}
-.field-input:focus{border-color:#75a9f8;box-shadow:0 0 0 4px rgba(20,115,234,.10)}
-.toggle-pass{position:absolute;right:14px;top:50%;transform:translateY(-50%);border:0;background:none;color:#60708f;cursor:pointer;font-size:17px;padding:5px}
+            background: #08172f;
 
-.form-options{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:6px 0 17px;font-size:12.5px;color:#34415d}
-.remember{display:flex;align-items:center;gap:7px;cursor:pointer;white-space:nowrap}.remember input{width:16px;height:16px;accent-color:var(--blue)}
-.forgot{color:#086bea;text-decoration:none;font-weight:600;white-space:nowrap}.forgot:hover{text-decoration:underline}
+            overflow: hidden;
+        }
 
-.btn-login{width:100%;height:54px;border:0;border-radius:11px;background:linear-gradient(135deg,#1473ea,#0862d5);color:#fff;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:9px;box-shadow:0 8px 23px rgba(20,115,234,.25);transition:.18s}
-.btn-login:hover{transform:translateY(-1px);box-shadow:0 12px 28px rgba(20,115,234,.32)}
-.btn-arrow{font-size:22px;line-height:1}
 
-.card-decoration{height:145px;margin:20px -38px 0;background:url('/images/login/halloween-card-bottom.png') center bottom / cover no-repeat}
-.production-link{display:flex;justify-content:center;align-items:center;gap:8px;color:#50617d;text-decoration:none;font-size:12px;font-weight:600;padding:12px 0 14px;border-top:1px solid #edf1f7;background:#fff}
-.production-link:hover{color:var(--blue)}
+        /* =====================================================
+           FONDO PRINCIPAL
+        ===================================================== */
 
-/* Evita que el contenido sobresalga en pantallas pequeñas. */
-@media (max-height:760px) and (min-width:901px){
-    .login-page{padding-top:18px;padding-bottom:18px}
-    .form-content{padding-top:23px}
-    .brand-logo{width:210px;margin-bottom:12px}
-    .welcome{font-size:26px}.subtitle{margin-bottom:15px}
-    .field{margin-bottom:10px}.field-input{height:48px}
-    .form-options{margin-bottom:12px}.btn-login{height:49px}
-    .card-decoration{height:110px;margin-top:14px}
-    .production-link{padding:9px 0 10px}
-}
+        .login-background {
+            position: fixed;
 
-@media(max-width:900px){
-    html,body{overflow:auto}
-    .login-page{
-        min-height:100vh;
-        align-items:flex-start;
-        justify-content:center;
-        padding:32px 18px;
-        background-position:center center;
-    }
-    .login-page::before{
-        content:'';
-        position:absolute;inset:0;
-        background:rgba(4,12,32,.20);
-        z-index:1;
-    }
-    .login-side{width:min(480px,100%);min-width:0;margin-top:70px}
-}
+            inset: 0;
 
-@media(max-width:600px){
-    .login-page{padding:20px 12px 28px;background-position:42% center}
-    .login-side{margin-top:35px}
-    .login-card{border-radius:20px}
-    .form-content{padding:25px 22px 0}
-    .brand-logo{width:225px;margin-bottom:15px}
-    .welcome{font-size:27px}
-    .subtitle{font-size:13px}
-    .card-decoration{height:125px;margin-left:-22px;margin-right:-22px}
-}
+            width: 100%;
+            height: 100%;
 
-@media(max-width:390px){
-    .login-page{padding-left:9px;padding-right:9px}
-    .form-content{padding-left:17px;padding-right:17px}
-    .card-decoration{margin-left:-17px;margin-right:-17px}
-    .form-options{font-size:11px}
-    .forgot{font-size:11px}
-}
-</style>
+            background-image:
+                url("/images/login/login-background-octubre.png");
+
+            background-position: center center;
+            background-repeat: no-repeat;
+            background-size: cover;
+
+            z-index: 0;
+        }
+
+
+        /* =====================================================
+           CONTENEDOR
+        ===================================================== */
+
+        .wrapper {
+            position: relative;
+
+            z-index: 10;
+
+            width: 100%;
+            height: 100vh;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: flex-end;
+
+            padding-right: 4.1%;
+        }
+
+
+        /* =====================================================
+           TARJETA REAL DEL LOGIN
+        ===================================================== */
+
+        .login-card {
+            position: relative;
+
+            width: 31.8vw;
+
+            max-width: 600px;
+            min-width: 430px;
+
+            background: transparent;
+
+            border-radius: 25px;
+
+            overflow: visible;
+        }
+
+
+        /* Ocultamos completamente
+           el panel izquierdo antiguo */
+        .panel-left {
+            display: none !important;
+        }
+
+
+        /* =====================================================
+           PANEL DERECHO
+        ===================================================== */
+
+        .panel-right {
+            width: 100%;
+
+            padding: 0;
+
+            background: transparent;
+
+            border: none;
+
+            display: block;
+        }
+
+
+        /* =====================================================
+           FORMULARIO
+        ===================================================== */
+
+        .form-inner {
+            width: 100%;
+
+            background: rgba(255, 255, 255, 0.985);
+
+            border-radius: 25px;
+
+            padding:
+                35px
+                38px
+                0
+                38px;
+
+            overflow: hidden;
+
+            box-shadow:
+                0 25px 60px rgba(0, 0, 0, 0.35),
+                0 0 0 1px rgba(255, 255, 255, 0.7);
+        }
+
+
+        /* =====================================================
+           LOGO DISTAN ERP
+        ===================================================== */
+
+        .login-logo {
+            width: 100%;
+
+            display: flex;
+
+            justify-content: center;
+
+            align-items: center;
+
+            margin-bottom: 20px;
+        }
+
+        .login-logo img {
+            display: block;
+
+            width: 88%;
+
+            max-width: 430px;
+
+            height: auto;
+        }
+
+
+        /* =====================================================
+           TITULO
+        ===================================================== */
+
+        .form-title {
+            font-size: 31px;
+
+            line-height: 1.15;
+
+            font-weight: 800;
+
+            color: var(--text);
+
+            margin-bottom: 6px;
+        }
+
+        .form-sub {
+            font-size: 14px;
+
+            line-height: 1.5;
+
+            color: var(--muted);
+
+            margin-bottom: 23px;
+        }
+
+
+        /* =====================================================
+           ERROR
+        ===================================================== */
+
+        .error-box {
+            display: flex;
+
+            align-items: center;
+
+            gap: 8px;
+
+            padding: 11px 13px;
+
+            margin-bottom: 15px;
+
+            background: #fff1f2;
+
+            border: 1px solid #fecdd3;
+
+            border-left: 4px solid #ef4444;
+
+            border-radius: 8px;
+
+            color: #be123c;
+
+            font-size: 13px;
+        }
+
+
+        /* =====================================================
+           CAMPOS
+        ===================================================== */
+
+        .field {
+            display: flex;
+
+            flex-direction: column;
+
+            margin-bottom: 14px;
+        }
+
+        .field-label {
+            display: none;
+        }
+
+        .field-wrap {
+            position: relative;
+
+            width: 100%;
+        }
+
+        .field-icon {
+            position: absolute;
+
+            left: 17px;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            font-size: 17px;
+
+            color: #63718a;
+
+            pointer-events: none;
+        }
+
+        .field-input {
+            width: 100%;
+
+            height: 57px;
+
+            padding:
+                0
+                48px
+                0
+                50px;
+
+            border-radius: 10px;
+
+            border: 1px solid var(--border);
+
+            background: #ffffff;
+
+            color: var(--text);
+
+            font-family: inherit;
+
+            font-size: 15px;
+
+            outline: none;
+
+            transition:
+                border-color 0.2s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .field-input::placeholder {
+            color: #9aa7ba;
+        }
+
+        .field-input:focus {
+            border-color: #4b9af5;
+
+            box-shadow:
+                0 0 0 3px rgba(22, 117, 237, 0.13);
+        }
+
+
+        /* =====================================================
+           MOSTRAR CONTRASEÑA
+        ===================================================== */
+
+        .toggle-pass {
+            position: absolute;
+
+            right: 15px;
+
+            top: 50%;
+
+            transform: translateY(-50%);
+
+            border: none;
+
+            background: transparent;
+
+            color: #63718a;
+
+            cursor: pointer;
+
+            font-size: 17px;
+
+            padding: 4px;
+        }
+
+        .toggle-pass:hover {
+            color: var(--blue);
+        }
+
+
+        /* =====================================================
+           RECORDAR / RECUPERAR
+        ===================================================== */
+
+        .login-options {
+            width: 100%;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: space-between;
+
+            gap: 15px;
+
+            margin:
+                3px
+                0
+                19px;
+
+            font-size: 13px;
+        }
+
+        .remember {
+            display: flex;
+
+            align-items: center;
+
+            gap: 7px;
+
+            color: #263754;
+
+            white-space: nowrap;
+        }
+
+        .remember input {
+            width: 17px;
+
+            height: 17px;
+
+            accent-color: var(--blue);
+
+            cursor: pointer;
+        }
+
+        .forgot-password {
+            color: var(--blue);
+
+            font-weight: 600;
+
+            text-decoration: none;
+
+            white-space: nowrap;
+        }
+
+        .forgot-password:hover {
+            text-decoration: underline;
+        }
+
+
+        /* =====================================================
+           BOTON INICIAR SESION
+        ===================================================== */
+
+        .btn-login {
+            width: 100%;
+
+            height: 57px;
+
+            border: none;
+
+            border-radius: 10px;
+
+            background:
+                linear-gradient(
+                    135deg,
+                    #167af0,
+                    #0865d8
+                );
+
+            color: #ffffff;
+
+            font-family: inherit;
+
+            font-size: 16px;
+
+            font-weight: 700;
+
+            letter-spacing: 0.01em;
+
+            cursor: pointer;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 10px;
+
+            box-shadow:
+                0 7px 20px rgba(22, 117, 237, 0.28);
+
+            transition:
+                transform 0.15s ease,
+                box-shadow 0.2s ease;
+        }
+
+        .btn-login:hover {
+            transform: translateY(-1px);
+
+            box-shadow:
+                0 11px 26px rgba(22, 117, 237, 0.38);
+        }
+
+        .btn-login:active {
+            transform: translateY(0);
+        }
+
+        .btn-arrow {
+            font-size: 20px;
+
+            transition:
+                transform 0.2s ease;
+        }
+
+        .btn-login:hover .btn-arrow {
+            transform: translateX(3px);
+        }
+
+
+        /* =====================================================
+           REGISTRAR SALIDA
+        ===================================================== */
+
+        .btn-production {
+            width: calc(100% + 76px);
+
+            margin-left: -38px;
+
+            min-height: 54px;
+
+            padding: 13px 18px;
+
+            margin-top: 0;
+
+            display: flex;
+
+            align-items: center;
+
+            justify-content: center;
+
+            gap: 9px;
+
+            background: #ffffff;
+
+            color: #1475e8;
+
+            border: none;
+
+            border-top: 1px solid #e5e9f0;
+
+            border-radius: 0 0 25px 25px;
+
+            text-decoration: none;
+
+            font-size: 13px;
+
+            font-weight: 700;
+
+            transition:
+                background 0.2s ease;
+        }
+
+        .btn-production:hover {
+            background: #f5f8fc;
+        }
+
+        .btn-production span {
+            font-size: 16px;
+        }
+
+
+        /* =====================================================
+           ILUSTRACION HALLOWEEN DEL FORMULARIO
+        ===================================================== */
+
+        .login-season-art {
+            display: block;
+
+            width: calc(100% + 76px);
+
+            height: 150px;
+
+            margin-left: -38px;
+
+            margin-top: 19px;
+
+            object-fit: cover;
+
+            object-position: center;
+
+            border: none;
+        }
+
+
+        /* =====================================================
+           FOOTER ANTIGUO
+        ===================================================== */
+
+        .form-footer {
+            display: none !important;
+        }
+
+
+        /* =====================================================
+           RESPONSIVE — PANTALLAS MEDIANAS
+        ===================================================== */
+
+        @media (max-width: 1200px) {
+
+            .wrapper {
+                padding-right: 2.5%;
+            }
+
+            .login-card {
+                width: 36vw;
+
+                min-width: 410px;
+            }
+
+            .form-inner {
+                padding-left: 32px;
+
+                padding-right: 32px;
+            }
+
+            .btn-production,
+            .login-season-art {
+                width: calc(100% + 64px);
+
+                margin-left: -32px;
+            }
+
+            .login-logo img {
+                width: 90%;
+            }
+        }
+
+
+        /* =====================================================
+           TABLET
+        ===================================================== */
+
+        @media (max-width: 850px) {
+
+            body {
+                overflow-y: auto;
+            }
+
+            .login-background {
+                background-position: center center;
+            }
+
+            .wrapper {
+                height: auto;
+
+                min-height: 100vh;
+
+                justify-content: center;
+
+                align-items: center;
+
+                padding:
+                    30px
+                    20px;
+            }
+
+            .login-card {
+                width: min(520px, 94vw);
+
+                min-width: 0;
+
+                margin: 0;
+            }
+
+            .form-inner {
+                padding:
+                    32px
+                    30px
+                    0;
+            }
+
+            .btn-production,
+            .login-season-art {
+                width: calc(100% + 60px);
+
+                margin-left: -30px;
+            }
+        }
+
+
+        /* =====================================================
+           CELULAR
+        ===================================================== */
+
+        @media (max-width: 520px) {
+
+            .wrapper {
+                padding:
+                    18px
+                    12px;
+            }
+
+            .login-card {
+                width: 100%;
+            }
+
+            .form-inner {
+                padding:
+                    27px
+                    20px
+                    0;
+
+                border-radius: 18px;
+            }
+
+            .login-logo {
+                margin-bottom: 16px;
+            }
+
+            .login-logo img {
+                width: 94%;
+            }
+
+            .form-title {
+                font-size: 26px;
+            }
+
+            .form-sub {
+                font-size: 13px;
+
+                margin-bottom: 19px;
+            }
+
+            .field-input {
+                height: 53px;
+
+                font-size: 14px;
+            }
+
+            .btn-login {
+                height: 53px;
+
+                font-size: 15px;
+            }
+
+            .login-options {
+                font-size: 12px;
+
+                gap: 8px;
+            }
+
+            .login-season-art {
+                height: 125px;
+
+                width: calc(100% + 40px);
+
+                margin-left: -20px;
+
+                margin-top: 17px;
+            }
+
+            .btn-production {
+                width: calc(100% + 40px);
+
+                margin-left: -20px;
+
+                min-height: 52px;
+
+                border-radius:
+                    0
+                    0
+                    18px
+                    18px;
+
+                font-size: 12px;
+            }
+        }
+
+
+        /* =====================================================
+           CELULAR PEQUEÑO
+        ===================================================== */
+
+        @media (max-width: 380px) {
+
+            .login-options {
+                align-items: flex-start;
+
+                flex-direction: column;
+
+                gap: 8px;
+            }
+
+            .forgot-password {
+                margin-left: 24px;
+            }
+        }
+
+    </style>
 </head>
+
+
 <body>
-<div class="login-page">
-    <main class="login-side">
-        <section class="login-card" aria-label="Inicio de sesión DISTAN ERP">
-            <div class="form-content">
-                <img class="brand-logo" src="{{ asset('images/login/distan-logo-login.png') }}" alt="DISTAN ERP">
 
-                <h1 class="welcome">Bienvenido</h1>
-                <p class="subtitle">Ingresa a tu cuenta para continuar</p>
+    {{-- =====================================================
+         FONDO DE TEMPORADA
+    ====================================================== --}}
 
-                @if ($errors->any())
-                    <div class="error-box">⚠️ {{ $errors->first() }}</div>
-                @endif
+    <div class="login-background"></div>
 
-                <form method="POST" action="{{ route('login') }}">
-                    @csrf
 
-                    <div class="field">
-                        <div class="field-wrap">
-                            <span class="field-icon" aria-hidden="true">♙</span>
-                            <input type="email" name="email" class="field-input" placeholder="Usuario" value="{{ old('email') }}" autocomplete="email" required autofocus>
+    {{-- =====================================================
+         CONTENEDOR
+    ====================================================== --}}
+
+    <div class="wrapper">
+
+        <div class="login-card">
+
+            {{-- =================================================
+                 PANEL DERECHO / LOGIN
+            ================================================== --}}
+
+            <div class="panel-right">
+
+                <div class="form-inner">
+
+
+                    {{-- =================================================
+                         LOGO GRANDE DISTAN ERP
+                    ================================================== --}}
+
+                    <div class="login-logo">
+
+                        <img
+                            src="{{ asset('images/login/distan-logo-login.png') }}"
+                            alt="DISTAN ERP"
+                        >
+
+                    </div>
+
+
+                    {{-- =================================================
+                         TITULO
+                    ================================================== --}}
+
+                    <div class="form-title">
+                        Bienvenido
+                    </div>
+
+                    <div class="form-sub">
+                        Ingresa a tu cuenta para continuar
+                    </div>
+
+
+                    {{-- =================================================
+                         ERRORES
+                    ================================================== --}}
+
+                    @if ($errors->any())
+
+                        <div class="error-box">
+
+                            <span>⚠️</span>
+
+                            <span>
+                                {{ $errors->first() }}
+                            </span>
+
                         </div>
-                    </div>
 
-                    <div class="field">
-                        <div class="field-wrap">
-                            <span class="field-icon" aria-hidden="true">♙</span>
-                            <input type="password" id="password" name="password" class="field-input" placeholder="Contraseña" autocomplete="current-password" required>
-                            <button type="button" class="toggle-pass" onclick="togglePassword()" aria-label="Mostrar contraseña">◉</button>
+                    @endif
+
+
+                    {{-- =================================================
+                         FORMULARIO LARAVEL
+                    ================================================== --}}
+
+                    <form
+                        method="POST"
+                        action="{{ route('login') }}"
+                    >
+
+                        @csrf
+
+
+                        {{-- =================================================
+                             USUARIO / CORREO
+                        ================================================== --}}
+
+                        <div class="field">
+
+                            <label
+                                class="field-label"
+                                for="email"
+                            >
+                                Correo electrónico
+                            </label>
+
+                            <div class="field-wrap">
+
+                                <span class="field-icon">
+                                    👤
+                                </span>
+
+                                <input
+                                    id="email"
+                                    type="email"
+                                    name="email"
+                                    class="field-input"
+                                    placeholder="Usuario"
+                                    value="{{ old('email') }}"
+                                    autocomplete="email"
+                                    required
+                                    autofocus
+                                >
+
+                            </div>
+
                         </div>
-                    </div>
 
-                    <div class="form-options">
-                        <label class="remember">
-                            <input type="checkbox" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}>
-                            <span>Recordarme</span>
-                        </label>
-                        @if (Route::has('password.request'))
-                            <a class="forgot" href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
-                        @endif
-                    </div>
 
-                    <button type="submit" class="btn-login">
-                        <span class="btn-arrow">→</span>
-                        Iniciar sesión
-                    </button>
-                </form>
+                        {{-- =================================================
+                             CONTRASEÑA
+                        ================================================== --}}
+
+                        <div class="field">
+
+                            <label
+                                class="field-label"
+                                for="password"
+                            >
+                                Contraseña
+                            </label>
+
+                            <div class="field-wrap">
+
+                                <span class="field-icon">
+                                    🔒
+                                </span>
+
+                                <input
+                                    id="password"
+                                    type="password"
+                                    name="password"
+                                    class="field-input"
+                                    placeholder="Contraseña"
+                                    autocomplete="current-password"
+                                    required
+                                >
+
+                                <button
+                                    type="button"
+                                    class="toggle-pass"
+                                    onclick="togglePassword()"
+                                    tabindex="-1"
+                                    aria-label="Mostrar contraseña"
+                                >
+                                    👁
+                                </button>
+
+                            </div>
+
+                        </div>
+
+
+                        {{-- =================================================
+                             RECORDAR / RECUPERAR
+                        ================================================== --}}
+
+                        <div class="login-options">
+
+                            <label class="remember">
+
+                                <input
+                                    type="checkbox"
+                                    name="remember"
+                                    value="1"
+                                >
+
+                                <span>
+                                    Recordarme
+                                </span>
+
+                            </label>
+
+
+                            @if (Route::has('password.request'))
+
+                                <a
+                                    href="{{ route('password.request') }}"
+                                    class="forgot-password"
+                                >
+                                    ¿Olvidaste tu contraseña?
+                                </a>
+
+                            @endif
+
+                        </div>
+
+
+                        {{-- =================================================
+                             INICIAR SESION
+                        ================================================== --}}
+
+                        <button
+                            type="submit"
+                            class="btn-login"
+                        >
+
+                            <span class="btn-arrow">
+                                →
+                            </span>
+
+                            <span>
+                                Iniciar sesión
+                            </span>
+
+                        </button>
+
+
+                    </form>
+
+
+                    {{-- =================================================
+                         IMAGEN INFERIOR DE HALLOWEEN
+                    ================================================== --}}
+
+                    <img
+                        class="login-season-art"
+                        src="{{ asset('images/login/halloween-card-bottom.png') }}"
+                        alt=""
+                    >
+
+
+                    {{-- =================================================
+                         REGISTRAR SALIDA DE PRODUCCION
+                         DEBAJO DEL LOGIN
+                    ================================================== --}}
+
+                    <a
+                        href="{{ route('production.outputs') }}"
+                        class="btn-production"
+                    >
+
+                        <span>
+                            📦
+                        </span>
+
+                        <span>
+                            Registrar salida de producción
+                        </span>
+
+                    </a>
+
+
+                </div>
+
             </div>
 
-            <div class="card-decoration" aria-hidden="true"></div>
+        </div>
 
-            @if (Route::has('production.outputs'))
-                <a href="{{ route('production.outputs') }}" class="production-link">
-                    📦 Registrar salida de producción
-                </a>
-            @endif
-        </section>
-    </main>
-</div>
+    </div>
 
-<script>
-function togglePassword(){
-    const input=document.getElementById('password');
-    const button=document.querySelector('.toggle-pass');
-    const visible=input.type==='text';
-    input.type=visible?'password':'text';
-    button.setAttribute('aria-label',visible?'Mostrar contraseña':'Ocultar contraseña');
-}
-</script>
+
+    {{-- =====================================================
+         JAVASCRIPT
+    ====================================================== --}}
+
+    <script>
+
+        function togglePassword() {
+
+            const input =
+                document.getElementById('password');
+
+            const button =
+                document.querySelector('.toggle-pass');
+
+            if (input.type === 'password') {
+
+                input.type = 'text';
+
+                button.innerHTML = '🙈';
+
+                button.setAttribute(
+                    'aria-label',
+                    'Ocultar contraseña'
+                );
+
+            } else {
+
+                input.type = 'password';
+
+                button.innerHTML = '👁';
+
+                button.setAttribute(
+                    'aria-label',
+                    'Mostrar contraseña'
+                );
+
+            }
+
+        }
+
+    </script>
+
 </body>
+
 </html>
