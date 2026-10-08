@@ -89,16 +89,13 @@ public function previewPdf(Request $request){
         'archivo' => 'required|file|mimes:pdf|max:10240',
     ]);
 
-    try {
+  try {
 
     $archivoPdf = $request->file('archivo')->getRealPath();
 
     /*
     |--------------------------------------------------------------------------
-    | Detectar automáticamente la plantilla
-    |--------------------------------------------------------------------------
-    | Primero intentamos SPSA.
-    | Si no corresponde a SPSA, usamos el parser estándar.
+    | Intentar detectar SPSA
     |--------------------------------------------------------------------------
     */
 
@@ -112,10 +109,18 @@ public function previewPdf(Request $request){
 
     } catch (\Throwable $e) {
 
-        $parser = app(PedidoPdfParser::class);
+        \Log::error(
+            'ERROR PARSER SPSA',
+            [
+                'mensaje' => $e->getMessage(),
+                'archivo' => $e->getFile(),
+                'linea' => $e->getLine(),
+            ]
+        );
 
-        $datos = $parser->parse(
-            $archivoPdf
+        throw new \RuntimeException(
+            'El parser SPSA falló: '
+            . $e->getMessage()
         );
     }
 
@@ -125,7 +130,8 @@ public function previewPdf(Request $request){
         ->withInput()
         ->with(
             'error',
-            'No se pudo analizar el PDF: ' . $e->getMessage()
+            'No se pudo analizar el PDF: '
+            . $e->getMessage()
         );
 }
 
