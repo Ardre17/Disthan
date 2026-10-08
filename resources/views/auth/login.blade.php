@@ -3,540 +3,139 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>DISTAN— Acceso al sistema</title>
+<title>DISTAN ERP — Acceso al sistema</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-
+*{margin:0;padding:0;box-sizing:border-box}
 :root{
-    --navy:#0f172a;
-    --navy2:#1e293b;
-    --navy3:#334155;
-    --accent:#3b82f6;
-    --accent2:#1d4ed8;
-    --ok:#22c55e;
-    --ink:#f1f5f9;
-    --ink-muted:#94a3b8;
-    --border:#334155;
-    --font:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;
-    --font-mono:'Consolas','SFMono-Regular',monospace;
+    --blue:#1473ea;
+    --blue-dark:#0d47b5;
+    --navy:#08152f;
+    --text:#172554;
+    --muted:#71809d;
+    --line:#dce3ef;
+    --orange:#ff8a00;
+    --card:#fff;
+    --font:'Segoe UI',-apple-system,BlinkMacSystemFont,'Helvetica Neue',Arial,sans-serif;
 }
+html,body{min-height:100%;font-family:var(--font);background:#07152f}
+body{overflow-x:hidden}
+.login-page{min-height:100vh;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(390px,.95fr);background:#07152f}
 
-html,body{
-    height:100%;
-    font-family:var(--font);
-    background:var(--navy);
-    color:var(--ink);
-    overflow:hidden;
+/* IZQUIERDA: arte aprobado de octubre */
+.season-panel{
+    position:relative;min-height:100vh;overflow:hidden;
+    background:#111d35 url('/images/login/octubre-left.png') center center/cover no-repeat;
 }
+.season-panel::after{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(3,10,27,.08),rgba(3,10,27,.05) 65%,rgba(3,10,27,.24));pointer-events:none}
 
-/* ── Fondo animado ── */
-.bg{
-    position:fixed;inset:0;
-    background:var(--navy);
-    overflow:hidden;
-    z-index:0;
-}
-.bg-glow{
-    position:absolute;
-    border-radius:50%;
-    filter:blur(100px);
-    opacity:.25;
-    animation:pulse 8s ease-in-out infinite;
-}
-.bg-glow-1{
-    width:600px;height:600px;
-    background:#1d4ed8;
-    top:-200px;left:-200px;
-    animation-delay:0s;
-}
-.bg-glow-2{
-    width:500px;height:500px;
-    background:#059669;
-    bottom:-200px;right:-200px;
-    animation-delay:4s;
-}
-.bg-glow-3{
-    width:300px;height:300px;
-    background:#7c3aed;
-    top:40%;left:40%;
-    animation-delay:2s;
-    opacity:.12;
-}
-@keyframes pulse{
-    0%,100%{transform:scale(1);opacity:.25;}
-    50%{transform:scale(1.15);opacity:.35;}
-}
+/* DERECHA */
+.login-side{display:flex;align-items:center;justify-content:center;padding:34px;background:linear-gradient(145deg,#07152f 0%,#10254a 100%);position:relative}
+.login-side::before{content:'';position:absolute;width:360px;height:360px;border-radius:50%;background:#1473ea;filter:blur(120px);opacity:.10;right:-150px;top:-100px}
+.login-card{position:relative;width:min(500px,100%);background:rgba(255,255,255,.98);border-radius:24px;padding:38px 42px 0;box-shadow:0 30px 80px rgba(0,0,0,.38);overflow:hidden;animation:cardIn .55s cubic-bezier(.16,1,.3,1)}
+@keyframes cardIn{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 
-/* Grid de puntos de fondo */
-.bg-grid{
-    position:absolute;inset:0;
-    background-image:
-        radial-gradient(circle,#334155 1px,transparent 1px);
-    background-size:32px 32px;
-    opacity:.2;
-}
+.brand-logo{display:block;width:270px;max-width:82%;height:auto;margin:0 auto 20px}
+.welcome{text-align:left;color:var(--text);font-size:31px;font-weight:800;letter-spacing:-.03em}
+.subtitle{margin-top:5px;color:var(--muted);font-size:15px;margin-bottom:24px}
 
-/* ── Wrapper ── */
-.wrapper{
-    position:relative;z-index:1;
-    min-height:100vh;
-    display:flex;align-items:center;justify-content:center;
-    padding:1rem;
-}
+.error-box{background:#fff1f2;border:1px solid #fecdd3;border-left:4px solid #ef4444;border-radius:10px;color:#be123c;padding:11px 13px;margin-bottom:16px;font-size:13px}
+.field{margin-bottom:14px}.field-wrap{position:relative}
+.field-icon{position:absolute;left:17px;top:50%;transform:translateY(-50%);color:#60708f;pointer-events:none;z-index:2}
+.field-input{width:100%;height:58px;border:1px solid var(--line);border-radius:13px;background:#fff;color:#172554;font-size:15px;padding:0 48px 0 48px;outline:none;transition:.2s;box-shadow:0 2px 7px rgba(15,23,42,.025)}
+.field-input::placeholder{color:#9aa6bb}.field-input:focus{border-color:#75a9f8;box-shadow:0 0 0 4px rgba(20,115,234,.10)}
+.toggle-pass{position:absolute;right:15px;top:50%;transform:translateY(-50%);border:0;background:none;color:#60708f;cursor:pointer;font-size:18px;padding:4px}
+.form-options{display:flex;align-items:center;justify-content:space-between;gap:12px;margin:7px 0 18px;font-size:13px;color:#34415d}
+.remember{display:flex;align-items:center;gap:8px;cursor:pointer}.remember input{width:17px;height:17px;accent-color:var(--blue)}
+.forgot{color:#086bea;text-decoration:none;font-weight:600}.forgot:hover{text-decoration:underline}
+.btn-login{width:100%;height:56px;border:0;border-radius:12px;background:linear-gradient(135deg,#1473ea,#0862d5);color:#fff;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;box-shadow:0 9px 25px rgba(20,115,234,.25);transition:.18s}
+.btn-login:hover{transform:translateY(-1px);box-shadow:0 13px 30px rgba(20,115,234,.32)}.btn-login:active{transform:none}
+.btn-arrow{font-size:23px;line-height:1}
 
-/* ── Card principal ── */
-.login-card{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    width:860px;
-    max-width:100%;
-    border-radius:12px;
-    overflow:hidden;
-    box-shadow:
-        0 0 0 1px rgba(255,255,255,.06),
-        0 40px 80px rgba(0,0,0,.6),
-        0 0 60px rgba(59,130,246,.08);
-    animation:slideUp .6s cubic-bezier(.16,1,.3,1) both;
-}
-@keyframes slideUp{
-    from{opacity:0;transform:translateY(24px);}
-    to{opacity:1;transform:translateY(0);}
-}
+.card-decoration{height:190px;margin:24px -42px 0;background:url('/images/login/halloween-card-bottom.png') center bottom/cover no-repeat;position:relative}
+.card-decoration::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,rgba(255,255,255,0) 0%,rgba(255,255,255,.02) 15%,rgba(255,255,255,.04));pointer-events:none}
+.production-link{display:flex;justify-content:center;align-items:center;gap:8px;color:#50617d;text-decoration:none;font-size:12px;font-weight:600;padding:13px 0 16px;border-top:1px solid #edf1f7;background:#fff;position:relative;z-index:3}
+.production-link:hover{color:var(--blue)}
 
-/* ── Panel izquierdo (branding) ── */
-.panel-left{
-    background:linear-gradient(160deg,#1e3a5f 0%,#0f172a 100%);
-    padding:2.5rem 2rem;
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    border-right:1px solid var(--border);
-    position:relative;
-    overflow:hidden;
+@media(max-width:1000px){.login-page{grid-template-columns:1fr}.season-panel{min-height:430px;height:430px}.login-side{min-height:auto;padding:28px 20px}.login-card{margin-top:-90px;z-index:5}}
+@media(max-width:600px){
+    .season-panel{height:310px;min-height:310px;background-position:56% center}
+    .login-side{padding:0 12px 18px;align-items:flex-start;background:#07152f}
+    .login-card{margin-top:-35px;border-radius:20px;padding:28px 22px 0}
+    .brand-logo{width:235px;margin-bottom:15px}.welcome{font-size:27px}.subtitle{font-size:14px}
+    .form-options{font-size:12px}.card-decoration{height:145px;margin-left:-22px;margin-right:-22px}
 }
-.panel-left::before{
-    content:'';
-    position:absolute;
-    width:300px;height:300px;
-    background:#2563eb;
-    border-radius:50%;
-    filter:blur(80px);
-    opacity:.12;
-    top:-80px;right:-80px;
-}
-
-/* Logo y nombre */
-.brand{display:flex;align-items:center;gap:10px;}
-.brand-icon{
-    width:40px;height:40px;
-    background:linear-gradient(135deg,#2563eb,#1d4ed8);
-    border-radius:8px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:20px;
-    box-shadow:0 4px 16px rgba(37,99,235,.4);
-    flex-shrink:0;
-}
-.brand-name{
-    font-size:18px;font-weight:800;
-    letter-spacing:.5px;color:#f8fafc;
-}
-.brand-sub{font-size:10px;color:#7eb8f7;font-weight:600;text-transform:uppercase;letter-spacing:.08em;}
-
-/* Módulos disponibles */
-.modules{margin-top:2rem;flex:1;}
-.modules-title{
-    font-size:10px;font-weight:700;
-    color:var(--ink-muted);text-transform:uppercase;
-    letter-spacing:.08em;margin-bottom:.85rem;
-}
-.module-list{display:flex;flex-direction:column;gap:6px;}
-.module-item{
-    display:flex;align-items:center;gap:8px;
-    padding:7px 10px;
-    background:rgba(255,255,255,.04);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:6px;
-    font-size:11.5px;color:#cbd5e1;
-    transition:background .2s;
-}
-.module-item:hover{background:rgba(255,255,255,.07);}
-.module-dot{
-    width:6px;height:6px;border-radius:50%;flex-shrink:0;
-    background:var(--ok);box-shadow:0 0 6px rgba(34,197,94,.5);
-}
-
-/* Status bar */
-.status-bar{
-    display:flex;align-items:center;gap:6px;
-    padding:8px 10px;
-    background:rgba(34,197,94,.08);
-    border:1px solid rgba(34,197,94,.15);
-    border-radius:6px;
-    font-size:11px;color:#86efac;
-}
-.status-dot{
-    width:7px;height:7px;border-radius:50%;
-    background:var(--ok);
-    box-shadow:0 0 6px rgba(34,197,94,.6);
-    animation:blink 2s ease infinite;
-    flex-shrink:0;
-}
-@keyframes blink{
-    0%,100%{opacity:1;}
-    50%{opacity:.3;}
-}
-
-/* ── Panel derecho (formulario) ── */
-.panel-right{
-    background:#0f172a;
-    padding:2.5rem 2rem;
-    display:flex;align-items:center;justify-content:center;
-}
-.form-inner{width:100%;}
-
-.form-title{
-    font-size:22px;font-weight:800;
-    color:#f8fafc;margin-bottom:4px;
-}
-.form-sub{
-    font-size:12px;color:var(--ink-muted);
-    margin-bottom:1.75rem;line-height:1.5;
-}
-
-/* Separador */
-.divider{
-    height:1px;background:var(--border);
-    margin-bottom:1.5rem;
-}
-
-/* Error */
-.error-box{
-    background:#450a0a;
-    border:1px solid #7f1d1d;
-    border-left:3px solid #ef4444;
-    border-radius:6px;
-    padding:10px 12px;
-    margin-bottom:1.1rem;
-    font-size:12px;color:#fca5a5;
-    display:flex;align-items:center;gap:7px;
-}
-
-/* Campo */
-.field{
-    display:flex;flex-direction:column;gap:5px;
-    margin-bottom:14px;
-}
-.field-label{
-    font-size:10px;font-weight:700;
-    color:var(--ink-muted);
-    text-transform:uppercase;letter-spacing:.06em;
-}
-.field-wrap{position:relative;}
-.field-icon{
-    position:absolute;left:11px;top:50%;
-    transform:translateY(-50%);
-    font-size:14px;color:#475569;
-    pointer-events:none;
-}
-.field-input{
-    width:100%;
-    padding:10px 12px 10px 36px;
-    background:rgba(255,255,255,.05);
-    border:1px solid var(--border);
-    border-radius:6px;
-    color:#f8fafc;
-    font-size:13px;
-    font-family:var(--font);
-    outline:none;
-    transition:border-color .2s,background .2s,box-shadow .2s;
-}
-.field-input::placeholder{color:#475569;}
-.field-input:focus{
-    border-color:var(--accent);
-    background:rgba(59,130,246,.06);
-    box-shadow:0 0 0 3px rgba(59,130,246,.15);
-}
-.field-input.email-input{
-    font-family:var(--font-mono);
-    letter-spacing:.3px;
-}
-.toggle-pass{
-    position:absolute;right:11px;top:50%;
-    transform:translateY(-50%);
-    cursor:pointer;color:#475569;
-    font-size:15px;
-    transition:color .15s;
-    background:none;border:none;
-    padding:2px;display:flex;
-}
-.toggle-pass:hover{color:#94a3b8;}
-
-/* Botón */
-.btn-login{
-    width:100%;
-    padding:11px;
-    background:linear-gradient(135deg,#2563eb,#1d4ed8);
-    border:none;border-radius:6px;
-    color:#fff;font-size:13px;font-weight:700;
-    cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:7px;
-    transition:transform .15s,box-shadow .2s,opacity .15s;
-    box-shadow:0 4px 20px rgba(37,99,235,.35);
-    margin-top:4px;
-    font-family:var(--font);
-    letter-spacing:.02em;
-}
-.btn-login:hover{
-    transform:translateY(-1px);
-    box-shadow:0 8px 28px rgba(37,99,235,.5);
-}
-.btn-login:active{transform:translateY(0);opacity:.9;}
-.btn-arrow{font-size:16px;transition:transform .2s;}
-.btn-login:hover .btn-arrow{transform:translateX(3px);}
-
-/* Footer */
-.form-footer{
-    margin-top:1.25rem;
-    padding-top:1rem;
-    border-top:1px solid var(--border);
-    display:flex;justify-content:space-between;align-items:center;
-    flex-wrap:wrap;gap:8px;
-}
-.footer-tag{
-    font-size:10px;color:#334155;
-    font-family:var(--font-mono);
-    letter-spacing:.04em;
-}
-.footer-version{
-    font-size:10px;color:#334155;
-    background:rgba(255,255,255,.03);
-    border:1px solid var(--border);
-    padding:2px 8px;border-radius:3px;
-    font-family:var(--font-mono);
-}
-
-/* ── RESPONSIVE ── */
-@media(max-width:680px){
-    html,body{overflow:auto;}
-    .wrapper{
-        align-items:flex-start;
-        padding:.75rem;
-    }
-    .login-card{
-        grid-template-columns:1fr;
-        border-radius:10px;
-        width:100%;
-    }
-    .panel-left{
-        padding:1.5rem 1.25rem;
-        border-right:none;
-        border-bottom:1px solid var(--border);
-    }
-    .modules{display:none;}
-    .panel-right{
-        padding:1.5rem 1.25rem;
-    }
-    .form-title{font-size:18px;}
-    .brand-name{font-size:16px;}
-}
-
-@media(max-width:360px){
-    .panel-right{padding:1.25rem 1rem;}
-}
-.btn-production {
-    width: 100%;
-    margin-top: 12px;
-
-    min-height: 52px;
-    padding: 14px 18px;
-
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-
-    border-radius: 10px;
-
-    background: #f1f5f9;
-    color: #0f172a;
-
-    border: 1px solid #cbd5e1;
-
-    text-decoration: none;
-
-    font-size: 15px;
-    font-weight: 700;
-
-    transition: all 0.2s ease;
-}
-
-.btn-production:hover {
-    background: #e2e8f0;
-    border-color: #94a3b8;
-    transform: translateY(-1px);
-}
-
-.btn-production span {
-    font-size: 20px;
-}
+@media(max-width:390px){.season-panel{height:260px;min-height:260px}.login-card{padding-left:17px;padding-right:17px}.card-decoration{margin-left:-17px;margin-right:-17px}.forgot{font-size:11px}}
 </style>
 </head>
-
 <body>
+<div class="login-page">
+    <section class="season-panel" aria-label="Temporada octubre DISTAN ERP"></section>
 
-<!-- Fondo -->
-<div class="bg">
-    <div class="bg-grid"></div>
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
-    <div class="bg-glow bg-glow-3"></div>
-</div>
+    <main class="login-side">
+        <section class="login-card" aria-label="Inicio de sesión DISTAN ERP">
+            <img class="brand-logo" src="{{ asset('images/login/distan-logo-login.png') }}" alt="DISTAN ERP">
 
-<div class="wrapper">
-<div class="login-card">
+            <h1 class="welcome">Bienvenido</h1>
+            <p class="subtitle">Ingresa a tu cuenta para continuar</p>
 
-    <!-- ── Panel izquierdo ── -->
-    <div class="panel-left">
+            @if ($errors->any())
+                <div class="error-box">⚠️ {{ $errors->first() }}</div>
+            @endif
 
-        <div>
-            <!-- Brand -->
-            <div class="brand">
-                <div class="brand-icon">🚀</div>
-                <div>
-                    <div class="brand-name"> DISTAN</div>
-                    <div class="brand-sub">ERP Logístico</div>
-                </div>
-            </div>
+            <form method="POST" action="{{ route('login') }}">
+                @csrf
 
-            <!-- Módulos -->
-            <div class="modules">
-                <div class="modules-title">Módulos disponibles</div>
-                <div class="module-list">
-                    <div class="module-item">
-                        <span class="module-dot"></span>
-                        📦 Inventario y stock
-                    </div>
-                    <div class="module-item">
-                        <span class="module-dot"></span>
-                        📋 Órdenes de pedido
-                    </div>
-                    <div class="module-item">
-                        <span class="module-dot"></span>
-                        🏭 Producción
-                    </div>
-                    <div class="module-item">
-                        <span class="module-dot"></span>
-                        🚚 Logística / Almacenes
-                    </div>
-                    <div class="module-item">
-                        <span class="module-dot"></span>
-                        👥 Clientes
-                    </div>
-                    <div class="module-item">
-                        <span class="module-dot"></span>
-                        📊 Proyectado de stock
+                <div class="field">
+                    <div class="field-wrap">
+                        <span class="field-icon" aria-hidden="true">♙</span>
+                        <input type="email" name="email" class="field-input" placeholder="Usuario" value="{{ old('email') }}" autocomplete="email" required autofocus>
                     </div>
                 </div>
-            </div>
-        </div>
 
-        <!-- Status -->
-        <div class="status-bar">
-            <div class="status-dot"></div>
-            Sistema operativo · v2025
-        </div>
-
-    </div>
-
-    <!-- ── Panel derecho ── -->
-    <div class="panel-right">
-    <div class="form-inner">
-
-        <div class="form-title">Bienvenido</div>
-        <div class="form-sub">
-            Ingresa tus credenciales para acceder<br>al sistema ERP de DISTAN.
-        </div>
-
-        <div class="divider"></div>
-
-        @if ($errors->any())
-        <div class="error-box">
-            ⚠️ {{ $errors->first() }}
-        </div>
-        @endif
-
-        <form method="POST" action="{{ route('login') }}">
-        @csrf
-
-            <div class="field">
-                <label class="field-label">Correo electrónico</label>
-                <div class="field-wrap">
-                    <span class="field-icon">✉️</span>
-                    <input
-                        type="email"
-                        name="email"
-                        class="field-input email-input"
-                        placeholder="usuario@disthan.com"
-                        value="{{ old('email') }}"
-                        autocomplete="email"
-                        required>
+                <div class="field">
+                    <div class="field-wrap">
+                        <span class="field-icon" aria-hidden="true">♙</span>
+                        <input type="password" id="password" name="password" class="field-input" placeholder="Contraseña" autocomplete="current-password" required>
+                        <button type="button" class="toggle-pass" onclick="togglePassword()" aria-label="Mostrar contraseña">◉</button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="field">
-                <label class="field-label">Contraseña</label>
-                <div class="field-wrap">
-                    <span class="field-icon">🔒</span>
-                    <input
-                        type="password"
-                        id="password"
-                        name="password"
-                        class="field-input"
-                        placeholder="••••••••"
-                        autocomplete="current-password"
-                        required>
-                    <button
-                        type="button"
-                        class="toggle-pass"
-                        onclick="togglePassword()"
-                        tabindex="-1"
-                        aria-label="Mostrar contraseña">
-                        👁
-                    </button>
+                <div class="form-options">
+                    <label class="remember">
+                        <input type="checkbox" name="remember" value="1" {{ old('remember') ? 'checked' : '' }}>
+                        <span>Recordarme</span>
+                    </label>
+                    @if (Route::has('password.request'))
+                        <a class="forgot" href="{{ route('password.request') }}">¿Olvidaste tu contraseña?</a>
+                    @endif
                 </div>
-            </div>
 
-            <button type="submit" class="btn-login">
-                Ingresar al sistema
-                <span class="btn-arrow">→</span>
-            </button>
-            <a
-                href="{{ route('production.outputs') }}"
-                class="btn-production"
-            >
-                <span>📦</span>
-                Registrar salida de producción
-            </a>
+                <button type="submit" class="btn-login">
+                    <span class="btn-arrow">→</span>
+                    Iniciar sesión
+                </button>
+            </form>
 
-        </form>
+            <div class="card-decoration" aria-hidden="true"></div>
 
-        <div class="form-footer">
-            <span class="footer-tag">DISTAN · Sistema ERP</span>
-            <span class="footer-version">build 2026.1</span>
-        </div>
-
-    </div>
-    </div>
-
-</div>
+            @if (Route::has('production.outputs'))
+                <a href="{{ route('production.outputs') }}" class="production-link">
+                    📦 Registrar salida de producción
+                </a>
+            @endif
+        </section>
+    </main>
 </div>
 
 <script>
-function togglePassword() {
-    var input = document.getElementById('password');
-    input.type = input.type === 'password' ? 'text' : 'password';
+function togglePassword(){
+    const input=document.getElementById('password');
+    const button=document.querySelector('.toggle-pass');
+    const visible=input.type==='text';
+    input.type=visible?'password':'text';
+    button.textContent=visible?'◉':'◉';
+    button.setAttribute('aria-label',visible?'Mostrar contraseña':'Ocultar contraseña');
 }
 </script>
-
 </body>
 </html>
