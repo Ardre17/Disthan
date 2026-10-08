@@ -907,7 +907,7 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .oc-pal{display:inline-block;padding:3px 9px;border-radius:7px;background:var(--oc-blue-soft);color:var(--oc-blue);font-weight:700;font-size:12px;font-family:var(--oc-mono);}
 .oc-dash{color:#94a3b8;}
 .oc-octos-imgs{display:flex;align-items:center;justify-content:center;gap:4px;flex-wrap:wrap;min-width:72px;max-width:105px;}
-.oc-oct-img{width:34px;height:34px;object-fit:contain;display:block;border-radius:3px;}
+.oc-oct-img{width:38px;height:38px;object-fit:contain;display:block;border-radius:3px;}
 .oc-oct{width:38px;height:38px;background:#111;color:#fff;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:6.5px;font-weight:800;line-height:1.1;text-align:center;margin-right:3px;}
 .oc-ult{font-size:12px;line-height:1.35;}
 .oc-ult small{color:var(--oc-muted);display:block;}
@@ -1630,19 +1630,12 @@ html, body {
                             $ocImg = asset('storage/' . ltrim($ocImg, '/'));
                         }
 
-                        $ocOcts = [];
-                        $ocRaw = $detail->product->octogonos ?? null;
-                        if (is_string($ocRaw) && trim($ocRaw) !== '') {
-                            $dec = json_decode($ocRaw, true);
-                            $ocRaw = is_array($dec) ? $dec : array_map('trim', explode(',', $ocRaw));
-                        }
-                        if (is_array($ocRaw)) {
-                            foreach ($ocRaw as $o) { $ocOcts[] = mb_strtolower((string) $o); }
-                        }
-                        foreach (['azucar'=>'alto_azucar','sodio'=>'alto_sodio','grasas saturadas'=>'alto_grasas_saturadas','grasas trans'=>'alto_grasas_trans'] as $k => $col) {
-                            if (!empty($detail->product->{$col})) { $ocOcts[] = $k; }
-                        }
-                        $ocOcts = array_values(array_unique($ocOcts));
+                        // Los octógonos se guardan en el mismo campo que usa la vista Products:
+                        // products.advertencias = "AZUCAR,SODIO,GRASAS"
+                        $ocOcts = array_values(array_filter(array_map(
+                            'trim',
+                            explode(',', strtoupper((string) ($detail->product->advertencias ?? '')))
+                        )));
 
                         $ocUbic = $detail->ubicacion ?? ($detail->product->ubicacion ?? null);
                         $ocUlt  = $ocDesp > 0 ? $detail->updated_at : null;
@@ -1691,11 +1684,11 @@ html, body {
                                         $lb = $ocOctLabel($o);
 
                                         $octImg = null;
-                                        if (str_contains($oNorm, 'azucar') || str_contains($oNorm, 'azúcar')) {
+                                        if (in_array('AZUCAR', $ocOcts, true) && $oNorm === 'azucar') {
                                             $octImg = 'https://pbs.twimg.com/media/F-6D6zQWEAMPN7d.png';
-                                        } elseif (str_contains($oNorm, 'sodio')) {
+                                        } elseif (in_array('SODIO', $ocOcts, true) && $oNorm === 'sodio') {
                                             $octImg = 'https://blogs.ucontinental.edu.pe/wp-content/uploads/2019/06/Octogono-sodio.png';
-                                        } elseif (str_contains($oNorm, 'grasas saturadas') || str_contains($oNorm, 'grasas')) {
+                                        } elseif ($oNorm === 'grasas') {
                                             $octImg = 'https://dolcezzaperu.pe/wp-content/uploads/2023/06/MicrosoftTeams-image-2.png';
                                         }
                                     @endphp
