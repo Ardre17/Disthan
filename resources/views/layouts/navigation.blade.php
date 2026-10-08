@@ -56,25 +56,10 @@ $menu = [
     ],
 
     'almacen' => [
-        'label' => 'Almacén', 'icon' => 'box', 'color' => '#f59e0b', 'group' => true,
+        'label' => 'Almacén', 'icon' => 'box','roles' => ['admin'], 'color' => '#f59e0b', 'group' => true,
         'items' => [
             ['label' => 'Productos',     'icon' => 'cube',   'href'  => '/products',
              'paths' => ['products'], 'not' => ['proyectado']],
-
-            ['label' => 'Materia Prima', 'icon' => 'flask',  'route' => 'raw-materials.index',
-             'roles' => ['admin'], 'paths' => ['raw-materials']],
-
-            ['label' => 'Suministros',   'icon' => 'layers', 'route' => 'supply-orders.index',
-             'title' => 'Abastecimiento a Plantas',
-             'routes' => ['supply-orders.*'], 'paths' => ['supply-orders']],
-
-            ['label' => 'Movimientos',   'icon' => 'swap',   'route' => 'kardex.index',
-             'title' => 'Kardex',
-             'roles' => ['admin'], 'paths' => ['kardex']],
-
-            ['label' => 'Inventario',    'icon' => 'grid',   'route' => 'warehouse.index',
-             'title' => 'Mapa del Almacén',
-             'paths' => ['warehouse']],
 
             ['label' => 'Etiquetas',     'icon' => 'tag',    'route' => 'labels.index',
              'roles' => ['admin'], 'paths' => ['labels']],
@@ -89,12 +74,6 @@ $menu = [
             ['label' => 'Cajas',         'icon' => 'box',    'route' => 'cajas.index',
              'paths' => ['cajas']],
 
-            ['label' => 'Conteo físico', 'icon' => 'clipboard', 'route' => 'stockcount.index',
-             'roles' => ['admin'], 'routes' => ['stockcount.*'], 'paths' => ['conteo-fisico']],
-
-            ['label' => 'Desmedros',     'icon' => 'ban',    'route' => 'desmedros.index',
-             'roles' => ['admin'], 'routes' => ['desmedros.*'], 'paths' => ['desmedros']],
-
             ['label' => 'Joselito',      'icon' => 'building', 'route' => 'joselito.index',
              'roles' => ['admin'], 'paths' => ['joselito']],
 
@@ -104,13 +83,16 @@ $menu = [
     ],
 
     'produccion' => [
-        'label' => 'Producción', 'icon' => 'grid', 'color' => '#2f6fd0', 'group' => true,
+        'label' => 'Producción', 'icon' => 'grid','roles' => ['admin'], 'color' => '#2f6fd0', 'group' => true,
         'items' => [
             ['label' => 'Producción', 'icon' => 'factory', 'route' => 'production-orders.index',
              'roles' => ['admin'], 'routes' => ['production-orders.*'], 'paths' => ['production', 'produccion']],
 
             ['label' => 'Proyectado', 'icon' => 'trend',   'route' => 'products.proyectado',
              'roles' => ['admin'], 'paths' => ['proyectado']],
+
+             ['label' => 'Materia Prima', 'icon' => 'flask',  'route' => 'raw-materials.index',
+             'roles' => ['admin'], 'paths' => ['raw-materials']],
         ],
     ],
 
@@ -120,13 +102,13 @@ $menu = [
             ['label' => 'Órdenes', 'icon' => 'list', 'href' => '/orders',
              'paths' => ['orders'], 'not' => ['supply-orders', 'production-orders', 'validacion', 'validation']],
 
-            ['label' => 'Pedidos', 'icon' => 'box', 'href' => '/pedidos',
+            ['label' => 'Pedidos', 'icon' => 'box','roles' => ['admin'], 'href' => '/pedidos',
              'roles' => ['operario'], 'paths' => ['pedidos'], 'not' => ['validacion', 'validation']],
 
             ['label' => 'Historial', 'icon' => 'clock', 'href' => '/historial',
              'paths' => ['historial']],
 
-            ['label' => 'Validación de Pedidos', 'icon' => 'check', 'route' => 'orders.validation.index',
+            ['label' => 'Validación de Pedidos','roles' => ['admin'], 'icon' => 'check', 'route' => 'orders.validation.index',
              'roles' => ['admin'], 'routes' => ['orders.validation.*'], 'paths' => ['validacion-pedidos']],
 
             ['label' => 'Rechazos', 'icon' => 'undo', 'route' => 'rechazos.index',
@@ -140,21 +122,39 @@ $menu = [
             ['label' => 'Clientes',    'icon' => 'user',  'href' => '/clients',
              'roles' => ['admin'], 'paths' => ['clients']],
 
-            ['label' => 'Proveedores', 'icon' => 'truck', 'href' => '/proveedores',
+            ['label' => 'Proveedores', 'icon' => 'truck','roles' => ['admin'], 'href' => '/proveedores',
              'roles' => ['admin'], 'paths' => ['proveedores']],
         ],
     ],
 
     'reportes' => [
-        'label' => 'Reportes', 'icon' => 'bars', 'color' => '#2f6fd0', 'group' => true,
+        'label' => 'Reportes', 'icon' => 'bars', 'color' => '#2f6fd0','roles' => ['admin'], 'group' => true,
         'items' => [
             ['label' => 'Movimientos', 'icon' => 'swap', 'route' => 'reports.movimientos',
              'roles' => ['admin'], 'routes' => ['reports.*'], 'paths' => ['reports', 'reportes']],
-        ],
+       
+             ['label' => 'Movimientos',   'icon' => 'swap',   'route' => 'kardex.index',
+             'title' => 'Kardex',
+             'roles' => ['admin'], 'paths' => ['kardex']],
+
+             ['label' => 'Salidas Suministros',   'icon' => 'layers', 'route' => 'supply-orders.index',
+             'title' => 'Abastecimiento a Plantas',
+             'routes' => ['supply-orders.*'], 'paths' => ['supply-orders']],
+
+             ['label' => 'Mapa',    'icon' => 'grid',   'route' => 'warehouse.index',
+             'title' => 'Mapa del Almacén',
+             'paths' => ['warehouse']],
+
+             ['label' => 'Conteo físico', 'icon' => 'clipboard', 'route' => 'stockcount.index',
+             'roles' => ['admin'], 'routes' => ['stockcount.*'], 'paths' => ['conteo-fisico']],
+
+            ['label' => 'Desmedros',     'icon' => 'ban',    'route' => 'desmedros.index',
+             'roles' => ['admin'], 'routes' => ['desmedros.*'], 'paths' => ['desmedros']],
+             ],
     ],
 
     'configuracion' => [
-        'label' => 'Configuración', 'icon' => 'gear', 'color' => '#f59e0b', 'group' => true,
+        'label' => 'Configuración', 'icon' => 'gear','roles' => ['admin'], 'color' => '#f59e0b', 'group' => true,
         'items' => [
             ['label' => 'Usuarios',   'icon' => 'user', 'route' => 'users.index',
              'roles' => ['admin'], 'routes' => ['users.*'], 'paths' => ['users']],
