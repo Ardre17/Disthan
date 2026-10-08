@@ -1285,12 +1285,6 @@ html, body {
 
 {{-- ══════════ CABECERA ══════════ --}}
 <div class="oc-head">
-    <div class="oc-head-l">
-        <a href="{{ route('pedidos.index') }}" class="oc-back oc-back-orders" title="Volver a órdenes">
-            <svg class="oc-i"><use href="#oc-back"/></svg>
-            <span>Volver a órdenes</span>
-        </a>
-        <div>
             <h1 class="oc-title">Control de la orden</h1>
             <div class="oc-sub">Gestiona los productos, despachos y paletas de la orden</div>
         </div>
