@@ -51,16 +51,15 @@
             if ($d >= 0 && $d <= 30) $porVencer++;
         }
 
-        $k = $catKey($p->categoria);
+        $k = (string) $p->category_id;
         $conteoCat[$k] = ($conteoCat[$k] ?? 0) + 1;
     }
 
     // Pestaña activa si llega ?category_id=
     $catActiva = '';
-    foreach ($categories as $c) {
-        if ((string) request('category_id') === (string) $c->id) {
-            $catActiva = $catKey($c->nombre);
-        }
+
+    if (request()->filled('category_id')) {
+        $catActiva = (string) request('category_id');
     }
 @endphp
 
@@ -311,9 +310,10 @@
 
         @foreach($categories as $category)
             @php
-                $key  = $catKey($category->nombre);
+                $key  = (string) $category->id;
                 $meta = $catMeta($category->nombre);
             @endphp
+
             <button type="button" class="pv-tab {{ $catActiva === $key ? 'active' : '' }}" data-cat="{{ $key }}">
                 <span class="em">{{ $meta['icon'] }}</span>
                 <span class="t">
@@ -444,7 +444,7 @@
 
                     <tr class="pv-row"
                         data-idx="{{ $loop->index }}"
-                        data-cat="{{ $catKey($product->categoria) }}"
+                        data-cat="{{ (string) $product->category_id }}"
                         data-nombre="{{ \Illuminate\Support\Str::ascii(mb_strtolower($product->nombre)) }}"
                         data-stock="{{ $stk }}"
                         data-venc="{{ $vencTs }}"
