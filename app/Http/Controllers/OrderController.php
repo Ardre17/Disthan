@@ -11,7 +11,7 @@ use App\Services\Barcode\Code128Generator;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\Barcode\Ean13Generator;
 use App\Services\PedidoPdfParser;
-
+use App\Services\PedidoSpsaPdfParser;
 
 class OrderController extends Controller
 {
@@ -84,29 +84,50 @@ public function importPdf()
     );
 }
 
-public function previewPdf(
-    Request $request,
-    PedidoPdfParser $parser
-) {
+public function previewPdf(Request $request){
     $request->validate([
         'archivo' => 'required|file|mimes:pdf|max:10240',
     ]);
 
     try {
 
-        $datos = $parser->parse(
-            $request->file('archivo')->getRealPath()
+    $archivoPdf = $request->file('archivo')->getRealPath();
+
+    /*
+    |--------------------------------------------------------------------------
+    | Detectar automáticamente la plantilla
+    |--------------------------------------------------------------------------
+    | Primero intentamos SPSA.
+    | Si no corresponde a SPSA, usamos el parser estándar.
+    |--------------------------------------------------------------------------
+    */
+
+    try {
+
+        $spsaParser = app(PedidoSpsaPdfParser::class);
+
+        $datos = $spsaParser->parse(
+            $archivoPdf
         );
 
     } catch (\Throwable $e) {
 
-        return back()
-            ->withInput()
-            ->with(
-                'error',
-                'No se pudo analizar el PDF: ' . $e->getMessage()
-            );
+        $parser = app(PedidoPdfParser::class);
+
+        $datos = $parser->parse(
+            $archivoPdf
+        );
     }
+
+} catch (\Throwable $e) {
+
+    return back()
+        ->withInput()
+        ->with(
+            'error',
+            'No se pudo analizar el PDF: ' . $e->getMessage()
+        );
+}
 
     /*
     |--------------------------------------------------------------------------
