@@ -457,8 +457,12 @@
                         <td class="c-img" data-label="Imagen">
                             <div class="pv-thumb">
                                 @if($product->imagen)
-                                    <img src="{{ asset('storage/'.$product->imagen) }}" alt="{{ $product->nombre }}" loading="lazy" decoding="async">
-                                @else
+                                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($product->imagen) }}"
+                                        alt="{{ $product->nombre }}"
+                                        loading="lazy"
+                                        decoding="async"
+                                        onerror="this.style.display='none'; this.parentElement.innerHTML='📦';">
+                                    @else
                                     📦
                                 @endif
                             </div>
