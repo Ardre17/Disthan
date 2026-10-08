@@ -1,890 +1,631 @@
 @php
 $role = auth()->user()->role;
+$url  = request()->path();
 
-// ── Detectar sección activa para el color del menú ──
-$seccionActiva = 'dash';
-$url = request()->path();
+// Cantidad de notificaciones (campana). 0 = sin globo rojo.
+$nvNotifCount = 0;
 
-if (
-    str_contains($url, 'joselito') ||
-    str_contains($url, 'dalsa')
-) {
-    $seccionActiva = 'alm';
+/* ─────────────────────────────────────────────
+   ICONOS (SVG inline, 24x24, trazo)
+   ───────────────────────────────────────────── */
+$ico = [
+    'home'      => '<path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V20a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V9.5"/>',
+    'box'       => '<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
+    'cube'      => '<path d="M21 8 12 3 3 8v8l9 5 9-5z"/><path d="m3 8 9 5 9-5M12 13v8"/>',
+    'grid'      => '<rect x="3" y="3" width="7" height="7" rx="1.6"/><rect x="14" y="3" width="7" height="7" rx="1.6"/><rect x="3" y="14" width="7" height="7" rx="1.6"/><rect x="14" y="14" width="7" height="7" rx="1.6"/>',
+    'truck'     => '<path d="M2 6h11v10H2z"/><path d="M13 9h4l4 4v3h-8"/><circle cx="6.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/>',
+    'users'     => '<circle cx="9" cy="8" r="3.5"/><path d="M2.5 20c0-3.6 2.9-6 6.5-6s6.5 2.4 6.5 6"/><circle cx="17" cy="9" r="2.5"/><path d="M17 14c2.7 0 4.5 1.8 4.5 4.5"/>',
+    'bars'      => '<path d="M5 21V11M12 21V4M19 21v-7"/>',
+    'gear'      => '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+    'flask'     => '<path d="M9 3h6M10 3v6L4.5 19a2 2 0 0 0 1.7 3h11.6a2 2 0 0 0 1.7-3L14 9V3"/>',
+    'layers'    => '<path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5"/>',
+    'swap'      => '<path d="M7 4 3 8l4 4M3 8h14M17 20l4-4-4-4M21 16H7"/>',
+    'tag'       => '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.2"/>',
+    'lock'      => '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/>',
+    'clipboard' => '<rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4h6v3H9zM9 12h6M9 16h6"/>',
+    'clock'     => '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    'check'     => '<circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/>',
+    'undo'      => '<path d="M9 14 4 9l5-5"/><path d="M4 9h10a6 6 0 0 1 0 12h-3"/>',
+    'user'      => '<circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 3.6-6 8-6s8 2 8 6"/>',
+    'building'  => '<path d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6"/>',
+    'factory'   => '<path d="M3 21V9l6 4V9l6 4V5h6v16z"/>',
+    'ban'       => '<circle cx="12" cy="12" r="9"/><path d="m5.6 5.6 12.8 12.8"/>',
+    'trend'     => '<path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/>',
+    'list'      => '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+    'search'    => '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+    'dot'       => '<circle cx="12" cy="12" r="3"/>',
+];
+$svg = function ($name) use ($ico) {
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+         . ($ico[$name] ?? $ico['dot'])
+         . '</svg>';
+};
 
-} elseif (
-    str_contains($url, 'orders') ||
-    str_contains($url, 'historial') ||
-    str_contains($url, 'raw-materials') ||
-    str_contains($url, 'proyectado') ||
-    str_contains($url, 'kardex') ||
-    str_contains($url, 'production') ||
-    str_contains($url, 'pedidos') ||
-    str_contains($url, 'validacion-pedidos') ||
-    str_contains($url, 'produccion')
-) {
-    $seccionActiva = 'ops';
+/* ─────────────────────────────────────────────
+   ESTRUCTURA DEL MENÚ (mismo orden que la imagen)
+   - roles: null = todos | ['admin'] | ['operario']
+   - route: nombre de ruta | href: ruta directa
+   - paths / routes / not: para detectar el ítem activo
+   - sep: separador visual antes del ítem
+   ───────────────────────────────────────────── */
+$menu = [
 
-} elseif (
-    str_contains($url, 'categories') ||
-    str_contains($url, 'labels') ||
-    str_contains($url, 'stickers') ||
-    str_contains($url, 'precintos') ||
-    str_contains($url, 'cajas') ||
-    str_contains($url, 'products') ||
-    str_contains($url, 'warehouse')
-) {
-    $seccionActiva = 'inv';
-
-} elseif (
-    str_contains($url, 'clients') ||
-    str_contains($url, 'proveedores')
-) {
-    $seccionActiva = 'com';
-}
-
-// Colores por sección
-$temas = [
-    'dash' => [
-        'grad1' => '#060f1e',
-        'grad2' => '#0a1628',
-        'grad3' => '#0d1f38',
-        'accent'=> '#3b82f6',
-        'glow'  => 'rgba(59,130,246,.12)',
-        'link'  => '#93c5fd',
-        'sub'   => '#60a5fa',
-        'icon'  => '#3b82f6',
-        'label' => 'Dashboard',
+    'inicio' => [
+        'label' => 'Inicio', 'icon' => 'home', 'color' => '#2f6fd0',
+        'href'  => '/dashboard', 'group' => false, 'items' => [],
     ],
-    'alm' => [
-        'grad1' => '#061818',
-        'grad2' => '#082020',
-        'grad3' => '#0a2828',
-        'accent'=> '#06b6d4',
-        'glow'  => 'rgba(6,182,212,.12)',
-        'link'  => '#67e8f9',
-        'sub'   => '#22d3ee',
-        'icon'  => '#06b6d4',
-        'label' => 'Almacenes',
+
+    'almacen' => [
+        'label' => 'Almacén', 'icon' => 'box', 'color' => '#f59e0b', 'group' => true,
+        'items' => [
+            ['label' => 'Productos',     'icon' => 'cube',   'href'  => '/products',
+             'paths' => ['products'], 'not' => ['proyectado']],
+
+            ['label' => 'Materia Prima', 'icon' => 'flask',  'route' => 'raw-materials.index',
+             'roles' => ['admin'], 'paths' => ['raw-materials']],
+
+            ['label' => 'Suministros',   'icon' => 'layers', 'route' => 'supply-orders.index',
+             'title' => 'Abastecimiento a Plantas',
+             'routes' => ['supply-orders.*'], 'paths' => ['supply-orders']],
+
+            ['label' => 'Movimientos',   'icon' => 'swap',   'route' => 'kardex.index',
+             'title' => 'Kardex',
+             'roles' => ['admin'], 'paths' => ['kardex']],
+
+            ['label' => 'Inventario',    'icon' => 'grid',   'route' => 'warehouse.index',
+             'title' => 'Mapa del Almacén',
+             'paths' => ['warehouse']],
+
+            ['label' => 'Etiquetas',     'icon' => 'tag',    'route' => 'labels.index',
+             'roles' => ['admin'], 'paths' => ['labels']],
+
+            // — Resto de enlaces de almacén que ya existían —
+            ['label' => 'Stickers de tapa', 'icon' => 'tag',  'route' => 'stickers.index',
+             'roles' => ['admin'], 'paths' => ['stickers'], 'sep' => true],
+
+            ['label' => 'Precintos',     'icon' => 'lock',   'route' => 'precintos.index',
+             'roles' => ['admin'], 'paths' => ['precintos']],
+
+            ['label' => 'Cajas',         'icon' => 'box',    'route' => 'cajas.index',
+             'paths' => ['cajas']],
+
+            ['label' => 'Conteo físico', 'icon' => 'clipboard', 'route' => 'stockcount.index',
+             'roles' => ['admin'], 'routes' => ['stockcount.*'], 'paths' => ['conteo-fisico']],
+
+            ['label' => 'Desmedros',     'icon' => 'ban',    'route' => 'desmedros.index',
+             'roles' => ['admin'], 'routes' => ['desmedros.*'], 'paths' => ['desmedros']],
+
+            ['label' => 'Joselito',      'icon' => 'building', 'route' => 'joselito.index',
+             'roles' => ['admin'], 'paths' => ['joselito']],
+
+            ['label' => 'Dalsa',         'icon' => 'factory',  'route' => 'dalsa.index',
+             'roles' => ['admin'], 'paths' => ['dalsa']],
+        ],
     ],
-    'ops' => [
-        'grad1' => '#1a1000',
-        'grad2' => '#1f1500',
-        'grad3' => '#251a00',
-        'accent'=> '#f59e0b',
-        'glow'  => 'rgba(245,158,11,.12)',
-        'link'  => '#fcd34d',
-        'sub'   => '#fbbf24',
-        'icon'  => '#f59e0b',
-        'label' => 'Operaciones',
+
+    'produccion' => [
+        'label' => 'Producción', 'icon' => 'grid', 'color' => '#2f6fd0', 'group' => true,
+        'items' => [
+            ['label' => 'Producción', 'icon' => 'factory', 'route' => 'production-orders.index',
+             'roles' => ['admin'], 'routes' => ['production-orders.*'], 'paths' => ['production', 'produccion']],
+
+            ['label' => 'Proyectado', 'icon' => 'trend',   'route' => 'products.proyectado',
+             'roles' => ['admin'], 'paths' => ['proyectado']],
+        ],
     ],
-    'inv' => [
-        'grad1' => '#061a0a',
-        'grad2' => '#082010',
-        'grad3' => '#0a2814',
-        'accent'=> '#22c55e',
-        'glow'  => 'rgba(34,197,94,.12)',
-        'link'  => '#86efac',
-        'sub'   => '#4ade80',
-        'icon'  => '#22c55e',
-        'label' => 'Inventario',
+
+    'despachos' => [
+        'label' => 'Despachos', 'icon' => 'truck', 'color' => '#1f4f8f', 'group' => true,
+        'items' => [
+            ['label' => 'Órdenes', 'icon' => 'list', 'href' => '/orders',
+             'paths' => ['orders'], 'not' => ['supply-orders', 'production-orders', 'validacion', 'validation']],
+
+            ['label' => 'Pedidos', 'icon' => 'box', 'href' => '/pedidos',
+             'roles' => ['operario'], 'paths' => ['pedidos'], 'not' => ['validacion', 'validation']],
+
+            ['label' => 'Historial', 'icon' => 'clock', 'href' => '/historial',
+             'paths' => ['historial']],
+
+            ['label' => 'Validación de Pedidos', 'icon' => 'check', 'route' => 'orders.validation.index',
+             'roles' => ['admin'], 'routes' => ['orders.validation.*'], 'paths' => ['validacion-pedidos']],
+
+            ['label' => 'Rechazos', 'icon' => 'undo', 'route' => 'rechazos.index',
+             'roles' => ['admin'], 'paths' => ['rechazos']],
+        ],
     ],
-    'com' => [
-        'grad1' => '#120820',
-        'grad2' => '#160a28',
-        'grad3' => '#1a0c30',
-        'accent'=> '#8b5cf6',
-        'glow'  => 'rgba(139,92,246,.12)',
-        'link'  => '#c4b5fd',
-        'sub'   => '#a78bfa',
-        'icon'  => '#8b5cf6',
-        'label' => 'Comercial',
+
+    'comercial' => [
+        'label' => 'Comercial', 'icon' => 'users', 'color' => '#2f6fd0', 'group' => true,
+        'items' => [
+            ['label' => 'Clientes',    'icon' => 'user',  'href' => '/clients',
+             'roles' => ['admin'], 'paths' => ['clients']],
+
+            ['label' => 'Proveedores', 'icon' => 'truck', 'href' => '/proveedores',
+             'roles' => ['admin'], 'paths' => ['proveedores']],
+        ],
+    ],
+
+    'reportes' => [
+        'label' => 'Reportes', 'icon' => 'bars', 'color' => '#2f6fd0', 'group' => true,
+        'items' => [
+            ['label' => 'Movimientos', 'icon' => 'swap', 'route' => 'reports.movimientos',
+             'roles' => ['admin'], 'routes' => ['reports.*'], 'paths' => ['reports', 'reportes']],
+        ],
+    ],
+
+    'configuracion' => [
+        'label' => 'Configuración', 'icon' => 'gear', 'color' => '#f59e0b', 'group' => true,
+        'items' => [
+            ['label' => 'Usuarios',   'icon' => 'user', 'route' => 'users.index',
+             'roles' => ['admin'], 'routes' => ['users.*'], 'paths' => ['users']],
+
+            ['label' => 'Categorías', 'icon' => 'tag',  'href' => '/categories',
+             'roles' => ['admin'], 'paths' => ['categories']],
+        ],
     ],
 ];
 
-$t = $temas[$seccionActiva];
+/* ── Filtrar por rol y resolver URLs (solo de lo permitido) ── */
+$can = function ($it) use ($role) {
+    return empty($it['roles']) || in_array($role, $it['roles']);
+};
+
+foreach ($menu as $mk => $m) {
+    if (empty($m['group'])) continue;
+
+    $items = array_values(array_filter($m['items'], $can));
+
+    if (!count($items)) {
+        unset($menu[$mk]);
+        continue;
+    }
+
+    foreach ($items as $i => $it) {
+        $items[$i]['url'] = isset($it['route']) ? route($it['route']) : $it['href'];
+    }
+    $menu[$mk]['items'] = $items;
+}
+
+/* ── Detectar ítem / sección activa (primera coincidencia) ── */
+$isMatch = function ($it) use ($url) {
+    foreach (($it['not'] ?? []) as $n) {
+        if (str_contains($url, $n)) return false;
+    }
+    foreach (($it['routes'] ?? []) as $r) {
+        if (request()->routeIs($r)) return true;
+    }
+    foreach (($it['paths'] ?? []) as $p) {
+        if (str_contains($url, $p)) return true;
+    }
+    return false;
+};
+
+$activeMenu = null;
+$activeItem = null;
+
+foreach ($menu as $mk => $m) {
+    foreach ($m['items'] as $ik => $it) {
+        if ($isMatch($it)) {
+            $activeMenu = $mk;
+            $activeItem = $ik;
+            break 2;
+        }
+    }
+}
+if ($activeMenu === null) {
+    $activeMenu = 'inicio';
+}
+
+$showSubs = !empty($menu[$activeMenu]['group']);
+
+$userName = Auth::user()->name;
 @endphp
 
 <style>
 *{box-sizing:border-box;}
 
+/* Variables conservadas por compatibilidad con otras vistas */
 :root{
-    --sb-bg1:{{ $t['grad1'] }};
-    --sb-bg2:{{ $t['grad2'] }};
-    --sb-bg3:{{ $t['grad3'] }};
-    --sb-accent:{{ $t['accent'] }};
-    --sb-glow:{{ $t['glow'] }};
-    --sb-link:{{ $t['link'] }};
-    --sb-sub:{{ $t['sub'] }};
+    --sb-bg1:#060f1e;
+    --sb-bg2:#0a1628;
+    --sb-bg3:#0d1f38;
+    --sb-accent:#3b82f6;
+    --sb-glow:rgba(59,130,246,.12);
+    --sb-link:#93c5fd;
+    --sb-sub:#60a5fa;
     --sb-border:rgba(255,255,255,.06);
     --sb-text:#c8daf0;
     --sb-text-muted:#5b7da8;
     --sb-ok:#22c55e;
-    --sb-width:270px;
+    --sb-width:0px;
     --font:'Segoe UI',-apple-system,BlinkMacSystemFont,sans-serif;
     --font-mono:'Consolas','SFMono-Regular',monospace;
+
+    --nv-navy1:#0e2545;
+    --nv-navy2:#1e3a5f;
+    --nv-blue:#1a86f5;
+    --nv-blue-dark:#1769d1;
+    --nv-bg:#e8f0fa;
+    --nv-bg-sub:#d9e7f7;
+    --nv-text:#1f3a5f;
+    --nv-text-soft:#475f80;
 }
 
-/* ── Contenido principal ── */
-.main-content{
-    margin-left:var(--sb-width);
-    transition:margin-left .3s ease;
-    min-height:100vh;
-}
+/* ── Contenido principal: ya no hay sidebar lateral ── */
+.main-content,
 .main-content.sidebar-collapsed{
-    margin-left:56px;
-}
-@media(max-width:768px){
-    .main-content{margin-left:0 !important;}
+    margin-left:0 !important;
+    min-height:auto;
 }
 
-/* ── Botón hamburguesa ── */
-.sb-toggle{
-    position:fixed;
-    top:12px;left:12px;
-    z-index:1001;
-    width:36px;height:36px;
-    background:#0a1628;
-    border:1px solid rgba(255,255,255,.1);
-    border-radius:6px;
-    display:none;
-    align-items:center;justify-content:center;
-    cursor:pointer;
-    box-shadow:0 2px 10px rgba(0,0,0,.4);
-    transition:background .2s;
-}
-.sb-toggle:hover{background:var(--sb-accent);}
-.sb-toggle-icon{display:flex;flex-direction:column;gap:4px;}
-.sb-toggle-icon span{
-    display:block;width:18px;height:2px;
-    background:#7eb8f7;border-radius:2px;
-    transition:transform .3s,opacity .3s;
-}
-
-/* Overlay móvil */
-.sb-overlay{
-    display:none;
-    position:fixed;inset:0;
-    background:rgba(0,0,0,.6);
-    backdrop-filter:blur(2px);
-    z-index:999;
-}
-.sb-overlay.show{display:block;}
-
-/* ── Sidebar ── */
-.sidebar{
-    width:var(--sb-width);
-    height:100vh;
-    position:fixed;
-    top:0;left:0;
-    overflow-y:auto;
-    overflow-x:hidden;
-    background:linear-gradient(
-        180deg,
-        var(--sb-bg1) 0%,
-        var(--sb-bg2) 50%,
-        var(--sb-bg3) 100%
-    );
-    color:var(--sb-text);
-    display:flex;
-    flex-direction:column;
-    justify-content:space-between;
-    box-shadow:
-        6px 0 24px rgba(0,0,0,.4),
-        inset -1px 0 0 var(--sb-border);
+/* ── Contenedor ── */
+.nv{
     font-family:var(--font);
     font-size:13px;
-    z-index:1000;
-    transition:width .3s cubic-bezier(.16,1,.3,1),
-               transform .3s cubic-bezier(.16,1,.3,1);
+    padding:10px 14px 0;
+    position:relative;   /* cambia a sticky + top:0 + z-index:1000 si lo quieres fijo */
+    z-index:900;
+}
+.nv-card{
+    background:var(--nv-bg);
+    border-radius:14px;
+    box-shadow:0 6px 24px rgba(15,39,71,.14);
 }
 
-/* Glow de color en el sidebar */
-.sidebar::before{
-    content:'';
-    position:absolute;
-    top:0;left:0;right:0;
-    height:200px;
-    background:radial-gradient(ellipse at top left, var(--sb-glow), transparent 70%);
-    pointer-events:none;
-    z-index:0;
-}
-.sidebar > *{position:relative;z-index:1;}
-
-.sidebar::-webkit-scrollbar{width:4px;}
-.sidebar::-webkit-scrollbar-track{background:transparent;}
-.sidebar::-webkit-scrollbar-thumb{background:var(--sb-accent);border-radius:99px;opacity:.3;}
-
-/* ── Header ── */
-.sb-header{
-    padding:18px 16px 14px;
-    border-bottom:1px solid var(--sb-border);
-    flex-shrink:0;
-}
-.sb-brand{
-    display:flex;align-items:center;gap:10px;
-    margin-bottom:14px;
-}
-.sb-brand-icon{
-    width:36px;height:36px;flex-shrink:0;
-    background:linear-gradient(135deg,var(--sb-accent),var(--sb-sub));
-    border-radius:8px;
-    display:flex;align-items:center;justify-content:center;
-    font-size:18px;
-    box-shadow:0 4px 14px var(--sb-glow);
-    transition:background .4s;
-}
-.sb-brand-name{
-    font-size:14px;font-weight:800;
-    color:#f1f5f9;letter-spacing:.3px;
-}
-.sb-brand-sub{
-    font-size:10px;color:var(--sb-text-muted);
-    text-transform:uppercase;letter-spacing:.07em;margin-top:1px;
-}
-.sb-collapse-btn{
-    margin-left:auto;
-    width:26px;height:26px;flex-shrink:0;
-    background:rgba(255,255,255,.05);
-    border:1px solid var(--sb-border);
-    border-radius:5px;
-    display:flex;align-items:center;justify-content:center;
-    cursor:pointer;color:var(--sb-text-muted);
-    font-size:16px;font-weight:700;
-    transition:background .15s,color .15s,border-color .15s;
-    line-height:1;user-select:none;
-}
-.sb-collapse-btn:hover{
-    background:var(--sb-accent);
-    border-color:var(--sb-accent);
+/* ── Barra superior ── */
+.nv-top{
+    position:relative;
+    display:flex;align-items:center;gap:14px;
+    padding:12px 18px;
+    background:linear-gradient(90deg,var(--nv-navy1) 0%,var(--nv-navy2) 100%);
+    border-radius:14px 14px 0 0;
     color:#fff;
 }
-
-/* User card */
-.sb-user{
-    background:rgba(255,255,255,.05);
-    border:1px solid var(--sb-border);
-    border-radius:8px;
-    padding:12px;
+.nv-brand{
     display:flex;align-items:center;gap:10px;
-    transition:border-color .4s;
+    text-decoration:none;color:#fff;flex-shrink:0;
 }
-.sb-user:hover{border-color:var(--sb-accent);}
-.sb-avatar{
-    width:38px;height:38px;flex-shrink:0;
-    border-radius:50%;
-    background:linear-gradient(135deg,var(--sb-accent),var(--sb-sub));
+.nv-logo{
+    width:36px;height:36px;flex-shrink:0;
+    background:linear-gradient(135deg,#2b8cff,#1565d8);
+    border-radius:10px;
     display:flex;align-items:center;justify-content:center;
-    font-size:16px;font-weight:800;color:#fff;
-    box-shadow:0 4px 12px var(--sb-glow);
-    border:2px solid rgba(255,255,255,.12);
-    transition:background .4s,box-shadow .4s;
+    box-shadow:0 4px 12px rgba(26,134,245,.4);
 }
-.sb-user-info{flex:1;min-width:0;}
-.sb-user-name{
-    font-size:13px;font-weight:700;color:#f1f5f9;
+.nv-logo svg{width:22px;height:22px;}
+.nv-brand-name{font-size:16px;font-weight:800;letter-spacing:.3px;line-height:1.1;}
+.nv-brand-sub{font-size:10.5px;color:#9db6d6;margin-top:2px;}
+
+/* Buscador */
+.nv-search{
+    position:relative;
+    margin-left:auto;
+    width:270px;
+    background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.1);
+    border-radius:9px;
+    display:flex;align-items:center;gap:8px;
+    padding:0 12px;height:36px;
+    transition:background .15s,border-color .15s;
+}
+.nv-search:focus-within{background:rgba(255,255,255,.18);border-color:rgba(255,255,255,.3);}
+.nv-search svg{width:16px;height:16px;flex-shrink:0;color:#c4d4ea;}
+.nv-search input{
+    flex:1;min-width:0;
+    background:transparent;border:0;outline:0;
+    color:#fff;font:inherit;font-size:12.5px;
+}
+.nv-search input::placeholder{color:#b6c8e2;}
+.nv-results{
+    display:none;
+    position:absolute;top:calc(100% + 8px);left:0;right:0;
+    background:#fff;border-radius:10px;
+    box-shadow:0 12px 32px rgba(15,39,71,.28);
+    padding:6px;max-height:320px;overflow-y:auto;
+    z-index:1100;
+}
+.nv-results.show{display:block;}
+.nv-results a{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:8px 10px;border-radius:7px;
+    color:var(--nv-text);text-decoration:none;font-size:12.5px;font-weight:600;
+}
+.nv-results a small{color:#7a8ea9;font-weight:500;font-size:11px;}
+.nv-results a:hover,.nv-results a.sel{background:#eaf2fc;color:var(--nv-blue-dark);}
+.nv-results .nv-empty{padding:10px;color:#7a8ea9;font-size:12px;}
+
+.nv-icon-btn{
+    position:relative;
+    width:36px;height:36px;flex-shrink:0;
+    background:transparent;border:0;border-radius:9px;
+    color:#e3ecf8;cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    transition:background .15s;
+}
+.nv-icon-btn:hover{background:rgba(255,255,255,.12);}
+.nv-icon-btn svg{width:20px;height:20px;}
+.nv-badge{
+    position:absolute;top:1px;right:1px;
+    min-width:16px;height:16px;padding:0 4px;
+    background:#ef4444;color:#fff;
+    border-radius:99px;font-size:10px;font-weight:700;
+    display:flex;align-items:center;justify-content:center;
+    border:2px solid var(--nv-navy2);
+    line-height:1;
+}
+.nv-search-btn{display:none;}
+
+/* Usuario */
+.nv-user-wrap{position:relative;flex-shrink:0;}
+.nv-user{
+    display:flex;align-items:center;gap:9px;
+    background:transparent;border:0;border-radius:99px;
+    padding:3px 8px 3px 3px;cursor:pointer;color:#fff;font:inherit;
+    transition:background .15s;
+}
+.nv-user:hover{background:rgba(255,255,255,.1);}
+.nv-avatar{
+    width:34px;height:34px;border-radius:50%;
+    background:#fff;color:#1a6fe0;
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;
+}
+.nv-avatar svg{width:20px;height:20px;}
+.nv-user-name{
+    font-size:13px;font-weight:600;max-width:120px;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
 }
-.sb-user-role{
-    font-size:10px;color:var(--sb-text-muted);
-    margin-top:1px;text-transform:capitalize;
+.nv-chev{width:14px;height:14px;color:#b6c8e2;transition:transform .2s;}
+.nv-user[aria-expanded="true"] .nv-chev{transform:rotate(180deg);}
+
+.nv-menu{
+    display:none;
+    position:absolute;right:0;top:calc(100% + 10px);
+    width:250px;background:#fff;color:var(--nv-text);
+    border-radius:12px;padding:14px;
+    box-shadow:0 14px 36px rgba(15,39,71,.3);
+    z-index:1100;
 }
-.sb-status{
-    display:inline-flex;align-items:center;gap:4px;
-    border-radius:99px;
-    padding:2px 8px;
-    font-size:10px;
-    margin-top:4px;font-weight:600;
-    background:color-mix(in srgb, var(--sb-accent) 15%, transparent);
-    border:1px solid color-mix(in srgb, var(--sb-accent) 30%, transparent);
-    color:var(--sb-link);
-    transition:background .4s,border-color .4s,color .4s;
+.nv-menu.show{display:block;}
+.nv-menu-name{font-size:14px;font-weight:700;word-break:break-word;}
+.nv-menu-role{font-size:11px;color:#7a8ea9;margin-top:1px;text-transform:capitalize;}
+.nv-status{
+    display:inline-flex;align-items:center;gap:5px;margin-top:8px;
+    padding:2px 9px;border-radius:99px;font-size:10.5px;font-weight:700;
+    background:#e7f7ee;color:#15803d;border:1px solid #bfe8cf;
 }
-.sb-status-dot{
-    width:6px;height:6px;border-radius:50%;
-    background:var(--sb-accent);
-    animation:sbPulse 1.5s ease infinite;
-    flex-shrink:0;
-    transition:background .4s;
+.nv-status i{
+    width:6px;height:6px;border-radius:50%;background:#22c55e;
+    animation:nvPulse 1.5s ease infinite;
 }
-@keyframes sbPulse{
+@keyframes nvPulse{
     0%,100%{opacity:1;transform:scale(1);}
     50%{opacity:.4;transform:scale(1.4);}
 }
-
-/* ── Nav ── */
-.sb-nav{flex:1;padding:8px 0;}
-
-.sb-item{
-    display:flex;align-items:center;gap:10px;
-    color:var(--sb-text);
-    text-decoration:none;
-    padding:10px 16px;
-    border-left:3px solid transparent;
-    transition:background .15s,color .15s,border-color .15s;
-    font-size:13px;font-weight:500;
-}
-.sb-item:hover{
-    background:color-mix(in srgb, var(--sb-accent) 8%, transparent);
-    color:#f1f5f9;
-}
-.sb-item.active{
-    background:color-mix(in srgb, var(--sb-accent) 12%, transparent);
-    color:#fff;font-weight:700;
-    border-left-color:var(--sb-accent);
-}
-.sb-item .sb-icon{
-    width:24px;height:24px;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;
-    font-size:15px;
-}
-
-/* Secciones */
-.sb-section{margin-bottom:2px;}
-.sb-section-title{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:9px 16px;
-    cursor:pointer;
-    font-size:11px;font-weight:700;
-    text-transform:uppercase;letter-spacing:.07em;
-    color:var(--sb-text-muted);
-    border-left:3px solid transparent;
-    transition:background .15s,color .15s,border-color .15s;
-    user-select:none;
-}
-.sb-section-title:hover{
-    background:color-mix(in srgb, var(--sb-accent) 6%, transparent);
-    color:var(--sb-text);
-}
-.sb-section-left{display:flex;align-items:center;gap:8px;}
-.sb-section-icon{font-size:14px;width:20px;text-align:center;}
-.sb-section-arrow{
-    font-size:11px;color:var(--sb-text-muted);
-    transition:transform .3s;flex-shrink:0;
-}
-.sb-section-title.open{
-    color:var(--sb-link);
-    border-left-color:var(--sb-accent);
-}
-.sb-section-title.open .sb-section-arrow{
-    transform:rotate(180deg);
-    color:var(--sb-accent);
-}
-
-/* Submenú */
-.sb-sub{
-    overflow:hidden;
-    max-height:0;
-    transition:max-height .35s ease;
-}
-.sb-sub a{
-    display:flex;align-items:center;gap:9px;
-    color:var(--sb-text-muted);
-    text-decoration:none;
-    padding:8px 16px 8px 40px;
-    font-size:12.5px;
-    border-left:3px solid transparent;
-    transition:background .15s,color .15s,padding-left .15s,border-color .15s;
-}
-.sb-sub a:hover{
-    background:color-mix(in srgb, var(--sb-accent) 8%, transparent);
-    color:var(--sb-link);
-    padding-left:46px;
-    border-left-color:color-mix(in srgb, var(--sb-accent) 40%, transparent);
-}
-.sb-sub a .sb-icon{
-    width:20px;height:20px;flex-shrink:0;
-    display:flex;align-items:center;justify-content:center;
-    font-size:13px;
-}
-
-.sb-divider{
-    height:1px;
-    background:linear-gradient(90deg, var(--sb-accent) 0%, transparent 100%);
-    opacity:.15;
-    margin:6px 16px;
-}
-
-/* ── Footer ── */
-.sb-footer{
-    border-top:1px solid var(--sb-border);
-    padding:14px 16px;
-    flex-shrink:0;
-}
-.sb-clock{
-    text-align:center;
-    margin-bottom:12px;
-    background:color-mix(in srgb, var(--sb-accent) 6%, transparent);
-    border:1px solid color-mix(in srgb, var(--sb-accent) 20%, transparent);
-    border-radius:7px;
-    padding:10px;
-    transition:background .4s,border-color .4s;
+.nv-clock{
+    margin-top:12px;padding:10px;text-align:center;
+    background:#eef4fc;border:1px solid #d5e3f6;border-radius:9px;
 }
 #clockTime{
-    font-family:var(--font-mono);
-    font-size:22px;font-weight:700;
-    color:var(--sb-link);
-    letter-spacing:2px;line-height:1;
-    transition:color .4s;
+    font-family:var(--font-mono);font-size:20px;font-weight:700;
+    color:var(--nv-blue-dark);letter-spacing:2px;line-height:1;
 }
-#clockDate{
-    margin-top:5px;font-size:11px;
-    color:var(--sb-text-muted);
-    text-transform:capitalize;
-}
-.sb-storage{margin-bottom:12px;}
-.sb-storage-top{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-bottom:6px;
-}
-.sb-storage-label{font-size:11px;color:var(--sb-text-muted);}
-.sb-storage-pct{
-    font-size:11px;font-weight:700;
-    color:var(--sb-link);
-    font-family:var(--font-mono);
-    transition:color .4s;
-}
-.sb-storage-bar{
-    height:5px;background:rgba(255,255,255,.07);
-    border-radius:99px;overflow:hidden;
-}
-.sb-storage-fill{
-    height:100%;width:82%;
-    background:linear-gradient(90deg, var(--sb-accent), var(--sb-sub));
-    border-radius:99px;
-    transition:background .4s;
-}
-.sb-version{
-    text-align:center;font-size:10px;
-    color:var(--sb-text-muted);margin-bottom:10px;
-    font-family:var(--font-mono);
-}
-
-/* Indicador de sección activa */
-.sb-section-indicator{
+#clockDate{margin-top:5px;font-size:11px;color:#7a8ea9;text-transform:capitalize;}
+.nv-logout{
+    width:100%;margin-top:12px;padding:9px 12px;
+    border:1px solid rgba(239,68,68,.25);border-radius:8px;
+    background:rgba(239,68,68,.08);color:#dc2626;
+    font:inherit;font-size:12.5px;font-weight:700;cursor:pointer;
     display:flex;align-items:center;justify-content:center;gap:6px;
-    margin-bottom:10px;
-    padding:5px 10px;
-    background:color-mix(in srgb, var(--sb-accent) 10%, transparent);
-    border:1px solid color-mix(in srgb, var(--sb-accent) 25%, transparent);
-    border-radius:5px;
-    font-size:10px;font-weight:700;
-    color:var(--sb-link);
-    text-transform:uppercase;letter-spacing:.06em;
-    transition:background .4s,border-color .4s,color .4s;
+    transition:background .15s;
 }
-.sb-section-indicator-dot{
-    width:6px;height:6px;border-radius:50%;
-    background:var(--sb-accent);
-    transition:background .4s;
+.nv-logout:hover{background:rgba(239,68,68,.16);}
+
+/* ── Pestañas principales ── */
+.nv-tabs{
+    display:flex;align-items:center;gap:6px;
+    padding:10px 16px;
+    overflow-x:auto;
+    scrollbar-width:none;
+}
+.nv-tabs::-webkit-scrollbar{display:none;}
+.nv-tab{
+    --ic:#2f6fd0;
+    flex-shrink:0;
+    display:inline-flex;align-items:center;gap:8px;
+    height:38px;padding:0 16px;
+    background:transparent;border:0;border-radius:9px;
+    color:var(--nv-text);text-decoration:none;
+    font:inherit;font-size:13px;font-weight:600;
+    cursor:pointer;white-space:nowrap;
+    transition:background .15s,color .15s,box-shadow .15s;
+}
+.nv-tab .nv-ic{color:var(--ic);display:flex;transition:color .15s;}
+.nv-tab .nv-ic svg{width:18px;height:18px;}
+.nv-tab:hover{background:rgba(26,134,245,.1);}
+.nv-tab.is-active{
+    background:var(--nv-blue);color:#fff;
+    box-shadow:0 4px 12px rgba(26,134,245,.35);
+}
+.nv-tab.is-active .nv-ic{color:#fff;}
+
+/* ── Subpestañas ── */
+.nv-subs{display:none;padding:0 16px 12px;}
+.nv-subs.show{display:block;}
+.nv-panel{
+    display:none;align-items:center;gap:4px;
+    background:var(--nv-bg-sub);
+    border:1px solid rgba(26,100,200,.08);
+    border-radius:11px;padding:6px 8px;
+    overflow-x:auto;scrollbar-width:none;
+}
+.nv-panel::-webkit-scrollbar{display:none;}
+.nv-panel.show{display:flex;}
+.nv-sub{
+    flex-shrink:0;
+    display:inline-flex;align-items:center;gap:7px;
+    padding:8px 14px;border-radius:8px;
+    color:var(--nv-text-soft);text-decoration:none;
+    font-size:12.5px;font-weight:500;white-space:nowrap;
+    transition:background .15s,color .15s;
+}
+.nv-sub .nv-ic{color:#3b78c4;display:flex;}
+.nv-sub .nv-ic svg{width:16px;height:16px;}
+.nv-sub:hover{background:rgba(255,255,255,.6);color:var(--nv-text);}
+.nv-sub.active{
+    background:#eef5fd;color:var(--nv-blue-dark);font-weight:700;
+    box-shadow:inset 0 -2px 0 var(--nv-blue);
+}
+.nv-sub.active .nv-ic{color:var(--nv-blue-dark);}
+.nv-sep{
+    flex-shrink:0;width:1px;height:20px;margin:0 6px;
+    background:rgba(31,58,95,.2);
 }
 
-.sb-logout{
-    width:100%;padding:9px 12px;
-    border:1px solid rgba(239,68,68,.2);
-    border-radius:6px;
-    background:rgba(239,68,68,.08);
-    color:#fca5a5;
-    font-size:12px;font-weight:700;
-    cursor:pointer;
-    display:flex;align-items:center;justify-content:center;gap:6px;
-    transition:background .15s,box-shadow .15s,transform .1s;
-    font-family:var(--font);
+/* ── Responsive ── */
+@media(max-width:900px){
+    .nv-search{width:200px;}
 }
-.sb-logout:hover{
-    background:rgba(239,68,68,.18);
-    box-shadow:0 4px 16px rgba(239,68,68,.15);
-    transform:translateY(-1px);
-}
-
-/* ── COLAPSADO ── */
-.sidebar.collapsed{width:56px;}
-
-.sidebar.collapsed .sb-brand-info,
-.sidebar.collapsed .sb-user-info,
-.sidebar.collapsed .sb-status,
-.sidebar.collapsed .sb-section-left span:not(.sb-section-icon),
-.sidebar.collapsed .sb-section-arrow,
-.sidebar.collapsed .sb-item .sb-item-label,
-.sidebar.collapsed .sb-sub,
-.sidebar.collapsed #clockDate,
-.sidebar.collapsed .sb-storage-label,
-.sidebar.collapsed .sb-storage-pct,
-.sidebar.collapsed .sb-storage-bar,
-.sidebar.collapsed .sb-version,
-.sidebar.collapsed .sb-section-indicator,
-.sidebar.collapsed .sb-logout span:last-child,
-.sidebar.collapsed .sb-divider{
-    display:none !important;
-}
-.sidebar.collapsed .sb-brand{justify-content:center;margin-bottom:0;}
-.sidebar.collapsed .sb-user{justify-content:center;padding:8px;}
-.sidebar.collapsed .sb-avatar{margin:0;}
-.sidebar.collapsed .sb-item{justify-content:center;padding:10px 0;}
-.sidebar.collapsed .sb-section-title{justify-content:center;padding:10px 0;}
-.sidebar.collapsed .sb-clock{padding:8px;}
-.sidebar.collapsed #clockTime{font-size:11px;letter-spacing:0;}
-.sidebar.collapsed .sb-logout{justify-content:center;padding:9px 0;}
-.sidebar.collapsed .sb-collapse-btn{display:none;}
-.sidebar.collapsed .sb-storage{display:none;}
-
-/* Botón expandir colapsado */
-.sb-expand-btn{
-    display:none;
-    width:100%;padding:10px 0;
-    background:none;border:none;
-    color:var(--sb-accent);
-    font-size:18px;cursor:pointer;
-    font-weight:700;
-    transition:color .15s,transform .15s;
-}
-.sb-expand-btn:hover{
-    color:var(--sb-link);
-    transform:scale(1.2);
-}
-.sidebar.collapsed .sb-expand-btn{display:block;}
-
-/* ── RESPONSIVE ── */
-@media(max-width:768px){
-    .sb-toggle{display:flex;}
-    .sidebar{
-        transform:translateX(-100%);
-        width:var(--sb-width) !important;
+@media(max-width:680px){
+    .nv{padding:6px 6px 0;}
+    .nv-top{padding:10px 12px;gap:8px;}
+    .nv-brand-sub,.nv-user-name,.nv-chev{display:none;}
+    .nv-user{padding:3px;}
+    .nv-search-btn{display:flex;margin-left:auto;}
+    .nv-search{
+        display:none;
+        position:absolute;left:10px;right:10px;top:calc(100% + 6px);
+        width:auto;margin:0;
+        background:var(--nv-navy2);z-index:1100;
+        box-shadow:0 10px 28px rgba(15,39,71,.35);
     }
-    .sidebar.mobile-open{transform:translateX(0);}
-    .sidebar.collapsed{
-        width:var(--sb-width) !important;
-        transform:translateX(-100%);
-    }
+    .nv-search.open{display:flex;}
+    .nv-tabs{padding:8px 10px;}
+    .nv-tab{padding:0 12px;}
+    .nv-subs{padding:0 10px 10px;}
 }
 </style>
 
-{{-- Botón hamburguesa (móvil) --}}
-<button class="sb-toggle" id="sbToggle" aria-label="Abrir menú">
-    <div class="sb-toggle-icon">
-        <span></span><span></span><span></span>
-    </div>
-</button>
+<header class="nv" id="nv">
+    <div class="nv-card">
 
-{{-- Overlay fondo (móvil) --}}
-<div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+        {{-- Barra superior --}}
+        <div class="nv-top">
 
-<div class="sidebar" id="sidebar">
-
-    <div>
-        {{-- Header --}}
-        <div class="sb-header">
-            <div class="sb-brand">
-                <div class="sb-brand-icon">🚀</div>
-                <div class="sb-brand-info">
-                    <div class="sb-brand-name">DISTAN</div>
-                    <div class="sb-brand-sub">Warehouse & Production</div>
+            <a class="nv-brand" href="/dashboard">
+                <div class="nv-logo">
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill="#fff" fill-rule="evenodd" d="M5 4h7.2a8 8 0 0 1 0 16H5zM9.5 8.2v7.6h2.7a3.8 3.8 0 0 0 0-7.6z"/>
+                    </svg>
                 </div>
-                <div class="sb-collapse-btn"
-                     id="collapseBtn"
-                     onclick="toggleSidebar()"
-                     title="Colapsar menú">‹</div>
-            </div>
-
-            <button class="sb-expand-btn" onclick="toggleSidebar()" title="Expandir">›</button>
-
-            <div class="sb-user">
-                <div class="sb-avatar">
-                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
+                <div>
+                    <div class="nv-brand-name">DISTAN ERP</div>
+                    <div class="nv-brand-sub">Gestión empresarial</div>
                 </div>
-                <div class="sb-user-info">
-                    <div class="sb-user-name">{{ Auth::user()->name }}</div>
-                    <div class="sb-user-role">{{ ucfirst(auth()->user()->role) }}</div>
-                    <div class="sb-status">
-                        <span class="sb-status-dot"></span>
-                        En línea
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Nav --}}
-        <nav class="sb-nav">
-
-            <a href="/dashboard"
-               class="sb-item {{ request()->is('dashboard') ? 'active' : '' }}">
-                <span class="sb-icon">🏠</span>
-                <span class="sb-item-label">Dashboard</span>
             </a>
 
-            <div class="sb-divider"></div>
-
-            {{-- Almacenes --}}
-            @if($role == 'admin')
-            <div class="sb-section alm-s">
-                <div class="sb-section-title {{ $seccionActiva === 'alm' ? 'open' : '' }}"
-                     onclick="toggleMenu(this)">
-                    <div class="sb-section-left">
-                        <span class="sb-section-icon">🏢</span>
-                        <span>Almacenes</span>
-                    </div>
-                    <span class="sb-section-arrow">▾</span>
-                </div>
-                <div class="sb-sub">
-                    <a href="{{ route('joselito.index') }}">
-                        <span class="sb-icon">🏚️</span><span>Joselito</span>
-                    </a>
-                    <a href="{{ route('dalsa.index') }}">
-                        <span class="sb-icon">🏭</span><span>Dalsa</span>
-                    </a>
-                </div>
-            </div>
-            @endif
-
-            {{-- Operaciones --}}
-            <div class="sb-section ops-s">
-                <div class="sb-section-title {{ $seccionActiva === 'ops' ? 'open' : '' }}"
-                     onclick="toggleMenu(this)">
-                    <div class="sb-section-left">
-                        <span class="sb-section-icon">⚙️</span>
-                        <span>Operaciones</span>
-                    </div>
-                    <span class="sb-section-arrow">▾</span>
-                </div>
-                <div class="sb-sub">
-                    
-                    <a href="/orders">
-                        <span class="sb-icon">📋</span><span>Órdenes</span>
-                    </a>
-                    <a href="{{ route('supply-orders.index') }}"
-                    class="{{ request()->routeIs('supply-orders.*') ? 'active' : '' }}">
-                        <span class="sb-icon">🚚</span>
-                        <span>Abastecimiento a Plantas</span>
-                    </a>
-                    <a href="/historial">
-                        <span class="sb-icon">📚</span><span>Historial</span>
-                    </a>
-                    @if($role == 'admin')
-                    <a href="{{ route('raw-materials.index') }}">
-                        <span class="sb-icon">🧪</span><span>Materia Prima</span>
-                    </a>
-                    <a href="{{ route('products.proyectado') }}">
-                        <span class="sb-icon">📊</span><span>Proyectado</span>
-                    </a>
-                    <a href="{{ route('kardex.index') }}">
-                        <span class="sb-icon">📒</span><span>Kardex</span>
-                    </a>
-                    
-                    <a href="{{ route('production-orders.index') }}">
-                        <span class="sb-icon">🏭</span><span>Producción</span>
-                    </a>
-                    @endif
-                    @if($role == 'operario')
-                    <a href="/pedidos">
-                        <span class="sb-icon">📦</span><span>Pedidos</span>
-                    </a>
-                    @endif
-                </div>
+            <div class="nv-search" id="nvSearch">
+                {!! $svg('search') !!}
+                <input type="search" id="nvSearchInput" placeholder="Buscar en DISTAN..." autocomplete="off">
+                <div class="nv-results" id="nvResults"></div>
             </div>
 
-            {{-- Inventario --}}
-            <div class="sb-section inv-s">
-                <div class="sb-section-title {{ $seccionActiva === 'inv' ? 'open' : '' }}"
-                     onclick="toggleMenu(this)">
-                    <div class="sb-section-left">
-                        <span class="sb-section-icon">📦</span>
-                        <span>Inventario</span>
-                    </div>
-                    <span class="sb-section-arrow">▾</span>
-                </div>
-                <div class="sb-sub">
-                    @if($role == 'admin')
-                    <a href="/categories">
-                        <span class="sb-icon">🏷</span><span>Categorías</span>
-                    </a>
-                    <a href="{{ route('labels.index') }}">
-                        <span class="sb-icon">🔖</span><span>Etiquetas</span>
-                    </a>
-                    <a href="{{ route('stickers.index') }}">
-                        <span class="sb-icon">🏷️</span><span>Stickers de tapa</span>
-                    </a>
-                    <a href="{{ route('precintos.index') }}">
-                        <span class="sb-icon">🔒</span><span>Precintos</span>
-                    </a>
-                    @endif
-                    <a href="{{ route('cajas.index') }}">
-                        <span class="sb-icon">📫</span><span>Cajas</span>
-                    </a>
-                    <a href="/products">
-                        <span class="sb-icon">🛍️</span><span>Productos</span>
-                    </a>
-                    <a href="{{ route('warehouse.index') }}">
-                        <span class="sb-icon">🗺️</span><span>Mapa del Almacén</span>
-                    </a>
-                </div>
-            </div>
-
-            {{-- Comercial --}}
-            @if($role == 'admin')
-            <div class="sb-section com-s">
-                <div class="sb-section-title {{ $seccionActiva === 'com' ? 'open' : '' }}"
-                     onclick="toggleMenu(this)">
-                    <div class="sb-section-left">
-                        <span class="sb-section-icon">🤝</span>
-                        <span>Comercial</span>
-                    </div>
-                    <span class="sb-section-arrow">▾</span>
-                </div>
-                <div class="sb-sub">
-                    <a href="/clients">
-                        <span class="sb-icon">👤</span><span>Clientes</span>
-                    </a>
-                    <a href="/proveedores">
-                        <span class="sb-icon">🚚</span><span>Proveedores</span>
-                    </a>
-                    <a href="{{ route('users.index') }}" class="{{ request()->routeIs('users.*') ? 'active configuracion' : '' }}">
-                    <span class="sb-icon">👤</span><span>Usuarios</span> </a>
-                </div>
-            </div>
-            @endif
-            {{-- Comercial --}}
-            @if($role == 'admin')
-            <div class="sb-section com-s">
-                <div class="sb-section-title {{ $seccionActiva === 'com' ? 'open' : '' }}"
-                     onclick="toggleMenu(this)">
-                    <div class="sb-section-left">
-                        <span class="sb-section-icon">📝</span>
-                        <span>Auditoria</span>
-                    </div>
-                    <span class="sb-section-arrow">▾</span>
-                     </div>
-                <div class="sb-sub">
-                    <a href="{{ route('stockcount.index') }}"> <span>📈</span><span>Conteo físico</span></a>
-                
-                    <a href="{{ route('desmedros.index') }}" class="{{ request()->routeIs('desmedros.*') ? 'active' : '' }}">
-                        <span class="sb-icon">⛔</span><span>Desmedros</span> 
-                    </a>
-                    <a href="{{ route('rechazos.index') }}">
-                        <span>↩</span><span>Rechazos</span>
-                    </a>
-                    <a href="{{ route('orders.validation.index') }}">
-                        <span class="sb-icon">✅</span>
-                        <span>Validación de Pedidos</span>
-                    </a>
-                </div>
-            </div>
-            @endif
-
-                        {{-- Reportes --}}
-            @if($role == 'admin')
-            <div class="sb-section rep-s">
-
-                <div class="sb-section-title {{ $seccionActiva === 'rep' ? 'open' : '' }}"
-                     onclick="toggleMenu(this)">
-
-                    <div class="sb-section-left">
-                        <span class="sb-section-icon">📊</span>
-                        <span>Reportes</span>
-                    </div>
-
-                    <span class="sb-section-arrow">▾</span>
-                </div>
-
-                <div class="sb-sub">
-
-                    <a href="{{ route('reports.movimientos') }}"
-                       class="{{ request()->routeIs('reports.movimientos') ? 'active' : '' }}">
-
-                        <span class="sb-icon">🔄</span>
-                        <span>Movimientos</span>
-
-                    </a>
-
-                </div>
-
-            </div>
-            @endif
-        </nav>
-    </div>
-    
-
-    {{-- Footer --}}
-    <div class="sb-footer">
-
-        <div class="sb-section-indicator">
-            <span class="sb-section-indicator-dot"></span>
-            {{ $t['label'] }}
-        </div>
-
-        <div class="sb-clock">
-            <div id="clockTime">00:00:00</div>
-            <div id="clockDate">--</div>
-        </div>
-
-        <div class="sb-storage">
-            <div class="sb-storage-top">
-                <span class="sb-storage-label">📦 Capacidad almacén</span>
-                <span class="sb-storage-pct">82%</span>
-            </div>
-            <div class="sb-storage-bar">
-                <div class="sb-storage-fill"></div>
-            </div>
-        </div>
-
-        <div class="sb-version">DISTAN ERP · v1.0.0</div>
-
-        <form method="POST" action="{{ route('logout') }}">
-            @csrf
-            <button class="sb-logout">
-                <span>🚪</span>
-                <span>Cerrar sesión</span>
+            <button type="button" class="nv-icon-btn nv-search-btn" id="nvSearchBtn" aria-label="Buscar">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
             </button>
-        </form>
+
+            <button type="button" class="nv-icon-btn" aria-label="Notificaciones">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9a6 6 0 1 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9"/><path d="M10 20a2 2 0 0 0 4 0"/></svg>
+                @if($nvNotifCount > 0)
+                    <span class="nv-badge">{{ $nvNotifCount }}</span>
+                @endif
+            </button>
+
+            <div class="nv-user-wrap">
+                <button type="button" class="nv-user" id="nvUserBtn" aria-expanded="false" aria-haspopup="true">
+                    <span class="nv-avatar">{!! $svg('user') !!}</span>
+                    <span class="nv-user-name">{{ $userName }}</span>
+                    <svg class="nv-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg>
+                </button>
+
+                <div class="nv-menu" id="nvUserMenu">
+                    <div class="nv-menu-name">{{ $userName }}</div>
+                    <div class="nv-menu-role">{{ ucfirst(auth()->user()->role) }}</div>
+                    <div class="nv-status"><i></i>En línea</div>
+
+                    <div class="nv-clock">
+                        <div id="clockTime">00:00:00</div>
+                        <div id="clockDate">--</div>
+                    </div>
+
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+                        <button class="nv-logout">
+                            <span>🚪</span>
+                            <span>Cerrar sesión</span>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        {{-- Pestañas principales --}}
+        <nav class="nv-tabs" aria-label="Menú principal">
+            @foreach($menu as $mk => $m)
+                @if(empty($m['group']))
+                    <a href="{{ $m['href'] }}"
+                       class="nv-tab {{ $activeMenu === $mk ? 'is-active' : '' }}"
+                       style="--ic:{{ $m['color'] }}"
+                       data-menu="{{ $m['label'] }}">
+                        <span class="nv-ic">{!! $svg($m['icon']) !!}</span>
+                        <span>{{ $m['label'] }}</span>
+                    </a>
+                @else
+                    <button type="button"
+                            class="nv-tab {{ $activeMenu === $mk ? 'is-active' : '' }}"
+                            style="--ic:{{ $m['color'] }}"
+                            data-panel="{{ $mk }}">
+                        <span class="nv-ic">{!! $svg($m['icon']) !!}</span>
+                        <span>{{ $m['label'] }}</span>
+                    </button>
+                @endif
+            @endforeach
+        </nav>
+
+        {{-- Subpestañas --}}
+        <div class="nv-subs {{ $showSubs ? 'show' : '' }}" id="nvSubs">
+            @foreach($menu as $mk => $m)
+                @if(!empty($m['group']))
+                    <div class="nv-panel {{ $activeMenu === $mk ? 'show' : '' }}" data-panel="{{ $mk }}">
+                        @foreach($m['items'] as $ik => $it)
+                            @if(!empty($it['sep']))
+                                <span class="nv-sep"></span>
+                            @endif
+                            <a href="{{ $it['url'] }}"
+                               class="nv-sub {{ ($activeMenu === $mk && $activeItem === $ik) ? 'active' : '' }}"
+                               data-menu="{{ $m['label'] }}"
+                               @if(!empty($it['title'])) title="{{ $it['title'] }}" @endif
+                               @if($activeMenu === $mk && $activeItem === $ik) aria-current="page" @endif>
+                                <span class="nv-ic">{!! $svg($it['icon']) !!}</span>
+                                <span>{{ $it['label'] }}</span>
+                            </a>
+                        @endforeach
+                    </div>
+                @endif
+            @endforeach
+        </div>
 
     </div>
-
-</div>
+</header>
 
 <script>
-/* ── 1. Toggle secciones ── */
-function toggleMenu(el) {
-    var sub   = el.nextElementSibling;
-    var arrow = el.querySelector('.sb-section-arrow');
-    if (!sub) return;
+/* ── Compatibilidad: funciones del sidebar anterior (ya no hacen nada) ── */
+function toggleMenu() {}
+function toggleSidebar() {}
+function openSidebar() {}
+function closeSidebar() {}
 
-    if (sub.style.maxHeight && sub.style.maxHeight !== '0px') {
-        sub.style.maxHeight = '0px';
-        el.classList.remove('open');
-    } else {
-        sub.style.maxHeight = sub.scrollHeight + 'px';
-        el.classList.add('open');
-    }
-}
-
-/* ── 2. Colapsar / expandir (desktop) ── */
-var sbCollapsed = false;
-
-function toggleSidebar() {
-    var sb   = document.getElementById('sidebar');
-    var main = document.getElementById('mainContent');
-
-    sbCollapsed = !sbCollapsed;
-    sb.classList.toggle('collapsed', sbCollapsed);
-
-    if (main) {
-        main.classList.toggle('sidebar-collapsed', sbCollapsed);
-    }
-
-    localStorage.setItem('sb_collapsed', sbCollapsed ? '1' : '0');
-}
-
-/* ── 3. Sidebar móvil ── */
-function openSidebar() {
-    document.getElementById('sidebar').classList.add('mobile-open');
-    document.getElementById('sbOverlay').classList.add('show');
-    document.body.style.overflow = 'hidden';
-}
-function closeSidebar() {
-    document.getElementById('sidebar').classList.remove('mobile-open');
-    document.getElementById('sbOverlay').classList.remove('show');
-    document.body.style.overflow = '';
-}
-
-/* ── 4. Reloj ── */
+/* ── Reloj ── */
 function actualizarReloj() {
     var ahora  = new Date();
     var timeEl = document.getElementById('clockTime');
@@ -895,41 +636,149 @@ function actualizarReloj() {
     });
 }
 
-/* ── 5. Init ── */
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
+    var nv = document.getElementById('nv');
+    if (!nv) return;
 
-    /* Restaurar estado colapsado */
-    if (localStorage.getItem('sb_collapsed') === '1') {
-        var sb   = document.getElementById('sidebar');
-        var main = document.getElementById('mainContent');
-        sbCollapsed = true;
-        if (sb)   sb.classList.add('collapsed');
-        if (main) main.classList.add('sidebar-collapsed');
-    }
+    var each = function (list, fn) { Array.prototype.forEach.call(list, fn); };
 
-    /* Abrir sección activa y expandir su submenú */
-    var seccionActiva = '{{ $seccionActiva }}';
-    if (seccionActiva !== 'dash') {
-        document.querySelectorAll('.sb-section-title.open').forEach(function(title) {
-            var sub = title.nextElementSibling;
-            if (sub) sub.style.maxHeight = sub.scrollHeight + 'px';
+    /* ── Pestañas principales → cambian el panel de subpestañas ── */
+    var subs   = document.getElementById('nvSubs');
+    var panels = nv.querySelectorAll('.nv-panel');
+    var btnTabs = nv.querySelectorAll('button.nv-tab');
+
+    each(btnTabs, function (tab) {
+        tab.addEventListener('click', function () {
+            var key = tab.getAttribute('data-panel');
+
+            each(nv.querySelectorAll('.nv-tab'), function (t) { t.classList.remove('is-active'); });
+            tab.classList.add('is-active');
+
+            each(panels, function (p) {
+                p.classList.toggle('show', p.getAttribute('data-panel') === key);
+            });
+            if (subs) subs.classList.add('show');
         });
+    });
+
+    /* Llevar a la vista la pestaña / subpestaña activa (móvil) */
+    try {
+        var act = nv.querySelector('.nv-tab.is-active');
+        var sub = nv.querySelector('.nv-sub.active');
+        if (act) act.scrollIntoView({ inline:'center', block:'nearest' });
+        if (sub) sub.scrollIntoView({ inline:'center', block:'nearest' });
+    } catch (e) {}
+
+    /* ── Menú de usuario ── */
+    var userBtn  = document.getElementById('nvUserBtn');
+    var userMenu = document.getElementById('nvUserMenu');
+    if (userBtn && userMenu) {
+        userBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            var open = userMenu.classList.toggle('show');
+            userBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        });
+        userMenu.addEventListener('click', function (e) { e.stopPropagation(); });
     }
 
-    /* Botón hamburguesa */
-    var toggleBtn = document.getElementById('sbToggle');
-    if (toggleBtn) {
-        toggleBtn.addEventListener('click', function() {
-            var sb = document.getElementById('sidebar');
-            if (sb.classList.contains('mobile-open')) {
-                closeSidebar();
-            } else {
-                openSidebar();
+    /* ── Buscador (filtra los enlaces del propio menú) ── */
+    var box     = document.getElementById('nvSearch');
+    var input   = document.getElementById('nvSearchInput');
+    var results = document.getElementById('nvResults');
+    var sBtn    = document.getElementById('nvSearchBtn');
+
+    var norm = function (s) {
+        return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+    };
+
+    var links = [];
+    each(nv.querySelectorAll('a.nv-tab, a.nv-sub'), function (a) {
+        var label = a.textContent.replace(/\s+/g, ' ').trim();
+        var group = a.getAttribute('data-menu') || '';
+        links.push({
+            href: a.getAttribute('href'),
+            label: label,
+            group: group,
+            key: norm(label + ' ' + group + ' ' + (a.getAttribute('title') || ''))
+        });
+    });
+
+    var closeResults = function () {
+        results.classList.remove('show');
+        results.innerHTML = '';
+    };
+
+    var renderResults = function () {
+        var q = norm(input.value.trim());
+        results.innerHTML = '';
+        if (!q) { results.classList.remove('show'); return; }
+
+        var found = links.filter(function (l) { return l.key.indexOf(q) !== -1; }).slice(0, 8);
+
+        if (!found.length) {
+            var empty = document.createElement('div');
+            empty.className = 'nv-empty';
+            empty.textContent = 'Sin resultados';
+            results.appendChild(empty);
+        } else {
+            found.forEach(function (l, i) {
+                var a = document.createElement('a');
+                a.href = l.href;
+                if (i === 0) a.className = 'sel';
+                var s1 = document.createElement('span');
+                s1.textContent = l.label;
+                a.appendChild(s1);
+                if (l.group) {
+                    var s2 = document.createElement('small');
+                    s2.textContent = l.group;
+                    a.appendChild(s2);
+                }
+                results.appendChild(a);
+            });
+        }
+        results.classList.add('show');
+    };
+
+    if (input && results) {
+        input.addEventListener('input', renderResults);
+        input.addEventListener('focus', renderResults);
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                var first = results.querySelector('a');
+                if (first) { e.preventDefault(); window.location.href = first.getAttribute('href'); }
+            } else if (e.key === 'Escape') {
+                closeResults();
+                input.blur();
             }
         });
+        box.addEventListener('click', function (e) { e.stopPropagation(); });
     }
 
-    /* Reloj */
+    if (sBtn && box) {
+        sBtn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            box.classList.toggle('open');
+            if (box.classList.contains('open') && input) input.focus();
+        });
+    }
+
+    /* ── Cerrar desplegables al hacer clic fuera / con Escape ── */
+    document.addEventListener('click', function () {
+        if (userMenu) {
+            userMenu.classList.remove('show');
+            if (userBtn) userBtn.setAttribute('aria-expanded', 'false');
+        }
+        if (results) closeResults();
+        if (box) box.classList.remove('open');
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && userMenu) {
+            userMenu.classList.remove('show');
+            if (userBtn) userBtn.setAttribute('aria-expanded', 'false');
+        }
+    });
+
+    /* ── Reloj ── */
     actualizarReloj();
     setInterval(actualizarReloj, 1000);
 });
