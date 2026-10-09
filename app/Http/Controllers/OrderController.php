@@ -89,49 +89,28 @@ public function previewPdf(Request $request){
         'archivo' => 'required|file|mimes:pdf|max:10240',
     ]);
 
-  try {
+ 
+try {
 
-    $archivoPdf = $request->file('archivo')->getRealPath();
+    $parser = app(PedidoPdfParser::class);
 
-    /*
-    |--------------------------------------------------------------------------
-    | Intentar detectar SPSA
-    |--------------------------------------------------------------------------
-    */
-
-    try {
-
-        $spsaParser = app(PedidoSpsaPdfParser::class);
-
-        $datos = $spsaParser->parse(
-            $archivoPdf
-        );
-
-    } catch (\Throwable $e) {
-
-        \Log::error(
-            'ERROR PARSER SPSA',
-            [
-                'mensaje' => $e->getMessage(),
-                'archivo' => $e->getFile(),
-                'linea' => $e->getLine(),
-            ]
-        );
-
-        throw new \RuntimeException(
-            'El parser SPSA falló: '
-            . $e->getMessage()
-        );
-    }
+    $datos = $parser->parse(
+        $request->file('archivo')->getRealPath()
+    );
 
 } catch (\Throwable $e) {
+
+    \Log::error('Error al importar pedido local', [
+        'mensaje' => $e->getMessage(),
+        'archivo' => $e->getFile(),
+        'linea' => $e->getLine(),
+    ]);
 
     return back()
         ->withInput()
         ->with(
             'error',
-            'No se pudo analizar el PDF: '
-            . $e->getMessage()
+            'No se pudo analizar el PDF: ' . $e->getMessage()
         );
 }
 
