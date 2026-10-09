@@ -636,6 +636,17 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
                         @js($item->lote),
                         @js($item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('Y-m-d') : '')
                     )"><svg class="ic sm"><use href="#i-edit"/></svg></button>
+                    @if((float) $item->cantidad_despachada > 0)
+                    <a href="{{ $esSuper ? route('orders.etiqueta', $item) : route('orders.etiqueta.local', $item) }}"
+                       target="_blank" rel="noopener"
+                       class="op-icon-btn"
+                       style="text-decoration:none;"
+                       title="Imprimir etiqueta" aria-label="Imprimir etiqueta">
+                        <svg class="ic sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                            <path d="M6 9V3h12v6"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><path d="M6 14h12v7H6z"/><path d="M18 12h.01"/>
+                        </svg>
+                    </a>
+                    @endif
                     <button type="button" class="op-icon-btn" title="Seleccionar producto" aria-label="Seleccionar producto" onclick="seleccionarPorId({{ $item->id }})"><svg class="ic sm"><use href="#i-chevron"/></svg></button>
                 </div>
             </td>
