@@ -994,7 +994,7 @@ html, body {
     max-width: none !important;
     margin: 0 !important;
     padding: 20px 22px 30px !important;
-    min-height: 100vh !important;
+    min-height: 0 !important;
     background: #f1f5f9 !important;
 }
 
