@@ -292,7 +292,7 @@ body {
             <table width="100%" cellpadding="0" cellspacing="0">
                 <tr>
                     <td style="vertical-align:middle;">
-                        <div class="doc-title">GUÍA DE ENCOMIENDA</div>
+                        <div class="doc-title">ORDEN DE ENCOMIENDA</div>
                         <div class="doc-subtitle">Orden de despacho · {{ $order->tipo_orden }}</div>
                     </td>
                     <td style="width:128px;vertical-align:middle;">
