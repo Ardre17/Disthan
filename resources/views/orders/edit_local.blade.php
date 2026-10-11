@@ -181,6 +181,147 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
 .modal-head button{background:none;border:none;color:#93c5fd;font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;}
 .modal-body{padding:1rem;}
 .modal-warn{background:#fef3c7;border:1px solid #fde68a;border-radius:4px;padding:9px 10px;font-size:11px;color:#92400e;margin-bottom:12px;line-height:1.5;}
+
+/* ── Rediseño visual DISTAN: coherente con el panel de pedidos ── */
+.pg{
+    padding:clamp(12px,1.5vw,22px);
+    background:#f4f7fb;
+    min-height:100vh;
+    color:#172554;
+}
+.erp-bar{
+    background:#102b4e;
+    height:42px;
+    padding:0 1.25rem;
+    margin:-20px -20px 0;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+.erp-bar-title{color:#e7f0ff;font-size:12px;letter-spacing:.04em;}
+.erp-breadcrumb{color:#b8cbe5;}
+.erp-user{background:#174078;color:#fff;border-radius:999px;padding:5px 11px;}
+.order-header{
+    background:#fff;
+    border:1px solid #e1eaf5;
+    border-top:0;
+    border-radius:14px;
+    padding:16px 18px;
+    margin-bottom:14px;
+    box-shadow:0 4px 14px rgba(15,45,80,.04);
+    position:relative;
+}
+.order-header:before{
+    content:"";
+    position:absolute;left:0;top:0;bottom:0;width:4px;
+    border-radius:14px 0 0 14px;background:#2563eb;
+}
+.order-id{font-size:19px;color:#102e5b;letter-spacing:-.02em;}
+.order-sub{font-size:12px;color:#64748b;line-height:1.6;}
+.status-chip{border-radius:999px;letter-spacing:0;padding:6px 11px;font-size:11px;}
+.kpis{gap:10px;margin-bottom:14px;}
+.kpi{
+    border:1px solid #e1eaf5;border-left:0!important;border-radius:12px;
+    padding:12px 14px;background:#fff;box-shadow:0 3px 12px rgba(15,45,80,.035);
+    position:relative;overflow:hidden;
+}
+.kpi:before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:#3b82f6;}
+.kpi:nth-child(2):before{background:#22c55e;}
+.kpi:nth-child(3):before{background:#ef4444;}
+.kpi:nth-child(4):before{background:#0ea5e9;}
+.kpi:nth-child(5):before{background:#1e40af;}
+.kpi-label{color:#64748b;letter-spacing:.035em;font-size:9px;}
+.kpi-val{font-size:21px;color:#102e5b;}
+.kpi-sub{font-size:10px;color:#94a3b8;}
+.layout{grid-template-columns:minmax(0,1fr) 300px;gap:14px;align-items:start;}
+.left-col{gap:14px;min-width:0;}
+.panel{
+    border:1px solid #e1eaf5;border-radius:13px;overflow:hidden;
+    box-shadow:0 3px 12px rgba(15,45,80,.035);
+}
+.panel-header{
+    background:#f8fbff;border-bottom:1px solid #e7eef7;
+    padding:11px 14px;min-height:42px;
+}
+.panel-title{font-size:12px;color:#173b70;letter-spacing:.015em;text-transform:none;}
+.panel-body{padding:14px;}
+.scanner-erp{
+    background:linear-gradient(110deg,#10294b,#163b69);
+    border:1px solid #244a77;border-radius:12px;padding:10px 12px;
+    box-shadow:0 4px 12px rgba(16,43,78,.08);
+}
+.scan-input{
+    background:#fff;color:#102e5b;border:1px solid #d6e3f2;
+    border-radius:8px;padding:9px 11px;font-size:14px;
+}
+.scan-input::placeholder{color:#8294ad;font-size:12px;}
+.scan-input:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.15);}
+.add-grid{gap:9px;}
+.flabel{color:#64748b;font-size:10px;letter-spacing:.04em;}
+.finput{
+    border-color:#d8e3f0;border-radius:8px;padding:9px 10px;
+    font-size:12px;min-height:36px;
+}
+.finput:focus{border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,.1);}
+.erp-table{font-size:12px;}
+.erp-table th{
+    background:#f1f6fc;color:#526783;border-bottom:1px solid #dce7f4;
+    font-size:9px;letter-spacing:.04em;padding:10px 9px;
+}
+.erp-table td{padding:9px;border-bottom:1px solid #edf2f8;}
+.erp-table tbody tr:hover td{background:#f6faff;}
+.erp-table .num-input{
+    border:1px solid #d8e3f0;border-radius:7px;padding:6px 7px;
+}
+.lote-badge{border-radius:6px;background:#f5f8fc;border-color:#e0e9f4;}
+.btn-xs{border-radius:7px;padding:6px 9px;}
+.btn-primary{
+    background:#2563eb;border-radius:8px;padding:9px 14px;
+    box-shadow:0 3px 8px rgba(37,99,235,.15);
+}
+.btn-green{
+    background:#16a34a;border-radius:8px;padding:9px 14px;
+    box-shadow:0 3px 8px rgba(22,163,74,.13);
+}
+.btn-edit,.btn-save,.btn-del,.btn-cancel{border-radius:7px;}
+.summary-table tr td{padding:8px 7px;border-bottom:1px solid #edf2f8;}
+.summary-table .total-row td{border-top:1px solid #d8e3f0;color:#173b70;}
+.alert-ok,.alert-warn{border-radius:9px;padding:9px 12px;}
+hr.dv{border-top-color:#e8eef6;}
+.modal-overlay{backdrop-filter:blur(3px);}
+.modal-box{border-radius:14px;box-shadow:0 18px 50px rgba(10,30,60,.28);}
+.modal-head{background:#102e5b;padding:13px 16px;}
+.modal-head button{color:#dbeafe;}
+.modal-body{padding:16px;}
+.modal-warn{border-radius:8px;}
+@media(max-width:1100px){
+    .layout{grid-template-columns:minmax(0,1fr) 270px;}
+}
+@media(max-width:900px){
+    .pg{padding:12px;}
+    .layout{grid-template-columns:minmax(0,1fr);}
+    .right-col{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+}
+@media(max-width:600px){
+    .erp-bar{margin:-12px -12px 0;padding:0 12px;height:38px;}
+    .erp-bar-title{font-size:10px;}
+    .erp-user{font-size:10px;}
+    .pg{padding:10px;background:#f3f7fc;}
+    .order-header{padding:14px 13px;border-radius:12px;}
+    .order-id{font-size:17px;}
+    .order-sub{font-size:11px;}
+    .kpis{gap:8px;}
+    .kpi{padding:10px 11px;border-radius:10px;}
+    .kpi-val{font-size:19px;}
+    .layout{gap:10px;}
+    .left-col{gap:10px;}
+    .right-col{display:flex;flex-direction:column;gap:10px;}
+    .panel{border-radius:11px;}
+    .panel-header{padding:10px 12px;}
+    .panel-body{padding:11px;}
+    .scanner-erp{flex-wrap:wrap;}
+    .scan-input{font-size:16px;min-width:0;width:100%;}
+    .erp-table{min-width:580px;}
+}
+
 </style>
 
 {{-- ── ERP Top Bar ── --}}
