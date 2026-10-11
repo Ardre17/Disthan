@@ -11,7 +11,7 @@
 html, body { width: 100%; margin: 0; padding: 0; }
 body { font-family: DejaVu Sans, sans-serif; font-size: 7px; color: #172033; }
 .etiqueta {
-    width: 100%; border: 1.5px solid #22b86b; border-radius: 7px;
+    width: 96%; margin: 0 auto; border: 1.5px solid #22b86b; border-radius: 7px;
     padding: 5px 6px 4px; overflow: hidden;
 }
 .cabecera { width: 100%; margin-bottom: 3px; }
@@ -19,8 +19,8 @@ body { font-family: DejaVu Sans, sans-serif; font-size: 7px; color: #172033; }
 .cabecera td { padding: 0; border: none; vertical-align: middle; }
 .empresa { width: 58%; font-size: 7px; font-weight: bold; text-align: left; }
 .orden { width: 42%; font-size: 6px; font-weight: bold; text-align: right; white-space: nowrap; color: #42516b; }
-.cliente { width: 100%; margin: 0 0 4px; text-align: center; font-size: 7px; font-weight: bold; line-height: 1.1; overflow-wrap: break-word; }
-.cliente-label { color: #52627a; font-size: 5px; font-weight: bold; }
+.cliente { width: 100%; margin: 0 0 4px; text-align: center; font-size: 9px; font-weight: bold; line-height: 1.15; overflow-wrap: break-word; }
+.cliente-label { color: #52627a; font-size: 7px; font-weight: bold; }
 .bulto-box { width: 100%; padding: 1px 2px 3px; margin-bottom: 2px; }
 .bulto-cabecera { width: 100%; border-collapse: collapse; }
 .bulto-cabecera td { border: none; padding: 0; vertical-align: middle; }
