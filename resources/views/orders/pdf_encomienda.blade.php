@@ -98,6 +98,7 @@ body {
     border-bottom: 1px solid #c7dbf5;
 }
 .tbl thead th.center { text-align: center; }
+.tbl tbody tr { page-break-inside: avoid; }
 .tbl tbody td {
     padding: 3px 5px;
     border-bottom: 1px solid #e8eef7;
@@ -356,77 +357,13 @@ body {
     </tr>
 </table>
 
-{{-- ══ PRODUCTOS ENVIADOS + PROGRESO ══ --}}
-<table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
-    <tr>
-        <td style="width:67%;vertical-align:top;padding-right:6px;">
-
-            <div class="sec"><span class="num">1</span>Productos del envío</div>
-            <table class="tbl" cellpadding="0" cellspacing="0">
-                <thead>
-                    <tr>
-                        <th style="width:5%;" class="center">#</th>
-                        <th>Producto</th>
-                        @if($tienePres)
-                        <th style="width:16%;">Present.</th>
-                        @endif
-                        <th style="width:10%;" class="center">Solic.</th>
-                        <th style="width:9%;" class="center">Env.</th>
-                        <th style="width:9%;" class="center">Falt.</th>
-                        <th style="width:14%;" class="center">Peso (kg)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @foreach($order->details as $item)
-                    @php
-                        $pesoUnit = ($item->product->peso ?? 0) / 1000;
-                        $peso = $item->cantidad_despachada * $pesoUnit;
-                        $totalPeso += $peso;
-                        $totalUnidades += $item->cantidad_despachada;
-
-                        $faltaItem = max(0, $item->cantidad_solicitada - $item->cantidad_despachada);
-                        $colEnv = $item->cantidad_despachada >= $item->cantidad_solicitada && $item->cantidad_solicitada > 0
-                            ? '#15803d'
-                            : ($item->cantidad_despachada > 0 ? '#d97706' : '#dc2626');
-                    @endphp
-                    <tr>
-                        <td class="center" style="color:#64748b;">{{ $loop->iteration }}</td>
-                        <td>
-                            <div class="p-name">{{ $item->product->nombre }}</div>
-                            <div class="p-sub">{{ number_format($pesoUnit, 3) }} kg/u</div>
-                        </td>
-                        @if($tienePres)
-                        <td>{{ data_get($item->product, 'presentacion') }}</td>
-                        @endif
-                        <td class="center mono">{{ number_format($item->cantidad_solicitada, 0) }}</td>
-                        <td class="center mono" style="font-weight:700;color:{{ $colEnv }};">{{ number_format($item->cantidad_despachada, 0) }}</td>
-                        <td class="center mono" style="font-weight:700;color:{{ $faltaItem > 0 ? '#dc2626' : '#94a3b8' }};">{{ number_format($faltaItem, 0) }}</td>
-                        <td class="center mono" style="font-weight:700;color:#1e3a5f;">{{ number_format($peso, 2) }}</td>
-                    </tr>
-                @endforeach
-                </tbody>
-                <tfoot>
-                    <tr>
-                        <td></td>
-                        <td>TOTALES</td>
-                        @if($tienePres)
-                        <td></td>
-                        @endif
-                        <td class="center">{{ number_format($uSolicitadas, 0) }}</td>
-                        <td class="center">{{ number_format($totalUnidades, 0) }}</td>
-                        <td class="center">{{ number_format(max(0, $uSolicitadas - $uDespachadas), 0) }}</td>
-                        <td class="center">{{ number_format($totalPeso, 2) }}</td>
-                    </tr>
-                </tfoot>
-            </table>
-
-        </td>
-        <td style="width:33%;vertical-align:top;">
-
-            <div class="card">
-                <div class="card-b" style="padding:9px 10px;">
+{{-- ══ PROGRESO DE PREPARACIÓN ══ --}}
+<div class="card" style="margin-bottom:10px;page-break-inside:avoid;">
+    <div class="card-b" style="padding:8px 10px;">
+        <table width="100%" cellpadding="0" cellspacing="0">
+            <tr>
+                <td style="width:72%;vertical-align:middle;padding-right:12px;">
                     <div class="prog-title">Progreso de preparación</div>
-
                     <table class="prog-bar" cellpadding="0" cellspacing="0">
                         <tr>
                             @if($pctProg >= 100)
@@ -439,32 +376,83 @@ body {
                             @endif
                         </tr>
                     </table>
+                    <div style="font-size:8px;color:#475569;margin-top:4px;">
+                        {{ number_format($uDespachadas, 0) }} / {{ number_format($uSolicitadas, 0) }} unidades preparadas
+                    </div>
+                </td>
+                <td style="width:12%;vertical-align:middle;text-align:right;">
+                    <div class="prog-pct">{{ number_format($pctProg, 0) }}%</div>
+                </td>
+                <td style="width:16%;vertical-align:middle;padding-left:12px;">
+                    <div style="font-size:7.5px;color:#475569;line-height:1.8;">
+                        <div><span class="sq" style="background:#22c55e;"></span>Completos ({{ $nCompletos }})</div>
+                        <div><span class="sq" style="background:#f59e0b;"></span>Parciales ({{ $nParciales }})</div>
+                        <div><span class="sq" style="background:#ef4444;"></span>Pendientes ({{ $nPendientes }})</div>
+                    </div>
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
 
-                    <table width="100%" cellpadding="0" cellspacing="0" style="margin-top:6px;">
-                        <tr>
-                            <td class="prog-units" style="text-align:left;vertical-align:bottom;">
-                                {{ number_format($uDespachadas, 0) }} / {{ number_format($uSolicitadas, 0) }} unidades
-                            </td>
-                            <td class="prog-pct">{{ number_format($pctProg, 0) }}%</td>
-                        </tr>
-                    </table>
+{{-- ══ PRODUCTOS ENVIADOS ══ --}}
+<div class="sec"><span class="num">1</span>Productos del envío</div>
+<table class="tbl" cellpadding="0" cellspacing="0" style="margin-bottom:10px;">
+    <thead>
+        <tr>
+            <th style="width:5%;" class="center">#</th>
+            <th>Producto</th>
+            @if($tienePres)
+            <th style="width:16%;">Present.</th>
+            @endif
+            <th style="width:10%;" class="center">Solic.</th>
+            <th style="width:9%;" class="center">Env.</th>
+            <th style="width:9%;" class="center">Falt.</th>
+            <th style="width:14%;" class="center">Peso (kg)</th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach($order->details as $item)
+        @php
+            $pesoUnit = ($item->product->peso ?? 0) / 1000;
+            $peso = $item->cantidad_despachada * $pesoUnit;
+            $totalPeso += $peso;
+            $totalUnidades += $item->cantidad_despachada;
 
-                    <table class="legend" width="100%" cellpadding="0" cellspacing="0">
-                        <tr>
-                            <td><span class="sq" style="background:#22c55e;"></span>Completos ({{ $nCompletos }})</td>
-                        </tr>
-                        <tr>
-                            <td><span class="sq" style="background:#f59e0b;"></span>Parciales ({{ $nParciales }})</td>
-                        </tr>
-                        <tr>
-                            <td><span class="sq" style="background:#ef4444;"></span>Pendientes ({{ $nPendientes }})</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-
-        </td>
-    </tr>
+            $faltaItem = max(0, $item->cantidad_solicitada - $item->cantidad_despachada);
+            $colEnv = $item->cantidad_despachada >= $item->cantidad_solicitada && $item->cantidad_solicitada > 0
+                ? '#15803d'
+                : ($item->cantidad_despachada > 0 ? '#d97706' : '#dc2626');
+        @endphp
+        <tr>
+            <td class="center" style="color:#64748b;">{{ $loop->iteration }}</td>
+            <td>
+                <div class="p-name">{{ $item->product->nombre }}</div>
+                <div class="p-sub">{{ number_format($pesoUnit, 3) }} kg/u</div>
+            </td>
+            @if($tienePres)
+            <td>{{ data_get($item->product, 'presentacion') }}</td>
+            @endif
+            <td class="center mono">{{ number_format($item->cantidad_solicitada, 0) }}</td>
+            <td class="center mono" style="font-weight:700;color:{{ $colEnv }};">{{ number_format($item->cantidad_despachada, 0) }}</td>
+            <td class="center mono" style="font-weight:700;color:{{ $faltaItem > 0 ? '#dc2626' : '#94a3b8' }};">{{ number_format($faltaItem, 0) }}</td>
+            <td class="center mono" style="font-weight:700;color:#1e3a5f;">{{ number_format($peso, 2) }}</td>
+        </tr>
+    @endforeach
+    </tbody>
+    <tfoot>
+        <tr>
+            <td></td>
+            <td>TOTALES</td>
+            @if($tienePres)
+            <td></td>
+            @endif
+            <td class="center">{{ number_format($uSolicitadas, 0) }}</td>
+            <td class="center">{{ number_format($totalUnidades, 0) }}</td>
+            <td class="center">{{ number_format(max(0, $uSolicitadas - $uDespachadas), 0) }}</td>
+            <td class="center">{{ number_format($totalPeso, 2) }}</td>
+        </tr>
+    </tfoot>
 </table>
 
 {{-- ══ BULTOS ══ --}}
