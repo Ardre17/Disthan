@@ -6,269 +6,44 @@
 <meta charset="UTF-8">
 
 <style>
-
-@page {
-    size: 100mm 70mm;
-    margin: 2mm;
-}
-
-* {
-    box-sizing: border-box;
-}
-
-html,
-body {
-    width: 100%;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: DejaVu Sans, sans-serif;
-    font-size: 7px;
-    color: #000;
-}
-
-/* =====================================================
-   ETIQUETA
-   ===================================================== */
-
+@page { size: 100mm 70mm; margin: 2mm; }
+* { box-sizing: border-box; }
+html, body { width: 100%; margin: 0; padding: 0; }
+body { font-family: DejaVu Sans, sans-serif; font-size: 7px; color: #172033; }
 .etiqueta {
-    width: 100%;
-    border: 1px solid #000;
-    padding: 3px;
+    width: 100%; border: 1.5px solid #22b86b; border-radius: 7px;
+    padding: 5px 6px 4px; overflow: hidden;
 }
-
-
-/* =====================================================
-   CABECERA
-   ===================================================== */
-
-.cabecera {
-    width: 100%;
-    border-bottom: 1px solid #000;
-    padding-bottom: 3px;
-    margin-bottom: 4px;
-}
-
-.cabecera table,
-.productos,
-.resumen {
-    width: 100%;
-    max-width: 100%;
-}
-
-.cabecera td,
-.productos th,
-.productos td,
-.resumen td {
-    overflow: hidden;
-}
-
-.cabecera td {
-    padding: 0;
-    border: none;
-}
-
-.empresa {
-    width: 60%;
-    font-size: 8px;
-    font-weight: bold;
-    text-align: left;
-}
-
-.orden {
-    width: 40%;
-    text-align: right;
-    font-size: 6px;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-
-/* =====================================================
-   CLIENTE
-   ===================================================== */
-
-.cliente-label {
-    font-size: 5.5px;
-    font-weight: bold;
-    margin-bottom: 1px;
-}
-
-.cliente {
-    width: 100%;
-    font-size: 8px;
-    font-weight: bold;
-    margin-bottom: 5px;
-    text-align: center;
-    line-height: 1.15;
-    word-break: break-word;
-    overflow-wrap: break-word;
-}
-
-
-/* =====================================================
-   BULTO
-   ===================================================== */
-.bulto-box {
-    width: 100%;
-    border: 1px solid #000;
-    text-align: center;
-    padding: 4px;
-    margin-bottom: 4px;
-}
-
-.bulto-numero {
-    font-size: 24px;
-    font-weight: bold;
-    line-height: 1;
-}
-
-.bulto-texto {
-    font-size: 7px;
-    font-weight: bold;
-    margin-top: 2px;
-}
-.bulto-nombre {
-    font-size: 16px;
-    font-weight: bold;
-    line-height: 1;
-}
-
-.bulto-total {
-    font-size: 6px;
-    margin-top: 2px;
-}
-.peso-box {
-    width: 100%;
-    border-top: 1px solid #000;
-    border-bottom: 1px solid #000;
-    text-align: center;
-    padding: 3px 0;
-    margin-top: 4px;
-}
-
-.peso-numero {
-    font-size: 18px;
-    font-weight: bold;
-    line-height: 1;
-}
-
-.peso-unidad {
-    font-size: 6px;
-    font-weight: bold;
-    margin-top: 1px;
-}
-
-/* =====================================================
-   PRODUCTOS
-   ===================================================== */
-
-.productos {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-}
-
-.productos th,
-.productos td {
-    padding: 2px 3px;
-    line-height: 1.05;
-}
-
-.productos th {
-    text-align: center;
-    font-size: 6px;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.productos td {
-    text-align: center;
-    padding: 2px 3px;
-    font-size: 7px;
-    line-height: 1.1;
-}
-
-.productos .producto {
-    width: 75%;
-    text-align: center;
-    font-weight: bold;
-    white-space: normal;
-    overflow: hidden;
-    word-wrap: break-word;
-}
-
-.productos .cantidad {
-    width: 25%;
-    text-align: center;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-/* =====================================================
-   RESUMEN
-   ===================================================== */
-
-.resumen {
-    width: 100%;
-    table-layout: fixed;
-    border-collapse: collapse;
-    margin-top: 4px;
-}
-
-.resumen td {
-    padding: 2px 3px;
-    border-top: 1px solid #000;
-    font-size: 6.5px;
-}
-
-.resumen .label {
-    width: 70%;
-    font-weight: bold;
-}
-
-.resumen .valor {
-    width: 30%;
-    text-align: right;
-    font-weight: bold;
-    white-space: nowrap;
-}
-
-
-/* =====================================================
-   PIE
-   ===================================================== */
-
-.pie {
-    margin-top: 3px;
-    padding-top: 2px;
-    border-top: 1px solid #000;
-    text-align: center;
-    font-size: 5px;
-}
-.total-box {
-    width: 100%;
-    border-top: 1px solid #000;
-    border-bottom: 1px solid #000;
-    text-align: center;
-    padding: 3px 0;
-    margin-top: 4px;
-}
-
-.total-label {
-    font-size: 6px;
-    font-weight: bold;
-    text-align: center;
-}
-
-.total-numero {
-    font-size: 14px;
-    font-weight: bold;
-    line-height: 1.1;
-    text-align: center;
-}
+.cabecera { width: 100%; margin-bottom: 3px; }
+.cabecera table { width: 100%; border-collapse: collapse; }
+.cabecera td { padding: 0; border: none; vertical-align: middle; }
+.empresa { width: 58%; font-size: 7px; font-weight: bold; text-align: left; }
+.orden { width: 42%; font-size: 6px; font-weight: bold; text-align: right; white-space: nowrap; color: #42516b; }
+.cliente { width: 100%; margin: 0 0 4px; text-align: center; font-size: 7px; font-weight: bold; line-height: 1.1; overflow-wrap: break-word; }
+.cliente-label { color: #52627a; font-size: 5px; font-weight: bold; }
+.bulto-box { width: 100%; padding: 1px 2px 3px; margin-bottom: 2px; }
+.bulto-cabecera { width: 100%; border-collapse: collapse; }
+.bulto-cabecera td { border: none; padding: 0; vertical-align: middle; }
+.bulto-indice { width: 16%; text-align: center; }
+.bulto-numero { display: inline-block; min-width: 20px; padding: 4px 5px; border-radius: 5px; background: #ddf8e8; color: #16864b; font-size: 15px; font-weight: bold; line-height: 1; }
+.bulto-nombre { text-align: left; font-size: 15px; font-weight: bold; color: #172033; line-height: 1; }
+.bulto-total { text-align: right; color: #52627a; font-size: 5.5px; padding-top: 2px; }
+.peso-box { text-align: center; margin: 1px 0 3px; }
+.peso-numero { display: inline-block; min-width: 34mm; padding: 4px 7px; border-radius: 7px; background: #e0ecff; color: #2459d3; font-size: 17px; font-weight: bold; line-height: 1; }
+.peso-unidad { font-size: 10px; font-weight: bold; }
+.total-box { text-align: center; margin: 0 0 3px; color: #52627a; font-size: 6px; }
+.productos { width: 100%; table-layout: fixed; border-collapse: collapse; margin-top: 1px; }
+.productos th, .productos td { padding: 3px; line-height: 1.1; overflow: hidden; border: none; }
+.productos thead { background: #eef2f8; }
+.productos th { font-size: 6.5px; font-weight: bold; text-align: left; color: #52627a; }
+.productos td { font-size: 7px; border-bottom: 1px solid #e4eaf2; vertical-align: middle; }
+.productos .producto { width: 78%; text-align: left; font-weight: bold; white-space: normal; overflow-wrap: break-word; }
+.productos .cantidad { width: 22%; text-align: right; font-weight: bold; white-space: nowrap; }
+.codigo-barras { text-align: center; margin-top: 4px; padding-top: 1px; }
+.barras { height: 13mm; width: 76%; margin: 0 auto 2px; white-space: nowrap; overflow: hidden; font-size: 0; line-height: 0; }
+.barras span { display: inline-block; height: 13mm; background: #111; vertical-align: top; }
+.codigo-texto { font-size: 7px; font-weight: bold; color: #42516b; text-align: center; overflow-wrap: break-word; }
+.pie { display: none; }
 </style>
 
 </head>
@@ -301,161 +76,82 @@ body {
 
     $totalUnidades = $bulto->detalles->sum('cantidad');
 
+    // Identificador impreso del bulto.
+    $codigoBulto = 'ORD' . str_pad((string) $order->id, 6, '0', STR_PAD_LEFT) . '-B' . $numeroBulto;
+
+    // Patrón gráfico de barras para acompañar al código impreso.
+    $patronBarras = [];
+    foreach (str_split($codigoBulto) as $caracter) {
+        $valor = ord($caracter);
+        $patronBarras[] = 1 + ($valor % 3);
+        $patronBarras[] = 1;
+        $patronBarras[] = 1 + (($valor >> 2) % 3);
+        $patronBarras[] = 1;
+    }
+
 @endphp
 
 
 <div class="etiqueta">
 
-
-    {{-- =================================================
-         CABECERA
-         ================================================= --}}
-
     <div class="cabecera">
-
         <table>
-
             <tr>
-
-                <td class="empresa">
-                    VALLE FERTIL SAC
-                </td>
-
-                <td class="orden">
-                    ORDEN #{{ $order->numero_orden }}
-                </td>
-
+                <td class="empresa">VALLE FERTIL SAC</td>
+                <td class="orden">ORDEN #{{ $order->numero_orden }}</td>
             </tr>
-
         </table>
-
-    </div>
-
-
-    {{-- =================================================
-         CLIENTE
-         ================================================= --}}
-
-    <div class="cliente-label">
-        CLIENTE
     </div>
 
     <div class="cliente">
-        {{ $cliente }}
+        <span class="cliente-label">CLIENTE: </span>{{ $cliente }}
     </div>
-
-
-    {{-- =================================================
-         IDENTIFICACIÓN DEL BULTO
-         ================================================= --}}
 
     <div class="bulto-box">
-
-        <div class="bulto-nombre">
-            BULTO {{ $numeroBulto }}
-        </div>
-
-        <div class="bulto-total">
-            Bulto {{ $numeroBulto }} de {{ $totalBultos }}
-        </div>
-
+        <table class="bulto-cabecera">
+            <tr>
+                <td class="bulto-indice"><span class="bulto-numero">{{ $numeroBulto }}</span></td>
+                <td class="bulto-nombre">Bulto {{ $numeroBulto }}</td>
+            </tr>
+        </table>
+        <div class="bulto-total">Bulto {{ $numeroBulto }} de {{ $totalBultos }}</div>
     </div>
 
+    <div class="peso-box">
+        <span class="peso-numero">{{ number_format($bulto->peso_total ?? 0, 2) }} <span class="peso-unidad">kg</span></span>
+    </div>
 
-    {{-- =================================================
-         PRODUCTOS
-         ================================================= --}}
+    <div class="total-box">
+        {{ $bulto->detalles->count() }} {{ $bulto->detalles->count() == 1 ? 'producto' : 'productos' }}
+    </div>
 
     <table class="productos">
-
         <thead>
-
             <tr>
-
-                <th class="producto">
-                    PRODUCTO
-                </th>
-
-                <th class="cantidad">
-                    CANT.
-                </th>
-
+                <th class="producto">Producto</th>
+                <th class="cantidad">Cant.</th>
             </tr>
-
         </thead>
-
         <tbody>
-
             @forelse($bulto->detalles as $detalle)
-
                 <tr>
-
-                    <td class="producto">
-                        {{ $detalle->product->nombre ?? 'Producto' }}
-                    </td>
-
-                    <td class="cantidad">
-                        {{ number_format($detalle->cantidad, 0) }}
-                    </td>
-
+                    <td class="producto">{{ $detalle->product->nombre ?? 'Producto' }}</td>
+                    <td class="cantidad">x {{ number_format($detalle->cantidad, 0) }}</td>
                 </tr>
-
             @empty
-
-                <tr>
-
-                    <td colspan="2" style="text-align:center;">
-                        Sin productos
-                    </td>
-
-                </tr>
-
+                <tr><td colspan="2" style="text-align:center;">Sin productos</td></tr>
             @endforelse
-
         </tbody>
-
     </table>
 
-
-    {{-- =================================================
-         RESUMEN
-         ================================================= --}}
-
-   <div class="total-box">
-
-    <div class="total-label">
-        TOTAL UNIDADES
+    <div class="codigo-barras">
+        <div class="barras">
+            @foreach($patronBarras as $ancho)
+                <span style="width: {{ $ancho * 0.45 }}mm; margin-right: 0.25mm;"></span>
+            @endforeach
+        </div>
+        <div class="codigo-texto">Código: {{ $codigoBulto }}</div>
     </div>
-
-    <div class="total-numero">
-        {{ number_format($totalUnidades, 0) }}
-    </div>
-
-</div>
-
-<div class="peso-box">
-
-    <div class="peso-numero">
-        {{ number_format($bulto->peso_total ?? 0, 3) }}
-    </div>
-
-    <div class="peso-unidad">
-        kg
-    </div>
-
-</div>
-
-          
-
-
-    {{-- =================================================
-         PIE
-         ================================================= --}}
-
-    <div class="pie">
-        Orden {{ $order->numero_orden }}
-    </div>
-
 
 </div>
 
