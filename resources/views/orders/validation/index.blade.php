@@ -2098,6 +2098,27 @@
     /* Historial (original) debajo del grid */
     .vp .validation-orders-section{display:block !important;margin-top:16px;scroll-margin-top:calc(var(--tn-h,176px) + 12px);}
     .vp .validation-orders-section > .validation-list-card:first-child{display:none !important;}
+
+
+    /* Ajustes de contención: evitar que las tres columnas excedan el área útil del ERP. */
+    .validation-page.vp {
+        box-sizing: border-box;
+        width: 100%;
+        min-width: 0;
+        max-width: 1680px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+    .vp-grid, .vp-left, .vp-center, .vp-right { min-width: 0; }
+    @media (max-width: 1550px) {
+        .vp-grid { grid-template-columns: minmax(260px, 320px) minmax(0, 1fr); }
+        .vp-right { grid-column: 2; }
+    }
+    @media (max-width: 950px) {
+        .vp-grid { grid-template-columns: minmax(0, 1fr); }
+        .vp-right { grid-column: 1; }
+        .validation-page.vp { padding-left: 12px; padding-right: 12px; }
+    }
 </style>
 <div class="validation-page vp">
 
@@ -3356,13 +3377,13 @@ document.addEventListener('DOMContentLoaded', function () {
 
     let modoActual = null;
 
-    /* Hook de SOLO LECTURA para el rediseño visual (no altera la lógica). */
+    // Estado compartido de solo lectura para los componentes visuales nuevos.
     window.__valPedido = {
-        get pedido()       { return pedidoActual; },
-        get detalles()     { return detalles; },
+        get pedido() { return pedidoActual; },
+        get detalles() { return detalles; },
         get validaciones() { return validaciones; },
-        get indice()       { return indiceItem; },
-        get modo()         { return modoActual; }
+        get indice() { return indiceItem; },
+        get modo() { return modoActual; }
     };
 
         /*
@@ -3491,117 +3512,2321 @@ document.addEventListener('DOMContentLoaded', function () {
         );
 
     }
+
+};
+
+
+    window.cerrarHistorialPedido = function () {
+
+        const modal =
+            document.getElementById('validationHistoryModal');
+
+        if (modal) {
+            modal.classList.add('d-none');
+        }
+    };
+
+
+    window.verHistorialPedido = async function (orderId) {
+
+        const modal =
+            document.getElementById('validationHistoryModal');
+
+        const body =
+            document.getElementById('validationHistoryBody');
+
+        const title =
+            document.getElementById('validationHistoryTitle');
+
+        modal.classList.remove('d-none');
+
+        body.innerHTML = `
+            <div class="validation-empty">
+                <i class="bi bi-arrow-repeat"></i>
+                Cargando historial...
+            </div>
+        `;
+
+        try {
+
+            const response = await fetch(
+                `/validacion-pedidos/${orderId}/historial`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                }
+            );
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+                throw new Error(
+                    data.message ||
+                    'No se pudo obtener el historial.'
+                );
+            }
+
+            const validaciones =
+                data.validations || [];
+
+            if (!validaciones.length) {
+
+                body.innerHTML = `
+                    <div class="validation-empty">
+                        <i class="bi bi-clock-history"></i>
+                        No existen validaciones para este pedido.
+                    </div>
+                `;
+
+                return;
+            }
+
+            const primera =
+                validaciones[0];
+
+            const order =
+                primera.order ||
+                primera.order_detail?.order ||
+                null;
+
+            title.textContent =
+                `Historial del pedido ${
+                    order?.numero_orden || ''
+                }`;
+
+            let html = '';
+
+            validaciones.forEach(function (validacion, index) {
+
+                const estado =
+                    validacion.estado || 'PENDIENTE';
+
+                const estadoClase =
+                    estado
+                        .toLowerCase()
+                        .replaceAll('_', '-');
+
+                const fecha =
+                    validacion.fecha_validacion
+                        ? new Date(
+                            validacion.fecha_validacion
+                          ).toLocaleString('es-PE')
+                        : '-';
+
+                const usuario =
+                    validacion.usuario?.name ||
+                    'Sistema';
+
+                html += `
+
+                    <div
+                        style="
+                            border:1px solid #e2e8f0;
+                            border-radius:12px;
+                            margin-bottom:16px;
+                            overflow:hidden;
+                        "
+                    >
+
+                        <div
+                            style="
+                                padding:14px 16px;
+                                background:#f8fafc;
+                                display:flex;
+                                align-items:center;
+                                justify-content:space-between;
+                                gap:10px;
+                            "
+                        >
+
+                            <div>
+
+                                <strong style="
+                                    display:block;
+                                    color:#0f172a;
+                                    font-size:14px;
+                                ">
+                                    Validación #${validaciones.length - index}
+                                </strong>
+
+                                <span style="
+                                    display:block;
+                                    margin-top:3px;
+                                    color:#64748b;
+                                    font-size:11px;
+                                ">
+                                    ${fecha} · ${usuario}
+                                </span>
+
+                            </div>
+
+                            <span class="
+                                validation-status
+                                ${estadoClase}
+                            ">
+                                ${estado}
+                            </span>
+
+                        </div>
+
+                        <div style="overflow-x:auto;">
+
+                            <table class="validation-list-table">
+
+                                <thead>
+
+                                    <tr>
+                                        <th>Producto</th>
+                                        <th>Solicitado</th>
+                                        <th>Validado</th>
+                                        <th>Estado</th>
+                                        <th>Código</th>
+                                    </tr>
+
+                                </thead>
+
+                                <tbody>
+                `;
+
+                const detallesValidacion =
+                    validacion.details || [];
+
+                detallesValidacion.forEach(function (detalle) {
+
+                    const producto =
+                        detalle.order_detail?.product;
+
+                    const nombreProducto =
+                        producto?.nombre ||
+                        'Producto';
+
+                    const estadoDetalle =
+                        detalle.estado ||
+                        'PENDIENTE';
+
+                    const claseDetalle =
+                        estadoDetalle
+                            .toLowerCase()
+                            .replaceAll('_', '-');
+
+                    html += `
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    ${nombreProducto}
+                                </strong>
+                            </td>
+
+                            <td>
+                                ${detalle.cantidad_despachada ?? 0}
+                            </td>
+
+                            <td>
+                                ${detalle.cantidad_validada ?? 0}
+                            </td>
+
+                            <td>
+
+                                <span class="
+                                    validation-status
+                                    ${claseDetalle}
+                                ">
+                                    ${estadoDetalle}
+                                </span>
+
+                            </td>
+
+                            <td>
+                                ${detalle.codigo_escaneado || '-'}
+                            </td>
+
+                        </tr>
+
+                    `;
+
+                });
+
+                html += `
+
+                                </tbody>
+
+                            </table>
+
+                        </div>
+
+                    </div>
+
+                `;
+
+            });
+
+            body.innerHTML = html;
+
+        } catch (error) {
+
+            body.innerHTML = `
+
+                <div class="validation-empty">
+
+                    <i class="bi bi-exclamation-triangle"></i>
+
+                    ${error.message}
+
+                </div>
+
+            `;
+
+        }
+
+    };
+
+
     /*
     |--------------------------------------------------------------------------
-    | PAGINACIÓN Y FILTRO DEL HISTORIAL
+    | CERRAR MODAL CON ESCAPE / CLICK EXTERIOR
     |--------------------------------------------------------------------------
     */
 
-    const historialFilas = Array.from(
-        document.querySelectorAll('.historial-row')
+    const historyModal =
+        document.getElementById(
+            'validationHistoryModal'
+        );
+
+    if (historyModal) {
+
+        historyModal.addEventListener(
+            'click',
+            function (event) {
+
+                if (event.target === historyModal) {
+                    cerrarHistorialPedido();
+                }
+
+            }
+        );
+
+    }
+
+    document.addEventListener(
+        'keydown',
+        function (event) {
+
+            if (
+                event.key === 'Escape' &&
+                historyModal &&
+                !historyModal.classList.contains('d-none')
+            ) {
+
+                cerrarHistorialPedido();
+
+            }
+
+        }
     );
 
-    const historialFechaDesde =
-        document.getElementById('historialFechaDesde');
+    /*
+    |--------------------------------------------------------------------------
+    | ELEMENTOS
+    |--------------------------------------------------------------------------
+    */
 
-    const historialFechaHasta =
-        document.getElementById('historialFechaHasta');
+    const codigoPedido =
+        document.getElementById('codigoPedido');
 
-    const btnFiltrarHistorial =
-        document.getElementById('btnFiltrarHistorial');
+    const btnBuscarPedido =
+        document.getElementById('btnBuscarPedido');
 
-    const btnLimpiarHistorial =
-        document.getElementById('btnLimpiarHistorial');
+    const pedidoInfo =
+        document.getElementById('pedidoInfo');
 
-    const historialPagination =
-        document.getElementById('historialPagination');
+    const modalidades =
+        document.getElementById('modalidades');
 
-    const historialCount =
-        document.querySelector(
-            '.validation-list-card:nth-child(2) .validation-count'
+    const panelItem =
+        document.getElementById('panelItem');
+
+    const panelScanner =
+        document.getElementById('panelScanner');
+
+    const panelCompleto =
+        document.getElementById('panelCompleto');
+
+    const alerta =
+        document.getElementById('alertaValidacion');
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ALERTAS
+    |--------------------------------------------------------------------------
+    */
+
+    function mostrarAlerta(mensaje, tipo = 'danger') {
+
+        alerta.className =
+            `validation-alert alert-${tipo}`;
+
+        alerta.textContent =
+            mensaje;
+
+        alerta.classList.remove('d-none');
+
+        setTimeout(function () {
+
+            alerta.classList.add('d-none');
+
+        }, 4500);
+
+    }
+
+
+    function ocultarAlerta() {
+
+        alerta.classList.add('d-none');
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | OCULTAR PANELES
+    |--------------------------------------------------------------------------
+    */
+
+    function ocultarPaneles() {
+
+        panelItem.classList.add('d-none');
+
+        panelScanner.classList.add('d-none');
+
+        panelCompleto.classList.add('d-none');
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | BUSCAR PEDIDO
+    |--------------------------------------------------------------------------
+    */
+
+    async function buscarPedido() {
+
+        const codigo =
+            codigoPedido.value.trim();
+
+        if (!codigo) {
+
+            mostrarAlerta(
+                'Ingresa una factura o guía.',
+                'warning'
+            );
+
+            codigoPedido.focus();
+
+            return;
+        }
+
+        ocultarAlerta();
+
+        btnBuscarPedido.disabled = true;
+
+        btnBuscarPedido.innerHTML =
+            '<i class="bi bi-arrow-repeat"></i> BUSCANDO...';
+
+        try {
+
+            const response =
+                await fetch(
+                    '{{ route("orders.validation.buscar") }}',
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json',
+
+                            'Accept':
+                                'application/json',
+
+                            'X-CSRF-TOKEN':
+                                '{{ csrf_token() }}'
+                        },
+
+                        body: JSON.stringify({
+                            codigo: codigo
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok || !data.success) {
+
+                throw new Error(
+                    data.message ||
+                    'No se encontró el pedido.'
+                );
+
+            }
+
+
+            pedidoActual =
+                data.order;
+
+            detalles =
+                pedidoActual.details || [];
+
+            validaciones = {};
+
+            indiceItem = 0;
+
+            itemScannerActual = null;
+
+
+            if (!detalles.length) {
+
+                throw new Error(
+                    'El pedido no tiene productos.'
+                );
+
+            }
+
+
+            mostrarInformacionPedido();
+
+            modalidades.classList.remove('d-none');
+
+            ocultarPaneles();
+
+            document.getElementById(
+                'modalidades'
+            ).scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+        } catch (error) {
+
+            mostrarAlerta(
+                error.message,
+                'danger'
+            );
+
+        } finally {
+
+            btnBuscarPedido.disabled = false;
+
+            btnBuscarPedido.innerHTML =
+                '<i class="bi bi-search"></i><span>BUSCAR PEDIDO</span>';
+
+        }
+
+    }
+
+
+    btnBuscarPedido.addEventListener(
+        'click',
+        buscarPedido
+    );
+
+
+    codigoPedido.addEventListener(
+        'keydown',
+        function (event) {
+
+            if (event.key === 'Enter') {
+
+                event.preventDefault();
+
+                buscarPedido();
+
+            }
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | INFORMACIÓN PEDIDO
+    |--------------------------------------------------------------------------
+    */
+
+    function mostrarInformacionPedido() {
+
+        document.getElementById(
+            'pedidoNumero'
+        ).textContent =
+            pedidoActual.numero_orden || '-';
+
+
+        document.getElementById(
+            'pedidoCliente'
+        ).textContent =
+            pedidoActual.client?.razon_social ||
+            pedidoActual.client?.nombre_comercial ||
+            '-';
+
+
+        document.getElementById(
+            'pedidoFactura'
+        ).textContent =
+            pedidoActual.factura_asociada || '-';
+
+
+        document.getElementById(
+            'pedidoGuia'
+        ).textContent =
+            pedidoActual.guia_asociada || '-';
+
+
+        pedidoInfo.classList.remove(
+            'd-none'
+        );
+
+        const fechaPedido = document.getElementById('pedidoFecha');
+        if (fechaPedido) {
+            const fechaRaw = pedidoActual.fecha_pedido || pedidoActual.created_at || '';
+            if (fechaRaw) {
+                const fecha = new Date(String(fechaRaw).slice(0, 10) + 'T00:00:00');
+                fechaPedido.textContent = Number.isNaN(fecha.getTime())
+                    ? String(fechaRaw).slice(0, 10)
+                    : fecha.toLocaleDateString('es-PE');
+            } else {
+                fechaPedido.textContent = '-';
+            }
+        }
+
+        const pedidoProductos = document.getElementById('pedidoProductos');
+        if (pedidoProductos) pedidoProductos.textContent = `${detalles.length} productos`;
+
+        const vpEstado = document.getElementById('vpEstado');
+        if (vpEstado) vpEstado.textContent = 'En revisión';
+
+        const vpEmpty = document.getElementById('vpEmpty');
+        if (vpEmpty) vpEmpty.classList.add('d-none');
+
+        if (typeof actualizarVpResumen === 'function') actualizarVpResumen();
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MODO ITEM POR ITEM
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        'btnModoItem'
+    ).addEventListener(
+        'click',
+        function () {
+
+            modoActual = 'item';
+
+            indiceItem = 0;
+
+            validaciones = {};
+
+            ocultarPaneles();
+
+            panelItem.classList.remove(
+                'd-none'
+            );
+
+            mostrarItemActual();
+
+            panelItem.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+        }
+    );
+
+
+    function mostrarItemActual() {
+
+        if (indiceItem >= detalles.length) {
+
+            finalizarValidacionItem();
+
+            return;
+        }
+
+
+        const detail =
+            detalles[indiceItem];
+
+        const product =
+            detail.product || {};
+
+
+        document.getElementById(
+            'contadorItem'
+        ).textContent =
+            `${indiceItem + 1} / ${detalles.length}`;
+
+
+        /*
+         * Barra de progreso.
+         */
+        const progress =
+            (
+                indiceItem /
+                detalles.length
+            ) * 100;
+
+
+        document.getElementById(
+            'itemProgressBar'
+        ).style.width =
+            `${progress}%`;
+
+
+        document.getElementById(
+            'itemNombre'
+        ).textContent =
+            product.nombre ||
+            'Producto sin nombre';
+
+
+        document.getElementById(
+            'itemMarca'
+        ).textContent =
+            product.marca ||
+            '';
+
+
+        document.getElementById(
+            'itemCantidadSolicitada'
+        ).textContent =
+            detail.cantidad_despachada ??
+            0;
+
+
+        document.getElementById(
+            'itemCodigo'
+        ).textContent =
+            product.barcode ||
+            product.box_barcode ||
+            '-';
+
+
+        document.getElementById(
+            'itemCantidadParcial'
+        ).classList.add(
+            'd-none'
         );
 
 
-    const HISTORIAL_POR_PAGINA = 15;
-
-    let historialPaginaActual = 1;
-
-    let historialFilasFiltradas = [...historialFilas];
+        document.getElementById(
+            'cantidadItem'
+        ).value = '';
 
 
-    function renderizarHistorial() {
+        ocultarAlerta();
 
-        const total =
-            historialFilasFiltradas.length;
+    }
 
-        const totalPaginas =
-            Math.max(
-                1,
-                Math.ceil(
-                    total / HISTORIAL_POR_PAGINA
+
+    /*
+    |--------------------------------------------------------------------------
+    | REGISTRAR ITEM
+    |--------------------------------------------------------------------------
+    */
+
+    function registrarItem(
+        estado,
+        cantidad = 0
+    ) {
+
+        const detail =
+            detalles[indiceItem];
+
+
+        validaciones[detail.id] = {
+
+            order_detail_id:
+                detail.id,
+
+            estado:
+                estado,
+
+            cantidad_validada:
+                cantidad,
+
+            codigo_escaneado:
+                null,
+
+            observaciones:
+                null
+
+        };
+
+
+        indiceItem++;
+
+        mostrarItemActual();
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ITEM - NO ENVIADO
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        'btnItemIncompleto'
+    ).addEventListener(
+        'click',
+        function () {
+
+            registrarItem(
+                'NO_ENVIADO',
+                0
+            );
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ITEM - PARCIAL
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        'btnItemParcial'
+    ).addEventListener(
+        'click',
+        function () {
+
+            const detail =
+                detalles[indiceItem];
+
+            const panelCantidad =
+                document.getElementById(
+                    'itemCantidadParcial'
+                );
+
+            const cantidadInput =
+                document.getElementById(
+                    'cantidadItem'
+                );
+
+
+            if (
+                panelCantidad.classList.contains(
+                    'd-none'
                 )
+            ) {
+
+                panelCantidad.classList.remove(
+                    'd-none'
+                );
+
+                cantidadInput.value = '';
+
+                cantidadInput.focus();
+
+                return;
+
+            }
+
+
+            const cantidad =
+                parseFloat(
+                    cantidadInput.value
+                );
+
+
+            if (
+                isNaN(cantidad) ||
+                cantidad <= 0
+            ) {
+
+                mostrarAlerta(
+                    'Ingresa una cantidad válida.',
+                    'warning'
+                );
+
+                cantidadInput.focus();
+
+                return;
+
+            }
+
+
+            if (
+                cantidad >=
+                parseFloat(
+                    detail.cantidad_despachada
+                )
+            ) {
+
+                mostrarAlerta(
+                    'La cantidad parcial debe ser menor que la cantidad despachada.',
+                    'warning'
+                );
+
+                cantidadInput.focus();
+
+                return;
+
+            }
+
+
+            ocultarAlerta();
+
+
+            registrarItem(
+                'PARCIAL',
+                cantidad
+            );
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ITEM - COMPLETO
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        'btnItemCompleto'
+    ).addEventListener(
+        'click',
+        function () {
+
+            registrarItem(
+                'COMPLETO',
+                parseFloat(
+                    detalles[indiceItem]
+                        .cantidad_despachada
+                )
+            );
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FINALIZAR ITEM
+    |--------------------------------------------------------------------------
+    */
+
+    function finalizarValidacionItem() {
+
+        document.getElementById(
+            'itemProgressBar'
+        ).style.width = '100%';
+
+
+        ocultarPaneles();
+
+        panelCompleto.classList.remove(
+            'd-none'
+        );
+
+        construirTablaCompleta();
+
+        mostrarAlerta(
+            'Todos los productos fueron revisados. Verifica la información antes de guardar.',
+            'success'
+        );
+
+        panelCompleto.scrollIntoView({
+            behavior: 'smooth',
+            block: 'start'
+        });
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MODO ESCÁNER
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        'btnModoScanner'
+    ).addEventListener(
+        'click',
+        function () {
+
+            modoActual = 'scanner';
+
+            validaciones = {};
+
+            itemScannerActual = null;
+
+            ocultarPaneles();
+
+            panelScanner.classList.remove(
+                'd-none'
+            );
+
+
+            document.getElementById(
+                'scannerProducto'
+            ).classList.add(
+                'd-none'
+            );
+
+
+            document.getElementById(
+                'codigoScanner'
+            ).value = '';
+
+
+            actualizarContadorScanner();
+
+
+            panelScanner.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+
+            setTimeout(function () {
+
+                document.getElementById(
+                    'codigoScanner'
+                ).focus();
+
+            }, 350);
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESCÁNER
+    |--------------------------------------------------------------------------
+    */
+
+    const codigoScanner =
+        document.getElementById(
+            'codigoScanner'
+        );
+
+
+    codigoScanner.addEventListener(
+        'keydown',
+        async function (event) {
+
+            if (
+                event.key !== 'Enter'
+            ) {
+
+                return;
+
+            }
+
+
+            event.preventDefault();
+
+
+            const codigo =
+                codigoScanner.value.trim();
+
+
+            if (!codigo) {
+
+                return;
+
+            }
+
+
+            await procesarScanner(
+                codigo
+            );
+
+        }
+    );
+
+
+    async function procesarScanner(
+        codigo
+    ) {
+
+        ocultarAlerta();
+
+
+        try {
+
+            const response =
+                await fetch(
+                    '{{ route("orders.validation.producto.buscar") }}',
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Content-Type':
+                                'application/json',
+
+                            'Accept':
+                                'application/json',
+
+                            'X-CSRF-TOKEN':
+                                '{{ csrf_token() }}'
+                        },
+
+                        body: JSON.stringify({
+                            codigo: codigo
+                        })
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (
+                !response.ok ||
+                !data.success
+            ) {
+
+                throw new Error(
+                    data.message ||
+                    'Producto no encontrado.'
+                );
+
+            }
+
+
+            const product =
+                data.product;
+
+
+            /*
+             * Verificar que el producto
+             * pertenece al pedido.
+             */
+            const encontrados =
+                detalles.filter(
+                    detail =>
+                        detail.product &&
+                        (
+                            String(
+                                detail.product.barcode
+                            ) === String(codigo)
+
+                            ||
+
+                            String(
+                                detail.product.box_barcode
+                            ) === String(codigo)
+                        )
+                );
+
+
+            if (
+                !encontrados.length
+            ) {
+
+                mostrarAlerta(
+                    '⚠️ Este producto no pertenece al pedido.',
+                    'warning'
+                );
+
+
+                codigoScanner.value = '';
+
+                codigoScanner.focus();
+
+                return;
+
+            }
+
+
+            /*
+             * Buscar un detalle que todavía
+             * no haya sido validado.
+             */
+            const detail =
+                encontrados.find(
+                    d =>
+                        !validaciones[d.id]
+                ) ||
+                encontrados[0];
+
+
+            itemScannerActual =
+                detail;
+
+
+            document.getElementById(
+                'scannerNombre'
+            ).textContent =
+                product.nombre ||
+                'Producto sin nombre';
+
+
+            document.getElementById(
+                'scannerMarca'
+            ).textContent =
+                product.marca ||
+                '';
+
+
+            document.getElementById(
+                'scannerSolicitado'
+            ).textContent =
+                detail.cantidad_despachada ??
+                0;
+
+
+            document.getElementById(
+                'scannerCodigo'
+            ).textContent =
+                codigo;
+
+
+            document.getElementById(
+                'scannerProducto'
+            ).classList.remove(
+                'd-none'
+            );
+
+
+            document.getElementById(
+                'scannerCantidadParcial'
+            ).classList.add(
+                'd-none'
+            );
+
+
+            document.getElementById(
+                'cantidadScanner'
+            ).value = '';
+
+
+            codigoScanner.value = '';
+
+
+        } catch (error) {
+
+            mostrarAlerta(
+                error.message,
+                'danger'
+            );
+
+
+            codigoScanner.select();
+
+        }
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | REGISTRAR ESCÁNER
+    |--------------------------------------------------------------------------
+    */
+
+    function registrarScanner(
+        estado,
+        cantidad = 0
+    ) {
+
+        if (!itemScannerActual) {
+
+            mostrarAlerta(
+                'Primero escanea un producto.',
+                'warning'
+            );
+
+            return;
+
+        }
+
+
+        validaciones[
+            itemScannerActual.id
+        ] = {
+
+            order_detail_id:
+                itemScannerActual.id,
+
+            estado:
+                estado,
+
+            cantidad_validada:
+                cantidad,
+
+            codigo_escaneado:
+                document.getElementById(
+                    'scannerCodigo'
+                ).textContent,
+
+            observaciones:
+                null
+
+        };
+
+
+        itemScannerActual =
+            null;
+
+
+        document.getElementById(
+            'scannerProducto'
+        ).classList.add(
+            'd-none'
+        );
+
+
+        actualizarContadorScanner();
+
+
+        codigoScanner.value = '';
+
+        codigoScanner.focus();
+
+
+        if (
+            Object.keys(validaciones).length >=
+            detalles.length
+        ) {
+
+            finalizarScanner();
+
+        }
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESCÁNER - NO ENVIADO
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        'btnScannerIncompleto'
+    ).addEventListener(
+        'click',
+        function () {
+
+            registrarScanner(
+                'NO_ENVIADO',
+                0
+            );
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESCÁNER - PARCIAL
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        'btnScannerParcial'
+    ).addEventListener(
+        'click',
+        function () {
+
+            if (
+                !itemScannerActual
+            ) {
+
+                return;
+
+            }
+
+
+            const panelCantidad =
+                document.getElementById(
+                    'scannerCantidadParcial'
+                );
+
+
+            if (
+                panelCantidad.classList.contains(
+                    'd-none'
+                )
+            ) {
+
+                panelCantidad.classList.remove(
+                    'd-none'
+                );
+
+
+                document.getElementById(
+                    'cantidadScanner'
+                ).focus();
+
+
+                return;
+
+            }
+
+
+            const cantidad =
+                parseFloat(
+                    document.getElementById(
+                        'cantidadScanner'
+                    ).value
+                );
+
+
+            const despachada =
+            parseFloat(
+                itemScannerActual
+                    .cantidad_despachada
+            );
+
+
+            if (
+                isNaN(cantidad) ||
+                cantidad <= 0 ||
+                cantidad >= despachada
+            ) {
+
+                mostrarAlerta(
+                    'La cantidad parcial debe ser mayor a 0 y menor a la cantidad despachada.',
+                    'warning'
+                );
+
+                return;
+
+            }
+
+
+            registrarScanner(
+                'PARCIAL',
+                cantidad
+            );
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESCÁNER - COMPLETO
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        'btnScannerCompleto'
+    ).addEventListener(
+        'click',
+        function () {
+
+            if (
+                !itemScannerActual
+            ) {
+
+                return;
+
+            }
+
+
+            registrarScanner(
+                'COMPLETO',
+                parseFloat(
+                    itemScannerActual
+                        .cantidad_despachada
+                )
+            );
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | CONTADOR ESCÁNER
+    |--------------------------------------------------------------------------
+    */
+
+    function actualizarContadorScanner() {
+
+        document.getElementById(
+            'contadorScanner'
+        ).textContent =
+            `${Object.keys(validaciones).length} / ${detalles.length}`;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | FINALIZAR ESCÁNER
+    |--------------------------------------------------------------------------
+    */
+
+    function finalizarScanner() {
+
+        ocultarPaneles();
+
+        panelCompleto.classList.remove(
+            'd-none'
+        );
+
+        construirTablaCompleta();
+
+        mostrarAlerta(
+            'Todos los productos fueron procesados por escáner. Revisa y guarda la validación.',
+            'success'
+        );
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | MODO PEDIDO COMPLETO
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        'btnModoCompleto'
+    ).addEventListener(
+        'click',
+        function () {
+
+            modoActual = 'completo';
+
+            validaciones = {};
+
+            ocultarPaneles();
+
+            panelCompleto.classList.remove(
+                'd-none'
+            );
+
+            construirTablaCompleta();
+
+
+            panelCompleto.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            });
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | TABLA COMPLETA
+    |--------------------------------------------------------------------------
+    */
+
+    function construirTablaCompleta() {
+
+        const tabla =
+            document.getElementById(
+                'tablaValidacion'
+            );
+
+
+        tabla.innerHTML = '';
+
+
+        detalles.forEach(
+            function (detail) {
+
+                const product =
+                    detail.product || {};
+
+
+                const validacion =
+                    validaciones[detail.id];
+
+
+                let estado =
+                    validacion?.estado ||
+                    'PENDIENTE';
+
+
+                let cantidad =
+                    validacion?.cantidad_validada ??
+                    0;
+
+
+                const tr =
+                    document.createElement(
+                        'tr'
+                    );
+
+
+                tr.dataset.detailId =
+                    detail.id;
+
+
+                tr.innerHTML = `
+
+                    <td>
+
+                        <div class="table-product-name">
+
+                            ${escapeHtml(
+                                product.nombre ||
+                                'Producto sin nombre'
+                            )}
+
+                        </div>
+
+                        <div class="table-product-brand">
+
+                            ${escapeHtml(
+                                product.marca ||
+                                ''
+                            )}
+
+                        </div>
+
+                    </td>
+
+
+                    <td>
+
+                        <span class="table-code">
+
+                            ${escapeHtml(
+                                product.barcode ||
+                                product.box_barcode ||
+                                '-'
+                            )}
+
+                        </span>
+
+                    </td>
+
+
+                    <td class="text-center">
+
+                        <span class="table-quantity">
+
+                            ${detail.cantidad_despachada}
+
+                        </span>
+
+                    </td>
+
+
+                    <td class="text-center">
+
+                        <input
+                            type="number"
+                            class="cantidad-validada"
+                            data-detail-id="${detail.id}"
+                            value="${cantidad}"
+                            min="0"
+                            step="0.01"
+                        >
+
+                    </td>
+
+
+                    <td class="text-center">
+
+                        <select
+                            class="estado-validacion"
+                            data-detail-id="${detail.id}"
+                        >
+
+                            <option
+                                value="PENDIENTE"
+                                ${estado === 'PENDIENTE' ? 'selected' : ''}
+                            >
+                                PENDIENTE
+                            </option>
+
+                            <option
+                                value="COMPLETO"
+                                ${estado === 'COMPLETO' ? 'selected' : ''}
+                            >
+                                COMPLETO
+                            </option>
+
+                            <option
+                                value="PARCIAL"
+                                ${estado === 'PARCIAL' ? 'selected' : ''}
+                            >
+                                PARCIAL
+                            </option>
+
+                            <option
+                                value="NO_ENVIADO"
+                                ${estado === 'NO_ENVIADO' ? 'selected' : ''}
+                            >
+                                NO ENVIADO
+                            </option>
+
+                        </select>
+
+                    </td>
+
+                `;
+
+
+                tabla.appendChild(
+                    tr
+                );
+
+            }
+        );
+
+
+        /*
+         * Eventos estado.
+         */
+        tabla
+            .querySelectorAll(
+                '.estado-validacion'
+            )
+            .forEach(
+                select => {
+
+                    select.addEventListener(
+                        'change',
+                        function () {
+
+                            actualizarValidacionTabla(
+                                this.dataset.detailId
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+        /*
+         * Eventos cantidad.
+         */
+        tabla
+            .querySelectorAll(
+                '.cantidad-validada'
+            )
+            .forEach(
+                input => {
+
+                    input.addEventListener(
+                        'change',
+                        function () {
+
+                            actualizarValidacionTabla(
+                                this.dataset.detailId
+                            );
+
+                        }
+                    );
+
+                }
+            );
+
+
+        actualizarContadorCompleto();
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ACTUALIZAR FILA
+    |--------------------------------------------------------------------------
+    */
+
+    function actualizarValidacionTabla(
+        detailId
+    ) {
+
+        const select =
+            document.querySelector(
+                `.estado-validacion[data-detail-id="${detailId}"]`
+            );
+
+
+        const input =
+            document.querySelector(
+                `.cantidad-validada[data-detail-id="${detailId}"]`
             );
 
 
         if (
-            historialPaginaActual >
-            totalPaginas
+            !select ||
+            !input
         ) {
-            historialPaginaActual =
-                totalPaginas;
+
+            return;
+
         }
 
 
-        const inicio =
-            (historialPaginaActual - 1) *
-            HISTORIAL_POR_PAGINA;
-
-        const fin =
-            inicio + HISTORIAL_POR_PAGINA;
-
-
-        historialFilas.forEach(function (fila) {
-            fila.style.display = 'none';
-        });
+        const detail =
+            detalles.find(
+                d =>
+                    String(d.id) ===
+                    String(detailId)
+            );
 
 
-        historialFilasFiltradas
-            .slice(inicio, fin)
-            .forEach(function (fila) {
-                fila.style.display = '';
-            });
+        if (!detail) {
 
+            return;
 
-        if (historialCount) {
-            historialCount.textContent =
-                total;
         }
 
 
-        renderizarBotonesPaginacion(
-            totalPaginas,
-            total
-        );
+        const estado =
+            select.value;
+
+
+        if (
+            estado === 'COMPLETO'
+        ) {
+
+            input.value =
+                detail.cantidad_despachada;
+
+        }
+
+
+        if (
+            estado === 'NO_ENVIADO'
+        ) {
+
+            input.value = 0;
+
+        }
+
+
+        validaciones[detailId] = {
+
+            order_detail_id:
+                parseInt(detailId),
+
+            estado:
+                estado,
+
+            cantidad_validada:
+                parseFloat(
+                    input.value
+                ) || 0,
+
+            codigo_escaneado:
+                null,
+
+            observaciones:
+                null
+
+        };
+
+
+        actualizarContadorCompleto();
+
     }
 
 
-    function renderizarBotonesPaginacion(
-        totalPaginas,
-        total
-    ) {
+    /*
+    |--------------------------------------------------------------------------
+    | CONTADOR PEDIDO COMPLETO
+    |--------------------------------------------------------------------------
+    */
 
-        if (!historialPagination) {
+    function actualizarContadorCompleto() {
+
+        document.getElementById(
+            'contadorCompleto'
+        ).textContent =
+            `${Object.keys(validaciones).length} / ${detalles.length}`;
+
+    }
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | GUARDAR VALIDACIÓN
+    |--------------------------------------------------------------------------
+    */
+
+    document.getElementById(
+        'btnGuardarValidacion'
+    ).addEventListener(
+        'click',
+        async function () {
+
+            /*
+             * Actualizar todos los productos
+             * visibles en la tabla.
+             */
+            detalles.forEach(
+                detail => {
+
+                    actualizarValidacionTabla(
+                        detail.id
+                    );
+
+                }
+            );
+
+
+            /*
+             * Todos deben estar definidos.
+             */
+            if (
+                Object.keys(validaciones).length !==
+                detalles.length
+            ) {
+
+                mostrarAlerta(
+                    'Debes validar todos los productos antes de guardar.',
+                    'warning'
+                );
+
+                return;
+
+            }
+
+
+            /*
+             * Validar cantidades.
+             */
+            for (
+                const detail of detalles
+            ) {
+
+                const validation =
+                    validaciones[
+                        detail.id
+                    ];
+
+
+                if (!validation) {
+
+                    continue;
+
+                }
+
+
+                const despachada =
+                    parseFloat(
+                        detail.cantidad_despachada
+                    );
+
+
+                const cantidad =
+                    parseFloat(
+                        validation.cantidad_validada
+                    ) || 0;
+
+
+                /*
+                 * COMPLETO.
+                 */
+                if (
+                    validation.estado ===
+                    'COMPLETO' &&
+                    cantidad < despachada
+                ) {
+
+                    mostrarAlerta(
+                        `El producto "${detail.product?.nombre || ''}" está marcado como COMPLETO pero la cantidad validada es menor a la despachada.`,
+                        'warning'
+                    );
+
+                    return;
+
+                }
+
+
+                /*
+                 * PARCIAL.
+                 */
+                if (
+                    validation.estado ===
+                    'PARCIAL' &&
+                    (
+                        cantidad <= 0 ||
+                        cantidad >= despachada
+                    )
+                ) {
+
+                    mostrarAlerta(
+                        `La cantidad parcial de "${detail.product?.nombre || ''}" no es válida.`,
+                        'warning'
+                    );
+
+                    return;
+
+                }
+
+
+                /*
+                 * NO ENVIADO.
+                 */
+                if (
+                    validation.estado ===
+                    'NO_ENVIADO' &&
+                    cantidad !== 0
+                ) {
+
+                    mostrarAlerta(
+                        `El producto "${detail.product?.nombre || ''}" está marcado como NO ENVIADO y debe tener cantidad 0.`,
+                        'warning'
+                    );
+
+                    return;
+
+                }
+
+
+                /*
+                 * PENDIENTE.
+                 */
+                if (
+                    validation.estado ===
+                    'PENDIENTE'
+                ) {
+
+                    mostrarAlerta(
+                        `El producto "${detail.product?.nombre || ''}" todavía está pendiente de validar.`,
+                        'warning'
+                    );
+
+                    return;
+
+                }
+
+            }
+
+
+            const boton =
+                document.getElementById(
+                    'btnGuardarValidacion'
+                );
+
+
+            boton.disabled = true;
+
+
+            boton.innerHTML =
+                '<i class="bi bi-arrow-repeat"></i> GUARDANDO...';
+
+
+            try {
+
+                const response =
+                    await fetch(
+                        '{{ url("validacion-pedidos") }}/' +
+                        pedidoActual.id +
+                        '/guardar',
+                        {
+                            method: 'POST',
+
+                            headers: {
+                                'Content-Type':
+                                    'application/json',
+
+                                'Accept':
+                                    'application/json',
+
+                                'X-CSRF-TOKEN':
+                                    '{{ csrf_token() }}'
+                            },
+
+                            body: JSON.stringify({
+
+                                items:
+                                    Object.values(
+                                        validaciones
+                                    ),
+
+                                observaciones:
+                                    document.getElementById(
+                                        'observacionesValidacion'
+                                    ).value
+
+                            })
+
+                        }
+                    );
+
+
+                const data =
+                    await response.json();
+
+
+                if (
+                    !response.ok ||
+                    !data.success
+                ) {
+
+                    throw new Error(
+                        data.message ||
+                        'No se pudo guardar la validación.'
+                    );
+
+                }
+
+
+                mostrarAlerta(
+                    '✓ Validación guardada correctamente.',
+                    'success'
+                );
+                setTimeout(function () {
+                    window.location.reload();
+                }, 1000);
+
+                boton.disabled = false;
+
+
+                boton.innerHTML =
+                    '<i class="bi bi-check-circle"></i><span>GUARDAR VALIDACIÓN</span>';
+
+
+            } catch (error) {
+
+                mostrarAlerta(
+                    error.message,
+                    'danger'
+                );
+
+
+                boton.disabled = false;
+
+
+                boton.innerHTML =
+                    '<i class="bi bi-check-circle"></i><span>GUARDAR VALIDACIÓN</span>';
+
+            }
+
+        }
+    );
+
+
+    /*
+    |--------------------------------------------------------------------------
+    | ESCAPE HTML
+    |--------------------------------------------------------------------------
+    */
+
+    function escapeHtml(value) {
+
+        const div =
+            document.createElement(
+                'div'
+            );
+
+
+        div.textContent =
+            value ?? '';
+
+
+        return div.innerHTML;
+
+    }
+
+
+    /* ================================================================
+       ADAPTADORES DEL REDISEÑO VISUAL
+       Conservan las acciones y endpoints del módulo original.
+    ================================================================ */
+
+    window.vpLTab = function (pane, button) {
+        document.querySelectorAll('.vp-ltab').forEach(el => el.classList.remove('on'));
+        if (button) button.classList.add('on');
+        const pend = document.getElementById('vpListPend');
+        const val = document.getElementById('vpListVal');
+        if (pend) pend.classList.toggle('on', pane === 'pend');
+        if (val) val.classList.toggle('on', pane === 'val');
+        window.vpLFiltrar();
+    };
+
+    window.vpLFiltrar = function () {
+        const input = document.getElementById('vpLSearch');
+        const query = (input?.value || '').trim().toLocaleLowerCase('es');
+        document.querySelectorAll('.vp-oc').forEach(card => {
+            const haystack = (card.dataset.search || card.textContent || '').toLocaleLowerCase('es');
+            card.style.display = haystack.includes(query) ? '' : 'none';
+        });
+    };
+
+    window.vpIrHistorial = function () {
+        const destino = document.getElementById('vpHistorial');
+        if (destino) destino.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+
+    window.vpDD = function (event) {
+        if (event) event.stopPropagation();
+        const menu = document.getElementById('vpDdMas');
+        if (menu) menu.classList.toggle('open');
+    };
+
+    window.vpAccion = function (accion) {
+        const menu = document.getElementById('vpDdMas');
+        if (menu) menu.classList.remove('open');
+        const pedido = window.__valPedido?.pedido;
+        if (!pedido?.id) {
+            mostrarAlerta('Primero selecciona un pedido.', 'warning');
             return;
         }
+        if (accion === 'historial') {
+            if (typeof window.verHistorialPedido === 'function') window.verHistorialPedido(pedido.id);
+        } else if (accion === 'recargar') {
+            window.abrirPedidoDesdeLista(pedido.id);
+        }
+    };
 
-
-        if (total === 0) {
-
-            historialPagination.innerHTML = `
-                <span class="validation-history-page-info">
-                    No hay resultados para el filtro seleccionado.
-                </span>
-            `;
-
+    window.vpFinalizar = function () {
+        const pedido = window.__valPedido?.pedido;
+        if (!pedido) {
+            mostrarAlerta('Primero selecciona un pedido.', 'warning');
             return;
-  
+        }
+        const panelCompleto = document.getElementById('panelCompleto');
+        if (panelCompleto && !panelCompleto.classList.contains('d-none')) {
+            document.getElementById('btnGuardarValidacion')?.click();
+        } else {
+            document.getElementById('btnModoCompleto')?.click();
+            panelCompleto?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    };
+
+    function actualizarVpResumen() {
+        const state = window.__valPedido;
+        const pedido = state?.pedido;
+        const detallesActuales = state?.detalles || [];
+        const validacionesActuales = state?.validaciones || {};
+        const panel = document.getElementById('vpProgress');
+        const lista = document.getElementById('vpItems');
+        const vacio = document.getElementById('vpEmpty');
+        const contador = document.getElementById('vpItemsCount');
+        if (!pedido || !detallesActuales.length) {
+            if (panel) panel.classList.add('d-none');
+            if (contador) contador.textContent = '(0)';
+            if (lista) lista.innerHTML = '<div class="vp-lempty">Carga un pedido para ver sus productos.</div>';
+            if (vacio) vacio.classList.remove('d-none');
+            return;
+        }
+        if (panel) panel.classList.remove('d-none');
+        if (vacio) vacio.classList.add('d-none');
+        const entries = detallesActuales.map(detail => {
+            const product = detail.product || {};
+            const validation = validacionesActuales[detail.id] || null;
+            const status = validation?.estado || 'PENDIENTE';
+            const valid = !!validation;
+            return { detail, product, status, valid };
+        });
+        const ok = entries.filter(x => x.valid && !String(x.status).includes('PARCIAL') && !String(x.status).includes('NO_ENVIADO')).length;
+        const parcial = entries.filter(x => x.valid && String(x.status).includes('PARCIAL')).length;
+        const no = entries.filter(x => x.valid && String(x.status).includes('NO_ENVIADO')).length;
+        const hechas = entries.filter(x => x.valid).length;
+        const total = entries.length;
+        const pct = total ? Math.round((hechas / total) * 100) : 0;
+        const setText = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+        setText('vpProgTxt', `${hechas} / ${total}`);
+        setText('vpProgPct', `${pct}%`);
+        setText('vpLgOk', ok);
+        setText('vpLgPar', parcial);
+        setText('vpLgNo', no);
+        setText('vpLgPen', total - hechas);
+        const bar = document.getElementById('vpProgBar');
+        if (bar) bar.style.width = `${pct}%`;
+        if (contador) contador.textContent = `(${total})`;
+        if (lista) {
+            lista.innerHTML = entries.map(({detail, product, status, valid}, index) => {
+                const name = product.nombre || product.name || 'Producto sin nombre';
+                const code = product.barcode || product.box_barcode || product.sku || 'Sin código';
+                const qty = detail.cantidad_despachada ?? detail.cantidad ?? 0;
+                const stateClass = !valid ? 'vp-st-pen' : String(status).includes('PARCIAL') ? 'vp-st-par' : String(status).includes('NO_ENVIADO') ? 'vp-st-no' : 'vp-st-ok';
+                const icon = !valid ? 'bi-circle' : String(status).includes('PARCIAL') ? 'bi-exclamation-circle-fill' : String(status).includes('NO_ENVIADO') ? 'bi-x-circle-fill' : 'bi-check-circle-fill';
+                return `<div class="vp-it ${index === (state?.indice ?? -1) ? 'cur' : ''}">
+                    <div class="vp-it-th"><i class="bi bi-box-seam"></i></div>
+                    <div><div class="vp-it-n" title="${escapeHtml(name)}">${escapeHtml(name)}</div>
+                    <div class="vp-it-s">${escapeHtml(String(code))}</div>
+                    <div class="vp-it-p"><div class="vp-bar"><div style="width:${valid ? 100 : 0}%"></div></div><b>${valid ? '100%' : '0%'}</b><span>${escapeHtml(String(qty))} u.</span></div></div>
+                    <div class="vp-it-st ${stateClass}"><i class="bi ${icon}"></i></div>
+                </div>`;
+            }).join('');
+        }
+    }
+
+    // Las tarjetas visuales activan los botones originales que ya contienen la lógica real.
+    document.querySelectorAll('.vp-mode').forEach(card => {
+        const activar = () => document.getElementById(card.dataset.vpBtn)?.click();
+        card.addEventListener('click', event => {
+            if (event.target.closest('button')) return;
+            activar();
+        });
+        card.addEventListener('keydown', event => {
+            if (event.key === 'Enter' || event.key === ' ') {
+                event.preventDefault();
+                activar();
+            }
+        });
+    });
+
+    // Controles + / − para cantidades parciales del diseño nuevo.
+    document.addEventListener('click', event => {
+        const button = event.target.closest('.vp-step');
+        if (!button) return;
+        const input = document.getElementById(button.dataset.target);
+        if (!input) return;
+        event.preventDefault();
+        const step = Number.parseFloat(input.step) || 1;
+        const current = Number.parseFloat(input.value) || 0;
+        const min = Number.parseFloat(input.min);
+        let next = current + (Number(button.dataset.step) * step);
+        if (Number.isFinite(min)) next = Math.max(min, next);
+        input.value = String(Number(next.toFixed(2)));
+        input.dispatchEvent(new Event('input', { bubbles: true }));
+        input.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+
+    // Mantener las observaciones del diseño sincronizadas con el campo que se guarda.
+    const vpObs = document.getElementById('vpObs');
+    const originalObs = document.getElementById('observacionesValidacion');
+    if (vpObs && originalObs) {
+        vpObs.addEventListener('input', () => { originalObs.value = vpObs.value; });
+        originalObs.addEventListener('input', () => { if (vpObs.value !== originalObs.value) vpObs.value = originalObs.value; });
+    }
+
+    document.addEventListener('click', event => {
+        const menu = document.getElementById('vpDdMas');
+        if (menu && !menu.contains(event.target)) menu.classList.remove('open');
+    });
+
+    // Refrescar la lista lateral cuando la validación original cambia de producto o estado.
+    const observer = new MutationObserver(() => actualizarVpResumen());
+    ['pedidoInfo', 'panelItem', 'panelScanner', 'panelCompleto'].forEach(id => {
+        const target = document.getElementById(id);
+        if (target) observer.observe(target, { subtree: true, childList: true, characterData: true, attributes: true });
+    });
+    actualizarVpResumen();
+
+});
+
+</script>
+
+@endsection
