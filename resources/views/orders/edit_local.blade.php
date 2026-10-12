@@ -322,16 +322,159 @@ hr.dv{border-top-color:#e8eef6;}
     .erp-table{min-width:580px;}
 }
 
-</style>
+/* ══════════════════════════════════════════════════════════
+   PEDIDO LOCAL · rediseño (prefijo lc-) — aditivo
+   Reutiliza: .scanner-erp, .scan-led, .scan-input, .add-grid, .flabel,
+   .finput, .btn-primary, .btn-xs y los modales del CSS anterior.
+══════════════════════════════════════════════════════════ */
+.lc{
+    --lc-navy:#1e3a5f; --lc-blue:#1d7ff2; --lc-blue-soft:#eaf2ff;
+    --lc-green:#16a34a; --lc-orange:#f59e0b; --lc-red:#ef4444;
+    --lc-text:#0f172a; --lc-muted:#64748b; --lc-line:#e2e8f0; --lc-bg:#f8fafc;
+    --lc-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    color:var(--lc-text);
+}
+.lc *{box-sizing:border-box;}
+.lc-i{width:16px;height:16px;flex-shrink:0;}
+.lc-num{font-family:var(--lc-mono);font-variant-numeric:tabular-nums;}
+.lc-card{background:#fff;border:1px solid var(--lc-line);border-radius:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+.lc-chip{display:inline-flex;align-items:center;gap:5px;padding:3px 11px;border-radius:7px;font-size:11.5px;font-weight:700;white-space:nowrap;}
 
-{{-- ── ERP Top Bar ── --}}
-<div class="erp-bar">
-    <div class="erp-bar-title">DISTHAN · Sistema ERP</div>
-    <div style="display:flex;align-items:center;gap:12px;">
-        <span class="erp-breadcrumb">Ventas › Órdenes › Pedido Local</span>
-        <span class="erp-user">👤 {{ auth()->user()->name ?? 'Operador' }}</span>
-    </div>
-</div>
+/* Cabecera de página */
+.lc-crumb{font-size:12.5px;color:var(--lc-muted);margin-bottom:10px;}
+.lc-crumb b{color:var(--lc-text);font-weight:600;}
+.lc-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+.lc-head-l{display:flex;align-items:center;gap:14px;}
+.lc-logo{width:56px;height:56px;border-radius:14px;background:#e3eefc;color:var(--lc-blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lc-logo .lc-i{width:28px;height:28px;}
+.lc-title{font-size:24px;font-weight:800;color:var(--lc-navy);margin:0;line-height:1.1;letter-spacing:-.3px;}
+.lc-sub{font-size:13px;color:var(--lc-muted);margin-top:4px;}
+.lc-head-r{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
+.lc-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;border:1px solid transparent;font-family:inherit;transition:filter .15s,background .15s;}
+.lc-btn:hover{filter:brightness(.95);}
+.lc-btn.blue{background:var(--lc-blue);color:#fff;}
+.lc-btn.green{background:#16a34a;color:#fff;}
+.lc-btn.purple{background:#7c3aed;color:#fff;}
+.lc-btn.white{background:#fff;color:var(--lc-blue);border-color:#cfe0fb;}
+.lc-btn.sm{padding:8px 13px;font-size:12px;}
+.lc-btn.is-off{opacity:.45;cursor:not-allowed;}
+.lc-btn.is-off:hover{filter:none;}
+
+/* KPIs */
+.lc-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:14px;}
+@media(max-width:1100px){.lc-kpis{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:620px){.lc-kpis{grid-template-columns:1fr 1fr;}}
+.lc-k{display:flex;align-items:center;gap:12px;border-radius:14px;padding:13px 14px;background:#fff;border:1px solid var(--lc-line);}
+.lc-k-ic{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lc-k-ic .lc-i{width:24px;height:24px;}
+.lc-k small.l{display:block;font-size:12px;font-weight:700;color:#334155;}
+.lc-k b{display:block;font-size:24px;font-weight:800;line-height:1.1;font-family:var(--lc-mono);}
+.lc-k small.s{font-size:11px;color:var(--lc-muted);}
+.lc-k.t-blue .lc-k-ic{background:#dbeafe;color:#2563eb;}.lc-k.t-blue{background:#f3f8ff;border-color:#dbe8ff;}
+.lc-k.t-green .lc-k-ic{background:#d1fae5;color:#16a34a;}.lc-k.t-green{background:#f1fcf5;border-color:#c9f0d5;}.lc-k.t-green b{color:#15803d;}
+.lc-k.t-red .lc-k-ic{background:#fee2e2;color:#dc2626;}.lc-k.t-red{background:#fff4f4;border-color:#fecaca;}.lc-k.t-red b{color:#b91c1c;}
+.lc-k.t-orange .lc-k-ic{background:#fde9c4;color:#d97706;}.lc-k.t-orange{background:#fff9ee;border-color:#fde7b0;}
+.lc-k.t-navy .lc-k-ic{background:#dbe5f5;color:#1e3a5f;}.lc-k.t-navy{background:#f0f6ff;border-color:#d3e1f7;}
+.lc-k.t-money b{font-size:19px;color:var(--lc-navy);}
+
+/* Tarjeta principal */
+.lc-main{margin-bottom:14px;overflow:hidden;}
+.lc-oh{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;padding:16px 18px 6px;}
+.lc-oh-l{display:flex;gap:13px;align-items:flex-start;min-width:0;}
+.lc-oh-ic{width:48px;height:48px;border-radius:12px;background:#e8f0fe;color:var(--lc-blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lc-oh-ic .lc-i{width:24px;height:24px;}
+.lc-oh-t{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.lc-oh-t strong{font-size:20px;font-weight:800;color:var(--lc-navy);font-family:var(--lc-mono);letter-spacing:-.5px;}
+.lc-oh-cli{font-size:13.5px;font-weight:600;color:#334155;margin-top:3px;}
+.lc-oh-r{display:flex;gap:8px;flex-wrap:wrap;}
+.lc-meta{display:flex;gap:22px;flex-wrap:wrap;padding:6px 18px 12px;font-size:12.5px;color:var(--lc-muted);}
+.lc-meta span{display:inline-flex;align-items:center;gap:7px;}
+.lc-meta b{color:var(--lc-text);font-weight:600;}
+
+/* Tabs */
+.lc-tabs{display:flex;gap:2px;border-bottom:1px solid var(--lc-line);padding:0 14px;overflow-x:auto;}
+.lc-tab{background:none;border:none;padding:12px 18px;font-size:13.5px;font-weight:600;color:var(--lc-muted);cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-1px;white-space:nowrap;font-family:inherit;}
+.lc-tab.on{color:var(--lc-blue);border-bottom-color:var(--lc-blue);}
+.lc-pane{display:none;padding:16px 18px 18px;}
+.lc-pane.on{display:block;}
+
+/* Progreso */
+.lc-prog-top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:7px;}
+.lc-prog-top b{font-size:13.5px;}
+.lc-prog-top span{font-size:12.5px;color:#334155;}
+.lc-prog-row{display:flex;align-items:center;gap:14px;margin-bottom:14px;}
+.lc-bar{flex:1;height:11px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
+.lc-bar > div{height:100%;border-radius:99px;}
+.lc-prog-pct{font-size:24px;font-weight:800;font-family:var(--lc-mono);}
+
+/* Barra de herramientas */
+.lc-tools{display:flex;gap:9px;align-items:center;flex-wrap:wrap;margin-bottom:12px;}
+.lc-search{position:relative;flex:1;min-width:220px;}
+.lc-search .lc-i{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:#94a3b8;}
+.lc-search input{width:100%;padding:10px 12px 10px 34px;border:1px solid var(--lc-line);border-radius:9px;font-size:13px;outline:none;font-family:inherit;}
+.lc-search input:focus,.lc-sel:focus{border-color:var(--lc-blue);box-shadow:0 0 0 3px rgba(29,127,242,.1);outline:none;}
+.lc-sel{padding:10px 11px;border:1px solid var(--lc-line);border-radius:9px;font-size:13px;background:#fff;font-family:inherit;color:var(--lc-text);}
+.lc-addbox{display:none;background:var(--lc-bg);border:1px solid var(--lc-line);border-radius:12px;padding:14px;margin-bottom:12px;}
+.lc-addbox.open{display:block;}
+.lc-scanwrap{margin-bottom:12px;}
+
+/* Tabla */
+.lc-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch;border:1px solid var(--lc-line);border-radius:12px;}
+.lc-tbl{width:100%;min-width:1000px;border-collapse:collapse;font-size:12.5px;}
+.lc-tbl th{background:#f1f5f9;color:#475569;font-size:11px;font-weight:700;padding:10px;text-align:left;white-space:nowrap;}
+.lc-tbl th.c,.lc-tbl td.c{text-align:center;}
+.lc-tbl th.r,.lc-tbl td.r{text-align:right;}
+.lc-tbl td{padding:9px 10px;border-top:1px solid #eef2f7;vertical-align:middle;}
+.lc-tbl tr.lc-row:hover td{background:#fafcff;}
+.lc-prod{display:flex;align-items:flex-start;gap:10px;min-width:210px;}
+.lc-thumb{width:38px;height:38px;border-radius:8px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:18px;flex-shrink:0;}
+.lc-thumb img{width:100%;height:100%;object-fit:cover;}
+.lc-pname{font-weight:700;font-size:13px;color:var(--lc-text);}
+.lc-tbl .num-input{width:78px;padding:6px 7px;border:1px solid #d8e3f0;border-radius:7px;font-size:12px;text-align:center;background:#fff;outline:none;font-family:var(--lc-mono);}
+.lc-tbl .num-input:focus{border-color:var(--lc-blue);}
+.lc-tbl .num-input:disabled{background:#f8fafc;color:#64748b;border-color:#e8eef6;}
+.lc-pg{display:flex;align-items:center;gap:7px;min-width:120px;}
+.lc-pg .lc-bar{height:7px;}
+.lc-pg b{font-family:var(--lc-mono);font-size:11.5px;min-width:36px;text-align:right;}
+.lc-acts{display:flex;gap:5px;align-items:center;flex-wrap:wrap;}
+.lc-acts form{display:inline;margin:0;}
+.lc-count{padding:9px 14px;font-size:11.5px;color:var(--lc-muted);}
+.lc-empty{display:none;text-align:center;padding:24px;color:var(--lc-muted);font-size:13px;}
+
+/* Información / observaciones / historial */
+.lc-info{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+@media(max-width:820px){.lc-info{grid-template-columns:1fr;}}
+.lc-box{border:1px solid var(--lc-line);border-radius:12px;padding:14px;}
+.lc-box h4{margin:0 0 10px;font-size:13px;font-weight:800;color:var(--lc-navy);}
+.lc-box .summary-table{font-size:12.5px;}
+.lc-obs-txt{font-size:13.5px;line-height:1.6;color:#334155;white-space:pre-wrap;min-height:60px;}
+.lc-ev{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid var(--lc-line);border-radius:11px;margin-bottom:7px;}
+.lc-ev-ic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;background:var(--lc-blue-soft);}
+.lc-ev b{display:block;font-size:13px;}
+.lc-ev span{font-size:12px;color:var(--lc-muted);}
+.lc-ev time{margin-left:auto;font-size:11.5px;color:var(--lc-muted);font-family:var(--lc-mono);white-space:nowrap;}
+
+/* Línea de estado */
+.lc-steps{display:grid;grid-template-columns:repeat(5,1fr);padding:18px 24px 12px;position:relative;margin-bottom:6px;}
+@media(max-width:700px){.lc-steps{padding:14px 4px 8px;}}
+.lc-step{text-align:center;position:relative;font-size:12px;color:var(--lc-muted);padding-top:2px;}
+.lc-step .dot{width:26px;height:26px;border-radius:50%;margin:0 auto 7px;display:flex;align-items:center;justify-content:center;background:#e5e7eb;color:#fff;position:relative;z-index:2;}
+.lc-step .dot .lc-i{width:14px;height:14px;}
+.lc-step::before{content:'';position:absolute;top:15px;left:-50%;width:100%;height:3px;background:#e5e7eb;z-index:1;}
+.lc-step:first-child::before{display:none;}
+.lc-step.done .dot{background:#2563eb;}
+.lc-step.done::before{background:#2563eb;}
+.lc-step.cur .dot{box-shadow:0 0 0 5px rgba(37,99,235,.15);}
+.lc-step b{display:block;font-size:12px;color:#334155;font-weight:700;}
+.lc-step.done b{color:var(--lc-text);}
+.lc-step small{display:block;font-size:10.5px;color:#94a3b8;font-family:var(--lc-mono);margin-top:1px;min-height:13px;}
+
+/* Barra de acciones */
+.lc-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;margin-top:6px;}
+.lc-actions .lc-btn{padding:12px 20px;}
+.lc-actions .lc-btn.big{min-width:290px;justify-content:center;}
+@media(max-width:620px){.lc-actions .lc-btn{flex:1;justify-content:center;}.lc-actions .lc-btn.big{min-width:100%;order:-1;}}
+</style>
 
 <div class="pg">
 
@@ -339,6 +482,7 @@ hr.dv{border-top-color:#e8eef6;}
 <div class="alert-ok" style="margin-bottom:.85rem;">✅ {{ session('success') }}</div>
 @endif
 
+{{-- ── Datos base (SIN CAMBIOS respecto al original) ── --}}
 @php
     $totalItems  = $order->details->count();
     $completados = $order->details->filter(fn($i) => $i->cantidad_despachada >= $i->cantidad_solicitada && $i->cantidad_solicitada > 0)->count();
@@ -348,93 +492,168 @@ hr.dv{border-top-color:#e8eef6;}
     $estadoBg    = $order->estado === 'COMPLETO' ? '#dcfce7' : ($order->estado === 'PARCIAL' ? '#fef3c7' : '#fee2e2');
 @endphp
 
-{{-- ── Order Header ── --}}
-<div class="order-header">
-    <div>
-        <div class="order-id">🏪 Pedido Local — {{ $order->numero_orden }}</div>
-        <div class="order-sub">
-            Cliente: {{ $order->client->razon_social ?? '—' }}
-            &nbsp;·&nbsp; Fecha: {{ \Carbon\Carbon::parse($order->fecha_pedido ?? now())->format('d M Y') }}
-            &nbsp;·&nbsp; Tipo: LOCAL
+{{-- ── Datos adicionales para el rediseño (solo lectura) ── --}}
+@php
+    // Rutas opcionales: si las defines, el botón se activa solo.
+    // Ej: $lcRutaGuia = route('orders.guia', $order);   $lcRutaListo = route('orders.marcarListo', $order);
+    $lcRutaGuia  = null;
+    $lcRutaListo = null;
+
+    $lcPct = $totalItems > 0 ? round(($completados / $totalItems) * 100) : 0;
+    $lcPctColor = $lcPct >= 100 ? '#16a34a' : '#1d7ff2';
+    $lcEstadoTxt = ['COMPLETO' => 'Completado', 'PARCIAL' => 'En preparación'][$order->estado] ?? 'Pendiente';
+    $lcFecha = fn($v, $f = 'd/m/Y') => $v ? \Carbon\Carbon::parse($v)->format($f) : '—';
+    $lcFechaHora = fn($v) => $v ? \Carbon\Carbon::parse($v)->format('d/m H:i') : '';
+    $lcN = fn($n) => rtrim(rtrim(number_format((float) $n, 2, '.', ''), '0'), '.') ?: '0';
+    $lcObs = $order->observaciones ?? $order->observacion ?? null;
+    $lcImg = function ($p) {
+        $i = $p->imagen ?? $p->image ?? $p->foto ?? null;
+        if ($i && is_string($i) && !preg_match('#^(https?:)?//#', $i)) { $i = asset('storage/' . ltrim($i, '/')); }
+        return is_string($i) ? $i : null;
+    };
+
+    // Línea de estado del pedido
+    $lcAnyDesp = $order->details->contains(fn($i) => $i->cantidad_despachada > 0);
+    $lcAllDone = $completados === $totalItems && $totalItems > 0;
+    $lcUlt     = $order->details->max('updated_at');
+    $lcFechaDesp = $order->fecha_despacho ?? $order->despachado_at ?? null;
+    $lcSteps = [
+        ['Pedido registrado',     true,                                                   $order->created_at ?? null],
+        ['En preparación',        $lcAnyDesp,                                             $lcAnyDesp ? $lcUlt : null],
+        ['Listo para despacho',   $lcAllDone,                                             $lcAllDone ? $lcUlt : null],
+        ['Despachado',            (bool) $lcFechaDesp,                                    $lcFechaDesp],
+        ['Completado',            (bool) $lcFechaDesp && $order->estado === 'COMPLETO',   $order->estado === 'COMPLETO' ? ($order->updated_at ?? null) : null],
+    ];
+    $lcCur = 0;
+    foreach ($lcSteps as $k => $s) { if ($s[1]) { $lcCur = $k; } }
+
+    // Historial (derivado de las fechas de registro existentes)
+    $lcEventos = collect();
+    $lcAdd = function ($f, $ico, $t, $d = '') use (&$lcEventos) {
+        if (!$f) { return; }
+        $c = \Carbon\Carbon::parse($f);
+        $lcEventos->push(['f' => $c, 'ts' => $c->getTimestamp(), 'i' => $ico, 't' => $t, 'd' => $d]);
+    };
+    $lcAdd($order->created_at ?? null, '🆕', 'Pedido local registrado', $order->numero_orden);
+    foreach ($order->details as $d) {
+        $nom = $d->product->nombre ?? 'Producto';
+        $lcAdd($d->created_at ?? null, '➕', 'Producto agregado', $nom . ' · ' . $lcN($d->cantidad_solicitada) . ' u');
+        if (($d->created_at ?? null) && ($d->updated_at ?? null)
+            && abs(\Carbon\Carbon::parse($d->updated_at)->getTimestamp() - \Carbon\Carbon::parse($d->created_at)->getTimestamp()) > 60) {
+            $lcAdd($d->updated_at, '✏️', 'Línea actualizada', $nom . ' · preparado ' . $lcN($d->cantidad_despachada) . ' de ' . $lcN($d->cantidad_solicitada));
+        }
+    }
+    $lcEventos = $lcEventos->sortByDesc('ts')->values();
+@endphp
+
+{{-- Iconos --}}
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+    <symbol id="lc-cart" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 1.98-1.7L23 6H6"/></symbol>
+    <symbol id="lc-store" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l1-5h16l1 5"/><path d="M3 9a3 3 0 0 0 6 0 3 3 0 0 0 6 0 3 3 0 0 0 6 0"/><path d="M5 12v8h14v-8"/><path d="M10 20v-5h4v5"/></symbol>
+    <symbol id="lc-box" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="16.5" y1="9.4" x2="7.5" y2="4.21"/><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></symbol>
+    <symbol id="lc-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></symbol>
+    <symbol id="lc-shield" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></symbol>
+    <symbol id="lc-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+    <symbol id="lc-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+    <symbol id="lc-money" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></symbol>
+    <symbol id="lc-file" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></symbol>
+    <symbol id="lc-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></symbol>
+    <symbol id="lc-printer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></symbol>
+    <symbol id="lc-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
+    <symbol id="lc-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+    <symbol id="lc-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+</defs></svg>
+
+<div class="lc">
+
+{{-- ══════════ BREADCRUMB + CABECERA ══════════ --}}
+<div class="lc-crumb">Operaciones &nbsp;/&nbsp; Órdenes &nbsp;/&nbsp; <b>Pedido local</b></div>
+
+<div class="lc-head">
+    <div class="lc-head-l">
+        <div class="lc-logo"><svg class="lc-i"><use href="#lc-cart"/></svg></div>
+        <div>
+            <h1 class="lc-title">Pedido local</h1>
+            <div class="lc-sub">Gestiona y da seguimiento a los productos y despachos del pedido.</div>
         </div>
     </div>
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <span class="status-chip" style="background:{{ $estadoBg }};color:{{ $estadoColor }};">
-            {{ $order->estado }}
-        </span>
-        <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="btn-green">📄 PDF</a>
+    <div class="lc-head-r">
+        <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="lc-btn green"><svg class="lc-i"><use href="#lc-file"/></svg> PDF</a>
         {{-- Solo para órdenes LOCAL --}}
-            @if($order->tipo_orden === 'LOCAL')
-            <a href="{{ route('orders.cartaCalidad', $order) }}"
-            target="_blank"
-            style="
-                display:inline-flex;align-items:center;gap:5px;
-                padding:7px 14px;border-radius:3px;
-                background:#7c3aed;color:#fff;
-                font-size:12px;font-weight:600;
-                text-decoration:none;
-                transition:opacity .15s;
-            ">
-                🏅 Carta de calidad
-            </a>
-@endif
+        @if($order->tipo_orden === 'LOCAL')
+        <a href="{{ route('orders.cartaCalidad', $order) }}" target="_blank" class="lc-btn purple">🏅 Carta de calidad</a>
+        @endif
     </div>
 </div>
 
-{{-- ── KPIs ── --}}
-<div class="kpis">
-    <div class="kpi" style="border-left-color:#1e3a5f;">
-        <div class="kpi-label">Productos</div>
-        <div class="kpi-val">{{ $totalItems }}</div>
-        <div class="kpi-sub">líneas de pedido</div>
-    </div>
-    <div class="kpi" style="border-left-color:#22c55e;">
-        <div class="kpi-label">Completos</div>
-        <div class="kpi-val" style="color:#15803d;">{{ $completados }}</div>
-        <div class="kpi-sub">ítems OK</div>
-    </div>
-    <div class="kpi" style="border-left-color:#ef4444;">
-        <div class="kpi-label">Pendientes</div>
-        <div class="kpi-val" style="color:#b91c1c;">{{ $pendientes }}</div>
-        <div class="kpi-sub">sin despachar</div>
-    </div>
-    <div class="kpi" style="border-left-color:#2563eb;">
-        <div class="kpi-label">Subtotal</div>
-        <div class="kpi-val" style="font-size:14px;color:#2563eb;">S/ {{ number_format($order->subtotal,2) }}</div>
-        <div class="kpi-sub">sin IGV</div>
-    </div>
-    <div class="kpi" style="border-left-color:#1e3a5f;background:#f0f7ff;">
-        <div class="kpi-label">Total</div>
-        <div class="kpi-val" style="font-size:14px;color:#1e3a5f;">S/ {{ number_format($order->total,2) }}</div>
-        <div class="kpi-sub">con IGV 18%</div>
-    </div>
+{{-- ══════════ KPIs ══════════ --}}
+<div class="lc-kpis">
+    <div class="lc-k t-blue"><div class="lc-k-ic"><svg class="lc-i"><use href="#lc-box"/></svg></div><div><small class="l">Productos</small><b>{{ $totalItems }}</b><small class="s">líneas de pedido</small></div></div>
+    <div class="lc-k t-green"><div class="lc-k-ic"><svg class="lc-i"><use href="#lc-shield"/></svg></div><div><small class="l">Completos</small><b>{{ $completados }}</b><small class="s">ítems OK</small></div></div>
+    <div class="lc-k t-red"><div class="lc-k-ic"><svg class="lc-i"><use href="#lc-alert"/></svg></div><div><small class="l">Pendientes</small><b>{{ $pendientes }}</b><small class="s">sin despachar</small></div></div>
+    <div class="lc-k t-orange t-money"><div class="lc-k-ic"><svg class="lc-i"><use href="#lc-money"/></svg></div><div><small class="l">Subtotal</small><b>S/ {{ number_format($order->subtotal,2) }}</b><small class="s">sin IGV</small></div></div>
+    <div class="lc-k t-navy t-money"><div class="lc-k-ic"><svg class="lc-i"><use href="#lc-money"/></svg></div><div><small class="l">Total</small><b>S/ {{ number_format($order->total,2) }}</b><small class="s">con IGV 18%</small></div></div>
 </div>
 
-{{-- ── Layout ── --}}
-<div class="layout">
+{{-- ══════════ TARJETA DEL PEDIDO ══════════ --}}
+<div class="lc-card lc-main">
 
-    {{-- ── Columna izquierda ── --}}
-    <div class="left-col">
+    <div class="lc-oh">
+        <div class="lc-oh-l">
+            <div class="lc-oh-ic"><svg class="lc-i"><use href="#lc-store"/></svg></div>
+            <div>
+                <div class="lc-oh-t">
+                    <strong>{{ $order->numero_orden }}</strong>
+                    <span class="lc-chip" style="background:{{ $estadoBg }};color:{{ $estadoColor }};" title="{{ $order->estado }}">{{ $lcEstadoTxt }}</span>
+                </div>
+                <div class="lc-oh-cli">{{ $order->client->razon_social ?? '—' }}</div>
+            </div>
+        </div>
+    </div>
+    <div class="lc-meta">
+        <span><svg class="lc-i"><use href="#lc-cal"/></svg><b class="lc-num">{{ \Carbon\Carbon::parse($order->fecha_pedido ?? now())->format('d/m/Y') }}</b></span>
+        <span><svg class="lc-i"><use href="#lc-box"/></svg><b>{{ $totalItems }} productos</b></span>
+        <span><svg class="lc-i"><use href="#lc-file"/></svg>Factura: <b class="lc-num">{{ $order->factura_asociada ?? '—' }}</b></span>
+        <span><svg class="lc-i"><use href="#lc-truck"/></svg>Guía: <b class="lc-num">{{ $order->guia_asociada ?? '—' }}</b></span>
+    </div>
 
-        {{-- ── Scanner ── --}}
-        <div class="scanner-erp">
-            <div class="scan-led"></div>
-            <input type="text" id="scanner" class="scan-input"
-                   placeholder="Escanea o escribe código de barras">
-            <span style="font-size:10px;color:#475569;white-space:nowrap;flex-shrink:0;">⏎ Enter</span>
-            <button type="button" id="btnCamara" onclick="abrirCamara()"
-                    style="display:none;background:#1e3a5f;border:1px solid #334155;color:#7eb8f7;border-radius:4px;padding:6px 10px;cursor:pointer;font-size:13px;white-space:nowrap;flex-shrink:0;">
-                📷 Cámara
-            </button>
+    <div class="lc-tabs">
+        <button type="button" class="lc-tab on" data-tab="productos" onclick="lcTab('productos',this)">Productos ({{ $totalItems }})</button>
+        <button type="button" class="lc-tab" data-tab="info" onclick="lcTab('info',this)">Información</button>
+        <button type="button" class="lc-tab" data-tab="obs" onclick="lcTab('obs',this)">Observaciones</button>
+        <button type="button" class="lc-tab" data-tab="hist" onclick="lcTab('hist',this)">Historial ({{ $lcEventos->count() }})</button>
+    </div>
+
+    {{-- ─────────── PRODUCTOS ─────────── --}}
+    <div class="lc-pane on" data-pane="productos">
+
+        <div class="lc-prog-top">
+            <b>Progreso de preparación</b>
+            <span class="lc-num">{{ $completados }} / {{ $totalItems }} productos</span>
+        </div>
+        <div class="lc-prog-row">
+            <div class="lc-bar"><div style="width:{{ $lcPct }}%;background:{{ $lcPctColor }};"></div></div>
+            <div class="lc-prog-pct" style="color:{{ $lcPctColor }};">{{ $lcPct }}%</div>
         </div>
 
-        {{-- ── Agregar producto ── --}}
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">➕ Agregar línea de producto</div>
+        {{-- Scanner (mismos ids) --}}
+        <div class="lc-scanwrap">
+            <div class="scanner-erp">
+                <div class="scan-led"></div>
+                <input type="text" id="scanner" class="scan-input"
+                       placeholder="Escanea o escribe código de barras">
+                <span style="font-size:10px;color:#b8cbe5;white-space:nowrap;flex-shrink:0;">⏎ Enter</span>
+                <button type="button" id="btnCamara" onclick="abrirCamara()"
+                        style="display:none;background:#1e3a5f;border:1px solid #334155;color:#7eb8f7;border-radius:4px;padding:6px 10px;cursor:pointer;font-size:13px;white-space:nowrap;flex-shrink:0;">
+                    📷 Cámara
+                </button>
             </div>
-            <div class="panel-body">
-                <form method="POST" action="{{ route('orders.addProduct',$order) }}">
+        </div>
+
+        {{-- Agregar producto (formulario original; se abre solo al escanear) --}}
+        <div class="lc-addbox" id="lcAddBox">
+            <div style="font-size:13px;font-weight:800;margin-bottom:10px;color:var(--lc-navy);">➕ Agregar línea de producto</div>
+<form method="POST" action="{{ route('orders.addProduct',$order) }}">
                 @csrf
                 <div class="add-grid">
                     <div>
@@ -457,135 +676,143 @@ hr.dv{border-top-color:#e8eef6;}
                     <button type="submit" class="btn-primary" style="align-self:end;">+ Agregar</button>
                 </div>
                 </form>
-            </div>
         </div>
 
-        {{-- ── Tabla ERP de productos ── --}}
-        <div class="panel">
-            <div class="panel-header">
-                <div class="panel-title">📦 Líneas del pedido</div>
-                <span style="font-size:10px;color:#94a3b8;">{{ $totalItems }} registro(s)</span>
+        <div class="lc-tools">
+            <div class="lc-search">
+                <svg class="lc-i"><use href="#lc-search"/></svg>
+                <input type="text" id="lcBuscar" placeholder="Buscar producto, SKU o lote..." oninput="lcFiltrar()">
             </div>
+            <select class="lc-sel" id="lcEstado" onchange="lcFiltrar()">
+                <option value="">Todos los estados</option>
+                <option value="LISTO">Listo</option>
+                <option value="PROCESO">En preparación</option>
+                <option value="PEND">Pendiente</option>
+            </select>
+            <button type="button" class="lc-btn blue sm" onclick="document.getElementById('lcAddBox').classList.toggle('open')"><svg class="lc-i"><use href="#lc-plus"/></svg> Agregar producto</button>
+        </div>
 
-            <div class="scroll-hint-mobile">← desliza horizontalmente →</div>
+        <div class="scroll-hint-mobile">← desliza horizontalmente →</div>
 
-            <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;">
-            <table class="erp-table">
-                <thead>
-                    <tr>
-                        <th>Est.</th>
-                        <th>Producto</th>
-                        <th>SKU</th>
-                        <th style="text-align:center;">Solicitado</th>
-                        <th style="text-align:center;">Despachado</th>
-                        <th style="text-align:center;">Precio</th>
-                        <th style="text-align:right;">Subtotal</th>
-                        <th style="text-align:center;">Prog.</th>
-                        <th>Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
+        <div class="lc-scroll">
+        <table class="lc-tbl" id="lcTabla">
+            <thead>
+                <tr>
+                    <th>Producto</th>
+                    <th>SKU</th>
+                    <th class="c">Pedido</th>
+                    <th class="c">Preparado</th>
+                    <th class="c">Pendiente</th>
+                    <th class="c">Precio</th>
+                    <th class="r">Subtotal</th>
+                    <th>Progreso</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach($order->details as $item)
+            @php
+                $pct = $item->cantidad_solicitada > 0
+                    ? ($item->cantidad_despachada / $item->cantidad_solicitada) * 100 : 0;
+                $lc  = $pct >= 100 ? '#22c55e' : ($pct > 0 ? '#f59e0b' : '#ef4444');
+                $montoColor = $pct >= 100 ? '#15803d' : ($pct > 0 ? '#b45309' : '#b91c1c');
 
-                @foreach($order->details as $item)
-                @php
-                    $pct = $item->cantidad_solicitada > 0
-                        ? ($item->cantidad_despachada / $item->cantidad_solicitada) * 100 : 0;
-                    $lc  = $pct >= 100 ? '#22c55e' : ($pct > 0 ? '#f59e0b' : '#ef4444');
-                    $montoColor = $pct >= 100 ? '#15803d' : ($pct > 0 ? '#b45309' : '#b91c1c');
+                // Lote / vencimiento por línea
+                $loteItem     = $item->lote;
+                $fechaVenc    = $item->fecha_vencimiento;
+                $vColor       = '#94a3b8';
+                $vIcon        = '';
+                $diasVencItem = null;
+                if ($fechaVenc) {
+                    $diasVencItem = (int) round(now()->diffInDays(\Carbon\Carbon::parse($fechaVenc), false));
+                    if ($diasVencItem < 0)       { $vColor = '#b91c1c'; $vIcon = '🔴'; }
+                    elseif ($diasVencItem <= 30) { $vColor = '#b45309'; $vIcon = '🟡'; }
+                    else                          { $vColor = '#15803d'; $vIcon = '🟢'; }
+                }
 
-                    // Lote / vencimiento por línea
-                    $loteItem     = $item->lote;
-                    $fechaVenc    = $item->fecha_vencimiento;
-                    $vColor       = '#94a3b8';
-                    $vIcon        = '';
-                    $diasVencItem = null;
-                    if ($fechaVenc) {
-                        $diasVencItem = (int) round(now()->diffInDays(\Carbon\Carbon::parse($fechaVenc), false));
-                        if ($diasVencItem < 0)       { $vColor = '#b91c1c'; $vIcon = '🔴'; }
-                        elseif ($diasVencItem <= 30) { $vColor = '#b45309'; $vIcon = '🟡'; }
-                        else                          { $vColor = '#15803d'; $vIcon = '🟢'; }
-                    }
-                @endphp
-
-                {{-- ✅ FIX: form FUERA del tr, referenciado con form="form-X" en los inputs --}}
-                <form method="POST"
-                      action="{{ route('orders.updateDetail',$item) }}"
-                      id="form-{{ $item->id }}"
-                      style="display:none;">
-                    @csrf @method('PUT')
-                    <input type="hidden" name="cantidad_solicitada" id="hid-sol-{{ $item->id }}" value="{{ $item->cantidad_solicitada }}">
-                    <input type="hidden" name="cantidad_despachada" id="hid-des-{{ $item->id }}" value="{{ $item->cantidad_despachada }}">
-                    <input type="hidden" name="precio_unitario"     id="hid-pre-{{ $item->id }}" value="{{ $item->precio_unitario }}">
-                </form>
-
-                <tr id="row-{{ $item->id }}">
-                    <td><span class="state-dot" style="background:{{ $lc }};"></span></td>
-                    <td style="font-weight:600;color:#0f172a;">
-                        {{ $item->product->nombre }}
-                        <div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                            <span class="lote-badge">🏷️ {{ $loteItem ?: 'Sin lote' }}</span>
-                            <span class="venc-badge" style="color:{{ $vColor }};">
-                                {{ $vIcon }} {{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('d/m/Y') : 'Sin fecha' }}
-                                @if($diasVencItem !== null && $diasVencItem >= 0)
-                                    <span class="venc-dias">({{ $diasVencItem }}d)</span>
-                                @endif
-                            </span>
-                            <button type="button" class="btn-lote-edit"
-                                    onclick="abrirModalLote({{ $item->id }}, '{{ addslashes($loteItem ?? '') }}', '{{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('Y-m-d') : '' }}')"
-                                    title="Editar lote / vencimiento">✏️</button>
+                $lcSol  = (float) $item->cantidad_solicitada;
+                $lcDesp = (float) $item->cantidad_despachada;
+                $lcPend = max($lcSol - $lcDesp, 0);
+                if ($pct >= 100)      { $lcEstK = 'LISTO';   $lcEstT = 'Listo';          $lcEstBg = '#dcfce7'; $lcEstCl = '#15803d'; }
+                elseif ($lcDesp > 0)  { $lcEstK = 'PROCESO'; $lcEstT = 'En preparación'; $lcEstBg = '#fef3c7'; $lcEstCl = '#b45309'; }
+                else                  { $lcEstK = 'PEND';    $lcEstT = 'Pendiente';      $lcEstBg = '#eef2f7'; $lcEstCl = '#475569'; }
+                $lcThumb = $lcImg($item->product);
+            @endphp
+                <tr class="lc-row" id="row-{{ $item->id }}"
+                    data-estado="{{ $lcEstK }}"
+                    data-nombre="{{ $item->product->nombre }}"
+                    data-sku="{{ $item->product->sku ?? '' }}"
+                    data-lote="{{ $loteItem ?? '' }}"
+                    data-search="{{ mb_strtolower($item->product->nombre.' '.($item->product->sku ?? '').' '.($loteItem ?? '')) }}">
+                    <td>
+                        <div class="lc-prod">
+                            <div class="lc-thumb">@if($lcThumb)<img src="{{ $lcThumb }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">@else 📦 @endif</div>
+                            <div>
+                                <div class="lc-pname">{{ $item->product->nombre }}</div>
+                                <div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
+                                    <span class="lote-badge">🏷️ {{ $loteItem ?: 'Sin lote' }}</span>
+                                    <span class="venc-badge" style="color:{{ $vColor }};">
+                                        {{ $vIcon }} {{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('d/m/Y') : 'Sin fecha' }}
+                                        @if($diasVencItem !== null && $diasVencItem >= 0)
+                                            <span class="venc-dias">({{ $diasVencItem }}d)</span>
+                                        @endif
+                                    </span>
+                                    <button type="button" class="btn-lote-edit"
+                                            onclick="abrirModalLote({{ $item->id }}, '{{ addslashes($loteItem ?? '') }}', '{{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('Y-m-d') : '' }}')"
+                                            title="Editar lote / vencimiento">✏️</button>
+                                </div>
+                            </div>
                         </div>
                     </td>
-                    <td style="color:#94a3b8;font-size:11px;">{{ $item->product->sku ?? '—' }}</td>
-                    <td style="text-align:center;">
+                    <td class="lc-num" style="color:#64748b;font-size:11.5px;">{{ $item->product->sku ?? '—' }}</td>
+                    <td class="c">
                         <input type="number" step="0.01"
                                class="num-input" id="sol-{{ $item->id }}"
                                value="{{ $item->cantidad_solicitada }}"
                                disabled
                                oninput="syncHidden({{ $item->id }})">
                     </td>
-                    <td style="text-align:center;">
+                    <td class="c">
                         <input type="number" step="0.01"
                                class="num-input" id="des-{{ $item->id }}"
                                value="{{ $item->cantidad_despachada }}"
                                disabled
                                oninput="syncHidden({{ $item->id }})">
                     </td>
-                    <td style="text-align:center;">
+                    <td class="c lc-num" style="font-weight:700;color:{{ $lcPend > 0 ? '#ef4444' : '#16a34a' }};">{{ $lcN($lcPend) }}</td>
+                    <td class="c">
                         <input type="number" step="0.01"
                                class="num-input" id="pre-{{ $item->id }}"
                                value="{{ $item->precio_unitario }}"
                                disabled
                                oninput="syncHidden({{ $item->id }})">
                     </td>
-                    <td style="text-align:right;font-weight:700;color:{{ $montoColor }};">
+                    <td class="r lc-num" style="font-weight:700;color:{{ $montoColor }};white-space:nowrap;">
                         S/ {{ number_format($item->subtotal ?? ($item->cantidad_despachada * $item->precio_unitario),2) }}
                     </td>
-                    <td style="text-align:center;">
-                        <div class="mini-bar">
-                            <div class="mini-fill" style="width:{{ min($pct,100) }}%;background:{{ $lc }};"></div>
-                        </div>
-                        <div style="font-size:10px;font-weight:700;color:{{ $lc }};">{{ number_format($pct,0) }}%</div>
-                    </td>
                     <td>
-                        <a href="{{ route('orders.etiqueta.local', $item) }}"
-                        target="_blank"
-                        class="btn-xs"
-                        style="
-                            background:#e0e7ff;
-                            color:#4338ca;
-                            border:1px solid #c7d2fe;
-                            text-decoration:none;
-                        ">
-                            🏷️ Etiqueta
-                        </a>
-                                                <div style="display:flex;gap:4px;flex-wrap:wrap;">
+                        <div class="lc-pg">
+                            <div class="lc-bar"><div style="width:{{ min($pct,100) }}%;background:{{ $lc }};"></div></div>
+                            <b style="color:{{ $lc }};">{{ number_format($pct,0) }}%</b>
+                        </div>
+                    </td>
+                    <td><span class="lc-chip" style="background:{{ $lcEstBg }};color:{{ $lcEstCl }};">{{ $lcEstT }}</span></td>
+                    <td>
+                        <div class="lc-acts">
+                            <a href="{{ route('orders.etiqueta.local', $item) }}"
+                               target="_blank"
+                               class="btn-xs"
+                               style="background:#e0e7ff;color:#4338ca;border:1px solid #c7d2fe;text-decoration:none;">
+                                🏷️ Etiqueta
+                            </a>
                             <button type="button" class="btn-xs btn-edit"
                                     onclick="editar({{ $item->id }})">✏️ Editar</button>
                             <button type="submit" form="form-{{ $item->id }}"
                                     class="btn-xs btn-save"
                                     id="btn-save-{{ $item->id }}"
                                     style="display:none;">💾 Guardar</button>
-                               <form method="POST"
+                            <form method="POST"
                                   action="{{ route('orders.details.destroy',$item) }}"
                                   onsubmit="return confirm('¿Eliminar {{ addslashes($item->product->nombre) }}?')"
                                   style="display:inline;">
@@ -595,40 +822,37 @@ hr.dv{border-top-color:#e8eef6;}
                         </div>
                     </td>
                 </tr>
-
-                @endforeach
-
-                </tbody>
-            </table>
-            </div>
+            @endforeach
+            </tbody>
+        </table>
         </div>
+        <div class="lc-empty" id="lcVacio">Ningún producto coincide con la búsqueda o el filtro.</div>
+        <div class="lc-count"><span id="lcContador">{{ $totalItems }} de {{ $totalItems }}</span> productos</div>
+    </div>
 
-    </div>{{-- fin left-col --}}
+    {{-- ─────────── INFORMACIÓN (antes: Resumen del pedido) ─────────── --}}
+    <div class="lc-pane" data-pane="info">
+        @if($completados === $totalItems && $totalItems > 0)
+        <div class="alert-ok">✅ Todos los ítems completos</div>
+        @else
+        <div class="alert-warn">⏳ {{ $completados }} de {{ $totalItems }} ítems completos</div>
+        @endif
 
-    {{-- ── Columna derecha: Resumen ── --}}
-    <div>
-        <div class="panel" style="position:sticky;top:10px;">
-            <div class="panel-header">
-                <div class="panel-title">📊 Resumen del pedido</div>
-            </div>
-            <div class="panel-body">
-
-                @if($completados === $totalItems && $totalItems > 0)
-                <div class="alert-ok">✅ Todos los ítems completos</div>
-                @else
-                <div class="alert-warn">⏳ {{ $completados }} de {{ $totalItems }} ítems completos</div>
-                @endif
-
+        <div class="lc-info">
+            <div class="lc-box">
+                <h4>Datos del pedido</h4>
                 <table class="summary-table">
                     <tr><td>Nº Orden</td><td>{{ $order->numero_orden }}</td></tr>
                     <tr><td>Tipo</td><td>LOCAL</td></tr>
                     <tr><td>Fecha</td><td>{{ \Carbon\Carbon::parse($order->fecha_pedido ?? now())->format('d M Y') }}</td></tr>
                     <tr><td>Cliente</td><td style="font-size:11px;">{{ $order->client->razon_social ?? '—' }}</td></tr>
                     <tr><td>Productos</td><td>{{ $totalItems }}</td></tr>
+                    <tr><td>Factura</td><td>{{ $order->factura_asociada ?? '—' }}</td></tr>
+                    <tr><td>Guía</td><td>{{ $order->guia_asociada ?? '—' }}</td></tr>
                 </table>
-
-                <hr class="dv">
-
+            </div>
+            <div class="lc-box">
+                <h4>Importes</h4>
                 <table class="summary-table">
                     <tr><td>Subtotal</td><td>S/ {{ number_format($order->subtotal,2) }}</td></tr>
                     <tr><td>IGV (18%)</td><td>S/ {{ number_format($order->igv,2) }}</td></tr>
@@ -641,13 +865,86 @@ hr.dv{border-top-color:#e8eef6;}
                 <div class="status-row"><span>🟢 Completo</span><span style="font-weight:700;color:#15803d;">{{ $completados }}</span></div>
                 <div class="status-row"><span>🟡 Parcial</span><span style="font-weight:700;color:#b45309;">{{ $parciales }}</span></div>
                 <div class="status-row"><span>🔴 Pendiente</span><span style="font-weight:700;color:#b91c1c;">{{ $pendientes }}</span></div>
-
-                <hr class="dv">
             </div>
         </div>
     </div>
 
-</div>{{-- fin layout --}}
+    {{-- ─────────── OBSERVACIONES ─────────── --}}
+    <div class="lc-pane" data-pane="obs">
+        <div class="lc-box">
+            <h4>Observaciones del pedido</h4>
+            <div class="lc-obs-txt">{{ $lcObs ?: 'Sin observaciones registradas.' }}</div>
+        </div>
+    </div>
+
+    {{-- ─────────── HISTORIAL ─────────── --}}
+    <div class="lc-pane" data-pane="hist">
+        @forelse($lcEventos as $ev)
+            <div class="lc-ev">
+                <div class="lc-ev-ic">{{ $ev['i'] }}</div>
+                <div>
+                    <b>{{ $ev['t'] }}</b>
+                    @if($ev['d'] !== '')<span>{{ $ev['d'] }}</span>@endif
+                </div>
+                <time>{{ $ev['f']->format('d/m/Y H:i') }}</time>
+            </div>
+        @empty
+            <div style="text-align:center;color:#94a3b8;padding:24px;">Aún no hay movimientos registrados.</div>
+        @endforelse
+        <div style="margin-top:8px;font-size:11px;color:var(--lc-muted);">El historial se arma con las fechas de registro del pedido y sus líneas.</div>
+    </div>
+</div>
+
+{{-- ══════════ LÍNEA DE ESTADO ══════════ --}}
+<div class="lc-card" style="padding:6px 10px;margin-bottom:12px;">
+    <div class="lc-steps">
+        @foreach($lcSteps as $k => $st)
+            <div class="lc-step {{ $st[1] ? 'done' : '' }} {{ $k === $lcCur ? 'cur' : '' }}">
+                <div class="dot">@if($st[1])<svg class="lc-i"><use href="#lc-check"/></svg>@endif</div>
+                <b>{{ $st[0] }}</b>
+                <small>{{ $st[1] ? $lcFechaHora($st[2]) : '' }}</small>
+            </div>
+        @endforeach
+    </div>
+</div>
+
+{{-- ══════════ ACCIONES ══════════ --}}
+<div class="lc-actions">
+    <button type="button" class="lc-btn white" onclick="lcPicking()"><svg class="lc-i"><use href="#lc-printer"/></svg> Imprimir picking</button>
+
+    @if($lcRutaGuia)
+        <a href="{{ $lcRutaGuia }}" class="lc-btn white"><svg class="lc-i"><use href="#lc-truck"/></svg> Generar guía</a>
+    @else
+        <button type="button" class="lc-btn white is-off" disabled title="Ruta de guía sin configurar"><svg class="lc-i"><use href="#lc-truck"/></svg> Generar guía</button>
+    @endif
+
+    @if($lcRutaListo)
+        <form method="POST" action="{{ $lcRutaListo }}" style="display:inline;"
+              onsubmit="return confirm('¿Marcar el pedido {{ $order->numero_orden }} como listo para despacho?')">
+            @csrf
+            <button type="submit" class="lc-btn green big"><svg class="lc-i"><use href="#lc-check"/></svg> Marcar como listo para despacho</button>
+        </form>
+    @else
+        <button type="button" class="lc-btn green big is-off" disabled title="Ruta de “listo para despacho” sin configurar"><svg class="lc-i"><use href="#lc-check"/></svg> Marcar como listo para despacho</button>
+    @endif
+</div>
+
+{{-- Formularios de actualización por línea (mismos ids; los inputs usan form="form-X") --}}
+<div style="display:none;">
+@foreach($order->details as $item)
+    <form method="POST"
+          action="{{ route('orders.updateDetail',$item) }}"
+          id="form-{{ $item->id }}"
+          style="display:none;">
+        @csrf @method('PUT')
+        <input type="hidden" name="cantidad_solicitada" id="hid-sol-{{ $item->id }}" value="{{ $item->cantidad_solicitada }}">
+        <input type="hidden" name="cantidad_despachada" id="hid-des-{{ $item->id }}" value="{{ $item->cantidad_despachada }}">
+        <input type="hidden" name="precio_unitario"     id="hid-pre-{{ $item->id }}" value="{{ $item->precio_unitario }}">
+    </form>
+@endforeach
+</div>
+
+</div>{{-- /.lc --}}
 
 {{-- ── Modal cámara ── --}}
 <div id="modalCamara" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:9999;flex-direction:column;align-items:center;justify-content:center;padding:1rem;">
@@ -875,6 +1172,77 @@ function empezarConDispositivo(deviceId) {
 document.getElementById('modalCamara').addEventListener('click', function(e) {
     if (e.target === this) cerrarCamara();
 });
+</script>
+
+<script>
+// ══════════════════════════════════════════════════════════
+//  PEDIDO LOCAL · interacciones del rediseño (aditivo)
+//  No modifica syncHidden / editar / scanner / cámara / modal de lote.
+// ══════════════════════════════════════════════════════════
+var LC_TOTAL = {{ $totalItems }};
+var LC_ORDEN = {{ Js::from($order->numero_orden) }};
+var LC_CLIENTE = {{ Js::from($order->client->razon_social ?? '—') }};
+
+/* ── Pestañas ── */
+function lcTab(name, btn) {
+    document.querySelectorAll('.lc-pane').forEach(function (p) { p.classList.toggle('on', p.dataset.pane === name); });
+    document.querySelectorAll('.lc-tab').forEach(function (b) { b.classList.toggle('on', b === btn); });
+}
+
+/* ── Búsqueda + filtro por estado (solo oculta/muestra filas) ── */
+function lcFiltrar() {
+    var q = (document.getElementById('lcBuscar').value || '').trim().toLowerCase();
+    var est = document.getElementById('lcEstado').value;
+    var n = 0;
+    document.querySelectorAll('#lcTabla tr.lc-row').forEach(function (tr) {
+        var ok = (!q || (tr.dataset.search || '').indexOf(q) !== -1) && (!est || tr.dataset.estado === est);
+        tr.style.display = ok ? '' : 'none';
+        if (ok) n++;
+    });
+    document.getElementById('lcVacio').style.display = n ? 'none' : 'block';
+    document.getElementById('lcContador').textContent = n + ' de ' + LC_TOTAL;
+}
+
+/* ── Imprimir picking (ventana de impresión con los valores actuales) ── */
+function lcEsc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
+function lcPicking() {
+    var w = window.open('', '_blank');
+    if (!w) { alert('Permite las ventanas emergentes para imprimir.'); return; }
+    var filas = '', i = 0;
+    document.querySelectorAll('#lcTabla tr.lc-row').forEach(function (tr) {
+        var id = tr.id.replace('row-', '');
+        var sol = parseFloat((document.getElementById('sol-' + id) || {}).value) || 0;
+        var des = parseFloat((document.getElementById('des-' + id) || {}).value) || 0;
+        var pend = Math.max(sol - des, 0);
+        i++;
+        filas += '<tr><td>' + i + '</td><td>' + lcEsc(tr.dataset.sku) + '</td><td>' + lcEsc(tr.dataset.nombre) +
+                 '</td><td>' + lcEsc(tr.dataset.lote || '—') + '</td><td class="n">' + sol + '</td><td class="n">' + des +
+                 '</td><td class="n">' + pend + '</td><td class="chk"></td></tr>';
+    });
+    var css = 'body{font-family:Arial,Helvetica,sans-serif;margin:18px;color:#0f172a}h1{font-size:20px;margin:0 0 4px}' +
+              '.s{font-size:13px;color:#475569;margin-bottom:14px}table{width:100%;border-collapse:collapse;font-size:12px}' +
+              'th,td{border:1px solid #94a3b8;padding:6px 8px;text-align:left}th{background:#e2e8f0}.n{text-align:right;font-family:monospace}' +
+              '.chk{width:50px}@page{size:A4;margin:10mm}';
+    w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Picking ' + lcEsc(LC_ORDEN) + '</title><style>' + css +
+        '</style></head><body><h1>Picking · ' + lcEsc(LC_ORDEN) + '</h1><div class="s">Cliente: ' + lcEsc(LC_CLIENTE) +
+        ' · ' + new Date().toLocaleString('es-PE') + '</div><table><thead><tr><th>#</th><th>SKU</th><th>Producto</th><th>Lote</th>' +
+        '<th>Pedido</th><th>Preparado</th><th>Pendiente</th><th>✓</th></tr></thead><tbody>' + filas + '</tbody></table></body></html>');
+    w.document.close();
+    w.focus();
+    setTimeout(function () { w.print(); }, 350);
+}
+
+/* ── Scanner: abre el panel "Agregar producto" antes del handler original ──
+   (el handler original rellena producto/precio y enfoca la cantidad; el panel debe estar visible) */
+(function () {
+    var sc = document.getElementById('scanner');
+    if (!sc) return;
+    sc.addEventListener('keypress', function (e) {
+        if (e.key !== 'Enter') return;
+        if ((this.value || '').trim() === '') return;
+        document.getElementById('lcAddBox').classList.add('open');
+    }, true);
+})();
 </script>
 
 @endsection
