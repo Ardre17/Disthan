@@ -1915,13 +1915,195 @@
         height: 34px;
     }
 }
-</style>
-<div class="validation-page">
 
-    {{-- =========================================================
-         ENCABEZADO
-    ========================================================== --}}
-    <div class="validation-header">
+    /* =========================================================
+       REDISEÑO · VALIDACIÓN DE PEDIDOS (prefijo vp-)
+       Aditivo: sobrescribe estilos, no toca IDs ni lógica.
+    ========================================================= */
+    .vp{
+        --vp-blue:#1d7ff2; --vp-blue-soft:#eaf2ff; --vp-navy:#1e3a5f;
+        --vp-green:#16a34a; --vp-orange:#f59e0b; --vp-red:#ef4444;
+        --vp-text:#0f172a; --vp-muted:#64748b; --vp-line:#e2e8f0; --vp-bg:#f8fafc;
+        --vp-mono:'JetBrains Mono',ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+        max-width:1680px;
+        padding:16px 22px 44px;
+    }
+    .vp *{box-sizing:border-box;}
+    .vp-card{background:#fff;border:1px solid var(--vp-line);border-radius:14px;padding:14px;box-shadow:0 1px 2px rgba(15,23,42,.04);}
+    .vp-num{font-family:var(--vp-mono);font-variant-numeric:tabular-nums;}
+    .vp-hide{display:none !important;}
+    .vp-crumb{font-size:12.5px;color:var(--vp-muted);margin-bottom:10px;}
+    .vp-crumb b{color:var(--vp-text);font-weight:600;}
+
+    /* Cabecera */
+    .vp .validation-header{margin-bottom:12px;}
+    .vp .validation-title-icon{width:58px;height:58px;border-radius:14px;background:#e3eefc;color:var(--vp-blue);font-size:28px;}
+    .vp .validation-title h1{font-size:24px;color:var(--vp-navy);letter-spacing:-.3px;}
+
+    /* Buscador original (compacto) */
+    .vp .validation-search-card{display:flex !important;align-items:center;gap:18px;flex-wrap:wrap;padding:12px 16px !important;margin-bottom:14px !important;border-radius:14px !important;}
+    .vp .search-card-label{flex-shrink:0;margin:0 !important;}
+    .vp .search-row{flex:1;min-width:260px;margin:0 !important;}
+    .vp .search-help{display:none !important;}
+
+    /* Grid de 3 columnas */
+    .vp-grid{display:grid;grid-template-columns:330px minmax(0,1fr) 320px;gap:14px;align-items:start;}
+    @media(max-width:1320px){
+        .vp-grid{grid-template-columns:320px minmax(0,1fr);}
+        .vp-right{grid-column:2;}
+    }
+    @media(max-width:900px){
+        .vp-grid{grid-template-columns:1fr;}
+        .vp-right{grid-column:1;}
+        .vp{padding:12px 12px 36px;}
+    }
+
+    /* Lista de pedidos (izquierda) */
+    .vp-ltabs{display:flex;gap:6px;margin-bottom:10px;}
+    .vp-ltab{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:9px 8px;border:none;border-radius:9px;background:#eef2f7;color:#334155;font-size:12.5px;font-weight:700;cursor:pointer;font-family:inherit;}
+    .vp-ltab em{font-style:normal;background:rgba(15,23,42,.08);border-radius:99px;padding:1px 8px;font-size:11px;}
+    .vp-ltab.on{background:var(--vp-blue);color:#fff;}
+    .vp-ltab.on em{background:rgba(255,255,255,.25);}
+    .vp-lsearch{position:relative;margin-bottom:10px;}
+    .vp-lsearch i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#94a3b8;font-size:14px;}
+    .vp-lsearch input{width:100%;padding:10px 12px 10px 36px;border:1px solid var(--vp-line);border-radius:10px;font-size:13px;outline:none;font-family:inherit;}
+    .vp-lsearch input:focus{border-color:var(--vp-blue);box-shadow:0 0 0 3px rgba(29,127,242,.1);}
+    .vp-list{display:none;flex-direction:column;gap:9px;max-height:calc(100vh - 360px);min-height:220px;overflow-y:auto;padding:2px;}
+    .vp-list.on{display:flex;}
+    .vp-oc{display:flex;gap:11px;align-items:center;padding:11px 12px;border:1px solid var(--vp-line);border-radius:12px;cursor:pointer;background:#fff;transition:border-color .15s,box-shadow .15s,background .15s;}
+    .vp-oc:hover{border-color:#b9d3f7;box-shadow:0 4px 12px rgba(15,23,42,.06);}
+    .vp-oc.sel{border-color:var(--vp-blue);background:#f3f8ff;box-shadow:0 0 0 2px rgba(29,127,242,.15);}
+    .vp-oc-ic{width:42px;height:42px;border-radius:10px;background:#e8f0fe;color:var(--vp-blue);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+    .vp-oc-b{flex:1;min-width:0;}
+    .vp-oc-b .r1{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+    .vp-oc-b .r1 b{font-size:14px;font-weight:800;color:var(--vp-text);}
+    .vp-oc-b .cli{font-size:12.5px;color:#334155;margin:2px 0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .vp-oc-b .meta{display:flex;gap:10px;flex-wrap:wrap;font-size:11.5px;color:var(--vp-muted);margin-top:2px;}
+    .vp-oc-b .meta i{margin-right:4px;}
+    .vp-oc > .bi-chevron-right{color:var(--vp-blue);font-size:15px;}
+    .vp-chip{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;border-radius:99px;padding:2px 10px;}
+    .vp-chip.pend{background:#eef2f7;color:#475569;}
+    .vp-chip.rev{background:#fff1d6;color:#b45309;}
+    .vp-chip.ok{background:#dcfce7;color:#15803d;}
+    .vp-oc-act{display:flex;gap:6px;margin-top:6px;}
+    .vp-mini{border:1px solid var(--vp-line);background:#fff;border-radius:7px;font-size:11px;font-weight:700;padding:4px 9px;cursor:pointer;color:#334155;font-family:inherit;}
+    .vp-mini:hover{background:#f1f5f9;}
+    .vp-lfoot{display:block;text-align:center;margin-top:10px;font-size:12.5px;font-weight:600;color:var(--vp-blue);background:none;border:none;cursor:pointer;width:100%;font-family:inherit;}
+    .vp-lempty{text-align:center;color:#94a3b8;padding:28px 10px;font-size:13px;}
+
+    /* Centro */
+    .vp-center{display:flex;flex-direction:column;gap:14px;min-width:0;}
+    .vp-empty{text-align:center;padding:64px 20px;color:var(--vp-muted);}
+    .vp-empty i{font-size:42px;color:#b9d3f7;display:block;margin-bottom:10px;}
+    .vp-empty b{display:block;font-size:16px;color:var(--vp-text);margin-bottom:4px;}
+
+    .vp-oh{background:#fff;border:1px solid var(--vp-line);border-radius:14px;padding:14px 16px;display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:flex-start;}
+    .vp-oh-l{display:flex;gap:13px;align-items:flex-start;min-width:0;}
+    .vp-oh-ic{width:46px;height:46px;border-radius:11px;background:#e8f0fe;color:var(--vp-blue);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+    .vp-oh-t{display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+    .vp-oh-t strong{font-size:18px;font-weight:800;color:var(--vp-navy);font-family:var(--vp-mono);}
+    .vp-oh-cli{font-size:13px;color:#334155;margin-top:2px;}
+    .vp-oh-meta{display:flex;gap:18px;flex-wrap:wrap;margin-top:10px;font-size:12.5px;color:var(--vp-muted);}
+    .vp-oh-meta span{display:inline-flex;align-items:center;gap:6px;}
+    .vp-oh-meta b{color:var(--vp-text);font-weight:600;}
+    .vp-oh-meta small{font-size:10.5px;text-transform:uppercase;letter-spacing:.04em;opacity:.8;}
+    .vp-oh-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
+    .vp-btn{display:inline-flex;align-items:center;gap:7px;padding:10px 16px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;border:1px solid transparent;font-family:inherit;}
+    .vp-btn.green{background:#16a34a;color:#fff;}
+    .vp-btn.green:hover{background:#15803d;}
+    .vp-btn.white{background:#fff;color:#1e293b;border-color:var(--vp-line);}
+    .vp-btn.white:hover{background:#f1f5f9;}
+    .vp-dd{position:relative;}
+    .vp-dd-menu{display:none;position:absolute;right:0;top:calc(100% + 6px);min-width:230px;background:#fff;border:1px solid var(--vp-line);border-radius:10px;box-shadow:0 12px 30px rgba(15,23,42,.14);padding:6px;z-index:60;}
+    .vp-dd.open .vp-dd-menu{display:block;}
+    .vp-dd-menu button{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border:none;background:none;border-radius:7px;font-size:13px;color:#1e293b;cursor:pointer;font-family:inherit;text-align:left;}
+    .vp-dd-menu button:hover{background:#f1f5f9;}
+
+    /* Progreso */
+    .vp-prog-top{display:flex;justify-content:space-between;align-items:flex-end;gap:10px;margin-bottom:8px;}
+    .vp-prog-top b{font-size:14px;font-weight:800;}
+    .vp-prog-top span{font-size:12.5px;color:#334155;}
+    .vp-prog-row{display:flex;align-items:center;gap:14px;}
+    .vp-bar{flex:1;height:11px;background:#e5e7eb;border-radius:99px;overflow:hidden;}
+    .vp-bar > div{height:100%;border-radius:99px;background:var(--vp-green);transition:width .3s;}
+    .vp-prog-pct{font-size:22px;font-weight:800;color:var(--vp-green);font-family:var(--vp-mono);}
+    .vp-legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:10px;font-size:12px;color:var(--vp-muted);}
+    .vp-legend i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;}
+    .vp-legend b{font-family:var(--vp-mono);color:var(--vp-text);margin-left:3px;}
+
+    /* Modos de validación (compactos) */
+    .vp-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+    @media(max-width:560px){.vp-modes{grid-template-columns:1fr;}}
+    .vp-mode{border:1px solid var(--vp-line);border-radius:12px;background:#fff;padding:12px 10px;text-align:center;cursor:pointer;position:relative;transition:border-color .15s,background .15s,box-shadow .15s;user-select:none;}
+    .vp-mode:hover{border-color:#b9d3f7;}
+    .vp-mode i{display:block;font-size:24px;color:var(--vp-blue);margin-bottom:4px;}
+    .vp-mode b{display:block;font-size:14px;font-weight:800;color:var(--vp-text);}
+    .vp-mode small{display:block;font-size:11.5px;color:var(--vp-muted);margin-top:1px;}
+    .vp-mode.active{border:2px solid var(--vp-blue);background:#f3f8ff;box-shadow:0 4px 14px rgba(29,127,242,.14);padding:11px 9px;}
+
+    /* Paneles de validación (originales, restilizados) */
+    .vp .validation-panel{margin-bottom:0 !important;border-radius:14px !important;box-shadow:0 1px 2px rgba(15,23,42,.04) !important;}
+    .vp .panel-header{min-height:0 !important;padding:11px 16px !important;}
+    .vp .panel-body{padding:16px !important;}
+    .vp .scanner-body{min-height:0 !important;}
+
+    .vp .item-validation-content{max-width:none !important;margin:0 !important;text-align:left !important;display:grid;grid-template-columns:96px minmax(0,1fr);column-gap:16px;align-items:center;}
+    .vp .item-validation-content > .product-main-icon{grid-row:1;margin:0 !important;width:96px !important;height:96px !important;border-radius:14px !important;overflow:hidden;}
+    .vp .item-validation-content > .product-main-icon img{width:100%;height:100%;object-fit:cover;}
+    .vp .item-validation-content > .product-information{grid-column:2;}
+    .vp .item-validation-content > .product-data-grid,
+    .vp .item-validation-content > .partial-quantity-box,
+    .vp .item-validation-content > .validation-actions{grid-column:1 / -1;}
+    .vp .product-information h2{font-size:20px !important;}
+    .vp .product-data-grid{max-width:none !important;margin:14px 0 0 !important;}
+    .vp .product-data-box{background:#fff !important;}
+
+    .vp .partial-quantity-box{max-width:none !important;margin:12px 0 0 !important;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+    .vp-stepper{display:flex;align-items:center;gap:8px;}
+    .vp-step{width:44px;height:46px;border:1px solid var(--vp-line);background:#fff;border-radius:10px;font-size:22px;font-weight:700;cursor:pointer;line-height:1;color:#334155;font-family:inherit;}
+    .vp-step:hover{background:#f1f5f9;}
+    .vp .partial-quantity-box input{width:110px !important;}
+
+    .vp .validation-actions{grid-template-columns:1fr 1fr !important;margin-top:14px !important;}
+    .vp .action-success{grid-column:1 / -1;order:-1;background:#16a34a !important;color:#fff !important;border-color:#16a34a !important;min-height:58px !important;}
+    .vp .action-success:hover{background:#15803d !important;border-color:#15803d !important;}
+    .vp .action-success small{opacity:.9 !important;font-size:11px !important;}
+    .vp .action-success strong{font-size:14px !important;}
+    .vp .action-danger{background:#fff5f5 !important;}
+    .vp .action-warning{background:#fffbeb !important;}
+    .vp .validation-action{min-height:52px !important;}
+
+    /* Observaciones (espejo) */
+    .vp-obs h4{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:800;margin:0 0 8px;}
+    .vp-obs h4 span{font-size:11.5px;color:var(--vp-muted);font-weight:500;}
+    .vp-obs textarea{width:100%;min-height:78px;border:1px solid var(--vp-line);border-radius:10px;padding:10px 12px;font-family:inherit;font-size:13px;resize:vertical;outline:none;}
+    .vp-obs textarea:focus{border-color:var(--vp-blue);box-shadow:0 0 0 3px rgba(29,127,242,.1);}
+
+    /* Productos del pedido (derecha) */
+    .vp-right h4{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:800;margin:0 0 10px;}
+    .vp-items{display:flex;flex-direction:column;gap:4px;max-height:calc(100vh - 250px);min-height:120px;overflow-y:auto;}
+    .vp-it{display:grid;grid-template-columns:46px minmax(0,1fr) 28px;gap:10px;align-items:center;padding:8px;border:1px solid transparent;border-radius:10px;}
+    .vp-it.cur{background:#f3f8ff;border-color:#bcd6fb;}
+    .vp-it-th{width:46px;height:46px;border-radius:9px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:20px;}
+    .vp-it-th img{width:100%;height:100%;object-fit:cover;}
+    .vp-it-n{font-size:12.5px;font-weight:700;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+    .vp-it-s{font-size:11px;color:var(--vp-muted);font-family:var(--vp-mono);}
+    .vp-it-p{display:flex;align-items:center;gap:7px;margin-top:3px;}
+    .vp-it-p .vp-bar{height:6px;}
+    .vp-it-p b{font-size:11px;font-family:var(--vp-mono);min-width:34px;text-align:right;}
+    .vp-it-p span{font-size:11px;font-family:var(--vp-mono);color:#334155;min-width:34px;}
+    .vp-it-st{font-size:24px;text-align:center;line-height:1;}
+    .vp-st-ok{color:#16a34a;}.vp-st-par{color:#f59e0b;}.vp-st-no{color:#ef4444;}.vp-st-pen{color:#94a3b8;}
+
+    /* Historial (original) debajo del grid */
+    .vp .validation-orders-section{display:block !important;margin-top:16px;scroll-margin-top:calc(var(--tn-h,176px) + 12px);}
+    .vp .validation-orders-section > .validation-list-card:first-child{display:none !important;}
+</style>
+<div class="validation-page vp">
+
+    <div class="vp-crumb">Operaciones &nbsp;/&nbsp; Órdenes &nbsp;/&nbsp; <b>Validación de pedidos</b></div>
+
+<div class="validation-header">
 
         <div class="validation-title">
 
@@ -1930,10 +2112,10 @@
             </div>
 
             <div>
-                <h1>Validación de Pedidos</h1>
+                <h1>Validación de pedidos</h1>
 
                 <p>
-                    Verifica los productos recibidos contra el pedido.
+                    Revisa y confirma los productos del pedido.
                 </p>
             </div>
 
@@ -1946,8 +2128,7 @@
 
     </div>
 
-
-    {{-- =========================================================
+{{-- =========================================================
          BUSCADOR
     ========================================================== --}}
     <div class="validation-search-card">
@@ -1999,10 +2180,721 @@
         </div>
 
     </div>
+
     {{-- =========================================================
-     PEDIDOS PENDIENTES + HISTORIAL
-========================================================= --}}
-<div class="validation-orders-section">
+         GRID: LISTA DE PEDIDOS · VALIDACIÓN · PRODUCTOS
+    ========================================================== --}}
+    <div class="vp-grid">
+
+        {{-- ───────────── IZQUIERDA: pedidos ───────────── --}}
+        <aside class="vp-left vp-card">
+
+            <div class="vp-ltabs">
+                <button type="button" class="vp-ltab on" data-pane="pend" onclick="vpLTab('pend', this)">
+                    Pendientes <em>{{ $pendientes->count() }}</em>
+                </button>
+                <button type="button" class="vp-ltab" data-pane="val" onclick="vpLTab('val', this)">
+                    Validados <em>{{ $historial->total() }}</em>
+                </button>
+            </div>
+
+            <div class="vp-lsearch">
+                <i class="bi bi-search"></i>
+                <input type="text" id="vpLSearch" placeholder="Buscar por pedido, factura, guía, cliente..." autocomplete="off" oninput="vpLFiltrar()">
+            </div>
+
+            {{-- Pendientes (mismos datos y misma acción que la tabla original) --}}
+            <div class="vp-list on" id="vpListPend">
+                @forelse($pendientes as $pedido)
+                    @php
+                        $vpCli = $pedido->client->razon_social ?? $pedido->client->nombre_comercial ?? 'Sin cliente';
+                        $vpFecha = $pedido->fecha_pedido ? \Carbon\Carbon::parse($pedido->fecha_pedido)->format('d/m/Y') : '-';
+                        $vpNProd = $pedido->details_count ?? null;
+                    @endphp
+                    <div class="vp-oc" tabindex="0" role="button"
+                         data-numero="{{ $pedido->numero_orden }}"
+                         data-search="{{ mb_strtolower(($pedido->numero_orden ?? '').' '.($pedido->factura_asociada ?? '').' '.($pedido->guia_asociada ?? '').' '.$vpCli) }}"
+                         onclick="abrirPedidoDesdeLista({{ $pedido->id }})">
+                        <div class="vp-oc-ic"><i class="bi bi-shop"></i></div>
+                        <div class="vp-oc-b">
+                            <div class="r1"><b>{{ $pedido->numero_orden ?? '-' }}</b><span class="vp-chip pend">Pendiente</span></div>
+                            <div class="cli">{{ $vpCli }}</div>
+                            <div class="meta">
+                                <span><i class="bi bi-file-earmark-text"></i>{{ $pedido->factura_asociada ?? '-' }}</span>
+                                <span><i class="bi bi-receipt"></i>{{ $pedido->guia_asociada ?? '-' }}</span>
+                            </div>
+                            <div class="meta">
+                                <span><i class="bi bi-calendar3"></i>{{ $vpFecha }}</span>
+                                @if($vpNProd !== null)<span><i class="bi bi-box-seam"></i>{{ $vpNProd }} productos</span>@endif
+                            </div>
+                        </div>
+                        <i class="bi bi-chevron-right"></i>
+                    </div>
+                @empty
+                    <div class="vp-lempty"><i class="bi bi-check-circle" style="font-size:26px;"></i><br>No hay pedidos pendientes de validar</div>
+                @endforelse
+            </div>
+
+            {{-- Validados (mismas acciones: historial y revalidar) --}}
+            <div class="vp-list" id="vpListVal">
+                @forelse($historial as $validacion)
+                    @php
+                        $vpPed = $validacion->order;
+                        $vpEst = $validacion->estado;
+                        $vpCli2 = $vpPed->client->razon_social ?? $vpPed->client->nombre_comercial ?? 'Sin cliente';
+                    @endphp
+                    @if($vpPed)
+                    <div class="vp-oc" tabindex="0" role="button"
+                         data-numero="{{ $vpPed->numero_orden }}"
+                         data-search="{{ mb_strtolower(($vpPed->numero_orden ?? '').' '.($vpPed->factura_asociada ?? '').' '.($vpPed->guia_asociada ?? '').' '.$vpCli2) }}"
+                         onclick="abrirPedidoDesdeLista({{ $vpPed->id }})" title="Revalidar este pedido">
+                        <div class="vp-oc-ic" style="background:#dcfce7;color:#16a34a;"><i class="bi bi-check2-circle"></i></div>
+                        <div class="vp-oc-b">
+                            <div class="r1">
+                                <b>{{ $vpPed->numero_orden ?? '-' }}</b>
+                                <span class="validation-status {{ strtolower(str_replace('_', '-', $vpEst)) }}">{{ $vpEst }}</span>
+                            </div>
+                            <div class="cli">{{ $vpCli2 }}</div>
+                            <div class="meta">
+                                <span><i class="bi bi-calendar3"></i>{{ $validacion->fecha_validacion ? \Carbon\Carbon::parse($validacion->fecha_validacion)->format('d/m/Y H:i') : '-' }}</span>
+                                <span><i class="bi bi-person"></i>{{ $validacion->usuario->name ?? 'Sistema' }}</span>
+                            </div>
+                            <div class="vp-oc-act">
+                                <button type="button" class="vp-mini" onclick="event.stopPropagation();verHistorialPedido({{ $vpPed->id }})"><i class="bi bi-clock-history"></i> Historial</button>
+                                <button type="button" class="vp-mini" onclick="event.stopPropagation();abrirPedidoDesdeLista({{ $vpPed->id }})"><i class="bi bi-arrow-repeat"></i> Revalidar</button>
+                            </div>
+                        </div>
+                    </div>
+                    @endif
+                @empty
+                    <div class="vp-lempty"><i class="bi bi-clock-history" style="font-size:26px;"></i><br>Todavía no hay validaciones</div>
+                @endforelse
+                @if($historial->total() > 0)
+                    <button type="button" class="vp-lfoot" onclick="vpIrHistorial()">Ver historial completo ({{ $historial->total() }}) <i class="bi bi-arrow-down"></i></button>
+                @endif
+            </div>
+        </aside>
+
+        {{-- ───────────── CENTRO: validación ───────────── --}}
+        <main class="vp-center">
+
+            <div class="vp-card vp-empty" id="vpEmpty">
+                <i class="bi bi-clipboard2-check"></i>
+                <b>Selecciona un pedido para validar</b>
+                Elige uno de la lista o búscalo por factura o guía.
+            </div>
+
+            {{-- Información del pedido (mismos IDs) --}}
+            <div id="pedidoInfo" class="vp-oh d-none">
+                <div class="vp-oh-l">
+                    <div class="vp-oh-ic"><i class="bi bi-shop"></i></div>
+                    <div>
+                        <div class="vp-oh-t">
+                            <strong id="pedidoNumero">-</strong>
+                            <span class="vp-chip rev" id="vpEstado">En revisión</span>
+                        </div>
+                        <div class="vp-oh-cli" id="pedidoCliente">-</div>
+                        <div class="vp-oh-meta">
+                            <span><i class="bi bi-calendar3"></i><b id="pedidoFecha" class="vp-num">-</b></span>
+                            <span><i class="bi bi-box-seam"></i><b id="pedidoProductos">-</b></span>
+                            <span><i class="bi bi-file-earmark-text"></i><small>Factura</small><b id="pedidoFactura" class="vp-num">-</b></span>
+                            <span><i class="bi bi-receipt"></i><small>Guía</small><b id="pedidoGuia" class="vp-num">-</b></span>
+                        </div>
+                    </div>
+                </div>
+                <div class="vp-oh-r">
+                    <button type="button" class="vp-btn green" onclick="vpFinalizar()"><i class="bi bi-check2"></i> Finalizar validación</button>
+                    <div class="vp-dd" id="vpDdMas">
+                        <button type="button" class="vp-btn white" onclick="vpDD(event)"><i class="bi bi-three-dots"></i> Más acciones <i class="bi bi-chevron-down"></i></button>
+                        <div class="vp-dd-menu" onclick="event.stopPropagation()">
+                            <button type="button" onclick="vpAccion('historial')"><i class="bi bi-clock-history"></i> Historial del pedido</button>
+                            <button type="button" onclick="vpAccion('recargar')"><i class="bi bi-arrow-repeat"></i> Recargar pedido (reinicia el avance)</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {{-- Progreso de validación --}}
+            <div class="vp-card d-none" id="vpProgress">
+                <div class="vp-prog-top">
+                    <b>Progreso de validación</b>
+                    <span><b id="vpProgTxt" class="vp-num">0 / 0</b> productos</span>
+                </div>
+                <div class="vp-prog-row">
+                    <div class="vp-bar"><div id="vpProgBar" style="width:0%;"></div></div>
+                    <div class="vp-prog-pct" id="vpProgPct">0%</div>
+                </div>
+                <div class="vp-legend">
+                    <span><i style="background:#16a34a;"></i>Completos <b id="vpLgOk">0</b></span>
+                    <span><i style="background:#f59e0b;"></i>Parciales <b id="vpLgPar">0</b></span>
+                    <span><i style="background:#ef4444;"></i>No enviados <b id="vpLgNo">0</b></span>
+                    <span><i style="background:#94a3b8;"></i>Sin validar <b id="vpLgPen">0</b></span>
+                </div>
+            </div>
+
+            {{-- Modos de validación (mismos botones ocultos; la tarjeta los activa) --}}
+            <div id="modalidades" class="vp-modes d-none">
+                <div class="vp-mode" role="button" tabindex="0" data-vp-btn="btnModoItem" data-vp-panel="panelItem">
+                    <i class="bi bi-list-check"></i><b>Ítem por ítem</b><small>Valida uno por uno</small>
+                    <button type="button" id="btnModoItem" class="vp-hide" tabindex="-1">INICIAR VALIDACIÓN</button>
+                </div>
+                <div class="vp-mode" role="button" tabindex="0" data-vp-btn="btnModoScanner" data-vp-panel="panelScanner">
+                    <i class="bi bi-upc-scan"></i><b>Escáner</b><small>Código de producto o caja</small>
+                    <button type="button" id="btnModoScanner" class="vp-hide" tabindex="-1">INICIAR ESCÁNER</button>
+                </div>
+                <div class="vp-mode" role="button" tabindex="0" data-vp-btn="btnModoCompleto" data-vp-panel="panelCompleto">
+                    <i class="bi bi-grid"></i><b>Pedido completo</b><small>Vista de todos</small>
+                    <button type="button" id="btnModoCompleto" class="vp-hide" tabindex="-1">VALIDAR PEDIDO</button>
+                </div>
+            </div>
+
+{{-- =========================================================
+         PANEL ITEM POR ITEM
+    ========================================================== --}}
+    <div
+        id="panelItem"
+        class="validation-panel d-none"
+    >
+
+        <div class="panel-header panel-blue">
+
+            <div class="panel-header-left">
+
+                <div class="panel-icon">
+                    <i class="bi bi-list-check"></i>
+                </div>
+
+                <div>
+                    <span>VALIDACIÓN</span>
+                    <strong>ITEM POR ITEM</strong>
+                </div>
+
+            </div>
+
+
+            <div class="progress-counter">
+
+                <span id="contadorItem">
+                    0 / 0
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel-body">
+
+            <div class="item-progress">
+
+                <div class="progress-line">
+
+                    <div
+                        id="itemProgressBar"
+                        class="progress-line-fill progress-blue"
+                    ></div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="itemActual"
+                class="item-validation-content"
+            >
+
+                <div class="product-main-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+
+                <div class="product-information">
+
+                    <span class="product-overline">
+                        PRODUCTO A VALIDAR
+                    </span>
+
+                    <h2 id="itemNombre">
+                        -
+                    </h2>
+
+                    <div
+                        id="itemMarca"
+                        class="product-brand"
+                    >
+                        -
+                    </div>
+
+                </div>
+
+
+                <div class="product-data-grid">
+
+                    <div class="product-data-box">
+
+                        <span>
+                            CANTIDAD DESPACHADO
+                        </span>
+
+                        <strong id="itemCantidadSolicitada">
+                            0
+                        </strong>
+
+                    </div>
+
+
+                    <div class="product-data-box">
+
+                        <span>
+                            CÓDIGO
+                        </span>
+
+                        <strong
+                            id="itemCodigo"
+                            class="product-code"
+                        >
+                            -
+                        </strong>
+
+                    </div>
+
+                </div>
+
+
+                {{-- CANTIDAD PARCIAL --}}
+                <div
+                    id="itemCantidadParcial"
+                    class="partial-quantity-box d-none"
+                >
+
+                    <div>
+
+                        <span>
+                            VALIDACIÓN PARCIAL
+                        </span>
+
+                        <strong>
+                            ¿Cuánto recibiste?
+                        </strong>
+
+                    </div>
+
+                    <div class="vp-stepper"><button type="button" class="vp-step" data-step="-1" data-target="cantidadItem" title="Restar">−</button><input
+                        type="number"
+                        id="cantidadItem"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                    ><button type="button" class="vp-step" data-step="1" data-target="cantidadItem" title="Sumar">+</button></div>
+
+                </div>
+
+
+                <div class="validation-actions">
+
+                    <button
+                        type="button"
+                        id="btnItemIncompleto"
+                        class="validation-action action-danger"
+                    >
+                        <i class="bi bi-x-circle"></i>
+
+                        <span>
+                            <strong>NO ENVIADO</strong>
+                            <small>No se recibió</small>
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btnItemParcial"
+                        class="validation-action action-warning"
+                    >
+                        <i class="bi bi-dash-circle"></i>
+
+                        <span>
+                            <strong>PARCIAL</strong>
+                            <small>Recibido parcialmente</small>
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btnItemCompleto"
+                        class="validation-action action-success"
+                    >
+                        <i class="bi bi-check-circle"></i>
+
+                        <span>
+                            <strong>Marcar como validado</strong>
+                            <small>Recibido completo</small>
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- =========================================================
+         PANEL ESCÁNER
+    ========================================================== --}}
+    <div
+        id="panelScanner"
+        class="validation-panel d-none"
+    >
+
+        <div class="panel-header panel-green">
+
+            <div class="panel-header-left">
+
+                <div class="panel-icon">
+                    <i class="bi bi-upc-scan"></i>
+                </div>
+
+                <div>
+                    <span>VALIDACIÓN</span>
+                    <strong>ESCÁNER</strong>
+                </div>
+
+            </div>
+
+
+            <div class="progress-counter">
+
+                <span id="contadorScanner">
+                    0 / 0
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel-body scanner-body">
+
+            <div class="scanner-instruction">
+
+                <div class="scanner-large-icon">
+                    <i class="bi bi-upc-scan"></i>
+                </div>
+
+                <h2>
+                    Escanea el producto
+                </h2>
+
+                <p>
+                    Utiliza el lector de códigos o escribe el código manualmente.
+                </p>
+
+            </div>
+
+
+            <div class="scanner-input-wrapper">
+
+                <i class="bi bi-upc"></i>
+
+                <input
+                    type="text"
+                    id="codigoScanner"
+                    placeholder="Esperando código..."
+                    autocomplete="off"
+                >
+
+            </div>
+
+
+            <div class="scanner-help">
+
+                <span>
+                    <i class="bi bi-check-circle"></i>
+                    Código de producto
+                </span>
+
+                <span>
+                    <i class="bi bi-box-seam"></i>
+                    Código de caja
+                </span>
+
+            </div>
+
+
+            {{-- PRODUCTO ENCONTRADO --}}
+            <div
+                id="scannerProducto"
+                class="scanner-product-card d-none"
+            >
+
+                <div class="scanner-product-icon">
+                    <i class="bi bi-box-seam"></i>
+                </div>
+
+
+                <div class="scanner-product-info">
+
+                    <span>
+                        PRODUCTO ENCONTRADO
+                    </span>
+
+                    <h2 id="scannerNombre">
+                        -
+                    </h2>
+
+                    <p id="scannerMarca">
+                        -
+                    </p>
+
+                </div>
+
+
+                <div class="scanner-product-data">
+
+                    <div>
+                        <span>DESPACHADO</span>
+
+                        <strong id="scannerSolicitado">
+                            0
+                        </strong>
+                    </div>
+
+                    <div>
+                        <span>CÓDIGO</span>
+
+                        <strong id="scannerCodigo">
+                            -
+                        </strong>
+                    </div>
+
+                </div>
+
+
+                {{-- CANTIDAD PARCIAL --}}
+                <div
+                    id="scannerCantidadParcial"
+                    class="partial-quantity-box d-none"
+                >
+
+                    <div>
+
+                        <span>
+                            VALIDACIÓN PARCIAL
+                        </span>
+
+                        <strong>
+                            ¿Cuánto recibiste?
+                        </strong>
+
+                    </div>
+
+                    <div class="vp-stepper"><button type="button" class="vp-step" data-step="-1" data-target="cantidadScanner" title="Restar">−</button><input
+                        type="number"
+                        id="cantidadScanner"
+                        min="0"
+                        step="0.01"
+                        placeholder="0"
+                    ><button type="button" class="vp-step" data-step="1" data-target="cantidadScanner" title="Sumar">+</button></div>
+
+                </div>
+
+
+                <div class="validation-actions">
+
+                    <button
+                        type="button"
+                        id="btnScannerIncompleto"
+                        class="validation-action action-danger"
+                    >
+                        <i class="bi bi-x-circle"></i>
+
+                        <span>
+                            <strong>NO ENVIADO</strong>
+                            <small>No se recibió</small>
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btnScannerParcial"
+                        class="validation-action action-warning"
+                    >
+                        <i class="bi bi-dash-circle"></i>
+
+                        <span>
+                            <strong>PARCIAL</strong>
+                            <small>Recibido parcialmente</small>
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        type="button"
+                        id="btnScannerCompleto"
+                        class="validation-action action-success"
+                    >
+                        <i class="bi bi-check-circle"></i>
+
+                        <span>
+                            <strong>Marcar como validado</strong>
+                            <small>Recibido completo</small>
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    {{-- =========================================================
+         PANEL PEDIDO COMPLETO
+    ========================================================== --}}
+    <div
+        id="panelCompleto"
+        class="validation-panel d-none"
+    >
+
+        <div class="panel-header panel-orange">
+
+            <div class="panel-header-left">
+
+                <div class="panel-icon">
+                    <i class="bi bi-boxes"></i>
+                </div>
+
+                <div>
+                    <span>VALIDACIÓN</span>
+                    <strong>PEDIDO COMPLETO</strong>
+                </div>
+
+            </div>
+
+
+            <div class="progress-counter">
+
+                <span id="contadorCompleto">
+                    0 / 0
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="panel-body">
+
+            <div class="table-wrapper">
+
+                <table class="validation-table">
+
+                    <thead>
+
+                        <tr>
+
+                            <th>
+                                PRODUCTO
+                            </th>
+
+                            <th>
+                                CÓDIGO
+                            </th>
+
+                            <th class="text-center">
+                                DESPACHADO
+                            </th>
+
+                            <th class="text-center">
+                                VALIDADO
+                            </th>
+
+                            <th class="text-center">
+                                ESTADO
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+                    <tbody id="tablaValidacion">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+
+            <div class="complete-footer">
+
+                <div class="observation-box">
+
+                    <label for="observacionesValidacion">
+                        <i class="bi bi-chat-left-text"></i>
+                        OBSERVACIONES
+                    </label>
+
+                    <textarea
+                        id="observacionesValidacion"
+                        rows="3"
+                        placeholder="Agrega una observación si es necesario..."
+                    ></textarea>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    id="btnGuardarValidacion"
+                    class="save-validation-button"
+                >
+                    <i class="bi bi-check-circle"></i>
+
+                    <span>
+                        GUARDAR VALIDACIÓN
+                    </span>
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+            {{-- Observaciones (refleja el campo original #observacionesValidacion) --}}
+            <div class="vp-card vp-obs d-none" id="vpObsCard">
+                <h4><span><i class="bi bi-chat-left-text"></i> Observaciones del pedido</span><span>Se envían al guardar la validación</span></h4>
+                <textarea id="vpObs" placeholder="Agrega una observación general sobre esta validación..."></textarea>
+            </div>
+
+        </main>
+
+        {{-- ───────────── DERECHA: productos del pedido ───────────── --}}
+        <aside class="vp-right vp-card">
+            <h4><span>Productos del pedido <span class="vp-num" id="vpItemsCount">(0)</span></span></h4>
+            <div class="vp-items" id="vpItems">
+                <div class="vp-lempty">Carga un pedido para ver sus productos.</div>
+            </div>
+        </aside>
+
+    </div>
+
+<div class="validation-orders-section" id="vpHistorial">
 
     {{-- =====================================================
          PEDIDOS PENDIENTES
@@ -2370,7 +3262,6 @@
 
 @endif
             </div>
-                </div>
 
         @else
 
@@ -2391,7 +3282,6 @@
     </div>
 
 </div>
-
 
 {{-- =========================================================
      MODAL HISTORIAL
@@ -2435,815 +3325,10 @@
 
 </div>
 
-    {{-- =========================================================
-         INFORMACIÓN DEL PEDIDO
-    ========================================================== --}}
-    <div
-        id="pedidoInfo"
-        class="order-info-card d-none"
-    >
-
-        <div class="order-info-main">
-
-            <div class="order-icon">
-                <i class="bi bi-box-seam"></i>
-            </div>
-
-            <div class="order-main-text">
-
-                <span class="order-label">
-                    PEDIDO
-                </span>
-
-                <strong id="pedidoNumero">
-                    -
-                </strong>
-
-            </div>
-
-        </div>
-
-
-        <div class="order-info-item">
-
-            <span>CLIENTE</span>
-
-            <strong id="pedidoCliente">
-                -
-            </strong>
-
-        </div>
-
-
-        <div class="order-info-item">
-
-            <span>FACTURA</span>
-
-            <strong id="pedidoFactura">
-                -
-            </strong>
-
-        </div>
-
-
-        <div class="order-info-item">
-
-            <span>GUÍA</span>
-
-            <strong id="pedidoGuia">
-                -
-            </strong>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         MODALIDADES
-    ========================================================== --}}
-    <div
-        id="modalidades"
-        class="modalities-section d-none"
-    >
-
-        <div class="section-heading">
-
-            <div>
-                <h2>¿Cómo deseas validar?</h2>
-
-                <p>
-                    Selecciona el método que utilizarás para verificar este pedido.
-                </p>
-            </div>
-
-        </div>
-
-
-        <div class="modalities-grid">
-
-
-            {{-- =================================================
-                 ITEM POR ITEM
-            ================================================== --}}
-            <div class="modality-card modality-blue">
-
-                <div class="modality-top">
-
-                    <div class="modality-icon">
-                        <i class="bi bi-list-check"></i>
-                    </div>
-
-                    <span class="modality-number">
-                        01
-                    </span>
-
-                </div>
-
-
-                <h3>
-                    ITEM POR ITEM
-                </h3>
-
-                <p>
-                    Revisa cada producto individualmente y define
-                    si fue recibido completo, parcialmente o no enviado.
-                </p>
-
-
-                <div class="modality-features">
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Un producto a la vez
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Avance automático
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Cantidad parcial
-                    </span>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="btnModoItem"
-                    class="modality-button"
-                >
-                    INICIAR VALIDACIÓN
-                    <i class="bi bi-arrow-right"></i>
-                </button>
-
-            </div>
-
-
-            {{-- =================================================
-                 ESCÁNER
-            ================================================== --}}
-            <div class="modality-card modality-green">
-
-                <div class="modality-top">
-
-                    <div class="modality-icon">
-                        <i class="bi bi-upc-scan"></i>
-                    </div>
-
-                    <span class="modality-number">
-                        02
-                    </span>
-
-                </div>
-
-
-                <h3>
-                    ESCÁNER
-                </h3>
-
-                <p>
-                    Escanea los productos mediante código de barras
-                    utilizando un lector físico o dispositivo compatible.
-                </p>
-
-
-                <div class="modality-features">
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Código de producto
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Código de caja
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Validación inmediata
-                    </span>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="btnModoScanner"
-                    class="modality-button"
-                >
-                    INICIAR ESCÁNER
-                    <i class="bi bi-arrow-right"></i>
-                </button>
-
-            </div>
-
-
-            {{-- =================================================
-                 PEDIDO COMPLETO
-            ================================================== --}}
-            <div class="modality-card modality-orange">
-
-                <div class="modality-top">
-
-                    <div class="modality-icon">
-                        <i class="bi bi-boxes"></i>
-                    </div>
-
-                    <span class="modality-number">
-                        03
-                    </span>
-
-                </div>
-
-
-                <h3>
-                    PEDIDO COMPLETO
-                </h3>
-
-                <p>
-                    Visualiza todos los productos del pedido
-                    y define su estado desde una sola pantalla.
-                </p>
-
-
-                <div class="modality-features">
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Todos los productos
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Estado individual
-                    </span>
-
-                    <span>
-                        <i class="bi bi-check2"></i>
-                        Guardado completo
-                    </span>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="btnModoCompleto"
-                    class="modality-button"
-                >
-                    VALIDAR PEDIDO
-                    <i class="bi bi-arrow-right"></i>
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         PANEL ITEM POR ITEM
-    ========================================================== --}}
-    <div
-        id="panelItem"
-        class="validation-panel d-none"
-    >
-
-        <div class="panel-header panel-blue">
-
-            <div class="panel-header-left">
-
-                <div class="panel-icon">
-                    <i class="bi bi-list-check"></i>
-                </div>
-
-                <div>
-                    <span>VALIDACIÓN</span>
-                    <strong>ITEM POR ITEM</strong>
-                </div>
-
-            </div>
-
-
-            <div class="progress-counter">
-
-                <span id="contadorItem">
-                    0 / 0
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="panel-body">
-
-            <div class="item-progress">
-
-                <div class="progress-line">
-
-                    <div
-                        id="itemProgressBar"
-                        class="progress-line-fill progress-blue"
-                    ></div>
-
-                </div>
-
-            </div>
-
-
-            <div
-                id="itemActual"
-                class="item-validation-content"
-            >
-
-                <div class="product-main-icon">
-                    <i class="bi bi-box-seam"></i>
-                </div>
-
-
-                <div class="product-information">
-
-                    <span class="product-overline">
-                        PRODUCTO A VALIDAR
-                    </span>
-
-                    <h2 id="itemNombre">
-                        -
-                    </h2>
-
-                    <div
-                        id="itemMarca"
-                        class="product-brand"
-                    >
-                        -
-                    </div>
-
-                </div>
-
-
-                <div class="product-data-grid">
-
-                    <div class="product-data-box">
-
-                        <span>
-                            CANTIDAD DESPACHADO
-                        </span>
-
-                        <strong id="itemCantidadSolicitada">
-                            0
-                        </strong>
-
-                    </div>
-
-
-                    <div class="product-data-box">
-
-                        <span>
-                            CÓDIGO
-                        </span>
-
-                        <strong
-                            id="itemCodigo"
-                            class="product-code"
-                        >
-                            -
-                        </strong>
-
-                    </div>
-
-                </div>
-
-
-                {{-- CANTIDAD PARCIAL --}}
-                <div
-                    id="itemCantidadParcial"
-                    class="partial-quantity-box d-none"
-                >
-
-                    <div>
-
-                        <span>
-                            VALIDACIÓN PARCIAL
-                        </span>
-
-                        <strong>
-                            ¿Cuánto recibiste?
-                        </strong>
-
-                    </div>
-
-                    <input
-                        type="number"
-                        id="cantidadItem"
-                        min="0"
-                        step="0.01"
-                        placeholder="0"
-                    >
-
-                </div>
-
-
-                <div class="validation-actions">
-
-                    <button
-                        type="button"
-                        id="btnItemIncompleto"
-                        class="validation-action action-danger"
-                    >
-                        <i class="bi bi-x-circle"></i>
-
-                        <span>
-                            <strong>NO ENVIADO</strong>
-                            <small>No se recibió</small>
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        id="btnItemParcial"
-                        class="validation-action action-warning"
-                    >
-                        <i class="bi bi-dash-circle"></i>
-
-                        <span>
-                            <strong>PARCIAL</strong>
-                            <small>Recibido parcialmente</small>
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        id="btnItemCompleto"
-                        class="validation-action action-success"
-                    >
-                        <i class="bi bi-check-circle"></i>
-
-                        <span>
-                            <strong>COMPLETO</strong>
-                            <small>Recibido completo</small>
-                        </span>
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         PANEL ESCÁNER
-    ========================================================== --}}
-    <div
-        id="panelScanner"
-        class="validation-panel d-none"
-    >
-
-        <div class="panel-header panel-green">
-
-            <div class="panel-header-left">
-
-                <div class="panel-icon">
-                    <i class="bi bi-upc-scan"></i>
-                </div>
-
-                <div>
-                    <span>VALIDACIÓN</span>
-                    <strong>ESCÁNER</strong>
-                </div>
-
-            </div>
-
-
-            <div class="progress-counter">
-
-                <span id="contadorScanner">
-                    0 / 0
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="panel-body scanner-body">
-
-            <div class="scanner-instruction">
-
-                <div class="scanner-large-icon">
-                    <i class="bi bi-upc-scan"></i>
-                </div>
-
-                <h2>
-                    Escanea el producto
-                </h2>
-
-                <p>
-                    Utiliza el lector de códigos o escribe el código manualmente.
-                </p>
-
-            </div>
-
-
-            <div class="scanner-input-wrapper">
-
-                <i class="bi bi-upc"></i>
-
-                <input
-                    type="text"
-                    id="codigoScanner"
-                    placeholder="Esperando código..."
-                    autocomplete="off"
-                >
-
-            </div>
-
-
-            <div class="scanner-help">
-
-                <span>
-                    <i class="bi bi-check-circle"></i>
-                    Código de producto
-                </span>
-
-                <span>
-                    <i class="bi bi-box-seam"></i>
-                    Código de caja
-                </span>
-
-            </div>
-
-
-            {{-- PRODUCTO ENCONTRADO --}}
-            <div
-                id="scannerProducto"
-                class="scanner-product-card d-none"
-            >
-
-                <div class="scanner-product-icon">
-                    <i class="bi bi-box-seam"></i>
-                </div>
-
-
-                <div class="scanner-product-info">
-
-                    <span>
-                        PRODUCTO ENCONTRADO
-                    </span>
-
-                    <h2 id="scannerNombre">
-                        -
-                    </h2>
-
-                    <p id="scannerMarca">
-                        -
-                    </p>
-
-                </div>
-
-
-                <div class="scanner-product-data">
-
-                    <div>
-                        <span>DESPACHADO</span>
-
-                        <strong id="scannerSolicitado">
-                            0
-                        </strong>
-                    </div>
-
-                    <div>
-                        <span>CÓDIGO</span>
-
-                        <strong id="scannerCodigo">
-                            -
-                        </strong>
-                    </div>
-
-                </div>
-
-
-                {{-- CANTIDAD PARCIAL --}}
-                <div
-                    id="scannerCantidadParcial"
-                    class="partial-quantity-box d-none"
-                >
-
-                    <div>
-
-                        <span>
-                            VALIDACIÓN PARCIAL
-                        </span>
-
-                        <strong>
-                            ¿Cuánto recibiste?
-                        </strong>
-
-                    </div>
-
-                    <input
-                        type="number"
-                        id="cantidadScanner"
-                        min="0"
-                        step="0.01"
-                        placeholder="0"
-                    >
-
-                </div>
-
-
-                <div class="validation-actions">
-
-                    <button
-                        type="button"
-                        id="btnScannerIncompleto"
-                        class="validation-action action-danger"
-                    >
-                        <i class="bi bi-x-circle"></i>
-
-                        <span>
-                            <strong>NO ENVIADO</strong>
-                            <small>No se recibió</small>
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        id="btnScannerParcial"
-                        class="validation-action action-warning"
-                    >
-                        <i class="bi bi-dash-circle"></i>
-
-                        <span>
-                            <strong>PARCIAL</strong>
-                            <small>Recibido parcialmente</small>
-                        </span>
-
-                    </button>
-
-
-                    <button
-                        type="button"
-                        id="btnScannerCompleto"
-                        class="validation-action action-success"
-                    >
-                        <i class="bi bi-check-circle"></i>
-
-                        <span>
-                            <strong>COMPLETO</strong>
-                            <small>Recibido completo</small>
-                        </span>
-
-                    </button>
-
-                </div>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         PANEL PEDIDO COMPLETO
-    ========================================================== --}}
-    <div
-        id="panelCompleto"
-        class="validation-panel d-none"
-    >
-
-        <div class="panel-header panel-orange">
-
-            <div class="panel-header-left">
-
-                <div class="panel-icon">
-                    <i class="bi bi-boxes"></i>
-                </div>
-
-                <div>
-                    <span>VALIDACIÓN</span>
-                    <strong>PEDIDO COMPLETO</strong>
-                </div>
-
-            </div>
-
-
-            <div class="progress-counter">
-
-                <span id="contadorCompleto">
-                    0 / 0
-                </span>
-
-            </div>
-
-        </div>
-
-
-        <div class="panel-body">
-
-            <div class="table-wrapper">
-
-                <table class="validation-table">
-
-                    <thead>
-
-                        <tr>
-
-                            <th>
-                                PRODUCTO
-                            </th>
-
-                            <th>
-                                CÓDIGO
-                            </th>
-
-                            <th class="text-center">
-                                DESPACHADO
-                            </th>
-
-                            <th class="text-center">
-                                VALIDADO
-                            </th>
-
-                            <th class="text-center">
-                                ESTADO
-                            </th>
-
-                        </tr>
-
-                    </thead>
-
-                    <tbody id="tablaValidacion">
-
-                    </tbody>
-
-                </table>
-
-            </div>
-
-
-            <div class="complete-footer">
-
-                <div class="observation-box">
-
-                    <label for="observacionesValidacion">
-                        <i class="bi bi-chat-left-text"></i>
-                        OBSERVACIONES
-                    </label>
-
-                    <textarea
-                        id="observacionesValidacion"
-                        rows="3"
-                        placeholder="Agrega una observación si es necesario..."
-                    ></textarea>
-
-                </div>
-
-
-                <button
-                    type="button"
-                    id="btnGuardarValidacion"
-                    class="save-validation-button"
-                >
-                    <i class="bi bi-check-circle"></i>
-
-                    <span>
-                        GUARDAR VALIDACIÓN
-                    </span>
-                </button>
-
-            </div>
-
-        </div>
-
-    </div>
-
-
-    {{-- =========================================================
-         ALERTA
-    ========================================================== --}}
-    <div
+<div
         id="alertaValidacion"
         class="validation-alert d-none"
     ></div>
-
 </div>
 
 {{-- =============================================================
@@ -3270,6 +3355,15 @@ document.addEventListener('DOMContentLoaded', function () {
     let itemScannerActual = null;
 
     let modoActual = null;
+
+    /* Hook de SOLO LECTURA para el rediseño visual (no altera la lógica). */
+    window.__valPedido = {
+        get pedido()       { return pedidoActual; },
+        get detalles()     { return detalles; },
+        get validaciones() { return validaciones; },
+        get indice()       { return indiceItem; },
+        get modo()         { return modoActual; }
+    };
 
         /*
     |--------------------------------------------------------------------------
@@ -3510,2386 +3604,4 @@ document.addEventListener('DOMContentLoaded', function () {
             `;
 
             return;
-        }
-
-
-        let html = '';
-
-
-        html += `
-            <button
-                type="button"
-                class="validation-history-page-button"
-                ${historialPaginaActual === 1 ? 'disabled' : ''}
-                onclick="cambiarPaginaHistorial(${historialPaginaActual - 1})"
-            >
-                <i class="bi bi-chevron-left"></i>
-            </button>
-        `;
-
-
-        const maxBotones = 7;
-
-        let inicioPagina =
-            Math.max(
-                1,
-                historialPaginaActual -
-                Math.floor(maxBotones / 2)
-            );
-
-        let finPagina =
-            Math.min(
-                totalPaginas,
-                inicioPagina + maxBotones - 1
-            );
-
-
-        if (
-            finPagina - inicioPagina + 1 <
-            maxBotones
-        ) {
-            inicioPagina =
-                Math.max(
-                    1,
-                    finPagina - maxBotones + 1
-                );
-        }
-
-
-        for (
-            let pagina = inicioPagina;
-            pagina <= finPagina;
-            pagina++
-        ) {
-
-            html += `
-                <button
-                    type="button"
-                    class="validation-history-page-button ${
-                        pagina === historialPaginaActual
-                            ? 'active'
-                            : ''
-                    }"
-                    onclick="cambiarPaginaHistorial(${pagina})"
-                >
-                    ${pagina}
-                </button>
-            `;
-        }
-
-
-        html += `
-            <span class="validation-history-page-info">
-                Página ${historialPaginaActual} de ${totalPaginas}
-            </span>
-        `;
-
-
-        html += `
-            <button
-                type="button"
-                class="validation-history-page-button"
-                ${historialPaginaActual === totalPaginas ? 'disabled' : ''}
-                onclick="cambiarPaginaHistorial(${historialPaginaActual + 1})"
-            >
-                <i class="bi bi-chevron-right"></i>
-            </button>
-        `;
-
-
-        historialPagination.innerHTML =
-            html;
-    }
-
-
-    window.cambiarPaginaHistorial =
-        function (pagina) {
-
-            const totalPaginas =
-                Math.max(
-                    1,
-                    Math.ceil(
-                        historialFilasFiltradas.length /
-                        HISTORIAL_POR_PAGINA
-                    )
-                );
-
-
-            if (
-                pagina < 1 ||
-                pagina > totalPaginas
-            ) {
-                return;
-            }
-
-
-            historialPaginaActual =
-                pagina;
-
-            renderizarHistorial();
-
-
-            const historialCard =
-                document.querySelector(
-                    '.validation-list-card:nth-child(2)'
-                );
-
-
-            if (historialCard) {
-                historialCard.scrollIntoView({
-                    behavior: 'smooth',
-                    block: 'start'
-                });
-            }
-        };
-
-
-    function aplicarFiltroHistorial() {
-
-        const desde =
-            historialFechaDesde?.value || '';
-
-        const hasta =
-            historialFechaHasta?.value || '';
-
-
-        if (
-            desde &&
-            hasta &&
-            desde > hasta
-        ) {
-
-            mostrarAlerta(
-                'La fecha desde no puede ser mayor que la fecha hasta.',
-                'warning'
-            );
-
-            return;
-        }
-
-
-        historialFilasFiltradas =
-            historialFilas.filter(
-                function (fila) {
-
-                    const fecha =
-                        fila.dataset.fecha || '';
-
-
-                    if (!fecha) {
-                        return false;
-                    }
-
-
-                    if (
-                        desde &&
-                        fecha < desde
-                    ) {
-                        return false;
-                    }
-
-
-                    if (
-                        hasta &&
-                        fecha > hasta
-                    ) {
-                        return false;
-                    }
-
-
-                    return true;
-                }
-            );
-
-
-        historialPaginaActual = 1;
-
-        renderizarHistorial();
-    }
-
-
-    if (btnFiltrarHistorial) {
-
-        btnFiltrarHistorial.addEventListener(
-            'click',
-            function () {
-
-                aplicarFiltroHistorial();
-
-            }
-        );
-
-    }
-
-
-    if (btnLimpiarHistorial) {
-
-        btnLimpiarHistorial.addEventListener(
-            'click',
-            function () {
-
-                if (historialFechaDesde) {
-                    historialFechaDesde.value = '';
-                }
-
-                if (historialFechaHasta) {
-                    historialFechaHasta.value = '';
-                }
-
-                historialFilasFiltradas =
-                    [...historialFilas];
-
-                historialPaginaActual = 1;
-
-                renderizarHistorial();
-
-            }
-        );
-
-    }
-
-
-    if (historialFechaDesde) {
-
-        historialFechaDesde.addEventListener(
-            'change',
-            aplicarFiltroHistorial
-        );
-
-    }
-
-
-    if (historialFechaHasta) {
-
-        historialFechaHasta.addEventListener(
-            'change',
-            aplicarFiltroHistorial
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | INICIALIZAR HISTORIAL
-    |--------------------------------------------------------------------------
-    */
-
-    if (historialFilas.length) {
-        renderizarHistorial();
-    }
-};
-
-
-    window.cerrarHistorialPedido = function () {
-
-        const modal =
-            document.getElementById('validationHistoryModal');
-
-        if (modal) {
-            modal.classList.add('d-none');
-        }
-    };
-
-
-    window.verHistorialPedido = async function (orderId) {
-
-        const modal =
-            document.getElementById('validationHistoryModal');
-
-        const body =
-            document.getElementById('validationHistoryBody');
-
-        const title =
-            document.getElementById('validationHistoryTitle');
-
-        modal.classList.remove('d-none');
-
-        body.innerHTML = `
-            <div class="validation-empty">
-                <i class="bi bi-arrow-repeat"></i>
-                Cargando historial...
-            </div>
-        `;
-
-        try {
-
-            const response = await fetch(
-                `/validacion-pedidos/${orderId}/historial`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                }
-            );
-
-            const data = await response.json();
-
-            if (!response.ok || !data.success) {
-                throw new Error(
-                    data.message ||
-                    'No se pudo obtener el historial.'
-                );
-            }
-
-            const validaciones =
-                data.validations || [];
-
-            if (!validaciones.length) {
-
-                body.innerHTML = `
-                    <div class="validation-empty">
-                        <i class="bi bi-clock-history"></i>
-                        No existen validaciones para este pedido.
-                    </div>
-                `;
-
-                return;
-            }
-
-            const primera =
-                validaciones[0];
-
-            const order =
-                primera.order ||
-                primera.order_detail?.order ||
-                null;
-
-            title.textContent =
-                `Historial del pedido ${
-                    order?.numero_orden || ''
-                }`;
-
-            let html = '';
-
-            validaciones.forEach(function (validacion, index) {
-
-                const estado =
-                    validacion.estado || 'PENDIENTE';
-
-                const estadoClase =
-                    estado
-                        .toLowerCase()
-                        .replaceAll('_', '-');
-
-                const fecha =
-                    validacion.fecha_validacion
-                        ? new Date(
-                            validacion.fecha_validacion
-                          ).toLocaleString('es-PE')
-                        : '-';
-
-                const usuario =
-                    validacion.usuario?.name ||
-                    'Sistema';
-
-                html += `
-
-                    <div
-                        style="
-                            border:1px solid #e2e8f0;
-                            border-radius:12px;
-                            margin-bottom:16px;
-                            overflow:hidden;
-                        "
-                    >
-
-                        <div
-                            style="
-                                padding:14px 16px;
-                                background:#f8fafc;
-                                display:flex;
-                                align-items:center;
-                                justify-content:space-between;
-                                gap:10px;
-                            "
-                        >
-
-                            <div>
-
-                                <strong style="
-                                    display:block;
-                                    color:#0f172a;
-                                    font-size:14px;
-                                ">
-                                    Validación #${validaciones.length - index}
-                                </strong>
-
-                                <span style="
-                                    display:block;
-                                    margin-top:3px;
-                                    color:#64748b;
-                                    font-size:11px;
-                                ">
-                                    ${fecha} · ${usuario}
-                                </span>
-
-                            </div>
-
-                            <span class="
-                                validation-status
-                                ${estadoClase}
-                            ">
-                                ${estado}
-                            </span>
-
-                        </div>
-
-                        <div style="overflow-x:auto;">
-
-                            <table class="validation-list-table">
-
-                                <thead>
-
-                                    <tr>
-                                        <th>Producto</th>
-                                        <th>Solicitado</th>
-                                        <th>Validado</th>
-                                        <th>Estado</th>
-                                        <th>Código</th>
-                                    </tr>
-
-                                </thead>
-
-                                <tbody>
-                `;
-
-                const detallesValidacion =
-                    validacion.details || [];
-
-                detallesValidacion.forEach(function (detalle) {
-
-                    const producto =
-                        detalle.order_detail?.product;
-
-                    const nombreProducto =
-                        producto?.nombre ||
-                        'Producto';
-
-                    const estadoDetalle =
-                        detalle.estado ||
-                        'PENDIENTE';
-
-                    const claseDetalle =
-                        estadoDetalle
-                            .toLowerCase()
-                            .replaceAll('_', '-');
-
-                    html += `
-
-                        <tr>
-
-                            <td>
-                                <strong>
-                                    ${nombreProducto}
-                                </strong>
-                            </td>
-
-                            <td>
-                                ${detalle.cantidad_despachada ?? 0}
-                            </td>
-
-                            <td>
-                                ${detalle.cantidad_validada ?? 0}
-                            </td>
-
-                            <td>
-
-                                <span class="
-                                    validation-status
-                                    ${claseDetalle}
-                                ">
-                                    ${estadoDetalle}
-                                </span>
-
-                            </td>
-
-                            <td>
-                                ${detalle.codigo_escaneado || '-'}
-                            </td>
-
-                        </tr>
-
-                    `;
-
-                });
-
-                html += `
-
-                                </tbody>
-
-                            </table>
-
-                        </div>
-
-                    </div>
-
-                `;
-
-            });
-
-            body.innerHTML = html;
-
-        } catch (error) {
-
-            body.innerHTML = `
-
-                <div class="validation-empty">
-
-                    <i class="bi bi-exclamation-triangle"></i>
-
-                    ${error.message}
-
-                </div>
-
-            `;
-
-        }
-
-    };
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CERRAR MODAL CON ESCAPE / CLICK EXTERIOR
-    |--------------------------------------------------------------------------
-    */
-
-    const historyModal =
-        document.getElementById(
-            'validationHistoryModal'
-        );
-
-    if (historyModal) {
-
-        historyModal.addEventListener(
-            'click',
-            function (event) {
-
-                if (event.target === historyModal) {
-                    cerrarHistorialPedido();
-                }
-
-            }
-        );
-
-    }
-
-    document.addEventListener(
-        'keydown',
-        function (event) {
-
-            if (
-                event.key === 'Escape' &&
-                historyModal &&
-                !historyModal.classList.contains('d-none')
-            ) {
-
-                cerrarHistorialPedido();
-
-            }
-
-        }
-    );
-
-    /*
-    |--------------------------------------------------------------------------
-    | ELEMENTOS
-    |--------------------------------------------------------------------------
-    */
-
-    const codigoPedido =
-        document.getElementById('codigoPedido');
-
-    const btnBuscarPedido =
-        document.getElementById('btnBuscarPedido');
-
-    const pedidoInfo =
-        document.getElementById('pedidoInfo');
-
-    const modalidades =
-        document.getElementById('modalidades');
-
-    const panelItem =
-        document.getElementById('panelItem');
-
-    const panelScanner =
-        document.getElementById('panelScanner');
-
-    const panelCompleto =
-        document.getElementById('panelCompleto');
-
-    const alerta =
-        document.getElementById('alertaValidacion');
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ALERTAS
-    |--------------------------------------------------------------------------
-    */
-
-    function mostrarAlerta(mensaje, tipo = 'danger') {
-
-        alerta.className =
-            `validation-alert alert-${tipo}`;
-
-        alerta.textContent =
-            mensaje;
-
-        alerta.classList.remove('d-none');
-
-        setTimeout(function () {
-
-            alerta.classList.add('d-none');
-
-        }, 4500);
-
-    }
-
-
-    function ocultarAlerta() {
-
-        alerta.classList.add('d-none');
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | OCULTAR PANELES
-    |--------------------------------------------------------------------------
-    */
-
-    function ocultarPaneles() {
-
-        panelItem.classList.add('d-none');
-
-        panelScanner.classList.add('d-none');
-
-        panelCompleto.classList.add('d-none');
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | BUSCAR PEDIDO
-    |--------------------------------------------------------------------------
-    */
-
-    async function buscarPedido() {
-
-        const codigo =
-            codigoPedido.value.trim();
-
-        if (!codigo) {
-
-            mostrarAlerta(
-                'Ingresa una factura o guía.',
-                'warning'
-            );
-
-            codigoPedido.focus();
-
-            return;
-        }
-
-        ocultarAlerta();
-
-        btnBuscarPedido.disabled = true;
-
-        btnBuscarPedido.innerHTML =
-            '<i class="bi bi-arrow-repeat"></i> BUSCANDO...';
-
-        try {
-
-            const response =
-                await fetch(
-                    '{{ route("orders.validation.buscar") }}',
-                    {
-                        method: 'POST',
-
-                        headers: {
-                            'Content-Type':
-                                'application/json',
-
-                            'Accept':
-                                'application/json',
-
-                            'X-CSRF-TOKEN':
-                                '{{ csrf_token() }}'
-                        },
-
-                        body: JSON.stringify({
-                            codigo: codigo
-                        })
-                    }
-                );
-
-
-            const data =
-                await response.json();
-
-
-            if (!response.ok || !data.success) {
-
-                throw new Error(
-                    data.message ||
-                    'No se encontró el pedido.'
-                );
-
-            }
-
-
-            pedidoActual =
-                data.order;
-
-            detalles =
-                pedidoActual.details || [];
-
-            validaciones = {};
-
-            indiceItem = 0;
-
-            itemScannerActual = null;
-
-
-            if (!detalles.length) {
-
-                throw new Error(
-                    'El pedido no tiene productos.'
-                );
-
-            }
-
-
-            mostrarInformacionPedido();
-
-            modalidades.classList.remove('d-none');
-
-            ocultarPaneles();
-
-            document.getElementById(
-                'modalidades'
-            ).scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-
-        } catch (error) {
-
-            mostrarAlerta(
-                error.message,
-                'danger'
-            );
-
-        } finally {
-
-            btnBuscarPedido.disabled = false;
-
-            btnBuscarPedido.innerHTML =
-                '<i class="bi bi-search"></i><span>BUSCAR PEDIDO</span>';
-
-        }
-
-    }
-
-
-    btnBuscarPedido.addEventListener(
-        'click',
-        buscarPedido
-    );
-
-
-    codigoPedido.addEventListener(
-        'keydown',
-        function (event) {
-
-            if (event.key === 'Enter') {
-
-                event.preventDefault();
-
-                buscarPedido();
-
-            }
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | INFORMACIÓN PEDIDO
-    |--------------------------------------------------------------------------
-    */
-
-    function mostrarInformacionPedido() {
-
-        document.getElementById(
-            'pedidoNumero'
-        ).textContent =
-            pedidoActual.numero_orden || '-';
-
-
-        document.getElementById(
-            'pedidoCliente'
-        ).textContent =
-            pedidoActual.client?.razon_social ||
-            pedidoActual.client?.nombre_comercial ||
-            '-';
-
-
-        document.getElementById(
-            'pedidoFactura'
-        ).textContent =
-            pedidoActual.factura_asociada || '-';
-
-
-        document.getElementById(
-            'pedidoGuia'
-        ).textContent =
-            pedidoActual.guia_asociada || '-';
-
-
-        pedidoInfo.classList.remove(
-            'd-none'
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | MODO ITEM POR ITEM
-    |--------------------------------------------------------------------------
-    */
-
-    document.getElementById(
-        'btnModoItem'
-    ).addEventListener(
-        'click',
-        function () {
-
-            modoActual = 'item';
-
-            indiceItem = 0;
-
-            validaciones = {};
-
-            ocultarPaneles();
-
-            panelItem.classList.remove(
-                'd-none'
-            );
-
-            mostrarItemActual();
-
-            panelItem.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-
-        }
-    );
-
-
-    function mostrarItemActual() {
-
-        if (indiceItem >= detalles.length) {
-
-            finalizarValidacionItem();
-
-            return;
-        }
-
-
-        const detail =
-            detalles[indiceItem];
-
-        const product =
-            detail.product || {};
-
-
-        document.getElementById(
-            'contadorItem'
-        ).textContent =
-            `${indiceItem + 1} / ${detalles.length}`;
-
-
-        /*
-         * Barra de progreso.
-         */
-        const progress =
-            (
-                indiceItem /
-                detalles.length
-            ) * 100;
-
-
-        document.getElementById(
-            'itemProgressBar'
-        ).style.width =
-            `${progress}%`;
-
-
-        document.getElementById(
-            'itemNombre'
-        ).textContent =
-            product.nombre ||
-            'Producto sin nombre';
-
-
-        document.getElementById(
-            'itemMarca'
-        ).textContent =
-            product.marca ||
-            '';
-
-
-        document.getElementById(
-            'itemCantidadSolicitada'
-        ).textContent =
-            detail.cantidad_despachada ??
-            0;
-
-
-        document.getElementById(
-            'itemCodigo'
-        ).textContent =
-            product.barcode ||
-            product.box_barcode ||
-            '-';
-
-
-        document.getElementById(
-            'itemCantidadParcial'
-        ).classList.add(
-            'd-none'
-        );
-
-
-        document.getElementById(
-            'cantidadItem'
-        ).value = '';
-
-
-        ocultarAlerta();
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | REGISTRAR ITEM
-    |--------------------------------------------------------------------------
-    */
-
-    function registrarItem(
-        estado,
-        cantidad = 0
-    ) {
-
-        const detail =
-            detalles[indiceItem];
-
-
-        validaciones[detail.id] = {
-
-            order_detail_id:
-                detail.id,
-
-            estado:
-                estado,
-
-            cantidad_validada:
-                cantidad,
-
-            codigo_escaneado:
-                null,
-
-            observaciones:
-                null
-
-        };
-
-
-        indiceItem++;
-
-        mostrarItemActual();
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ITEM - NO ENVIADO
-    |--------------------------------------------------------------------------
-    */
-
-    document.getElementById(
-        'btnItemIncompleto'
-    ).addEventListener(
-        'click',
-        function () {
-
-            registrarItem(
-                'NO_ENVIADO',
-                0
-            );
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ITEM - PARCIAL
-    |--------------------------------------------------------------------------
-    */
-
-    document.getElementById(
-        'btnItemParcial'
-    ).addEventListener(
-        'click',
-        function () {
-
-            const detail =
-                detalles[indiceItem];
-
-            const panelCantidad =
-                document.getElementById(
-                    'itemCantidadParcial'
-                );
-
-            const cantidadInput =
-                document.getElementById(
-                    'cantidadItem'
-                );
-
-
-            if (
-                panelCantidad.classList.contains(
-                    'd-none'
-                )
-            ) {
-
-                panelCantidad.classList.remove(
-                    'd-none'
-                );
-
-                cantidadInput.value = '';
-
-                cantidadInput.focus();
-
-                return;
-
-            }
-
-
-            const cantidad =
-                parseFloat(
-                    cantidadInput.value
-                );
-
-
-            if (
-                isNaN(cantidad) ||
-                cantidad <= 0
-            ) {
-
-                mostrarAlerta(
-                    'Ingresa una cantidad válida.',
-                    'warning'
-                );
-
-                cantidadInput.focus();
-
-                return;
-
-            }
-
-
-            if (
-                cantidad >=
-                parseFloat(
-                    detail.cantidad_despachada
-                )
-            ) {
-
-                mostrarAlerta(
-                    'La cantidad parcial debe ser menor que la cantidad despachada.',
-                    'warning'
-                );
-
-                cantidadInput.focus();
-
-                return;
-
-            }
-
-
-            ocultarAlerta();
-
-
-            registrarItem(
-                'PARCIAL',
-                cantidad
-            );
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ITEM - COMPLETO
-    |--------------------------------------------------------------------------
-    */
-
-    document.getElementById(
-        'btnItemCompleto'
-    ).addEventListener(
-        'click',
-        function () {
-
-            registrarItem(
-                'COMPLETO',
-                parseFloat(
-                    detalles[indiceItem]
-                        .cantidad_despachada
-                )
-            );
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | FINALIZAR ITEM
-    |--------------------------------------------------------------------------
-    */
-
-    function finalizarValidacionItem() {
-
-        document.getElementById(
-            'itemProgressBar'
-        ).style.width = '100%';
-
-
-        ocultarPaneles();
-
-        panelCompleto.classList.remove(
-            'd-none'
-        );
-
-        construirTablaCompleta();
-
-        mostrarAlerta(
-            'Todos los productos fueron revisados. Verifica la información antes de guardar.',
-            'success'
-        );
-
-        panelCompleto.scrollIntoView({
-            behavior: 'smooth',
-            block: 'start'
-        });
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | MODO ESCÁNER
-    |--------------------------------------------------------------------------
-    */
-
-    document.getElementById(
-        'btnModoScanner'
-    ).addEventListener(
-        'click',
-        function () {
-
-            modoActual = 'scanner';
-
-            validaciones = {};
-
-            itemScannerActual = null;
-
-            ocultarPaneles();
-
-            panelScanner.classList.remove(
-                'd-none'
-            );
-
-
-            document.getElementById(
-                'scannerProducto'
-            ).classList.add(
-                'd-none'
-            );
-
-
-            document.getElementById(
-                'codigoScanner'
-            ).value = '';
-
-
-            actualizarContadorScanner();
-
-
-            panelScanner.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-
-
-            setTimeout(function () {
-
-                document.getElementById(
-                    'codigoScanner'
-                ).focus();
-
-            }, 350);
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ESCÁNER
-    |--------------------------------------------------------------------------
-    */
-
-    const codigoScanner =
-        document.getElementById(
-            'codigoScanner'
-        );
-
-
-    codigoScanner.addEventListener(
-        'keydown',
-        async function (event) {
-
-            if (
-                event.key !== 'Enter'
-            ) {
-
-                return;
-
-            }
-
-
-            event.preventDefault();
-
-
-            const codigo =
-                codigoScanner.value.trim();
-
-
-            if (!codigo) {
-
-                return;
-
-            }
-
-
-            await procesarScanner(
-                codigo
-            );
-
-        }
-    );
-
-
-    async function procesarScanner(
-        codigo
-    ) {
-
-        ocultarAlerta();
-
-
-        try {
-
-            const response =
-                await fetch(
-                    '{{ route("orders.validation.producto.buscar") }}',
-                    {
-                        method: 'POST',
-
-                        headers: {
-                            'Content-Type':
-                                'application/json',
-
-                            'Accept':
-                                'application/json',
-
-                            'X-CSRF-TOKEN':
-                                '{{ csrf_token() }}'
-                        },
-
-                        body: JSON.stringify({
-                            codigo: codigo
-                        })
-                    }
-                );
-
-
-            const data =
-                await response.json();
-
-
-            if (
-                !response.ok ||
-                !data.success
-            ) {
-
-                throw new Error(
-                    data.message ||
-                    'Producto no encontrado.'
-                );
-
-            }
-
-
-            const product =
-                data.product;
-
-
-            /*
-             * Verificar que el producto
-             * pertenece al pedido.
-             */
-            const encontrados =
-                detalles.filter(
-                    detail =>
-                        detail.product &&
-                        (
-                            String(
-                                detail.product.barcode
-                            ) === String(codigo)
-
-                            ||
-
-                            String(
-                                detail.product.box_barcode
-                            ) === String(codigo)
-                        )
-                );
-
-
-            if (
-                !encontrados.length
-            ) {
-
-                mostrarAlerta(
-                    '⚠️ Este producto no pertenece al pedido.',
-                    'warning'
-                );
-
-
-                codigoScanner.value = '';
-
-                codigoScanner.focus();
-
-                return;
-
-            }
-
-
-            /*
-             * Buscar un detalle que todavía
-             * no haya sido validado.
-             */
-            const detail =
-                encontrados.find(
-                    d =>
-                        !validaciones[d.id]
-                ) ||
-                encontrados[0];
-
-
-            itemScannerActual =
-                detail;
-
-
-            document.getElementById(
-                'scannerNombre'
-            ).textContent =
-                product.nombre ||
-                'Producto sin nombre';
-
-
-            document.getElementById(
-                'scannerMarca'
-            ).textContent =
-                product.marca ||
-                '';
-
-
-            document.getElementById(
-                'scannerDespachado'
-            ).textContent =
-                detail.cantidad_despachada ??
-                0;
-
-
-            document.getElementById(
-                'scannerCodigo'
-            ).textContent =
-                codigo;
-
-
-            document.getElementById(
-                'scannerProducto'
-            ).classList.remove(
-                'd-none'
-            );
-
-
-            document.getElementById(
-                'scannerCantidadParcial'
-            ).classList.add(
-                'd-none'
-            );
-
-
-            document.getElementById(
-                'cantidadScanner'
-            ).value = '';
-
-
-            codigoScanner.value = '';
-
-
-        } catch (error) {
-
-            mostrarAlerta(
-                error.message,
-                'danger'
-            );
-
-
-            codigoScanner.select();
-
-        }
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | REGISTRAR ESCÁNER
-    |--------------------------------------------------------------------------
-    */
-
-    function registrarScanner(
-        estado,
-        cantidad = 0
-    ) {
-
-        if (!itemScannerActual) {
-
-            mostrarAlerta(
-                'Primero escanea un producto.',
-                'warning'
-            );
-
-            return;
-
-        }
-
-
-        validaciones[
-            itemScannerActual.id
-        ] = {
-
-            order_detail_id:
-                itemScannerActual.id,
-
-            estado:
-                estado,
-
-            cantidad_validada:
-                cantidad,
-
-            codigo_escaneado:
-                document.getElementById(
-                    'scannerCodigo'
-                ).textContent,
-
-            observaciones:
-                null
-
-        };
-
-
-        itemScannerActual =
-            null;
-
-
-        document.getElementById(
-            'scannerProducto'
-        ).classList.add(
-            'd-none'
-        );
-
-
-        actualizarContadorScanner();
-
-
-        codigoScanner.value = '';
-
-        codigoScanner.focus();
-
-
-        if (
-            Object.keys(validaciones).length >=
-            detalles.length
-        ) {
-
-            finalizarScanner();
-
-        }
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ESCÁNER - NO ENVIADO
-    |--------------------------------------------------------------------------
-    */
-
-    document.getElementById(
-        'btnScannerIncompleto'
-    ).addEventListener(
-        'click',
-        function () {
-
-            registrarScanner(
-                'NO_ENVIADO',
-                0
-            );
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ESCÁNER - PARCIAL
-    |--------------------------------------------------------------------------
-    */
-
-    document.getElementById(
-        'btnScannerParcial'
-    ).addEventListener(
-        'click',
-        function () {
-
-            if (
-                !itemScannerActual
-            ) {
-
-                return;
-
-            }
-
-
-            const panelCantidad =
-                document.getElementById(
-                    'scannerCantidadParcial'
-                );
-
-
-            if (
-                panelCantidad.classList.contains(
-                    'd-none'
-                )
-            ) {
-
-                panelCantidad.classList.remove(
-                    'd-none'
-                );
-
-
-                document.getElementById(
-                    'cantidadScanner'
-                ).focus();
-
-
-                return;
-
-            }
-
-
-            const cantidad =
-                parseFloat(
-                    document.getElementById(
-                        'cantidadScanner'
-                    ).value
-                );
-
-
-            const despachada =
-            parseFloat(
-                itemScannerActual
-                    .cantidad_despachada
-            );
-
-
-            if (
-                isNaN(cantidad) ||
-                cantidad <= 0 ||
-                cantidad >= despachada
-            ) {
-
-                mostrarAlerta(
-                    'La cantidad parcial debe ser mayor a 0 y menor a la cantidad despachada.',
-                    'warning'
-                );
-
-                return;
-
-            }
-
-
-            registrarScanner(
-                'PARCIAL',
-                cantidad
-            );
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ESCÁNER - COMPLETO
-    |--------------------------------------------------------------------------
-    */
-
-    document.getElementById(
-        'btnScannerCompleto'
-    ).addEventListener(
-        'click',
-        function () {
-
-            if (
-                !itemScannerActual
-            ) {
-
-                return;
-
-            }
-
-
-            registrarScanner(
-                'COMPLETO',
-                parseFloat(
-                    itemScannerActual
-                        .cantidad_despachada
-                )
-            );
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CONTADOR ESCÁNER
-    |--------------------------------------------------------------------------
-    */
-
-    function actualizarContadorScanner() {
-
-        document.getElementById(
-            'contadorScanner'
-        ).textContent =
-            `${Object.keys(validaciones).length} / ${detalles.length}`;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | FINALIZAR ESCÁNER
-    |--------------------------------------------------------------------------
-    */
-
-    function finalizarScanner() {
-
-        ocultarPaneles();
-
-        panelCompleto.classList.remove(
-            'd-none'
-        );
-
-        construirTablaCompleta();
-
-        mostrarAlerta(
-            'Todos los productos fueron procesados por escáner. Revisa y guarda la validación.',
-            'success'
-        );
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | MODO PEDIDO COMPLETO
-    |--------------------------------------------------------------------------
-    */
-
-    document.getElementById(
-        'btnModoCompleto'
-    ).addEventListener(
-        'click',
-        function () {
-
-            modoActual = 'completo';
-
-            validaciones = {};
-
-            ocultarPaneles();
-
-            panelCompleto.classList.remove(
-                'd-none'
-            );
-
-            construirTablaCompleta();
-
-
-            panelCompleto.scrollIntoView({
-                behavior: 'smooth',
-                block: 'start'
-            });
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | TABLA COMPLETA
-    |--------------------------------------------------------------------------
-    */
-
-    function construirTablaCompleta() {
-
-        const tabla =
-            document.getElementById(
-                'tablaValidacion'
-            );
-
-
-        tabla.innerHTML = '';
-
-
-        detalles.forEach(
-            function (detail) {
-
-                const product =
-                    detail.product || {};
-
-
-                const validacion =
-                    validaciones[detail.id];
-
-
-                let estado =
-                    validacion?.estado ||
-                    'PENDIENTE';
-
-
-                let cantidad =
-                    validacion?.cantidad_validada ??
-                    0;
-
-
-                const tr =
-                    document.createElement(
-                        'tr'
-                    );
-
-
-                tr.dataset.detailId =
-                    detail.id;
-
-
-                tr.innerHTML = `
-
-                    <td>
-
-                        <div class="table-product-name">
-
-                            ${escapeHtml(
-                                product.nombre ||
-                                'Producto sin nombre'
-                            )}
-
-                        </div>
-
-                        <div class="table-product-brand">
-
-                            ${escapeHtml(
-                                product.marca ||
-                                ''
-                            )}
-
-                        </div>
-
-                    </td>
-
-
-                    <td>
-
-                        <span class="table-code">
-
-                            ${escapeHtml(
-                                product.barcode ||
-                                product.box_barcode ||
-                                '-'
-                            )}
-
-                        </span>
-
-                    </td>
-
-
-                    <td class="text-center">
-
-                        <span class="table-quantity">
-
-                            ${detail.cantidad_despachada}
-
-                        </span>
-
-                    </td>
-
-
-                    <td class="text-center">
-
-                        <input
-                            type="number"
-                            class="cantidad-validada"
-                            data-detail-id="${detail.id}"
-                            value="${cantidad}"
-                            min="0"
-                            step="0.01"
-                        >
-
-                    </td>
-
-
-                    <td class="text-center">
-
-                        <select
-                            class="estado-validacion"
-                            data-detail-id="${detail.id}"
-                        >
-
-                            <option
-                                value="PENDIENTE"
-                                ${estado === 'PENDIENTE' ? 'selected' : ''}
-                            >
-                                PENDIENTE
-                            </option>
-
-                            <option
-                                value="COMPLETO"
-                                ${estado === 'COMPLETO' ? 'selected' : ''}
-                            >
-                                COMPLETO
-                            </option>
-
-                            <option
-                                value="PARCIAL"
-                                ${estado === 'PARCIAL' ? 'selected' : ''}
-                            >
-                                PARCIAL
-                            </option>
-
-                            <option
-                                value="NO_ENVIADO"
-                                ${estado === 'NO_ENVIADO' ? 'selected' : ''}
-                            >
-                                NO ENVIADO
-                            </option>
-
-                        </select>
-
-                    </td>
-
-                `;
-
-
-                tabla.appendChild(
-                    tr
-                );
-
-            }
-        );
-
-
-        /*
-         * Eventos estado.
-         */
-        tabla
-            .querySelectorAll(
-                '.estado-validacion'
-            )
-            .forEach(
-                select => {
-
-                    select.addEventListener(
-                        'change',
-                        function () {
-
-                            actualizarValidacionTabla(
-                                this.dataset.detailId
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-
-        /*
-         * Eventos cantidad.
-         */
-        tabla
-            .querySelectorAll(
-                '.cantidad-validada'
-            )
-            .forEach(
-                input => {
-
-                    input.addEventListener(
-                        'change',
-                        function () {
-
-                            actualizarValidacionTabla(
-                                this.dataset.detailId
-                            );
-
-                        }
-                    );
-
-                }
-            );
-
-
-        actualizarContadorCompleto();
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ACTUALIZAR FILA
-    |--------------------------------------------------------------------------
-    */
-
-    function actualizarValidacionTabla(
-        detailId
-    ) {
-
-        const select =
-            document.querySelector(
-                `.estado-validacion[data-detail-id="${detailId}"]`
-            );
-
-
-        const input =
-            document.querySelector(
-                `.cantidad-validada[data-detail-id="${detailId}"]`
-            );
-
-
-        if (
-            !select ||
-            !input
-        ) {
-
-            return;
-
-        }
-
-
-        const detail =
-            detalles.find(
-                d =>
-                    String(d.id) ===
-                    String(detailId)
-            );
-
-
-        if (!detail) {
-
-            return;
-
-        }
-
-
-        const estado =
-            select.value;
-
-
-        if (
-            estado === 'COMPLETO'
-        ) {
-
-            input.value =
-                detail.cantidad_despachada;
-
-        }
-
-
-        if (
-            estado === 'NO_ENVIADO'
-        ) {
-
-            input.value = 0;
-
-        }
-
-
-        validaciones[detailId] = {
-
-            order_detail_id:
-                parseInt(detailId),
-
-            estado:
-                estado,
-
-            cantidad_validada:
-                parseFloat(
-                    input.value
-                ) || 0,
-
-            codigo_escaneado:
-                null,
-
-            observaciones:
-                null
-
-        };
-
-
-        actualizarContadorCompleto();
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | CONTADOR PEDIDO COMPLETO
-    |--------------------------------------------------------------------------
-    */
-
-    function actualizarContadorCompleto() {
-
-        document.getElementById(
-            'contadorCompleto'
-        ).textContent =
-            `${Object.keys(validaciones).length} / ${detalles.length}`;
-
-    }
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | GUARDAR VALIDACIÓN
-    |--------------------------------------------------------------------------
-    */
-
-    document.getElementById(
-        'btnGuardarValidacion'
-    ).addEventListener(
-        'click',
-        async function () {
-
-            /*
-             * Actualizar todos los productos
-             * visibles en la tabla.
-             */
-            detalles.forEach(
-                detail => {
-
-                    actualizarValidacionTabla(
-                        detail.id
-                    );
-
-                }
-            );
-
-
-            /*
-             * Todos deben estar definidos.
-             */
-            if (
-                Object.keys(validaciones).length !==
-                detalles.length
-            ) {
-
-                mostrarAlerta(
-                    'Debes validar todos los productos antes de guardar.',
-                    'warning'
-                );
-
-                return;
-
-            }
-
-
-            /*
-             * Validar cantidades.
-             */
-            for (
-                const detail of detalles
-            ) {
-
-                const validation =
-                    validaciones[
-                        detail.id
-                    ];
-
-
-                if (!validation) {
-
-                    continue;
-
-                }
-
-
-                const despachada =
-                    parseFloat(
-                        detail.cantidad_despachada
-                    );
-
-
-                const cantidad =
-                    parseFloat(
-                        validation.cantidad_validada
-                    ) || 0;
-
-
-                /*
-                 * COMPLETO.
-                 */
-                if (
-                    validation.estado ===
-                    'COMPLETO' &&
-                    cantidad < despachada
-                ) {
-
-                    mostrarAlerta(
-                        `El producto "${detail.product?.nombre || ''}" está marcado como COMPLETO pero la cantidad validada es menor a la despachada.`,
-                        'warning'
-                    );
-
-                    return;
-
-                }
-
-
-                /*
-                 * PARCIAL.
-                 */
-                if (
-                    validation.estado ===
-                    'PARCIAL' &&
-                    (
-                        cantidad <= 0 ||
-                        cantidad >= despachada
-                    )
-                ) {
-
-                    mostrarAlerta(
-                        `La cantidad parcial de "${detail.product?.nombre || ''}" no es válida.`,
-                        'warning'
-                    );
-
-                    return;
-
-                }
-
-
-                /*
-                 * NO ENVIADO.
-                 */
-                if (
-                    validation.estado ===
-                    'NO_ENVIADO' &&
-                    cantidad !== 0
-                ) {
-
-                    mostrarAlerta(
-                        `El producto "${detail.product?.nombre || ''}" está marcado como NO ENVIADO y debe tener cantidad 0.`,
-                        'warning'
-                    );
-
-                    return;
-
-                }
-
-
-                /*
-                 * PENDIENTE.
-                 */
-                if (
-                    validation.estado ===
-                    'PENDIENTE'
-                ) {
-
-                    mostrarAlerta(
-                        `El producto "${detail.product?.nombre || ''}" todavía está pendiente de validar.`,
-                        'warning'
-                    );
-
-                    return;
-
-                }
-
-            }
-
-
-            const boton =
-                document.getElementById(
-                    'btnGuardarValidacion'
-                );
-
-
-            boton.disabled = true;
-
-
-            boton.innerHTML =
-                '<i class="bi bi-arrow-repeat"></i> GUARDANDO...';
-
-
-            try {
-
-                const response =
-                    await fetch(
-                        '{{ url("validacion-pedidos") }}/' +
-                        pedidoActual.id +
-                        '/guardar',
-                        {
-                            method: 'POST',
-
-                            headers: {
-                                'Content-Type':
-                                    'application/json',
-
-                                'Accept':
-                                    'application/json',
-
-                                'X-CSRF-TOKEN':
-                                    '{{ csrf_token() }}'
-                            },
-
-                            body: JSON.stringify({
-
-                                items:
-                                    Object.values(
-                                        validaciones
-                                    ),
-
-                                observaciones:
-                                    document.getElementById(
-                                        'observacionesValidacion'
-                                    ).value
-
-                            })
-
-                        }
-                    );
-
-
-                const data =
-                    await response.json();
-
-
-                if (
-                    !response.ok ||
-                    !data.success
-                ) {
-
-                    throw new Error(
-                        data.message ||
-                        'No se pudo guardar la validación.'
-                    );
-
-                }
-
-
-                mostrarAlerta(
-                    '✓ Validación guardada correctamente.',
-                    'success'
-                );
-                setTimeout(function () {
-                    window.location.reload();
-                }, 1000);
-
-                boton.disabled = false;
-
-
-                boton.innerHTML =
-                    '<i class="bi bi-check-circle"></i><span>GUARDAR VALIDACIÓN</span>';
-
-
-            } catch (error) {
-
-                mostrarAlerta(
-                    error.message,
-                    'danger'
-                );
-
-
-                boton.disabled = false;
-
-
-                boton.innerHTML =
-                    '<i class="bi bi-check-circle"></i><span>GUARDAR VALIDACIÓN</span>';
-
-            }
-
-        }
-    );
-
-
-    /*
-    |--------------------------------------------------------------------------
-    | ESCAPE HTML
-    |--------------------------------------------------------------------------
-    */
-
-    function escapeHtml(value) {
-
-        const div =
-            document.createElement(
-                'div'
-            );
-
-
-        div.textContent =
-            value ?? '';
-
-
-        return div.innerHTML;
-
-    }
-
-});
-
-</script>
-
-@endsection
+  
