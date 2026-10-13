@@ -637,6 +637,20 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
                         @js($item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('Y-m-d') : '')
                     )"><svg class="ic sm"><use href="#i-edit"/></svg></button>
                     <button type="button" class="op-icon-btn" title="Seleccionar producto" aria-label="Seleccionar producto" onclick="seleccionarPorId({{ $item->id }})"><svg class="ic sm"><use href="#i-chevron"/></svg></button>
+                    @if(in_array(strtoupper(trim($order->tipo_orden ?? '')), ['LOCAL', 'ENCOMIENDA'], true))
+                        <a href="{{ route('orders.etiqueta.local', $item) }}"
+                           target="_blank"
+                           rel="noopener"
+                           class="op-icon-btn"
+                           title="Imprimir etiqueta"
+                           aria-label="Imprimir etiqueta"
+                           style="color:#1f6bff;text-decoration:none;">
+                            <svg class="ic sm" viewBox="0 0 24 24" aria-hidden="true">
+                                <path d="M6 9V3h12v6M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                                <path d="M6 14h12v7H6zM18 12h.01"/>
+                            </svg>
+                        </a>
+                    @endif
                 </div>
             </td>
         </tr>
