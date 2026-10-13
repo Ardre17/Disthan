@@ -474,6 +474,62 @@ hr.dv{border-top-color:#e8eef6;}
 .lc-actions .lc-btn{padding:12px 20px;}
 .lc-actions .lc-btn.big{min-width:290px;justify-content:center;}
 @media(max-width:620px){.lc-actions .lc-btn{flex:1;justify-content:center;}.lc-actions .lc-btn.big{min-width:100%;order:-1;}}
+
+/* ── Franja: personal que armó + tiempo de armado ── */
+.lc-band{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;padding:12px 18px;margin-bottom:14px;}
+.lc-band-l{display:flex;align-items:center;gap:12px;min-width:0;}
+.lc-band-ic{width:42px;height:42px;border-radius:11px;background:#e8f0fe;color:var(--lc-blue);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lc-band-ic .lc-i{width:22px;height:22px;}
+.lc-band small.k{display:block;font-size:9.5px;font-weight:700;letter-spacing:.06em;color:#64748b;text-transform:uppercase;}
+.lc-band b{display:block;font-size:15px;font-weight:800;margin-top:1px;}
+.lc-band .names{font-size:10.5px;color:#94a3b8;margin-top:1px;max-width:560px;}
+.lc-band-r{display:flex;gap:8px;flex-wrap:wrap;}
+.lc-pill{display:inline-flex;align-items:center;gap:6px;border:1px solid #cfe0fb;background:#f3f8ff;border-radius:99px;padding:6px 13px;font-size:11.5px;font-weight:700;color:#1d4ed8;white-space:nowrap;}
+.lc-pill .lc-i{width:14px;height:14px;}
+.lc-pill.time{background:#fff7e6;border-color:#fde7b0;color:#b45309;}
+.lc-pill.time b{display:inline;font-size:12.5px;margin:0;}
+
+/* ── Dropdowns de la barra de herramientas ── */
+.lc-dd{position:relative;}
+.lc-dd-menu{display:none;position:absolute;right:0;top:calc(100% + 6px);min-width:230px;background:#fff;border:1px solid var(--lc-line);border-radius:10px;box-shadow:0 12px 30px rgba(15,23,42,.14);padding:10px;z-index:60;}
+.lc-dd.open .lc-dd-menu{display:block;}
+.lc-dd-lbl{display:block;font-size:10.5px;font-weight:700;color:var(--lc-muted);text-transform:uppercase;letter-spacing:.04em;margin:6px 2px 4px;}
+.lc-dd-item{display:flex;align-items:center;gap:9px;width:100%;padding:9px 10px;border:none;background:none;border-radius:7px;font-size:13px;color:#1e293b;cursor:pointer;font-family:inherit;text-align:left;}
+.lc-dd-item:hover{background:#f1f5f9;}
+
+/* ── Tabla estilo mockup ── */
+.lc-tbl2{min-width:1380px;font-size:12px;}
+.lc-tbl2 th{padding:11px 9px;font-size:11px;color:#334155;}
+.lc-tbl2 td{padding:8px 9px;}
+.lc-tbl2 .idx{width:28px;color:#475569;}
+.lc-tbl2 .lc-prod{min-width:230px;align-items:center;}
+.lc-tbl2 .lc-thumb{width:34px;height:34px;}
+.lc-tbl2 .lc-pname{font-weight:800;font-size:12.5px;}
+.lc-tbl2 .num-input{width:74px;font-size:12.5px;}
+/* Cantidades: se ven como texto; al editar se vuelven campos */
+.lc-tbl2 .num-input:disabled{border-color:transparent;background:transparent;font-weight:800;color:#0f172a;-webkit-text-fill-color:#0f172a;opacity:1;-moz-appearance:textfield;appearance:textfield;}
+.lc-tbl2 .num-input.des-in:disabled{color:#16a34a;-webkit-text-fill-color:#16a34a;}
+.lc-tbl2 .num-input:not(:disabled){border:1px solid #93c5fd;background:#fff;}
+/* Precio: solo aparece al editar la fila */
+.lc-tbl2 .pre-in:disabled{display:none;}
+.lc-tbl2 .pre-in:not(:disabled){display:block;margin:5px 0 0 auto;}
+.lc-pal{font-size:12.5px;font-weight:800;}
+.lc-arm{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#1e3a5f;white-space:nowrap;}
+.lc-arm .lc-i{width:13px;height:13px;color:#2563eb;}
+.lc-oct{width:38px;height:38px;background:#111;color:#fff;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:6.5px;font-weight:800;line-height:1.1;text-align:center;margin:0 1px;}
+.lc-tbl2 .lc-pg{min-width:130px;}
+.lc-tbl2 .lc-pg .lc-bar{height:8px;}
+.lc-tbl2 .lc-acts{gap:7px;flex-wrap:nowrap;}
+.lc-ic{width:34px;height:34px;border:1px solid transparent;background:transparent;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;color:#334155;padding:0;text-decoration:none;}
+.lc-ic:hover{background:#f1f5f9;}
+.lc-ic .lc-i{width:16px;height:16px;}
+.lc-ic.del{color:#dc2626;background:#fff1f1;border-color:#fde2e2;}
+.lc-ic.del:hover{background:#fee2e2;}
+.lc-ic.lc-save{color:#fff;background:#16a34a;}
+.lc-ic.lc-save:hover{background:#15803d;}
+.lc-octs{display:flex;gap:4px;justify-content:center;align-items:center;flex-wrap:nowrap;}
+.lc-octw{display:inline-flex;}
+.lc-octimg{width:40px;height:40px;object-fit:contain;display:block;}
 </style>
 
 <div class="pg">
@@ -527,6 +583,59 @@ hr.dv{border-top-color:#e8eef6;}
     $lcCur = 0;
     foreach ($lcSteps as $k => $s) { if ($s[1]) { $lcCur = $k; } }
 
+    // ── Personal que armó la orden (lee el nombre de cada línea; ajusta aquí si tu campo se llama distinto) ──
+    $lcArmo = function ($i) {
+        $n = $i->personal_despacho ?? $i->armado_por ?? $i->armo ?? null;
+        if (!is_string($n) || $n === '' || is_numeric($n)) {
+            $u = $i->usuario ?? $i->user ?? $i->operario ?? null;
+            $n = is_object($u) ? ($u->name ?? $u->nombre ?? null) : (is_string($u) ? $u : null);
+        }
+        return is_string($n) && trim($n) !== '' && !is_numeric($n) ? trim($n) : null;
+    };
+    $lcPersonas = [];
+    foreach ($order->details as $x) {
+        $n = $lcArmo($x);
+        if ($n) { $lcPersonas[$n] = ($lcPersonas[$n] ?? 0) + 1; }
+    }
+    ksort($lcPersonas);
+    $lcPersonasN = count($lcPersonas);
+
+    // ── Tiempo de armado: del primer al último despacho registrado (o campos propios si existen) ──
+    $lcConDesp = $order->details->filter(fn($i) => $i->cantidad_despachada > 0 && ($i->updated_at ?? null));
+    $lcIni = $order->inicio_armado ?? $order->armado_inicio ?? $lcConDesp->min('updated_at');
+    $lcFin = $order->fin_armado ?? $order->armado_fin ?? ($lcAllDone ? $lcConDesp->max('updated_at') : null);
+    $lcFinEf = $lcFin ?: now();
+    $lcDur = function ($a, $b) {
+        if (!$a || !$b) { return null; }
+        $s = abs(\Carbon\Carbon::parse($b)->getTimestamp() - \Carbon\Carbon::parse($a)->getTimestamp());
+        $d = intdiv($s, 86400); $h = intdiv($s % 86400, 3600); $m = intdiv($s % 3600, 60);
+        $p = [];
+        if ($d) { $p[] = $d . ' d'; }
+        if ($h) { $p[] = $h . ' h'; }
+        if ($m || !$p) { $p[] = $m . ' min'; }
+        return implode(' ', $p);
+    };
+    $lcTiempoArmado = $lcIni ? $lcDur($lcIni, $lcFinEf) : null;
+    $lcTiempoTotal  = ($order->created_at ?? null) ? $lcDur($order->created_at, $lcFinEf) : null;
+    $lcEnCurso      = !$lcFin;
+
+    // ── Octógonos (lee product->octogonos o alto_azucar / alto_sodio / alto_grasas_saturadas / alto_grasas_trans) ──
+    $lcOctLabel = function ($k) {
+        $k = mb_strtolower((string) $k);
+        if (str_contains($k, 'azuc') || str_contains($k, 'azúc')) return ['ALTO EN', 'AZÚCAR'];
+        if (str_contains($k, 'sod'))                              return ['ALTO EN', 'SODIO'];
+        if (str_contains($k, 'satur'))                            return ['ALTO EN', 'GRAS.SAT.'];
+        if (str_contains($k, 'trans'))                            return ['ALTO EN', 'GRAS.TRANS'];
+        if (str_contains($k, 'grasa'))                            return ['ALTO EN', 'GRASAS'];
+        return ['', mb_strtoupper(mb_substr($k, 0, 10))];
+    };
+    // Imágenes de octógonos (las mismas de la vista de control de la orden)
+    $lcOctImgs = [
+        'azucar' => 'https://pbs.twimg.com/media/F-6D6zQWEAMPN7d.png',
+        'sodio'  => 'https://blogs.ucontinental.edu.pe/wp-content/uploads/2019/06/Octogono-sodio.png',
+        'grasas' => 'https://dolcezzaperu.pe/wp-content/uploads/2023/06/MicrosoftTeams-image-2.png',
+    ];
+
     // Historial (derivado de las fechas de registro existentes)
     $lcEventos = collect();
     $lcAdd = function ($f, $ico, $t, $d = '') use (&$lcEventos) {
@@ -562,6 +671,15 @@ hr.dv{border-top-color:#e8eef6;}
     <symbol id="lc-truck" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></symbol>
     <symbol id="lc-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
     <symbol id="lc-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></symbol>
+    <symbol id="lc-user" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+    <symbol id="lc-timer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><polyline points="12 9 12 13 15 15"/><line x1="9" y1="2" x2="15" y2="2"/></symbol>
+    <symbol id="lc-eye" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></symbol>
+    <symbol id="lc-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"/></symbol>
+    <symbol id="lc-trash" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></symbol>
+    <symbol id="lc-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></symbol>
+    <symbol id="lc-filter" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></symbol>
+    <symbol id="lc-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></symbol>
+    <symbol id="lc-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></symbol>
 </defs></svg>
 
 <div class="lc">
@@ -595,6 +713,33 @@ hr.dv{border-top-color:#e8eef6;}
     <div class="lc-k t-navy t-money"><div class="lc-k-ic"><svg class="lc-i"><use href="#lc-money"/></svg></div><div><small class="l">Total</small><b>S/ {{ number_format($order->total,2) }}</b><small class="s">con IGV 18%</small></div></div>
 </div>
 
+{{-- ══════════ PERSONAL QUE ARMÓ + TIEMPO DE ARMADO ══════════ --}}
+<div class="lc-card lc-band">
+    <div class="lc-band-l">
+        <div class="lc-band-ic"><svg class="lc-i"><use href="#lc-user"/></svg></div>
+        <div style="min-width:0;">
+            <small class="k">Personal que armó la orden</small>
+            <b>{{ $lcPersonasN > 0 ? $lcPersonasN . ($lcPersonasN === 1 ? ' persona' : ' personas') : 'Sin registrar' }}</b>
+            <div class="names">
+                @if($lcPersonasN > 0)
+                    @foreach($lcPersonas as $pn => $pc){{ $pn }}@if(!$loop->last) · @endif @endforeach
+                @else
+                    El nombre de quien arma se muestra cuando la línea lo registra.
+                @endif
+            </div>
+        </div>
+    </div>
+    <div class="lc-band-r">
+        <span class="lc-pill time" title="Del primer al último despacho registrado{{ $lcEnCurso ? ' (aún en curso)' : '' }}">
+            <svg class="lc-i"><use href="#lc-timer"/></svg>
+            Tiempo de armado:
+            <b class="lc-num">{{ $lcTiempoArmado ?? '—' }}</b>
+            @if($lcTiempoArmado && $lcEnCurso)<em style="font-style:normal;font-weight:600;opacity:.8;">(en curso)</em>@endif
+        </span>
+        <span class="lc-pill">{{ $completados }} / {{ $totalItems }} productos completos</span>
+    </div>
+</div>
+
 {{-- ══════════ TARJETA DEL PEDIDO ══════════ --}}
 <div class="lc-card lc-main">
 
@@ -621,7 +766,8 @@ hr.dv{border-top-color:#e8eef6;}
         <button type="button" class="lc-tab on" data-tab="productos" onclick="lcTab('productos',this)">Productos ({{ $totalItems }})</button>
         <button type="button" class="lc-tab" data-tab="info" onclick="lcTab('info',this)">Información</button>
         <button type="button" class="lc-tab" data-tab="obs" onclick="lcTab('obs',this)">Observaciones</button>
-        <button type="button" class="lc-tab" data-tab="hist" onclick="lcTab('hist',this)">Historial ({{ $lcEventos->count() }})</button>
+        <button type="button" class="lc-tab" data-tab="hist" onclick="lcTab('hist',this)">Historial de despachos ({{ $lcEventos->count() }})</button>
+        <button type="button" class="lc-tab" data-tab="docs" onclick="lcTab('docs',this)">Documentos</button>
     </div>
 
     {{-- ─────────── PRODUCTOS ─────────── --}}
@@ -683,30 +829,58 @@ hr.dv{border-top-color:#e8eef6;}
                 <svg class="lc-i"><use href="#lc-search"/></svg>
                 <input type="text" id="lcBuscar" placeholder="Buscar producto, SKU o lote..." oninput="lcFiltrar()">
             </div>
-            <select class="lc-sel" id="lcEstado" onchange="lcFiltrar()">
-                <option value="">Todos los estados</option>
-                <option value="LISTO">Listo</option>
-                <option value="PROCESO">En preparación</option>
-                <option value="PEND">Pendiente</option>
-            </select>
-            <button type="button" class="lc-btn blue sm" onclick="document.getElementById('lcAddBox').classList.toggle('open')"><svg class="lc-i"><use href="#lc-plus"/></svg> Agregar producto</button>
+
+            <div class="lc-dd" id="lcDdFiltros">
+                <button type="button" class="lc-btn white sm" style="color:#334155;" onclick="lcDD('lcDdFiltros',event)"><svg class="lc-i"><use href="#lc-filter"/></svg> Filtros <svg class="lc-i"><use href="#lc-chev"/></svg></button>
+                <div class="lc-dd-menu" onclick="event.stopPropagation()">
+                    <span class="lc-dd-lbl">Estado</span>
+                    <select class="lc-sel" style="width:100%;" id="lcEstado" onchange="lcFiltrar()">
+                        <option value="">Todos los estados</option>
+                        <option value="LISTO">Listo</option>
+                        <option value="PROCESO">En preparación</option>
+                        <option value="PEND">Pendiente</option>
+                    </select>
+                    <span class="lc-dd-lbl">Armó</span>
+                    <select class="lc-sel" style="width:100%;" id="lcArmoSel" onchange="lcFiltrar()">
+                        <option value="">Todo el personal</option>
+                        @foreach(array_keys($lcPersonas) as $pn)
+                            <option value="{{ mb_strtolower($pn) }}">{{ $pn }}</option>
+                        @endforeach
+                        <option value="__sin__">Sin registrar</option>
+                    </select>
+                    <button type="button" class="lc-dd-item" style="margin-top:6px;color:var(--lc-blue);" onclick="lcLimpiar()">Limpiar filtros</button>
+                </div>
+            </div>
+
+            <div class="lc-dd" id="lcDdAcc">
+                <button type="button" class="lc-btn white sm" style="color:#334155;" onclick="lcDD('lcDdAcc',event)"><svg class="lc-i"><use href="#lc-sliders"/></svg> Acciones <svg class="lc-i"><use href="#lc-chev"/></svg></button>
+                <div class="lc-dd-menu" onclick="event.stopPropagation()">
+                    <button type="button" class="lc-dd-item" onclick="document.getElementById('lcAddBox').classList.add('open');lcDD('lcDdAcc',event)"><svg class="lc-i"><use href="#lc-plus"/></svg> Agregar producto</button>
+                    <button type="button" class="lc-dd-item" onclick="lcPicking()"><svg class="lc-i"><use href="#lc-printer"/></svg> Imprimir picking</button>
+                    <button type="button" class="lc-dd-item" onclick="lcExportCSV()"><svg class="lc-i"><use href="#lc-file"/></svg> Exportar CSV</button>
+                </div>
+            </div>
         </div>
 
         <div class="scroll-hint-mobile">← desliza horizontalmente →</div>
 
         <div class="lc-scroll">
-        <table class="lc-tbl" id="lcTabla">
+        <table class="lc-tbl lc-tbl2" id="lcTabla">
             <thead>
                 <tr>
+                    <th>#</th>
                     <th>Producto</th>
                     <th>SKU</th>
-                    <th class="c">Pedido</th>
-                    <th class="c">Preparado</th>
+                    <th class="c">Solicitado</th>
+                    <th class="c">Despachado</th>
                     <th class="c">Pendiente</th>
-                    <th class="c">Precio</th>
+                    <th>Avance</th>
+                    <th>Lote</th>
+                    <th>Vencimiento</th>
+                    <th class="c">Octógonos</th>
+                    <th>Últ. despacho</th>
+                    <th>Armó</th>
                     <th class="r">Subtotal</th>
-                    <th>Progreso</th>
-                    <th>Estado</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -721,103 +895,170 @@ hr.dv{border-top-color:#e8eef6;}
                 // Lote / vencimiento por línea
                 $loteItem     = $item->lote;
                 $fechaVenc    = $item->fecha_vencimiento;
-                $vColor       = '#94a3b8';
-                $vIcon        = '';
+                $vColor       = '#334155';
                 $diasVencItem = null;
                 if ($fechaVenc) {
                     $diasVencItem = (int) round(now()->diffInDays(\Carbon\Carbon::parse($fechaVenc), false));
-                    if ($diasVencItem < 0)       { $vColor = '#b91c1c'; $vIcon = '🔴'; }
-                    elseif ($diasVencItem <= 30) { $vColor = '#b45309'; $vIcon = '🟡'; }
-                    else                          { $vColor = '#15803d'; $vIcon = '🟢'; }
+                    if ($diasVencItem < 0)       { $vColor = '#b91c1c'; }
+                    elseif ($diasVencItem <= 30) { $vColor = '#b45309'; }
                 }
 
                 $lcSol  = (float) $item->cantidad_solicitada;
                 $lcDesp = (float) $item->cantidad_despachada;
                 $lcPend = max($lcSol - $lcDesp, 0);
-                if ($pct >= 100)      { $lcEstK = 'LISTO';   $lcEstT = 'Listo';          $lcEstBg = '#dcfce7'; $lcEstCl = '#15803d'; }
-                elseif ($lcDesp > 0)  { $lcEstK = 'PROCESO'; $lcEstT = 'En preparación'; $lcEstBg = '#fef3c7'; $lcEstCl = '#b45309'; }
-                else                  { $lcEstK = 'PEND';    $lcEstT = 'Pendiente';      $lcEstBg = '#eef2f7'; $lcEstCl = '#475569'; }
+                if ($pct >= 100)      { $lcEstK = 'LISTO'; }
+                elseif ($lcDesp > 0)  { $lcEstK = 'PROCESO'; }
+                else                  { $lcEstK = 'PEND'; }
                 $lcThumb = $lcImg($item->product);
+
+                $lcArmoN  = $lcArmo($item);
+                $lcUltD   = $lcDesp > 0 ? ($item->updated_at ?? null) : null;
+                $lcSubt   = $item->subtotal ?? ($item->cantidad_despachada * $item->precio_unitario);
+
+                $lcOcts = [];
+                $lcRaw  = $item->product->octogonos ?? null;
+                if (is_string($lcRaw) && trim($lcRaw) !== '') {
+                    $dec = json_decode($lcRaw, true);
+                    $lcRaw = is_array($dec) ? $dec : array_map('trim', explode(',', $lcRaw));
+                }
+                if (is_array($lcRaw)) { foreach ($lcRaw as $o) { $lcOcts[] = mb_strtolower((string) $o); } }
+                foreach (['azucar'=>'alto_azucar','sodio'=>'alto_sodio','grasas saturadas'=>'alto_grasas_saturadas','grasas trans'=>'alto_grasas_trans'] as $k => $col) {
+                    if (!empty($item->product->{$col})) { $lcOcts[] = $k; }
+                }
+                $lcOcts = array_values(array_unique($lcOcts));
+
+                // Normaliza cada octógono a: azucar / sodio / grasas (en cualquier mayúscula o forma escrita)
+                $lcOctKeys = [];
+                foreach ($lcOcts as $o) {
+                    $oNorm = mb_strtolower(trim((string) $o));
+                    if ($oNorm === '') { continue; }
+                    if (str_contains($oNorm, 'azuc') || str_contains($oNorm, 'azúc'))                                      { $ok = 'azucar'; }
+                    elseif (str_contains($oNorm, 'sod'))                                                                    { $ok = 'sodio'; }
+                    elseif (str_contains($oNorm, 'grasa') || str_contains($oNorm, 'satur') || str_contains($oNorm, 'trans')) { $ok = 'grasas'; }
+                    else                                                                                                    { $ok = $oNorm; }
+                    $lcOctKeys[$ok] = $oNorm;
+                }
             @endphp
                 <tr class="lc-row" id="row-{{ $item->id }}"
                     data-estado="{{ $lcEstK }}"
                     data-nombre="{{ $item->product->nombre }}"
                     data-sku="{{ $item->product->sku ?? '' }}"
                     data-lote="{{ $loteItem ?? '' }}"
-                    data-search="{{ mb_strtolower($item->product->nombre.' '.($item->product->sku ?? '').' '.($loteItem ?? '')) }}">
+                    data-venc="{{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('d/m/Y') : '' }}"
+                    data-armo="{{ $lcArmoN ? mb_strtolower($lcArmoN) : '' }}"
+                    data-armo-txt="{{ $lcArmoN ?? '' }}"
+                    data-sub="{{ number_format((float) $lcSubt, 2, '.', '') }}"
+                    data-search="{{ mb_strtolower($item->product->nombre.' '.($item->product->sku ?? '').' '.($loteItem ?? '').' '.($lcArmoN ?? '')) }}">
+
+                    <td class="lc-num idx">{{ $loop->iteration }}</td>
+
                     <td>
                         <div class="lc-prod">
                             <div class="lc-thumb">@if($lcThumb)<img src="{{ $lcThumb }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">@else 📦 @endif</div>
-                            <div>
-                                <div class="lc-pname">{{ $item->product->nombre }}</div>
-                                <div style="margin-top:4px;display:flex;align-items:center;gap:6px;flex-wrap:wrap;">
-                                    <span class="lote-badge">🏷️ {{ $loteItem ?: 'Sin lote' }}</span>
-                                    <span class="venc-badge" style="color:{{ $vColor }};">
-                                        {{ $vIcon }} {{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('d/m/Y') : 'Sin fecha' }}
-                                        @if($diasVencItem !== null && $diasVencItem >= 0)
-                                            <span class="venc-dias">({{ $diasVencItem }}d)</span>
-                                        @endif
-                                    </span>
-                                    <button type="button" class="btn-lote-edit"
-                                            onclick="abrirModalLote({{ $item->id }}, '{{ addslashes($loteItem ?? '') }}', '{{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('Y-m-d') : '' }}')"
-                                            title="Editar lote / vencimiento">✏️</button>
-                                </div>
-                            </div>
+                            <div class="lc-pname">{{ $item->product->nombre }}</div>
                         </div>
                     </td>
-                    <td class="lc-num" style="color:#64748b;font-size:11.5px;">{{ $item->product->sku ?? '—' }}</td>
+
+                    <td class="lc-num" style="color:#64748b;">{{ $item->product->sku ?? '—' }}</td>
+
                     <td class="c">
                         <input type="number" step="0.01"
-                               class="num-input" id="sol-{{ $item->id }}"
+                               class="num-input sol-in" id="sol-{{ $item->id }}"
                                value="{{ $item->cantidad_solicitada }}"
                                disabled
                                oninput="syncHidden({{ $item->id }})">
                     </td>
                     <td class="c">
                         <input type="number" step="0.01"
-                               class="num-input" id="des-{{ $item->id }}"
+                               class="num-input des-in" id="des-{{ $item->id }}"
                                value="{{ $item->cantidad_despachada }}"
                                disabled
                                oninput="syncHidden({{ $item->id }})">
                     </td>
-                    <td class="c lc-num" style="font-weight:700;color:{{ $lcPend > 0 ? '#ef4444' : '#16a34a' }};">{{ $lcN($lcPend) }}</td>
-                    <td class="c">
-                        <input type="number" step="0.01"
-                               class="num-input" id="pre-{{ $item->id }}"
-                               value="{{ $item->precio_unitario }}"
-                               disabled
-                               oninput="syncHidden({{ $item->id }})">
-                    </td>
-                    <td class="r lc-num" style="font-weight:700;color:{{ $montoColor }};white-space:nowrap;">
-                        S/ {{ number_format($item->subtotal ?? ($item->cantidad_despachada * $item->precio_unitario),2) }}
-                    </td>
+                    <td class="c lc-num" style="font-weight:800;color:{{ $lcPend > 0 ? '#f59e0b' : '#16a34a' }};">{{ $lcN($lcPend) }}</td>
+
                     <td>
                         <div class="lc-pg">
                             <div class="lc-bar"><div style="width:{{ min($pct,100) }}%;background:{{ $lc }};"></div></div>
-                            <b style="color:{{ $lc }};">{{ number_format($pct,0) }}%</b>
+                            <b style="color:{{ $pct > 0 ? ($pct >= 100 ? '#16a34a' : '#d97706') : '#dc2626' }};">{{ number_format($pct,0) }}%</b>
                         </div>
                     </td>
-                    <td><span class="lc-chip" style="background:{{ $lcEstBg }};color:{{ $lcEstCl }};">{{ $lcEstT }}</span></td>
+
+                    <td class="lc-num">{{ $loteItem ?: '—' }}</td>
+                    <td class="lc-num" style="color:{{ $vColor }};{{ ($diasVencItem !== null && $diasVencItem < 0) ? 'font-weight:700;' : '' }}" @if($diasVencItem !== null) title="{{ $diasVencItem < 0 ? 'Vencido' : $diasVencItem.' días para vencer' }}" @endif>
+                        {{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('d/m/Y') : '—' }}
+                    </td>
+
+                    <td class="c">
+                        <div class="lc-octs">
+                        @forelse($lcOctKeys as $okey => $oRaw)
+                            @php
+                                $lb = $lcOctLabel($okey);
+                                $octImg = $lcOctImgs[$okey] ?? null;
+                            @endphp
+                            <span class="lc-octw" title="{{ trim($lb[0].' '.$lb[1]) }}">
+                                @if($octImg)
+                                    <img class="lc-octimg" src="{{ $octImg }}" alt="{{ trim($lb[0].' '.$lb[1]) }}" loading="lazy"
+                                         onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
+                                @endif
+                                <span class="lc-oct" @if($octImg) style="display:none;" @endif><span>{{ $lb[0] }}</span><span>{{ $lb[1] }}</span></span>
+                            </span>
+                        @empty
+                            <span style="color:#94a3b8;">–</span>
+                        @endforelse
+                        </div>
+                    </td>
+
+                    <td class="lc-num" style="font-size:11.5px;white-space:nowrap;">{{ $lcUltD ? \Carbon\Carbon::parse($lcUltD)->format('d/m H:i') : '—' }}</td>
+
+                    <td>
+                        @if($lcArmoN)
+                            <span class="lc-arm"><svg class="lc-i"><use href="#lc-user"/></svg>{{ $lcArmoN }}</span>
+                        @else
+                            <span style="color:#94a3b8;font-size:11.5px;">Sin registrar</span>
+                        @endif
+                    </td>
+
+                    <td class="r">
+                        <div class="lc-num" style="font-weight:800;color:{{ $montoColor }};white-space:nowrap;"
+                             title="Precio unitario: S/ {{ number_format($item->precio_unitario,2) }}">
+                            S/ {{ number_format($lcSubt,2) }}
+                        </div>
+                        {{-- Precio: solo visible al editar la fila --}}
+                        <input type="number" step="0.01"
+                               class="num-input pre-in" id="pre-{{ $item->id }}"
+                               value="{{ $item->precio_unitario }}"
+                               disabled
+                               title="Precio unitario"
+                               oninput="syncHidden({{ $item->id }})">
+                    </td>
+
                     <td>
                         <div class="lc-acts">
-                            <a href="{{ route('orders.etiqueta.local', $item) }}"
-                               target="_blank"
-                               class="btn-xs"
-                               style="background:#e0e7ff;color:#4338ca;border:1px solid #c7d2fe;text-decoration:none;">
-                                🏷️ Etiqueta
-                            </a>
-                            <button type="button" class="btn-xs btn-edit"
-                                    onclick="editar({{ $item->id }})">✏️ Editar</button>
+                            <button type="button" class="lc-ic" title="Ver / editar lote y vencimiento"
+                                    onclick="abrirModalLote({{ $item->id }}, '{{ addslashes($loteItem ?? '') }}', '{{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('Y-m-d') : '' }}')">
+                                <svg class="lc-i"><use href="#lc-eye"/></svg>
+                            </button>
+                            <button type="button" class="lc-ic btn-edit" title="Editar cantidades y precio"
+                                    onclick="editar({{ $item->id }})">
+                                <svg class="lc-i"><use href="#lc-pencil"/></svg>
+                            </button>
                             <button type="submit" form="form-{{ $item->id }}"
-                                    class="btn-xs btn-save"
+                                    class="lc-ic lc-save btn-save"
                                     id="btn-save-{{ $item->id }}"
-                                    style="display:none;">💾 Guardar</button>
+                                    title="Guardar cambios"
+                                    style="display:none;">
+                                <svg class="lc-i"><use href="#lc-save"/></svg>
+                            </button>
+                            <a href="{{ route('orders.etiqueta.local', $item) }}" target="_blank" class="lc-ic" title="Imprimir etiqueta">
+                                <svg class="lc-i"><use href="#lc-printer"/></svg>
+                            </a>
                             <form method="POST"
                                   action="{{ route('orders.details.destroy',$item) }}"
                                   onsubmit="return confirm('¿Eliminar {{ addslashes($item->product->nombre) }}?')"
                                   style="display:inline;">
                                 @csrf @method('DELETE')
-                                <button type="submit" class="btn-xs btn-del">🗑</button>
+                                <button type="submit" class="lc-ic del" title="Eliminar"><svg class="lc-i"><use href="#lc-trash"/></svg></button>
                             </form>
                         </div>
                     </td>
@@ -849,7 +1090,11 @@ hr.dv{border-top-color:#e8eef6;}
                     <tr><td>Productos</td><td>{{ $totalItems }}</td></tr>
                     <tr><td>Factura</td><td>{{ $order->factura_asociada ?? '—' }}</td></tr>
                     <tr><td>Guía</td><td>{{ $order->guia_asociada ?? '—' }}</td></tr>
+                    <tr><td>Tiempo de armado</td><td>{{ $lcTiempoArmado ?? '—' }}@if($lcTiempoArmado && $lcEnCurso) <small>(en curso)</small>@endif</td></tr>
+                    <tr><td>Desde el registro</td><td>{{ $lcTiempoTotal ?? '—' }}</td></tr>
+                    <tr><td>Personal</td><td style="font-size:11px;">{{ $lcPersonasN ? implode(', ', array_keys($lcPersonas)) : 'Sin registrar' }}</td></tr>
                 </table>
+                <div style="font-size:10.5px;color:var(--lc-muted);margin-top:8px;">El tiempo de armado va del primer al último despacho registrado; “desde el registro” incluye la espera previa.</div>
             </div>
             <div class="lc-box">
                 <h4>Importes</h4>
@@ -892,6 +1137,16 @@ hr.dv{border-top-color:#e8eef6;}
             <div style="text-align:center;color:#94a3b8;padding:24px;">Aún no hay movimientos registrados.</div>
         @endforelse
         <div style="margin-top:8px;font-size:11px;color:var(--lc-muted);">El historial se arma con las fechas de registro del pedido y sus líneas.</div>
+    </div>
+    {{-- ─────────── DOCUMENTOS ─────────── --}}
+    <div class="lc-pane" data-pane="docs">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+            <a href="{{ route('orders.pdf',$order) }}" target="_blank" class="lc-btn green"><svg class="lc-i"><use href="#lc-file"/></svg> PDF del pedido</a>
+            @if($order->tipo_orden === 'LOCAL')
+            <a href="{{ route('orders.cartaCalidad', $order) }}" target="_blank" class="lc-btn purple">🏅 Carta de calidad</a>
+            @endif
+            <button type="button" class="lc-btn white" onclick="lcPicking()"><svg class="lc-i"><use href="#lc-printer"/></svg> Hoja de picking</button>
+        </div>
     </div>
 </div>
 
@@ -1195,7 +1450,9 @@ function lcFiltrar() {
     var est = document.getElementById('lcEstado').value;
     var n = 0;
     document.querySelectorAll('#lcTabla tr.lc-row').forEach(function (tr) {
-        var ok = (!q || (tr.dataset.search || '').indexOf(q) !== -1) && (!est || tr.dataset.estado === est);
+        var arm = (document.getElementById('lcArmoSel') || {}).value || '';
+        var okArm = !arm || (arm === '__sin__' ? !tr.dataset.armo : tr.dataset.armo === arm);
+        var ok = (!q || (tr.dataset.search || '').indexOf(q) !== -1) && (!est || tr.dataset.estado === est) && okArm;
         tr.style.display = ok ? '' : 'none';
         if (ok) n++;
     });
@@ -1217,7 +1474,7 @@ function lcPicking() {
         i++;
         filas += '<tr><td>' + i + '</td><td>' + lcEsc(tr.dataset.sku) + '</td><td>' + lcEsc(tr.dataset.nombre) +
                  '</td><td>' + lcEsc(tr.dataset.lote || '—') + '</td><td class="n">' + sol + '</td><td class="n">' + des +
-                 '</td><td class="n">' + pend + '</td><td class="chk"></td></tr>';
+                 '</td><td class="n">' + pend + '</td><td>' + lcEsc(tr.dataset.armoTxt || '') + '</td><td class="chk"></td></tr>';
     });
     var css = 'body{font-family:Arial,Helvetica,sans-serif;margin:18px;color:#0f172a}h1{font-size:20px;margin:0 0 4px}' +
               '.s{font-size:13px;color:#475569;margin-bottom:14px}table{width:100%;border-collapse:collapse;font-size:12px}' +
@@ -1226,10 +1483,51 @@ function lcPicking() {
     w.document.write('<!doctype html><html><head><meta charset="utf-8"><title>Picking ' + lcEsc(LC_ORDEN) + '</title><style>' + css +
         '</style></head><body><h1>Picking · ' + lcEsc(LC_ORDEN) + '</h1><div class="s">Cliente: ' + lcEsc(LC_CLIENTE) +
         ' · ' + new Date().toLocaleString('es-PE') + '</div><table><thead><tr><th>#</th><th>SKU</th><th>Producto</th><th>Lote</th>' +
-        '<th>Pedido</th><th>Preparado</th><th>Pendiente</th><th>✓</th></tr></thead><tbody>' + filas + '</tbody></table></body></html>');
+        '<th>Pedido</th><th>Preparado</th><th>Pendiente</th><th>Armó</th><th>✓</th></tr></thead><tbody>' + filas + '</tbody></table></body></html>');
     w.document.close();
     w.focus();
     setTimeout(function () { w.print(); }, 350);
+}
+
+
+/* ── Dropdowns (Filtros / Acciones) ── */
+function lcDD(id, ev) {
+    ev.stopPropagation();
+    document.querySelectorAll('.lc-dd.open').forEach(function (d) { if (d.id !== id) d.classList.remove('open'); });
+    var el = document.getElementById(id);
+    el.classList.toggle('open');
+}
+document.addEventListener('click', function () {
+    document.querySelectorAll('.lc-dd.open').forEach(function (d) { d.classList.remove('open'); });
+});
+
+/* ── Limpiar filtros ── */
+function lcLimpiar() {
+    document.getElementById('lcBuscar').value = '';
+    document.getElementById('lcEstado').value = '';
+    var a = document.getElementById('lcArmoSel'); if (a) a.value = '';
+    lcFiltrar();
+}
+
+/* ── Exportar CSV (valores actuales de la tabla) ── */
+function lcExportCSV() {
+    var head = ['SKU', 'Producto', 'Solicitado', 'Despachado', 'Pendiente', 'Lote', 'Vencimiento', 'Armó', 'Subtotal'];
+    var esc = function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
+    var rows = [];
+    document.querySelectorAll('#lcTabla tr.lc-row').forEach(function (tr) {
+        var id = tr.id.replace('row-', '');
+        var sol = parseFloat((document.getElementById('sol-' + id) || {}).value) || 0;
+        var des = parseFloat((document.getElementById('des-' + id) || {}).value) || 0;
+        rows.push([tr.dataset.sku, tr.dataset.nombre, sol, des, Math.max(sol - des, 0), tr.dataset.lote, tr.dataset.venc,
+                   tr.dataset.armoTxt, tr.dataset.sub]);
+    });
+    var csv = [head].concat(rows).map(function (r) { return r.map(esc).join(','); }).join('\r\n');
+    var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'pedido-' + LC_ORDEN + '.csv';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
 }
 
 /* ── Scanner: abre el panel "Agregar producto" antes del handler original ──
