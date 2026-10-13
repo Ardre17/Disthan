@@ -660,7 +660,7 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
     <button type="button" class="po-btn red" onclick="poEliminarSel()">🗑 Eliminar orden</button>
     <button type="button" class="po-btn white" onclick="poPicking()"><svg class="po-i"><use href="#po-printer"/></svg> Imprimir picking</button>
     <a href="#" id="poLnkEdit" class="po-btn white"><svg class="po-i"><use href="#po-edit"/></svg> Controlar</a>
-    <a href="#" id="poLnkOp" class="po-btn green"><svg class="po-i"><use href="#po-truck"/></svg> 🚀 Armado</a>
+    <a href="#" id="poLnkOp" class="po-btn green"><svg class="po-i"><use href="#po-truck"/></svg> Armado</a>
 </div>
 
 {{-- Formularios de eliminación (mismos action / method / confirmación del original) --}}
