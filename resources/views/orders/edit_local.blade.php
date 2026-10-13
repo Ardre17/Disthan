@@ -516,7 +516,12 @@ hr.dv{border-top-color:#e8eef6;}
 .lc-pal{font-size:12.5px;font-weight:800;}
 .lc-arm{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:700;color:#1e3a5f;white-space:nowrap;}
 .lc-arm .lc-i{width:13px;height:13px;color:#2563eb;}
-.lc-oct{width:38px;height:38px;background:#111;color:#fff;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:6.5px;font-weight:800;line-height:1.1;text-align:center;margin:0 1px;}
+.lc-oct{width:40px;height:40px;flex:0 0 40px;background:#111;color:#fff;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:6.5px;font-weight:900;line-height:1.1;text-align:center;margin:0 1px;padding:2px;box-sizing:border-box;}
+.lc-oct span{display:block;}
+.lc-octs{display:flex;gap:5px;justify-content:center;align-items:center;flex-wrap:wrap;min-width:125px;}
+.lc-octw{display:inline-flex;align-items:center;justify-content:center;width:42px;height:42px;flex:0 0 42px;}
+.lc-octimg{width:42px;height:42px;object-fit:contain;display:block;}
+.lc-tbl2 td:has(.lc-octs){min-width:135px;}
 .lc-tbl2 .lc-pg{min-width:130px;}
 .lc-tbl2 .lc-pg .lc-bar{height:8px;}
 .lc-tbl2 .lc-acts{gap:7px;flex-wrap:nowrap;}
@@ -916,26 +921,34 @@ hr.dv{border-top-color:#e8eef6;}
                 $lcSubt   = $item->subtotal ?? ($item->cantidad_despachada * $item->precio_unitario);
 
                 $lcOcts = [];
-                $lcRaw  = $item->product->octogonos ?? null;
-                if (is_string($lcRaw) && trim($lcRaw) !== '') {
-                    $dec = json_decode($lcRaw, true);
-                    $lcRaw = is_array($dec) ? $dec : array_map('trim', explode(',', $lcRaw));
+                // Compatibilidad con los dos formatos usados en las vistas: octogonos y advertencias.
+                foreach (['octogonos', 'advertencias'] as $lcCampoOct) {
+                    $lcRaw = $item->product->{$lcCampoOct} ?? null;
+                    if (is_string($lcRaw) && trim($lcRaw) !== '') {
+                        $dec = json_decode($lcRaw, true);
+                        $lcRaw = is_array($dec) ? $dec : preg_split('/[,;|]+/', $lcRaw);
+                    }
+                    if (is_array($lcRaw)) {
+                        foreach ($lcRaw as $o) {
+                            if (is_string($o) || is_numeric($o)) { $lcOcts[] = trim((string) $o); }
+                        }
+                    }
                 }
-                if (is_array($lcRaw)) { foreach ($lcRaw as $o) { $lcOcts[] = mb_strtolower((string) $o); } }
                 foreach (['azucar'=>'alto_azucar','sodio'=>'alto_sodio','grasas saturadas'=>'alto_grasas_saturadas','grasas trans'=>'alto_grasas_trans'] as $k => $col) {
                     if (!empty($item->product->{$col})) { $lcOcts[] = $k; }
                 }
-                $lcOcts = array_values(array_unique($lcOcts));
+                $lcOcts = array_values(array_unique(array_filter($lcOcts, fn($v) => trim((string) $v) !== '')));
 
-                // Normaliza cada octógono a: azucar / sodio / grasas (en cualquier mayúscula o forma escrita)
+                // Normaliza acentos y variantes al conjunto de imágenes usado en Supermercados.
                 $lcOctKeys = [];
                 foreach ($lcOcts as $o) {
                     $oNorm = mb_strtolower(trim((string) $o));
+                    $oNorm = strtr($oNorm, ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u']);
                     if ($oNorm === '') { continue; }
-                    if (str_contains($oNorm, 'azuc') || str_contains($oNorm, 'azúc'))                                      { $ok = 'azucar'; }
-                    elseif (str_contains($oNorm, 'sod'))                                                                    { $ok = 'sodio'; }
+                    if (str_contains($oNorm, 'azuc')) { $ok = 'azucar'; }
+                    elseif (str_contains($oNorm, 'sod')) { $ok = 'sodio'; }
                     elseif (str_contains($oNorm, 'grasa') || str_contains($oNorm, 'satur') || str_contains($oNorm, 'trans')) { $ok = 'grasas'; }
-                    else                                                                                                    { $ok = $oNorm; }
+                    else { continue; }
                     $lcOctKeys[$ok] = $oNorm;
                 }
             @endphp
