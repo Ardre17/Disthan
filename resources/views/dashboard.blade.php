@@ -143,8 +143,11 @@
 
 /* Grid de 3 columnas */
 .db-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) 340px;gap:14px;align-items:start;}
-@media(max-width:1350px){.db-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}.db-col3{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px;}}
-@media(max-width:900px){.db-grid{grid-template-columns:1fr;}.db-col3{grid-template-columns:1fr;}}
+/* Los gráficos ocupan el espacio libre debajo de las dos columnas principales, junto a la barra lateral. */
+.db-analysis-section{grid-column:1 / 3;min-width:0;}
+.db-analysis-section .db-sec-t{margin-top:0;}
+@media(max-width:1350px){.db-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr);}.db-col3{grid-column:1/-1;display:grid;grid-template-columns:1fr 1fr;gap:14px;}.db-analysis-section{grid-column:1/-1;}}
+@media(max-width:900px){.db-grid{grid-template-columns:1fr;}.db-col3{grid-template-columns:1fr;}.db-analysis-section{grid-column:1;}}
 .db-col{display:flex;flex-direction:column;gap:14px;min-width:0;}
 .db-col3{display:flex;flex-direction:column;gap:14px;min-width:0;}
 
@@ -276,7 +279,8 @@
 .db-analysis-card .db-card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
 .db-analysis-card .db-card-h h3{min-width:0;}
 .db-analysis-note{font-size:11px;color:var(--db-muted);white-space:nowrap;}
-.db-chart-area{height:260px;min-width:0;position:relative;}
+.db-chart-area{height:260px;min-width:0;position:relative;width:100%;}
+.db-chart-area canvas{display:block;width:100% !important;height:100% !important;}
 .db-chart-area-line{height:260px;}
 @media(max-width:900px){.db-analysis-grid{grid-template-columns:1fr;}.db-chart-area,.db-chart-area-line{height:230px;}}
 @media(max-width:560px){.db-analysis-card{padding:12px;}.db-analysis-note{display:none;}.db-chart-area,.db-chart-area-line{height:210px;}}
@@ -740,9 +744,8 @@
     </div>
 </div>
 
-</div>{{-- /.db-grid --}}
-
-{{-- ══════════ ANÁLISIS COMERCIAL: solo los dos gráficos que se mantienen ══════════ --}}
+{{-- ══════════ ANÁLISIS COMERCIAL: ocupa el espacio inferior de las dos columnas principales ══════════ --}}
+<div class="db-analysis-section">
 <div class="db-sec-t"><svg class="db-i"><use href="#db-chart"/></svg> Análisis de ventas</div>
 <div class="db-analysis-grid">
     <div class="db-card db-analysis-card">
@@ -764,6 +767,8 @@
         </div>
     </div>
 </div>
+</div>{{-- /.db-analysis-section --}}
+</div>{{-- /.db-grid --}}
 
 {{-- Modal: nueva tarea / evento --}}
 <div class="db-modal" id="dbModal" onclick="if(event.target===this)dbCerrarModal()">
