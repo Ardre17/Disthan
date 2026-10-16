@@ -1269,11 +1269,43 @@ public function stockPedidos()
         //
     }
 
-    public function edit(Order $order)
+   
+public function edit(Order $order)
 {
-    $order->load(['client','details.product','bultos.detalles.product']);
+    $order->load([
+        'client',
+        'details.product',
+        'bultos.detalles.product'
+    ]);
 
-    // 🔥 ESTO FALTABA
+    // Recalcular cada detalle con los valores actuales.
+    foreach ($order->details as $detail) {
+        $cantidad = (float) ($detail->cantidad_despachada ?? 0);
+        $precio = (float) ($detail->precio_unitario ?? 0);
+
+        $subtotalDetalle = round($cantidad * $precio, 2);
+
+        if ((float) $detail->subtotal !== $subtotalDetalle) {
+            $detail->subtotal = $subtotalDetalle;
+            $detail->save();
+        }
+    }
+
+    // Recalcular el resumen de la orden desde los detalles.
+    $order->subtotal = round(
+        (float) $order->details()->sum('subtotal'),
+        2
+    );
+
+    $order->igv = round($order->subtotal * 0.18, 2);
+
+    $order->total = round(
+        $order->subtotal + $order->igv,
+        2
+    );
+
+    $order->save();
+
     $products = \App\Models\Product::where('activo', true)
         ->orderBy('nombre')
         ->get();
@@ -1281,29 +1313,33 @@ public function stockPedidos()
     $tipo = strtoupper(trim($order->tipo_orden));
 
     if ($tipo == 'SUPERMERCADO') {
-        return view('orders.edit', compact('order','products'));
+        return view('orders.edit', compact('order', 'products'));
     }
 
     if ($tipo == 'LOCAL') {
-        return view('orders.edit_local', compact('order','products'));
+        return view('orders.edit_local', compact('order', 'products'));
     }
 
     if ($tipo == 'ENCOMIENDA') {
-        return view('orders.edit_encomienda', compact('order','products'));
+        return view('orders.edit_encomienda', compact('order', 'products'));
     }
 
     if ($tipo == 'EXPORTACION') {
+        $order->load([
+            'client',
+            'details.product',
+            'pallets.detalles.product',
+            'pallets.detalles.orderDetail',
+        ]);
 
-    $order->load([
-        'client',
-        'details.product',
-        'pallets.detalles.product',
-        'pallets.detalles.orderDetail',
-    ]);
-
-    return view('orders.edit_exportacion', compact('order', 'products'));
+        return view(
+            'orders.edit_exportacion',
+            compact('order', 'products')
+        );
     }
-}
+
+    abort(404, 'Tipo de orden no reconocido.');
+}  
 
 public function updateDetail(Request $request, OrderDetail $detail)
 {
