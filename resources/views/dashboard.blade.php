@@ -75,115 +75,6 @@
 .leg-item{display:flex;align-items:center;gap:4px;font-size:11px;color:#64748b;}
 .leg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0;}
 
-#fano-container{
-
-    position:fixed;
-
-    right:20px;
-
-    bottom:20px;
-
-    z-index:9999;
-
-}
-
-#fano-img{
-    width:200px;
-    height:auto;
-}
-
-#fano-img:hover{
-
-    transform:scale(1.05);
-
-}
-
-#fano-chat{
-
-    position:absolute;
-
-    bottom:260px;
-
-    right:120px;
-
-    width:250px;
-
-    background:#fff;
-
-    border-radius:18px;
-
-    padding:18px;
-
-    box-shadow:0 10px 30px rgba(0,0,0,.18);
-
-    transition:.4s;
-
-    z-index:10000;
-
-}
-#fano-chat::after{
-
-    content:"";
-
-    position:absolute;
-
-    right:-14px;
-
-    bottom:30px;
-
-    border-top:12px solid transparent;
-
-    border-bottom:12px solid transparent;
-
-    border-left:16px solid white;
-
-}
-
-.fano-hidden{
-
-    opacity:0;
-
-    visibility:hidden;
-
-}
-
-.fano-show{
-
-    opacity:1;
-
-    visibility:visible;
-
-}
-#fano-btn{
-
-    margin-top:15px;
-
-    width:100%;
-
-    border:none;
-
-    background:#2563eb;
-
-    color:white;
-
-    padding:12px;
-
-    border-radius:12px;
-
-    cursor:pointer;
-
-    font-weight:bold;
-
-    transition:.3s;
-
-}
-
-#fano-btn:hover{
-
-    background:#1d4ed8;
-
-}
-
 /* ══════════════════════════════════════════════════════════
    DASHBOARD · rediseño (prefijo db-) — aditivo
    Se conservan .kpis/.kpi/.chart-card/.stat-card/.recent-table del CSS anterior
@@ -333,10 +224,11 @@
 .db-ai-h h3{margin:0;font-size:14.5px;font-weight:800;display:flex;align-items:center;gap:8px;}
 .db-ai-min{margin-left:auto;width:26px;height:26px;border:1px solid var(--db-line);background:#fff;border-radius:7px;cursor:pointer;color:#475569;font-size:15px;line-height:1;}
 .db-ai-body.min{display:none;}
-.db-ai-top{display:flex;gap:10px;align-items:flex-end;margin-bottom:10px;}
-.db-ai-bot{width:92px;height:92px;object-fit:contain;flex-shrink:0;cursor:pointer;}
+.db-ai-top{display:block;margin-bottom:10px;}
+
 .db-ai-bubble{background:#eaf2ff;border-radius:14px 14px 14px 4px;padding:10px 12px;font-size:12.5px;line-height:1.45;color:#1e293b;}
 .db-ai-bubble b{display:block;margin-bottom:2px;}
+.db-ai-capability{font-size:10.5px;line-height:1.4;color:var(--db-muted);background:#f8fafc;border:1px solid var(--db-line);border-radius:9px;padding:8px 10px;margin:0 0 9px;}
 .db-chat{max-height:230px;overflow-y:auto;display:flex;flex-direction:column;gap:8px;margin-bottom:10px;padding-right:2px;}
 .db-msg{max-width:92%;padding:8px 11px;border-radius:12px;font-size:12.5px;line-height:1.45;word-wrap:break-word;}
 .db-msg.me{align-self:flex-end;background:var(--db-blue);color:#fff;border-bottom-right-radius:4px;}
@@ -377,8 +269,36 @@
 .db-modal-box .two{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .db-modal-box .acts{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
 
-/* Sección de análisis (contenido original) */
+/* Análisis comercial: se mantienen únicamente los dos gráficos solicitados */
 .db-sec-t{display:flex;align-items:center;gap:8px;font-size:15px;font-weight:800;color:var(--db-navy);margin:22px 0 12px;}
+.db-analysis-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:14px;margin:0 0 20px;}
+.db-analysis-card{min-width:0;padding:15px 16px;}
+.db-analysis-card .db-card-h{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;}
+.db-analysis-card .db-card-h h3{min-width:0;}
+.db-analysis-note{font-size:11px;color:var(--db-muted);white-space:nowrap;}
+.db-chart-area{height:260px;min-width:0;position:relative;}
+.db-chart-area-line{height:260px;}
+@media(max-width:900px){.db-analysis-grid{grid-template-columns:1fr;}.db-chart-area,.db-chart-area-line{height:230px;}}
+@media(max-width:560px){.db-analysis-card{padding:12px;}.db-analysis-note{display:none;}.db-chart-area,.db-chart-area-line{height:210px;}}
+
+/* Recordatorios de horario: solo aparecen mientras el dashboard está abierto */
+.db-reminder-toast{
+    position:fixed;right:20px;bottom:20px;z-index:12000;width:min(390px,calc(100vw - 28px));
+    display:none;align-items:flex-start;gap:12px;padding:16px 17px;background:#fff;
+    border:1px solid #bfdbfe;border-left:5px solid #2563eb;border-radius:15px;
+    box-shadow:0 16px 45px rgba(15,23,42,.22);animation:dbReminderIn .25s ease-out;
+}
+.db-reminder-toast.open{display:flex;}
+.db-reminder-icon{width:42px;height:42px;display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;border-radius:12px;background:#dbeafe;font-size:22px;}
+.db-reminder-content{flex:1;min-width:0;}
+.db-reminder-content strong{display:block;color:#1e3a5f;font-size:14px;margin:1px 0 4px;}
+.db-reminder-content span{display:block;color:#475569;font-size:12.5px;line-height:1.45;}
+.db-reminder-close{border:0;background:transparent;color:#64748b;font-size:20px;line-height:1;
+    cursor:pointer;padding:0 0 4px 4px;}
+@keyframes dbReminderIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:560px){.db-reminder-toast{right:12px;bottom:12px;width:calc(100vw - 24px);}}
+
 </style>
 
 <div class="page">
@@ -503,6 +423,21 @@
     }
     if ($dbEtqBajas > 0)  { $dbAl[] = ['t' => 'warn', 'i' => '🏷️', 'b' => 'Etiquetas', 's' => 'Stock bajo: ' . $dbEtqBajas . ' tipo(s)', 'h' => route('labels.index')]; }
     if ($dbEnviosN)       { $dbAl[] = ['t' => 'info', 'i' => '🚚', 'b' => 'Entrega pendiente', 's' => ($dbEnvios->first()->client->razon_social ?? 'Orden lista') . ' · ' . $dbEnviosN . ' sin guía', 'h' => url('/orders')]; }
+    // Última orden cerrada hoy: se muestra como aviso al cargar el dashboard.
+    $dbCerradaHoy = $dbSafe(fn() => \App\Models\Order::with('client')
+        ->where('estado', 'COMPLETO')
+        ->whereDate('updated_at', today())
+        ->orderByDesc('updated_at')
+        ->first(), null);
+    if ($dbCerradaHoy) {
+        $dbAl[] = [
+            't' => 'info',
+            'i' => '✅',
+            'b' => 'Orden cerrada: ' . $dbCerradaHoy->numero_orden,
+            's' => ($dbCerradaHoy->client->razon_social ?? 'Cliente') . ' · ' . optional($dbCerradaHoy->updated_at)->format('H:i'),
+            'h' => route('orders.edit', $dbCerradaHoy),
+        ];
+    }
 
     // ── Tareas sugeridas por el sistema (no se guardan; solo su estado "hecha") ──
     $dbSys = [];
@@ -529,11 +464,14 @@
         'enviosN'   => (int) ($dbEnviosN ?? 0),
         'sys'       => $dbSys,
         'urls'      => [
-            'productos' => route('products.index'),
-            'etiquetas' => route('labels.index'),
-            'ordenes'   => url('/orders'),
-            'kardex'    => route('kardex.index'),
-            'validar'   => route('orders.validation.index'),
+            'productos'      => route('products.index'),
+            'productoNuevo'  => url('/products/create'),
+            'etiquetas'      => route('labels.index'),
+            'ordenes'        => url('/orders'),
+            'ordenNueva'     => route('orders.create'),
+            'kardex'         => route('kardex.index'),
+            'validar'        => route('orders.validation.index'),
+            'suministros'    => url('/supplies'),
         ],
         'csrf'      => csrf_token(),
     ];
@@ -766,16 +704,19 @@
         </div>
         <div class="db-ai-body" id="dbAiBody">
             <div class="db-ai-top">
-                <img class="db-ai-bot" id="dbAiImg" src="/assets/fano/expresiones/invierno/Saludando.png" alt="Asistente"
-                     onerror="this.replaceWith(Object.assign(document.createElement('div'),{textContent:'🤖',style:'font-size:56px;width:92px;text-align:center;'}))">
-                <div class="db-ai-bubble"><b>Hola {{ $dbPrimer }} 👋</b>¿Cómo puedo ayudarte hoy? Puedo revisar tus órdenes, stock, reportes o recordatorios.</div>
+                <div class="db-ai-bubble"><b>Hola {{ $dbPrimer }} 👋</b>¿Cómo puedo ayudarte hoy? Puedo consultar órdenes y stock, generar reportes y abrir los módulos para registrar productos, etiquetas, cajas, precintos u órdenes.</div>
             </div>
             <div class="db-chat" id="dbChat"></div>
+            <div class="db-ai-capability">Por ahora te guía a los formularios y consulta los datos disponibles. Para crear o modificar registros directamente desde el chat habrá que conectar una API segura del ERP.</div>
             <div class="db-sug" id="dbSug">
                 <button type="button" onclick="dbPreguntar('¿Qué productos tienen stock bajo?')"><span class="e">📦</span> ¿Qué productos tienen stock bajo?</button>
                 <button type="button" onclick="dbPreguntar('Muéstrame las órdenes pendientes')"><span class="e">📋</span> Muéstrame las órdenes pendientes</button>
                 <button type="button" onclick="dbPreguntar('Genera un reporte de inventario')"><span class="e">📄</span> Genera un reporte de inventario</button>
                 <button type="button" onclick="dbPreguntar('¿Qué entregas tengo hoy?')"><span class="e">🚚</span> ¿Qué entregas tengo hoy?</button>
+                <button type="button" onclick="dbPreguntar('Crear un producto nuevo')"><span class="e">📦</span> Crear un producto nuevo</button>
+                <button type="button" onclick="dbPreguntar('Crear etiquetas nuevas')"><span class="e">🏷️</span> Crear o gestionar etiquetas</button>
+                <button type="button" onclick="dbPreguntar('Registrar cajas y precintos')"><span class="e">🧰</span> Registrar cajas y precintos</button>
+                <button type="button" onclick="dbPreguntar('Crear una nueva orden')"><span class="e">🧾</span> Crear una nueva orden</button>
                 <button type="button" onclick="dbPreguntar('Ayúdame a registrar una nota')"><span class="e">📝</span> Ayúdame a registrar una nota</button>
             </div>
             <form class="db-ai-in" onsubmit="dbEnviar(event)">
@@ -801,165 +742,27 @@
 
 </div>{{-- /.db-grid --}}
 
-{{-- ══════════ RESUMEN GENERAL Y ANÁLISIS (indicadores y gráficos originales, sin cambios) ══════════ --}}
-<div class="db-sec-t">📊 Resumen general y análisis</div>
-
-{{-- ── KPIs fila 1 ── --}}
-<div class="kpis">
-    <div class="kpi" style="border-left-color:#0b5ed7;">
-        <div class="kpi-icon">📦</div>
-        <div class="kpi-label">Total órdenes</div>
-        <div class="kpi-val" style="color:#0b5ed7;">{{ $totalOrdenes }}</div>
-        <div class="kpi-sub">acumulado histórico</div>
-    </div>
-    <div class="kpi" style="border-left-color:#b91c1c;">
-        <div class="kpi-icon">⏳</div>
-        <div class="kpi-label">Incompletas</div>
-        <div class="kpi-val" style="color:#b91c1c;">{{ $incompletas }}</div>
-        <div class="kpi-sub">requieren atención</div>
-    </div>
-    <div class="kpi" style="border-left-color:#b45309;">
-        <div class="kpi-icon">⚠️</div>
-        <div class="kpi-label">Parciales</div>
-        <div class="kpi-val" style="color:#b45309;">{{ $parciales }}</div>
-        <div class="kpi-sub">en progreso</div>
-    </div>
-    <div class="kpi" style="border-left-color:#15803d;background:#f0fdf4;">
-        <div class="kpi-icon">✅</div>
-        <div class="kpi-label">Completadas</div>
-        <div class="kpi-val" style="color:#15803d;">{{ $completas }}</div>
-        <div class="kpi-sub">{{ $pctCompletas }}% del total</div>
-    </div>
-</div>
-
-{{-- ── KPIs fila 2 ── --}}
-<div class="kpis">
-    <div class="kpi" style="border-left-color:#7c3aed;">
-        <div class="kpi-icon">💰</div>
-        <div class="kpi-label">Facturado este mes</div>
-        <div class="kpi-val" style="font-size:18px;color:#7c3aed;">S/ {{ number_format($facturadoMes,0) }}</div>
-        <div class="kpi-sub">{{ now()->format('F Y') }}</div>
-    </div>
-    <div class="kpi" style="border-left-color:#0ea5e9;">
-        <div class="kpi-icon">📋</div>
-        <div class="kpi-label">Órdenes este mes</div>
-        <div class="kpi-val" style="color:#0284c7;">{{ $ordenesEsteMes }}</div>
-        <div class="kpi-sub">mes en curso</div>
-    </div>
-    <div class="kpi" style="border-left-color:#f59e0b;">
-        <div class="kpi-icon">👥</div>
-        <div class="kpi-label">Clientes activos</div>
-        <div class="kpi-val" style="color:#b45309;">{{ $clientesActivos }}</div>
-        <div class="kpi-sub">con órdenes este mes</div>
-    </div>
-    <div class="kpi" style="border-left-color:#ef4444;">
-        <div class="kpi-icon">📦</div>
-        <div class="kpi-label">Productos s/ stock</div>
-        <div class="kpi-val" style="color:#b91c1c;">{{ $sinStock }}</div>
-        <div class="kpi-sub">stock ≤ mínimo</div>
-    </div>
-</div>
-
-{{-- ── Gráficos principales ── --}}
-<div class="section-row">
-
-    {{-- Barra clientes --}}
-    <div class="chart-card">
-        <div class="chart-title">🏆 Top 10 productos más vendidos</div>
-        <div style="position:relative;width:100%;height:220px;">
+{{-- ══════════ ANÁLISIS COMERCIAL: solo los dos gráficos que se mantienen ══════════ --}}
+<div class="db-sec-t"><svg class="db-i"><use href="#db-chart"/></svg> Análisis de ventas</div>
+<div class="db-analysis-grid">
+    <div class="db-card db-analysis-card">
+        <div class="db-card-h">
+            <h3><span class="db-ico orange">🏆</span> Top 10 productos más vendidos</h3>
+            <span class="db-analysis-note">Por unidades despachadas</span>
+        </div>
+        <div class="db-chart-area">
             <canvas id="clientesChart"></canvas>
         </div>
     </div>
-
-    <div class="right-col">
-        {{-- Donut estado --}}
-        <div class="stat-card">
-            <div class="chart-title">📈 Estado general</div>
-            <div class="legend">
-                <span class="leg-item"><span class="leg-dot" style="background:#22c55e;"></span>Completas</span>
-                <span class="leg-item"><span class="leg-dot" style="background:#f59e0b;"></span>Parciales</span>
-                <span class="leg-item"><span class="leg-dot" style="background:#ef4444;"></span>Incompletas</span>
-            </div>
-            <div style="position:relative;height:130px;">
-                <canvas id="estadoChart"></canvas>
-            </div>
+    <div class="db-card db-analysis-card">
+        <div class="db-card-h">
+            <h3><span class="db-ico"><svg class="db-i"><use href="#db-chart"/></svg></span> Facturación — últimos 6 meses</h3>
+            <span class="db-analysis-note">En soles (S/)</span>
         </div>
-
-        {{-- Tipos de orden barras --}}
-        <div class="stat-card">
-            <div class="chart-title">🏷️ Tipos de orden</div>
-            @foreach($tiposConteo as $tipo => $cnt)
-            @php $pct = $maxTipo > 0 ? round($cnt / $maxTipo * 100) : 0; @endphp
-            <div class="prog-item">
-                <div class="prog-hdr">
-                    <span>{{ $tipo }}</span>
-                    <span style="font-weight:700;">{{ $cnt }}</span>
-                </div>
-                <div class="prog-bar">
-                    <div class="prog-fill" style="width:{{ $pct }}%;background:#0b5ed7;"></div>
-                </div>
-            </div>
-            @endforeach
-        </div>
-    </div>
-
-</div>
-
-{{-- ── Fila inferior ── --}}
-<div class="bottom-row">
-
-    {{-- Línea facturación --}}
-    <div class="chart-card">
-        <div class="chart-title">📅 Facturación — últimos 6 meses</div>
-        <div style="position:relative;height:160px;">
+        <div class="db-chart-area db-chart-area-line">
             <canvas id="facturacionChart"></canvas>
         </div>
     </div>
-
-    {{-- Tabla recientes --}}
-    <div class="chart-card" style="padding:0;overflow:hidden;">
-        <div style="padding:.85rem 1.1rem;border-bottom:1px solid #f1f5f9;">
-            <div class="chart-title" style="margin:0;">🕐 Órdenes recientes</div>
-        </div>
-        <div style="overflow-x:auto;">
-            <table class="recent-table">
-                <thead>
-                    <tr>
-                        <th>Orden</th>
-                        <th>Cliente</th>
-                        <th>Total</th>
-                        <th>Estado</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($ordenesRecientes as $ord)
-                    @php
-                        $badgeCls = $ord->estado === 'COMPLETO' ? 'bc'
-                                  : ($ord->estado === 'PARCIAL'  ? 'bp' : 'bi');
-                    @endphp
-                    <tr>
-                        <td style="font-weight:600;font-family:'Consolas',monospace;font-size:11px;">
-                            {{ $ord->numero_orden }}
-                        </td>
-                        <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
-                            {{ $ord->client->razon_social ?? '—' }}
-                        </td>
-                        <td style="font-weight:600;color:#15803d;white-space:nowrap;">
-                            S/ {{ number_format($ord->total,0) }}
-                        </td>
-                        <td>
-                            <span class="badge {{ $badgeCls }}">{{ $ord->estado }}</span>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-</div>
-
-</div>
 </div>
 
 {{-- Modal: nueva tarea / evento --}}
@@ -991,8 +794,16 @@
     </div>
 </div>
 
-<x-fano />
 {{-- ── Scripts ── --}}
+<div class="db-reminder-toast" id="dbReminderToast" role="status" aria-live="polite">
+    <div class="db-reminder-icon" id="dbReminderIcon">☕</div>
+    <div class="db-reminder-content">
+        <strong id="dbReminderTitle">Recordatorio</strong>
+        <span id="dbReminderMessage"></span>
+    </div>
+    <button type="button" class="db-reminder-close" id="dbReminderClose" aria-label="Cerrar recordatorio">&times;</button>
+</div>
+
 @php
     $labelsClientes = json_encode($topProductos->map(fn($d) => $d->product->nombre ?? '?')->values()->toArray());
     $valuesClientes = json_encode($topProductos->map(fn($d) => (int)$d->total_vendido)->values()->toArray());
@@ -1014,7 +825,7 @@ new Chart(document.getElementById('clientesChart'), {
     data: {
         labels: labelsClientes,
         datasets: [{
-            label: 'Pedidos del mes',
+            label: 'Unidades despachadas',
             data: valuesClientes,
             backgroundColor: colores.slice(0, labelsClientes.length),
             borderRadius: 5,
@@ -1029,25 +840,6 @@ new Chart(document.getElementById('clientesChart'), {
             x: { grid: { display: false }, ticks: { font: { size: 10 } } },
             y: { beginAtZero: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } }
         }
-    }
-});
-
-new Chart(document.getElementById('estadoChart'), {
-    type: 'doughnut',
-    data: {
-        labels: ['Completas','Parciales','Incompletas'],
-        datasets: [{
-            data: [{{ $completas }}, {{ $parciales }}, {{ $incompletas }}],
-            backgroundColor: ['#22c55e','#f59e0b','#ef4444'],
-            borderWidth: 2,
-            borderColor: '#fff'
-        }]
-    },
-    options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        cutout: '62%'
     }
 });
 
@@ -1084,139 +876,6 @@ new Chart(document.getElementById('facturacionChart'), {
     }
 });
 </script>
-<script>
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const stock = {{ $stockBajo }};
-
-    const chat = document.getElementById("fano-chat");
-    const mensaje = document.getElementById("fano-message");
-    const imagen = document.getElementById("fano-img");
-    const boton = document.getElementById("fano-btn");
-
-    const hora = new Date().getHours();
-
-    let saludo = "";
-
-    if (hora < 12) {
-        saludo = "☀️ Buenos días";
-    } else if (hora < 18) {
-        saludo = "🌤️ Buenas tardes";
-    } else {
-        saludo = "🌙 Buenas noches";
-    }
-
-    const primeraVez = !sessionStorage.getItem("fano_saludo");
-
-    if (primeraVez) {
-        sessionStorage.setItem("fano_saludo", "1");
-    }
-
-    function esperar(ms){
-        return new Promise(resolve=>setTimeout(resolve,ms));
-    }
-
-    async function escribir(texto, velocidad = 22){
-
-        mensaje.innerHTML="";
-
-        for(let i=0;i<texto.length;i++){
-
-            if(texto[i]=="\n"){
-                mensaje.innerHTML+="<br>";
-            }else{
-                mensaje.innerHTML+=texto[i];
-            }
-
-            await esperar(velocidad);
-
-        }
-
-    }
-
-    async function mostrarResumen(){
-
-        boton.style.display="none";
-
-        imagen.src="/assets/fano/expresiones/invierno/Pensando.png";
-
-        await escribir("🔎 Revisando el almacén...");
-
-        await esperar(800);
-
-        if(stock==0){
-
-            imagen.src="/assets/fano/expresiones/invierno/Saludando.png";
-
-            await escribir(
-                "✅ Todo está en orden.\nNo encontré productos con stock bajo."
-            );
-
-        }else{
-
-            imagen.src="/assets/fano/expresiones/invierno/Pensando.png";
-
-            await escribir(
-                "⚠ Encontré "+stock+" productos con stock bajo."
-            );
-
-            boton.style.display="block";
-
-        }
-
-    }
-
-    async function iniciarFano(){
-
-        clearTimeout(window.fanoTimer);
-
-        chat.classList.remove("fano-hidden");
-        chat.classList.add("fano-show");
-
-        boton.style.display="none";
-
-        if(primeraVez){
-
-            imagen.src="/assets/fano/expresiones/invierno/Saludando.png";
-
-            await escribir(
-                saludo+"\nHola, bienvenido a DISTAN 👋"
-            );
-
-            await esperar(1200);
-
-        }
-
-        await mostrarResumen();
-
-        window.fanoTimer=setTimeout(function(){
-
-            chat.classList.remove("fano-show");
-            chat.classList.add("fano-hidden");
-
-        },8000);
-
-    }
-
-    imagen.addEventListener("click",function(){
-
-        iniciarFano();
-
-    });
-
-    boton.addEventListener("click",function(){
-
-        window.location.href="{{ route('products.index') }}";
-
-    });
-
-    iniciarFano();
-
-});
-
-</script>
-
 <script>
 // ══════════════════════════════════════════════════════════
 //  DASHBOARD · agenda, tareas y asistente DISTAN IA (aditivo)
@@ -1347,7 +1006,6 @@ var DISTAN_AI_URL = null;
 
     /* ══════════ ASISTENTE DISTAN IA ══════════ */
     var chat = $('dbChat'), hist = [], modoNota = false;
-    var IMG_OK = '/assets/fano/expresiones/invierno/Saludando.png', IMG_THINK = '/assets/fano/expresiones/invierno/Pensando.png';
 
     function addMsg(who, html) {
         var d = document.createElement('div');
@@ -1411,7 +1069,7 @@ var DISTAN_AI_URL = null;
                             : 'Todavía no guardaste notas. Dime «registrar una nota» para crear una.';
         },
         ayuda: function () {
-            return '👋 Puedo ayudarte con:<ul><li>Productos con <b>stock bajo</b></li><li><b>Órdenes</b> pendientes</li><li><b>Entregas</b> y envíos de hoy</li><li>Un <b>reporte</b> de inventario (CSV)</li><li><b>Etiquetas</b> con poco stock</li><li>Guardar una <b>nota</b> o ver tus tareas</li></ul>';
+            return '👋 Puedo ayudarte con:<ul><li>Productos con <b>stock bajo</b></li><li><b>Órdenes</b> pendientes</li><li><b>Entregas</b> y envíos de hoy</li><li>Un <b>reporte</b> de inventario (CSV)</li><li><b>Etiquetas</b> con poco stock</li><li>Abrir formularios para productos y órdenes</li><li>Ir al módulo de suministros para cajas y precintos</li><li>Guardar una <b>nota</b> o ver tus tareas</li></ul><small>Por ahora te guía a los módulos; para crear registros directamente desde el chat falta conectar el backend.</small>';
         }
     };
 
@@ -1426,6 +1084,20 @@ var DISTAN_AI_URL = null;
         }
         if (/(ver|mis|lista).*notas?|^notas?$/.test(n) && !/registrar|nueva|anotar/.test(n)) return R.notas();
         if (/registrar.*nota|anotar|nueva nota|agrega.*nota|recordatorio|apunta/.test(n)) { modoNota = true; return '¿Qué nota quieres guardar? Escríbela y la registro.'; }
+        // En esta versión el asistente puede orientar y abrir módulos existentes;
+        // todavía no crea registros directamente en la base de datos desde el chat.
+        if (/(crear|nuevo|nueva|registrar|agregar).*(producto)/.test(n) || /producto nuevo/.test(n)) {
+            return '📦 Puedo llevarte al formulario de productos para que completes y guardes el registro. La creación directa desde el chat requiere conectar una acción segura del backend. ' + link('Abrir nuevo producto →', DB.urls.productoNuevo);
+        }
+        if (/(crear|nuevo|nueva|registrar|agregar).*(etiqueta)/.test(n) || /etiqueta/.test(n)) {
+            return '🏷️ Puedes abrir el módulo de etiquetas para revisar y gestionar sus registros. La creación directa desde el chat aún necesita integración con el backend. ' + link('Abrir etiquetas →', DB.urls.etiquetas);
+        }
+        if (/(caja|cajas|precinto|precintos|suministro|suministros)/.test(n)) {
+            return '🧰 Para registrar cajas y precintos, abre el módulo de suministros. Si esa ruta no está habilitada en tu instalación, dime qué ruta utiliza tu menú y la conectamos. ' + link('Abrir suministros →', DB.urls.suministros);
+        }
+        if (/(crear|nuevo|nueva|registrar|agregar).*(orden|pedido)/.test(n)) {
+            return '🧾 Puedo abrir el formulario para crear la orden. La orden no se guardará hasta que revises los datos y confirmes en el formulario. ' + link('Crear nueva orden →', DB.urls.ordenNueva);
+        }
         if (/reporte|exportar|csv|informe/.test(n)) return R.reporte();
         if (/entrega|envio|despach|guia/.test(n)) return R.entregas();
         if (/stock|agotad|reponer|minimo/.test(n)) return R.stock();
@@ -1457,14 +1129,12 @@ var DISTAN_AI_URL = null;
         addMsg('me', esc(q));
         hist.push({ role: 'user', content: q });
         var typing = addMsg('bot', '<span class="db-typing"><i></i><i></i><i></i></span>');
-        var img = $('dbAiImg'); if (img && img.tagName === 'IMG') img.src = IMG_THINK;
         var reply;
         try { reply = await responder(q); } catch (e) { reply = 'Ocurrió un error al procesar tu consulta.'; }
         await new Promise(function (r) { setTimeout(r, 350); });
         typing.remove();
         addMsg('bot', reply);
         hist.push({ role: 'assistant', content: reply.replace(/<[^>]+>/g, '') });
-        if (img && img.tagName === 'IMG') img.src = IMG_OK;
     };
     window.dbEnviar = function (e) {
         e.preventDefault();
@@ -1475,6 +1145,76 @@ var DISTAN_AI_URL = null;
     /* ── Init ── */
     renderAgenda();
     renderTasks();
+})();
+</script>
+
+
+<script>
+/*
+ * Recordatorios diarios del dashboard:
+ * 08:00 - desayuno; 13:00 - almuerzo; 17:00 - salida.
+ * Se muestran una vez por día y horario mientras el dashboard está abierto.
+ */
+(function () {
+    var toast = document.getElementById('dbReminderToast');
+    if (!toast) return;
+
+    var reminders = [
+        { time: '08:00', icon: '☕', title: 'Hora de tomar desayuno', message: 'Tómate unos minutos para desayunar y empezar la mañana con energía.' },
+        { time: '13:00', icon: '🍽️', title: 'Es hora de almorzar', message: 'Haz una pausa para almorzar y recargar energías.' },
+        { time: '17:00', icon: '🏁', title: 'Hora de salida', message: 'Es hora de cerrar tus pendientes y prepararte para terminar la jornada.' }
+    ];
+
+    var title = document.getElementById('dbReminderTitle');
+    var message = document.getElementById('dbReminderMessage');
+    var icon = document.getElementById('dbReminderIcon');
+    var close = document.getElementById('dbReminderClose');
+    var activeTimer = null;
+    var shownInThisPage = {};
+
+    function localDateKey(d) {
+        return d.getFullYear() + '-' +
+            String(d.getMonth() + 1).padStart(2, '0') + '-' +
+            String(d.getDate()).padStart(2, '0');
+    }
+
+    function checkReminder() {
+        var now = new Date();
+        var current = String(now.getHours()).padStart(2, '0') + ':' +
+                      String(now.getMinutes()).padStart(2, '0');
+
+        reminders.forEach(function (r) {
+            if (current !== r.time) return;
+
+            var key = 'distan_reminder_' + localDateKey(now) + '_' + r.time;
+            if (shownInThisPage[key]) return;
+            try {
+                if (localStorage.getItem(key) === '1') return;
+                localStorage.setItem(key, '1');
+            } catch (e) {
+                // El control en memoria evita que la alerta se repita en esta página.
+            }
+            shownInThisPage[key] = true;
+
+            icon.textContent = r.icon;
+            title.textContent = r.title;
+            message.textContent = r.message;
+            toast.classList.add('open');
+
+            if (activeTimer) clearTimeout(activeTimer);
+            activeTimer = setTimeout(function () {
+                toast.classList.remove('open');
+            }, 15000);
+        });
+    }
+
+    close.addEventListener('click', function () {
+        toast.classList.remove('open');
+        if (activeTimer) clearTimeout(activeTimer);
+    });
+
+    checkReminder();
+    window.setInterval(checkReminder, 15000);
 })();
 </script>
 
