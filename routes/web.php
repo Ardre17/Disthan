@@ -18,6 +18,7 @@ use App\Http\Controllers\WarehouseMapController;
 use App\Http\Controllers\RawMaterialController;
 use App\Http\Controllers\ProductionOrderController;
 use App\Http\Controllers\KardexController;
+use App\Http\Controllers\ReconciliacionController;
 use App\Http\Controllers\LabelController;
 use App\Http\Controllers\RawMaterialEntryController;
 use App\Http\Controllers\WarehouseController;
@@ -354,6 +355,11 @@ Route::post(
 Route::resource('labels', LabelController::class);
 Route::post('labels/{label}/movimiento', [LabelController::class, 'movimiento'])
      ->name('labels.movimiento');
+
+Route::middleware(['auth'])->prefix('conciliacion')->name('reconciliacion.')->group(function () {
+    Route::get('/', [ReconciliacionController::class, 'index'])->name('index');
+    Route::post('/previsualizar', [ReconciliacionController::class, 'preview'])->name('preview');
+});
 
 Route::get('/kardex', [KardexController::class, 'index'])->name('kardex.index');
 

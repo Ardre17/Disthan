@@ -137,6 +137,10 @@ $menu = [
              'title' => 'Kardex',
              'roles' => ['admin'], 'paths' => ['kardex']],
 
+             ['label' => 'Conciliación', 'icon' => 'check', 'route' => 'reconciliacion.index',
+             'title' => 'Conciliación de inventario',
+             'roles' => ['admin'], 'routes' => ['reconciliacion.*'], 'paths' => ['conciliacion']],
+
              ['label' => 'Salidas Suministros',   'icon' => 'layers', 'route' => 'supply-orders.index',
              'title' => 'Abastecimiento a Plantas',
              'routes' => ['supply-orders.*'], 'paths' => ['supply-orders']],
