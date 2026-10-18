@@ -180,6 +180,53 @@ class ReconciliacionController extends Controller
         return redirect()->route('reconciliacion.index')->with('success', "Se guardó la conciliación #{$id} con {$count} movimientos. El stock de DISTAN no fue modificado.");
     }
 
+
+    /** Muestra el detalle comparativo guardado de una conciliación. */
+    public function show(Request $request, $id)
+    {
+        $reconciliacion = DB::table('reconciliaciones')->where('id', $id)->first();
+        abort_unless($reconciliacion, 404);
+
+        $query = DB::table('reconciliacion_movimientos')
+            ->where('reconciliacion_id', $id)
+            ->orderBy('numero_fila');
+
+        $estado = $request->query('estado');
+        if (in_array($estado, ['coincidencia', 'diferencia', 'pendiente'], true)) {
+            $query->where('estado_conciliacion', $estado);
+        }
+
+        $movimientos = $query->get()->map(function ($row) {
+            $extra = json_decode($row->datos_adicionales ?: '{}', true);
+            if (!is_array($extra)) $extra = [];
+            $match = $extra['_conciliacion'] ?? [];
+            $row->datos_csv = array_diff_key($extra, ['_conciliacion' => true]);
+            $row->kardex = is_array($match) ? $match : [];
+            $row->cantidad_csv = (float) ($row->ingresos > 0 ? $row->ingresos : $row->salidas);
+            $row->tipo_csv = $row->ingresos > 0 ? 'Ingreso' : ($row->salidas > 0 ? 'Salida' : 'Sin tipo');
+            $row->cantidad_kardex = isset($row->kardex['cantidad_kardex']) ? (float) $row->kardex['cantidad_kardex'] : null;
+            $row->diferencia_cantidad = $row->cantidad_kardex !== null
+                ? round($row->cantidad_csv - $row->cantidad_kardex, 3)
+                : null;
+            return $row;
+        });
+
+        $conteos = DB::table('reconciliacion_movimientos')
+            ->where('reconciliacion_id', $id)
+            ->selectRaw("COUNT(*) AS total")
+            ->selectRaw("SUM(CASE WHEN estado_conciliacion = 'coincidencia' THEN 1 ELSE 0 END) AS coincidencias")
+            ->selectRaw("SUM(CASE WHEN estado_conciliacion = 'diferencia' THEN 1 ELSE 0 END) AS diferencias")
+            ->selectRaw("SUM(CASE WHEN estado_conciliacion = 'pendiente' THEN 1 ELSE 0 END) AS pendientes")
+            ->first();
+
+        return view('reconciliacion.show', [
+            'reconciliacion' => $reconciliacion,
+            'movimientos' => $movimientos,
+            'estadoFiltro' => $estado,
+            'conteos' => $conteos,
+        ]);
+    }
+
     /** Compara los movimientos importados contra las mismas fuentes del Kardex. Solo lectura. */
     public function compare($id)
     {
@@ -271,7 +318,7 @@ class ReconciliacionController extends Controller
             ]);
         });
 
-        return redirect()->route('reconciliacion.index')->with('success', "Comparación #{$id} terminada: {$counts['coincidencia']} coincidencias, {$counts['diferencia']} diferencias y {$counts['pendiente']} pendientes. El stock no fue modificado.");
+        return redirect()->route('reconciliacion.show', $id)->with('success', "Comparación #{$id} terminada: {$counts['coincidencia']} coincidencias, {$counts['diferencia']} diferencias y {$counts['pendiente']} pendientes. El stock no fue modificado.");
     }
 
     private function candidate(string $source, int $id, $date, string $direction, $quantity, string $label, ?string $reference): array

@@ -40,6 +40,13 @@ use App\Http\Controllers\ProductionOutputController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplyOrderController;
 
+// Dentro del grupo protegido por auth en routes/web.php:
+Route::get('/conciliacion/{id}', [ReconciliacionController::class, 'show'])
+    ->whereNumber('id')
+    ->name('reconciliacion.show');
+
+// Conserva las rutas existentes para index, preview, save y compare.
+
 // Dentro del grupo de rutas protegido por auth, conserva las rutas existentes y agrega:
 Route::post('/conciliacion/{id}/comparar', [ReconciliacionController::class, 'compare'])
     ->whereNumber('id')
