@@ -2,7 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Desmedro;
+use App\Models\Movement;
+use App\Models\Order;
 use App\Models\Product;
+use App\Models\ProductEntry;
+use App\Models\ProductionOrder;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,7 +20,7 @@ class ReconciliacionController extends Controller
     {
         return view('reconciliacion.index', [
             'productos' => Product::query()->orderBy('nombre')->get(['id', 'nombre', 'sku']),
-            'historial' => DB::table('reconciliaciones')->orderByDesc('id')->limit(20)->get(),
+            'historial' => DB::table('reconciliaciones')->orderByDesc('id')->limit(30)->get(),
         ]);
     }
 
@@ -47,8 +52,8 @@ class ReconciliacionController extends Controller
         $normalize = static function ($value) {
             $value = preg_replace('/^\xEF\xBB\xBF/', '', (string) $value);
             $value = mb_strtolower(trim($value));
-            $value = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
-            return preg_replace('/[^a-z0-9]/', '', $value);
+            $converted = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value);
+            return preg_replace('/[^a-z0-9]/', '', $converted === false ? $value : $converted);
         };
         $normalized = array_map($normalize, $headers);
         $aliases = [
@@ -72,12 +77,9 @@ class ReconciliacionController extends Controller
             return back()->withErrors(['archivo_csv' => 'Faltan columnas necesarias: '.implode(', ', $missing).'. Se requieren Razón social, Emisión, Ingresos y Salidas.'])->withInput();
         }
 
-        // Excluir solo columnas identificadas explícitamente como RUC.
         $visibleHeaders = [];
         foreach ($headers as $i => $header) {
-            if (in_array($normalize($header), ['ruc', 'numeroruc', 'ruccliente', 'rucdelcliente', 'nroruc'], true)) {
-                continue;
-            }
+            if (in_array($normalize($header), ['ruc', 'numeroruc', 'ruccliente', 'rucdelcliente', 'nroruc'], true)) continue;
             $visibleHeaders[$i] = trim((string) $header);
         }
 
@@ -85,13 +87,9 @@ class ReconciliacionController extends Controller
         $line = 1;
         while (($record = fgetcsv($handle, 0, $delimiter)) !== false) {
             $line++;
-            if (count(array_filter($record, fn($v) => trim((string) $v) !== '')) === 0) {
-                continue;
-            }
+            if (count(array_filter($record, fn($v) => trim((string) $v) !== '')) === 0) continue;
             $values = [];
-            foreach ($visibleHeaders as $i => $header) {
-                $values[$header] = trim((string) ($record[$i] ?? ''));
-            }
+            foreach ($visibleHeaders as $i => $header) $values[$header] = trim((string) ($record[$i] ?? ''));
             $rows[] = [
                 'fila' => $line,
                 'razon_social' => trim((string) ($record[$indexes['razonsocial']] ?? '')),
@@ -102,9 +100,7 @@ class ReconciliacionController extends Controller
             ];
         }
         fclose($handle);
-        if (!$rows) {
-            return back()->withErrors(['archivo_csv' => 'El archivo no contiene movimientos.'])->withInput();
-        }
+        if (!$rows) return back()->withErrors(['archivo_csv' => 'El archivo no contiene movimientos.'])->withInput();
 
         $token = (string) Str::uuid();
         Storage::disk('local')->put('reconciliacion-temp/'.$token.'.json', json_encode([
@@ -121,7 +117,7 @@ class ReconciliacionController extends Controller
             'archivoNombre' => $request->file('archivo_csv')->getClientOriginalName(),
             'previewCount' => count($rows),
             'previewToken' => $token,
-            'historial' => DB::table('reconciliaciones')->orderByDesc('id')->limit(20)->get(),
+            'historial' => DB::table('reconciliaciones')->orderByDesc('id')->limit(30)->get(),
         ]);
     }
 
@@ -143,6 +139,7 @@ class ReconciliacionController extends Controller
         $id = DB::transaction(function () use ($payload, $product, $request, $count) {
             $dates = collect($payload['rows'])->pluck('fecha_movimiento')->filter()->sort()->values();
             $id = DB::table('reconciliaciones')->insertGetId([
+                'product_id' => $product->id,
                 'nombre' => $product->nombre,
                 'archivo_origen' => mb_substr((string) $payload['archivo_nombre'], 0, 255),
                 'fecha_desde' => $dates->first(),
@@ -183,6 +180,114 @@ class ReconciliacionController extends Controller
         return redirect()->route('reconciliacion.index')->with('success', "Se guardó la conciliación #{$id} con {$count} movimientos. El stock de DISTAN no fue modificado.");
     }
 
+    /** Compara los movimientos importados contra las mismas fuentes del Kardex. Solo lectura. */
+    public function compare($id)
+    {
+        $reconciliacion = DB::table('reconciliaciones')->where('id', $id)->first();
+        abort_unless($reconciliacion, 404);
+        if (empty($reconciliacion->product_id)) {
+            return redirect()->route('reconciliacion.index')->withErrors(['comparacion' => 'Esta conciliación no tiene producto asociado. Ejecuta el SQL de actualización y vuelve a importar el CSV para guardar el producto.']);
+        }
+
+        $rows = DB::table('reconciliacion_movimientos')->where('reconciliacion_id', $id)->orderBy('numero_fila')->get();
+        if ($rows->isEmpty()) return redirect()->route('reconciliacion.index')->withErrors(['comparacion' => 'La conciliación no contiene movimientos.']);
+
+        $validDates = $rows->pluck('fecha_movimiento')->filter()->map(fn($d) => Carbon::parse($d));
+        $minDate = $validDates->isNotEmpty() ? $validDates->min()->copy()->subDays(7)->startOfDay() : now()->subYears(10)->startOfDay();
+        $maxDate = $validDates->isNotEmpty() ? $validDates->max()->copy()->addDays(7)->endOfDay() : now()->endOfDay();
+        $productId = (int) $reconciliacion->product_id;
+        $candidates = collect();
+
+        $entries = ProductEntry::where('product_id', $productId)->whereBetween('created_at', [$minDate, $maxDate])->get();
+        foreach ($entries as $m) $candidates->push($this->candidate('ProductEntry', $m->id, $m->created_at, 'ingreso', $m->quantity, 'Entrada directa', $m->supplier));
+
+        $production = ProductionOrder::where('product_id', $productId)->where('status', 'FINALIZADA')->whereBetween('created_at', [$minDate, $maxDate])->get();
+        foreach ($production as $m) $candidates->push($this->candidate('ProductionOrder', $m->id, $m->created_at, 'ingreso', $m->produced_quantity, 'Producción', $m->number));
+
+        $orders = Order::with('details')->whereIn('estado', ['COMPLETO', 'PARCIAL', 'INCOMPLETO'])->whereBetween('fecha_pedido', [$minDate->toDateString(), $maxDate->toDateString()])->whereHas('details', fn($q) => $q->where('product_id', $productId))->get();
+        foreach ($orders as $order) foreach ($order->details as $detail) {
+            if ((int) $detail->product_id !== $productId || (float) $detail->cantidad_despachada <= 0) continue;
+            $candidates->push($this->candidate('OrderDetail', $detail->id, $order->fecha_pedido, 'salida', $detail->cantidad_despachada, 'Despacho', $order->numero_orden));
+        }
+
+        $movements = Movement::where('product_id', $productId)->where('tipo', 'SALIDA')->whereBetween('created_at', [$minDate, $maxDate])->get();
+        foreach ($movements as $m) $candidates->push($this->candidate('Movement', $m->id, $m->created_at, 'salida', $m->cantidad, 'Salida de producción', $m->motivo));
+
+        $desmedros = Desmedro::with('detalles')->where('estado', 'registrado')->whereBetween('registrado_at', [$minDate, $maxDate])->whereHas('detalles', fn($q) => $q->where('producto_id', $productId))->get();
+        foreach ($desmedros as $d) foreach ($d->detalles as $detail) {
+            if ((int) $detail->producto_id !== $productId || (float) $detail->cantidad <= 0) continue;
+            $candidates->push($this->candidate('DesmedroDetalle', $detail->id, $d->registrado_at ?? $d->updated_at, 'salida', $detail->cantidad, 'Desmedro', $d->codigo));
+        }
+
+        $used = [];
+        $counts = ['coincidencia' => 0, 'diferencia' => 0, 'pendiente' => 0];
+        DB::transaction(function () use ($rows, $candidates, &$used, &$counts, $id) {
+            foreach ($rows as $row) {
+                $externalDate = $row->fecha_movimiento ? Carbon::parse($row->fecha_movimiento) : null;
+                $direction = (float) $row->ingresos > 0 ? 'ingreso' : ((float) $row->salidas > 0 ? 'salida' : null);
+                $quantity = $direction === 'ingreso' ? (float) $row->ingresos : ($direction === 'salida' ? (float) $row->salidas : 0.0);
+                $eligible = $candidates->filter(function ($candidate) use ($direction, $externalDate, $used) {
+                    if (!$direction || $candidate['direction'] !== $direction || isset($used[$candidate['key']])) return false;
+                    if (!$externalDate || !$candidate['date']) return false;
+                    return abs($externalDate->diffInDays($candidate['date'], false)) <= 7;
+                })->sortBy(fn($candidate) => abs($externalDate->diffInSeconds($candidate['date'])))->values();
+
+                $exact = $eligible->first(fn($candidate) => abs($candidate['quantity'] - $quantity) < 0.001);
+                $nearest = $exact ?: $eligible->first();
+                $status = 'pendiente';
+                $matchedId = null;
+                $observation = 'No se encontró movimiento compatible en el Kardex dentro de ±7 días.';
+                $extra = json_decode($row->datos_adicionales ?: '{}', true);
+                if (!is_array($extra)) $extra = [];
+
+                if ($exact) {
+                    $status = 'coincidencia';
+                    $used[$exact['key']] = true;
+                    $matchedId = $exact['id'];
+                    $observation = 'Coincide por tipo, cantidad y fecha dentro de ±7 días.';
+                    $extra['_conciliacion'] = ['fuente' => $exact['source'], 'referencia' => $exact['reference'], 'fecha_kardex' => $exact['date']->toDateString(), 'cantidad_kardex' => $exact['quantity']];
+                } elseif ($nearest) {
+                    $status = 'diferencia';
+                    $used[$nearest['key']] = true;
+                    $matchedId = $nearest['id'];
+                    $observation = 'Se encontró un movimiento del mismo tipo, pero la cantidad difiere. CSV: '.$quantity.'; Kardex: '.$nearest['quantity'].'.';
+                    $extra['_conciliacion'] = ['fuente' => $nearest['source'], 'referencia' => $nearest['reference'], 'fecha_kardex' => $nearest['date']->toDateString(), 'cantidad_kardex' => $nearest['quantity']];
+                }
+                $counts[$status]++;
+                DB::table('reconciliacion_movimientos')->where('id', $row->id)->update([
+                    'estado_conciliacion' => $status,
+                    'movimiento_kardex_id' => $matchedId,
+                    'datos_adicionales' => json_encode($extra, JSON_UNESCAPED_UNICODE),
+                    'observacion' => $observation,
+                    'updated_at' => now(),
+                ]);
+            }
+            DB::table('reconciliaciones')->where('id', $id)->update([
+                'estado' => 'conciliada',
+                'total_coincidencias' => $counts['coincidencia'],
+                'total_diferencias' => $counts['diferencia'],
+                'total_pendientes' => $counts['pendiente'],
+                'updated_at' => now(),
+            ]);
+        });
+
+        return redirect()->route('reconciliacion.index')->with('success', "Comparación #{$id} terminada: {$counts['coincidencia']} coincidencias, {$counts['diferencia']} diferencias y {$counts['pendiente']} pendientes. El stock no fue modificado.");
+    }
+
+    private function candidate(string $source, int $id, $date, string $direction, $quantity, string $label, ?string $reference): array
+    {
+        return [
+            'key' => $source.':'.$id,
+            'source' => $source,
+            'id' => $id,
+            'date' => $date ? Carbon::parse($date) : null,
+            'direction' => $direction,
+            'quantity' => (float) $quantity,
+            'label' => $label,
+            'reference' => $reference,
+        ];
+    }
+
     private function parseNumber($value): float
     {
         $value = trim((string) $value);
@@ -191,12 +296,8 @@ class ReconciliacionController extends Controller
             if (strrpos($value, ',') > strrpos($value, '.')) {
                 $value = str_replace('.', '', $value);
                 $value = str_replace(',', '.', $value);
-            } else {
-                $value = str_replace(',', '', $value);
-            }
-        } elseif (str_contains($value, ',') && !str_contains($value, '.')) {
-            $value = str_replace(',', '.', $value);
-        }
+            } else $value = str_replace(',', '', $value);
+        } elseif (str_contains($value, ',') && !str_contains($value, '.')) $value = str_replace(',', '.', $value);
         return is_numeric($value) ? (float) $value : 0;
     }
 
