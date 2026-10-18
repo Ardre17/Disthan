@@ -283,6 +283,7 @@ $eficiencia = $totalProduccionGrafico > 0
 const salidas    = @json($chartData['salidas']);
 const produccion = @json($chartData['produccion']);
 const entradaDirecta = @json($chartData['entrada_directa'] ?? []);
+const desmedro = @json($chartData['desmedro'] ?? []);
 const subtotales = @json($chartData['subtotal']);
 const solicitado = @json($chartData['solicitado']);
 const pendiente = @json($chartData['pendiente']);
@@ -328,6 +329,19 @@ const valorPendiente = @json($chartData['valor_pendiente']);
         backgroundColor: 'rgba(114,46,209,.07)',
         borderWidth: 2.5,
         pointBackgroundColor: '#722ed1',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        tension: 0.35,
+        fill: false,
+        yAxisID: 'y',
+    },
+                {
+        label: 'Desmedro',
+        data: desmedro,
+        borderColor: '#fa8c16',
+        backgroundColor: 'rgba(250,140,22,.08)',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#fa8c16',
         pointRadius: 4,
         pointHoverRadius: 6,
         tension: 0.35,
@@ -425,6 +439,7 @@ const valorPendiente = @json($chartData['valor_pendiente']);
                         <th>Producto</th>
                         <th style="text-align:right;">Producción</th>
                         <th style="text-align:right;">Entrada directa</th>
+                        <th style="text-align:right;">Desmedro</th>
                         <th style="text-align:right;">Salida</th>
                         <th style="text-align:right;">Precio U.</th>
                         <th style="text-align:right;">Subtotal</th>
@@ -575,6 +590,15 @@ const valorPendiente = @json($chartData['valor_pendiente']);
     </td>
 
 
+    {{-- DESMEDRO --}}
+    <td style="text-align:right;font-weight:700;color:#fa8c16;">
+        @if(($mov['cantidad_desmedro'] ?? 0) > 0)
+            -{{ number_format($mov['cantidad_desmedro']) }}
+        @else
+            —
+        @endif
+    </td>
+
     {{-- SALIDA --}}
     <td style="
         text-align:right;
@@ -638,7 +662,7 @@ const valorPendiente = @json($chartData['valor_pendiente']);
 
 <tr>
 
-    <td colspan="10" style="text-align:center; padding:48px; color:#bfbfbf;">
+    <td colspan="11" style="text-align:center; padding:48px; color:#bfbfbf;">
         <p style="font-size:32px;margin:0;">📭</p>
         <p style="margin:8px 0 0;"> No hay movimientos con los filtros aplicados</p>
 

@@ -10,6 +10,7 @@ use App\Models\Client;
 use App\Models\ProductEntry;
 use App\Models\ProductionOrder;
 use App\Models\Movement;
+use App\Models\Desmedro;
 
 class KardexController extends Controller
 {
@@ -351,7 +352,60 @@ foreach ($producciones as $produccion) {
         }
         /*
         |--------------------------------------------------------------------------
-        | 3. ORDENAR TODOS LOS MOVIMIENTOS
+        | 4. DESMEDROS REGISTRADOS
+        |--------------------------------------------------------------------------
+        | El stock ya se descuenta al registrar el desmedro.
+        | Aquí solo lo incorporamos al historial, sin modificar stock.
+        */
+        $desmedrosQuery = Desmedro::with(['detalles.producto', 'usuario'])
+            ->where('estado', 'registrado')
+            ->orderBy('registrado_at', 'asc');
+
+        if ($dateFrom) {
+            $desmedrosQuery->whereDate('registrado_at', '>=', $dateFrom);
+        }
+        if ($dateTo) {
+            $desmedrosQuery->whereDate('registrado_at', '<=', $dateTo);
+        }
+        if ($productId) {
+            $desmedrosQuery->whereHas('detalles', function ($q) use ($productId) {
+                $q->where('producto_id', $productId);
+            });
+        }
+
+        foreach ($desmedrosQuery->get() as $desmedro) {
+            foreach ($desmedro->detalles as $detalle) {
+                if ($productId && (int) $detalle->producto_id !== (int) $productId) {
+                    continue;
+                }
+
+                $movimientos->push([
+                    'fecha' => $desmedro->registrado_at ?? $desmedro->updated_at,
+                    'tipo' => 'DESMEDRO',
+                    'numero_orden' => $desmedro->codigo,
+                    'cliente' => 'Desmedro' . ($desmedro->motivo ? ' · ' . $desmedro->motivo : ''),
+                    'client_id' => null,
+                    'producto' => optional($detalle->producto)->nombre ?? 'Sin producto',
+                    'product_id' => $detalle->producto_id,
+                    'cantidad_solicitada' => 0,
+                    'cantidad_produccion' => 0,
+                    'cantidad_entrada' => 0,
+                    'cantidad_desmedro' => (float) $detalle->cantidad,
+                    'cantidad_despachada' => 0,
+                    'precio_unitario' => 0,
+                    'subtotal' => 0,
+                    'estado_orden' => 'REGISTRADO',
+                    'stock_before' => $detalle->stock_antes,
+                    'stock_after' => null,
+                    'usuario' => optional($desmedro->usuario)->name ?? 'Sistema',
+                    'origen_id' => $detalle->id,
+                ]);
+            }
+        }
+
+        /*
+        |--------------------------------------------------------------------------
+        | 5. ORDENAR TODOS LOS MOVIMIENTOS
         |--------------------------------------------------------------------------
         */
 
@@ -395,6 +449,9 @@ foreach ($movimientos as $index => $mov) {
 
     $saldos[$productIdMovimiento] -=
         (float) $mov['cantidad_despachada'];
+
+    $saldos[$productIdMovimiento] -=
+        (float) ($mov['cantidad_desmedro'] ?? 0);
 
     // Collection::put() permite modificar correctamente el elemento
     $mov['saldo'] = $saldos[$productIdMovimiento];
@@ -472,6 +529,7 @@ foreach ($movimientos as $index => $mov) {
                         'solicitado' => $solicitado,
                         'produccion' => $grupo->sum('cantidad_produccion'),
                         'entrada_directa' => $grupo->sum('cantidad_entrada'),
+                        'desmedro' => $grupo->sum('cantidad_desmedro'),
                         'salidas' => $despachado,
                         'pendiente' => $pendiente,
                         'valor_pendiente' => $valorPendienteDia,
@@ -485,6 +543,7 @@ foreach ($movimientos as $index => $mov) {
                 'solicitado' => $porDia->pluck('solicitado')->values(),
                 'produccion' => $porDia->pluck('produccion')->values(),
                 'entrada_directa' => $porDia->pluck('entrada_directa')->values(),
+                'desmedro' => $porDia->pluck('desmedro')->values(),
                 'salidas' => $porDia->pluck('salidas')->values(),
                 'pendiente' => $porDia->pluck('pendiente')->values(),
                 'valor_pendiente' => $porDia->pluck('valor_pendiente')->values(),
