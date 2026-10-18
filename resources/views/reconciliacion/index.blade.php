@@ -2,119 +2,28 @@
 
 @section('content')
 <style>
-.conc-wrap{max-width:1600px;margin:0 auto;padding:22px;color:#19324d}
-.conc-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}
-.conc-head h1{font-size:25px;font-weight:800;margin:0;color:#163b67}
-.conc-head p{margin:5px 0 0;color:#718198}
-.conc-card{background:#fff;border:1px solid #dce6f1;border-radius:14px;padding:20px;box-shadow:0 5px 18px rgba(21,56,94,.05);margin-bottom:18px}
-.conc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}
-.conc-label{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#3b5069}
-.conc-control{width:100%;border:1px solid #cbd8e7;border-radius:9px;padding:11px 12px;background:#fff;color:#213b58}
-.conc-btn{border:0;border-radius:9px;background:#1769d1;color:#fff;padding:11px 17px;font-weight:700;cursor:pointer}
-.conc-btn:hover{background:#1257b4}
-.conc-muted{color:#718198;font-size:13px}
-.conc-table-wrap{overflow:auto}
-.conc-table{width:100%;border-collapse:collapse;min-width:760px}
-.conc-table th{background:#f0f5fb;color:#415a78;text-align:left;font-size:12px;padding:11px;border-bottom:1px solid #dbe5f0}
-.conc-table td{padding:10px 11px;border-bottom:1px solid #edf1f6;font-size:13px}
-.conc-pill{display:inline-block;border-radius:999px;background:#e8f1ff;color:#1759a6;padding:5px 9px;font-size:12px;font-weight:700}
-@media(max-width:850px){.conc-grid{grid-template-columns:1fr}.conc-head{align-items:flex-start;flex-direction:column}.conc-wrap{padding:14px}}
+.conc-wrap{max-width:1600px;margin:0 auto;padding:22px;color:#19324d}.conc-head{display:flex;justify-content:space-between;align-items:center;gap:16px;margin-bottom:20px}.conc-head h1{font-size:25px;font-weight:800;margin:0;color:#163b67}.conc-head p{margin:5px 0 0;color:#718198}.conc-card{background:#fff;border:1px solid #dce6f1;border-radius:14px;padding:20px;box-shadow:0 5px 18px rgba(21,56,94,.05);margin-bottom:18px}.conc-grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.conc-label{display:block;font-size:13px;font-weight:700;margin-bottom:7px;color:#3b5069}.conc-control{width:100%;border:1px solid #cbd8e7;border-radius:9px;padding:11px 12px;background:#fff;color:#213b58}.conc-btn{display:inline-block;border:0;border-radius:9px;background:#1769d1;color:#fff;padding:11px 17px;font-weight:700;cursor:pointer;text-decoration:none}.conc-btn:hover{background:#1257b4}.conc-muted{color:#718198;font-size:13px}.conc-table-wrap{overflow:auto}.conc-table{width:100%;border-collapse:collapse;min-width:760px}.conc-table th{background:#f0f5fb;color:#415a78;text-align:left;font-size:12px;padding:11px;border-bottom:1px solid #dbe5f0;white-space:nowrap}.conc-table td{padding:10px 11px;border-bottom:1px solid #edf1f6;font-size:13px}.conc-pill{display:inline-block;border-radius:999px;background:#e8f1ff;color:#1759a6;padding:5px 9px;font-size:12px;font-weight:700}.conc-alert{border-radius:10px;padding:13px 16px;margin-bottom:16px}@media(max-width:850px){.conc-grid{grid-template-columns:1fr}.conc-head{align-items:flex-start;flex-direction:column}.conc-wrap{padding:14px}}
 </style>
-
 <div class="conc-wrap">
-    <div class="conc-head">
-        <div>
-            <h1>Conciliación de inventario</h1>
-            <p>Compara los movimientos del sistema del cliente con los registros de DISTAN.</p>
-        </div>
-        <span class="conc-pill">Margen de fecha: ±7 días</span>
-    </div>
-
-    @if ($errors->any())
-        <div class="conc-card" style="border-color:#f3b6b6;background:#fff8f8;color:#a12626">
-            <strong>Revisa el archivo:</strong>
-            <ul style="margin:8px 0 0;padding-left:20px">
-                @foreach ($errors->all() as $error)
-                    <li>{{ $error }}</li>
-                @endforeach
-            </ul>
-        </div>
-    @endif
-
+    <div class="conc-head"><div><h1>Conciliación de inventario</h1><p>Importa los movimientos del cliente para compararlos con el Kardex de DISTAN.</p></div><span class="conc-pill">Margen previsto: ±7 días</span></div>
+    @if(session('success'))<div class="conc-alert" style="background:#edf9f0;border:1px solid #b7e4c1;color:#176534">{{ session('success') }}</div>@endif
+    @if($errors->any())<div class="conc-alert" style="border:1px solid #f3b6b6;background:#fff8f8;color:#a12626"><strong>Revisa lo siguiente:</strong><ul style="margin:8px 0 0;padding-left:20px">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
     <div class="conc-card">
-        <h2 style="font-size:17px;font-weight:800;margin:0 0 6px">Nueva conciliación</h2>
-        <p class="conc-muted" style="margin:0 0 18px">Selecciona el producto y carga el CSV que preparaste desde el sistema del cliente. La importación actual solo genera una vista previa; todavía no guarda ni modifica inventario.</p>
-        <form action="{{ route('reconciliacion.preview') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-            <div class="conc-grid">
-                <div>
-                    <label class="conc-label" for="product_id">Producto de DISTAN</label>
-                    <select class="conc-control" name="product_id" id="product_id" required>
-                        <option value="">Selecciona un producto...</option>
-                        @foreach($productos as $producto)
-                            <option value="{{ $producto->id }}" @selected(old('product_id', $productoSeleccionado ?? '') == $producto->id)>
-                                {{ $producto->nombre }}{{ $producto->sku ? ' · '.$producto->sku : '' }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-                <div>
-                    <label class="conc-label" for="archivo_csv">Archivo CSV del sistema del cliente</label>
-                    <input class="conc-control" type="file" name="archivo_csv" id="archivo_csv" accept=".csv,.txt" required>
-                    <p class="conc-muted" style="margin:6px 0 0">Se leerán todas las columnas del CSV, excepto RUC. Razón social, Emisión, Ingresos y Salidas deben estar presentes.</p>
-                </div>
-            </div>
-            <div style="margin-top:17px">
-                <button class="conc-btn" type="submit">Leer CSV y mostrar vista previa</button>
-            </div>
+        <h2 style="font-size:17px;font-weight:800;margin:0 0 6px">Nueva conciliación</h2><p class="conc-muted" style="margin:0 0 18px">Se excluye únicamente el RUC; los demás campos se conservarán. Esta importación no modifica el stock.</p>
+        <form action="{{ route('reconciliacion.preview') }}" method="POST" enctype="multipart/form-data">@csrf
+            <div class="conc-grid"><div><label class="conc-label" for="product_id">Producto de DISTAN</label><select class="conc-control" name="product_id" id="product_id" required><option value="">Selecciona un producto...</option>@foreach($productos as $producto)<option value="{{ $producto->id }}" @selected(old('product_id', $productoSeleccionado ?? '') == $producto->id)>{{ $producto->nombre }}{{ $producto->sku ? ' · '.$producto->sku : '' }}</option>@endforeach</select></div>
+            <div><label class="conc-label" for="archivo_csv">Archivo CSV del sistema del cliente</label><input class="conc-control" type="file" name="archivo_csv" id="archivo_csv" accept=".csv,.txt" required><p class="conc-muted" style="margin:6px 0 0">Se requieren Razón social, Emisión, Ingresos y Salidas.</p></div></div>
+            <div style="margin-top:17px"><button class="conc-btn" type="submit">Leer CSV y mostrar vista previa</button></div>
         </form>
     </div>
-
     @isset($previewRows)
-        <div class="conc-card">
-            <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px">
-                <div>
-                    <h2 style="font-size:17px;font-weight:800;margin:0">Vista previa del archivo</h2>
-                    <p class="conc-muted" style="margin:5px 0 0">{{ $archivoNombre ?? 'CSV' }} · {{ $previewCount ?? count($previewRows) }} movimientos leídos</p>
-                </div>
-                <span class="conc-pill">Sin guardar cambios</span>
-            </div>
-            <div class="conc-table-wrap">
-                <table class="conc-table">
-                    <thead>
-                        <tr>
-                            <th>Fila CSV</th>
-                            @foreach(($csvHeaders ?? []) as $header)
-                                <th>{{ $header }}</th>
-                            @endforeach
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($previewRows as $row)
-                            <tr>
-                                <td>{{ $row['fila'] }}</td>
-                                @foreach(($row['valores'] ?? []) as $value)
-                                    <td>{{ $value !== '' ? $value : '—' }}</td>
-                                @endforeach
-                            </tr>
-                        @empty
-                            <tr><td colspan="{{ 1 + count($csvHeaders ?? []) }}" style="text-align:center;padding:25px">El archivo no contiene movimientos.</td></tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </div>
+    <div class="conc-card"><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px"><div><h2 style="font-size:17px;font-weight:800;margin:0">Vista previa del archivo</h2><p class="conc-muted" style="margin:5px 0 0">{{ $archivoNombre ?? 'CSV' }} · {{ $previewCount ?? count($previewRows) }} movimientos leídos</p></div><span class="conc-pill">Pendiente de guardar</span></div>
+        <div class="conc-table-wrap"><table class="conc-table"><thead><tr><th>Fila CSV</th>@foreach(($csvHeaders ?? []) as $header)<th>{{ $header }}</th>@endforeach</tr></thead><tbody>@forelse($previewRows as $row)<tr><td>{{ $row['fila'] }}</td>@foreach(($row['valores'] ?? []) as $value)<td>{{ $value !== '' ? $value : '—' }}</td>@endforeach</tr>@empty<tr><td colspan="{{ 1 + count($csvHeaders ?? []) }}" style="text-align:center;padding:25px">El archivo no contiene movimientos.</td></tr>@endforelse</tbody></table></div>
+        @if(!empty($previewToken))<form action="{{ route('reconciliacion.save') }}" method="POST" style="margin-top:18px">@csrf<input type="hidden" name="preview_token" value="{{ $previewToken }}"><button class="conc-btn" type="submit" onclick="return confirm('¿Guardar estos movimientos? No se modificará el stock de DISTAN.')">Guardar movimientos</button></form>@endif
+    </div>
     @endisset
-
-    <div class="conc-grid">
-        <div class="conc-card">
-            <h2 style="font-size:16px;font-weight:800;margin:0 0 8px">Movimientos de DISTAN</h2>
-            <p class="conc-muted" style="margin:0">En la siguiente fase conectaremos aquí el Kardex real del producto, incluyendo producción, ingresos directos, despachos y desmedros.</p>
-        </div>
-        <div class="conc-card">
-            <h2 style="font-size:16px;font-weight:800;margin:0 0 8px">Movimientos del cliente</h2>
-            <p class="conc-muted" style="margin:0">Aquí aparecerán los movimientos importados, las coincidencias automáticas y los casos dudosos para revisar.</p>
-        </div>
+    <div class="conc-card"><h2 style="font-size:17px;font-weight:800;margin:0 0 12px">Historial de importaciones</h2>
+        @if(isset($historial) && $historial->count())<div class="conc-table-wrap"><table class="conc-table"><thead><tr><th>N.º</th><th>Producto</th><th>Archivo</th><th>Fecha de importación</th><th>Movimientos</th><th>Estado</th></tr></thead><tbody>@foreach($historial as $item)<tr><td>#{{ $item->id }}</td><td>{{ $item->nombre ?? '—' }}</td><td>{{ $item->archivo_origen ?? '—' }}</td><td>{{ $item->created_at ?? '—' }}</td><td>{{ $item->total_movimientos ?? 0 }}</td><td><span class="conc-pill">{{ $item->estado ?? 'pendiente' }}</span></td></tr>@endforeach</tbody></table></div>@else<p class="conc-muted" style="margin:0">Todavía no hay importaciones guardadas.</p>@endif
     </div>
 </div>
 @endsection
