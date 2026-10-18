@@ -58,7 +58,6 @@ class ReconciliacionController extends Controller
             'emision' => ['emision', 'fecha', 'fechamovimiento'],
             'ingresos' => ['ingresos', 'entrada', 'entradas'],
             'salidas' => ['salidas', 'salida'],
-            'ruc' => ['ruc', 'ccliente', 'documento', 'numerodocumento'],
         ];
 
         $indexes = [];
@@ -76,9 +75,19 @@ class ReconciliacionController extends Controller
         if ($missing) {
             fclose($handle);
             return back()->withErrors([
-                'archivo_csv' => 'Faltan columnas necesarias: ' . implode(', ', $missing) .
-                    '. Usa Razón social, Emisión, Ingresos y Salidas; el RUC es opcional.',
+                'archivo_csv' => 'No se encontraron las columnas necesarias: ' . implode(', ', $missing) .
+                    '. Se leerán todos los demás campos disponibles, excepto el RUC.',
             ])->withInput();
+        }
+
+        // Se conservan todos los encabezados y valores del CSV, excepto columnas de RUC.
+        $visibleHeaders = [];
+        foreach ($headers as $i => $header) {
+            $normalized = $normalize($header);
+            if (in_array($normalized, ['ruc', 'ccliente', 'documento', 'numerodocumento', 'numeroruc'], true)) {
+                continue;
+            }
+            $visibleHeaders[$i] = trim((string) $header);
         }
 
         $rows = [];
@@ -89,13 +98,18 @@ class ReconciliacionController extends Controller
                 continue;
             }
 
+            $values = [];
+            foreach ($visibleHeaders as $i => $header) {
+                $values[] = trim((string) ($record[$i] ?? ''));
+            }
+
             $rows[] = [
                 'fila' => $line,
                 'razon_social' => trim((string) ($record[$indexes['razonsocial']] ?? '')),
                 'emision' => trim((string) ($record[$indexes['emision']] ?? '')),
                 'ingresos' => $this->parseNumber($record[$indexes['ingresos']] ?? 0),
                 'salidas' => $this->parseNumber($record[$indexes['salidas']] ?? 0),
-                'ruc' => isset($indexes['ruc']) ? trim((string) ($record[$indexes['ruc']] ?? '')) : '',
+                'valores' => $values,
             ];
         }
         fclose($handle);
@@ -106,6 +120,7 @@ class ReconciliacionController extends Controller
             'productos' => Product::query()->orderBy('nombre')->get(['id', 'nombre', 'sku']),
             'productoSeleccionado' => $producto->id,
             'previewRows' => $rows,
+            'csvHeaders' => array_values($visibleHeaders),
             'archivoNombre' => $request->file('archivo_csv')->getClientOriginalName(),
             'previewCount' => count($rows),
         ]);

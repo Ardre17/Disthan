@@ -61,7 +61,7 @@
                 <div>
                     <label class="conc-label" for="archivo_csv">Archivo CSV del sistema del cliente</label>
                     <input class="conc-control" type="file" name="archivo_csv" id="archivo_csv" accept=".csv,.txt" required>
-                    <p class="conc-muted" style="margin:6px 0 0">Columnas: Razón social, Emisión, Ingresos, Salidas y RUC/Cliente (opcional).</p>
+                    <p class="conc-muted" style="margin:6px 0 0">Se leerán todas las columnas del CSV, excepto RUC. Razón social, Emisión, Ingresos y Salidas deben estar presentes.</p>
                 </div>
             </div>
             <div style="margin-top:17px">
@@ -82,20 +82,23 @@
             <div class="conc-table-wrap">
                 <table class="conc-table">
                     <thead>
-                        <tr><th>Fila CSV</th><th>Razón social</th><th>Emisión</th><th>RUC / Cliente</th><th style="text-align:right">Ingresos</th><th style="text-align:right">Salidas</th></tr>
+                        <tr>
+                            <th>Fila CSV</th>
+                            @foreach(($csvHeaders ?? []) as $header)
+                                <th>{{ $header }}</th>
+                            @endforeach
+                        </tr>
                     </thead>
                     <tbody>
                         @forelse($previewRows as $row)
                             <tr>
                                 <td>{{ $row['fila'] }}</td>
-                                <td>{{ $row['razon_social'] ?: '—' }}</td>
-                                <td>{{ $row['emision'] ?: '—' }}</td>
-                                <td>{{ $row['ruc'] ?: '—' }}</td>
-                                <td style="text-align:right;color:#15803d;font-weight:700">{{ number_format($row['ingresos'], 3) }}</td>
-                                <td style="text-align:right;color:#c24141;font-weight:700">{{ number_format($row['salidas'], 3) }}</td>
+                                @foreach(($row['valores'] ?? []) as $value)
+                                    <td>{{ $value !== '' ? $value : '—' }}</td>
+                                @endforeach
                             </tr>
                         @empty
-                            <tr><td colspan="6" style="text-align:center;padding:25px">El archivo no contiene movimientos.</td></tr>
+                            <tr><td colspan="{{ 1 + count($csvHeaders ?? []) }}" style="text-align:center;padding:25px">El archivo no contiene movimientos.</td></tr>
                         @endforelse
                     </tbody>
                 </table>
