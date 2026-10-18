@@ -282,6 +282,7 @@ $eficiencia = $totalProduccionGrafico > 0
     const labels     = @json($chartData['labels']);
 const salidas    = @json($chartData['salidas']);
 const produccion = @json($chartData['produccion']);
+const entradaDirecta = @json($chartData['entrada_directa'] ?? []);
 const subtotales = @json($chartData['subtotal']);
 const solicitado = @json($chartData['solicitado']);
 const pendiente = @json($chartData['pendiente']);
@@ -318,6 +319,19 @@ const valorPendiente = @json($chartData['valor_pendiente']);
         pointHoverRadius: 6,
         tension: 0.35,
         fill: true,
+        yAxisID: 'y',
+    },
+                {
+        label: 'Ingreso directo a tienda',
+        data: entradaDirecta,
+        borderColor: '#722ed1',
+        backgroundColor: 'rgba(114,46,209,.07)',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#722ed1',
+        pointRadius: 4,
+        pointHoverRadius: 6,
+        tension: 0.35,
+        fill: false,
         yAxisID: 'y',
     },
                 {

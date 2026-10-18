@@ -471,6 +471,7 @@ foreach ($movimientos as $index => $mov) {
                     return [
                         'solicitado' => $solicitado,
                         'produccion' => $grupo->sum('cantidad_produccion'),
+                        'entrada_directa' => $grupo->sum('cantidad_entrada'),
                         'salidas' => $despachado,
                         'pendiente' => $pendiente,
                         'valor_pendiente' => $valorPendienteDia,
@@ -483,6 +484,7 @@ foreach ($movimientos as $index => $mov) {
                 'labels' => $porDia->keys()->map(fn($k) => \Carbon\Carbon::parse($k)->format('d/m/Y'))->values(),
                 'solicitado' => $porDia->pluck('solicitado')->values(),
                 'produccion' => $porDia->pluck('produccion')->values(),
+                'entrada_directa' => $porDia->pluck('entrada_directa')->values(),
                 'salidas' => $porDia->pluck('salidas')->values(),
                 'pendiente' => $porDia->pluck('pendiente')->values(),
                 'valor_pendiente' => $porDia->pluck('valor_pendiente')->values(),
