@@ -1,136 +1,49 @@
 @extends('layouts.app')
 
 @section('content')
+
 <style>
-.conc-detail{max-width:1700px;margin:0 auto;padding:22px;color:#19324d}
-.conc-head{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:18px}
-.conc-head h1{font-size:25px;font-weight:800;margin:0;color:#163b67}
-.conc-muted{color:#718198;font-size:13px}
-.conc-card{background:#fff;border:1px solid #dce6f1;border-radius:14px;padding:18px;box-shadow:0 5px 18px rgba(21,56,94,.05);margin-bottom:18px}
-.conc-btn{display:inline-block;border:0;border-radius:9px;background:#1769d1;color:#fff;padding:10px 15px;font-weight:700;cursor:pointer;text-decoration:none}
-.conc-btn.secondary{background:#eef4fb;color:#23486f;border:1px solid #d3e0ef}
-.conc-stats{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:12px}
-.conc-stat{border:1px solid #e0e8f2;border-radius:11px;padding:13px;background:#fbfdff}
-.conc-stat small{display:block;color:#6d8098;font-size:12px;font-weight:700}
-.conc-stat strong{display:block;font-size:23px;color:#183e68;margin-top:5px}
-.conc-table-wrap{overflow:auto}
-.conc-table{width:100%;border-collapse:collapse;min-width:1450px}
-.conc-table th{background:#f0f5fb;color:#415a78;text-align:left;font-size:12px;padding:11px;border-bottom:1px solid #dbe5f0;white-space:nowrap}
-.conc-table td{padding:10px 11px;border-bottom:1px solid #edf1f6;font-size:13px;vertical-align:top}
-.conc-pill{display:inline-block;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:800;white-space:nowrap}
-.pill-coincidencia{background:#e8f7ed;color:#176534}.pill-diferencia{background:#fff1dd;color:#965600}.pill-pendiente{background:#eef2f7;color:#4a6079}
-.conc-filter{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
-.conc-filter select{border:1px solid #cbd8e7;border-radius:9px;padding:10px;background:#fff;color:#213b58}
-.conc-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
-.conc-diff{font-weight:800}
-@media(max-width:800px){.conc-detail{padding:12px}.conc-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.conc-page{position:relative;min-height:100vh;padding:22px 24px 40px;background:linear-gradient(180deg,#f3f7fd 0%,#eef3fa 100%);color:#0f172a;font-size:13px}.conc-page *,.conc-page *:before,.conc-page *:after{box-sizing:border-box}.conc-wrap{max-width:1680px;margin:0 auto}.conc-card{background:#fff;border:1px solid #e1e9f5;border-radius:16px;box-shadow:0 2px 12px rgba(15,42,77,.05);padding:18px;margin-bottom:16px}.conc-head{display:flex;align-items:center;justify-content:space-between;gap:16px 24px;flex-wrap:wrap;margin-bottom:18px}.conc-title{display:flex;align-items:center;gap:14px;min-width:0}.conc-title-ico{width:56px;height:56px;display:flex;align-items:center;justify-content:center;color:#1d6fe8;flex-shrink:0}.conc-title-ico svg{width:52px;height:52px;stroke:currentColor;fill:none;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}.conc-title h1{margin:0;font-size:28px;font-weight:800;color:#0f2a4d;letter-spacing:-.5px;line-height:1.1}.conc-title p{margin:5px 0 0;font-size:14px;color:#475569}.conc-head-right{display:flex;align-items:center;gap:12px;flex-wrap:wrap}.conc-crumbs{display:flex;align-items:center;gap:7px;color:#64748b;font-size:12px}.conc-crumbs a{color:#64748b;text-decoration:none}.conc-crumbs a:hover{color:#2563eb}.conc-date{padding:9px 13px;border:1px solid #dfe8f5;border-radius:12px;background:#fff;box-shadow:0 2px 10px rgba(15,42,77,.05);color:#0f2a4d;font-weight:700}.conc-date small{display:block;color:#64748b;font-size:11px;font-weight:400;margin-top:2px}.conc-muted{color:#718198;font-size:13px}.conc-section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}.conc-section-head h2{font-size:17px;font-weight:800;color:#0f2a4d;margin:0}.conc-section-head p{margin:5px 0 0}.conc-grid{display:grid;grid-template-columns:minmax(260px,1fr) minmax(280px,1fr);gap:16px}.conc-label{display:block;font-size:12px;font-weight:700;color:#1e293b;margin-bottom:7px}.conc-control{width:100%;min-height:42px;border:1px solid #d5e0ef;border-radius:11px;padding:10px 12px;background:#fff;color:#0f172a;font:inherit;outline:0;transition:border-color .15s,box-shadow .15s}.conc-control:focus{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}.conc-control-wrap{display:flex;align-items:center;gap:9px;min-height:42px;padding:0 12px;border:1px solid #d5e0ef;border-radius:11px;background:#fff;transition:border-color .15s,box-shadow .15s}.conc-control-wrap:focus-within,.conc-control-wrap.is-open{border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.12)}.conc-control-wrap>svg{width:18px;height:18px;stroke:#475569;fill:none;stroke-width:1.8;flex-shrink:0}.conc-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 18px;border:0;border-radius:11px;background:linear-gradient(135deg,#1d6fe8,#1243a8);color:#fff;font:inherit;font-size:13px;font-weight:700;cursor:pointer;text-decoration:none;box-shadow:0 5px 14px rgba(29,78,216,.22);transition:transform .15s,box-shadow .15s}.conc-btn:hover{transform:translateY(-1px);box-shadow:0 8px 18px rgba(29,78,216,.28)}.conc-btn.secondary{background:#fff;color:#334155;border:1px solid #d5e0ef;box-shadow:none}.conc-btn.secondary:hover{background:#f5f8fd}.conc-btn.small{min-height:34px;padding:0 11px;font-size:12px}.conc-actions{display:flex;gap:7px;align-items:center;flex-wrap:wrap}.conc-alert{border-radius:12px;padding:13px 16px;margin-bottom:16px}.conc-table-wrap{overflow:auto;border:1px solid #e4ebf5;border-radius:12px}.conc-table{width:100%;border-collapse:separate;border-spacing:0;min-width:760px;background:#fff}.conc-table th{position:sticky;top:0;background:#f0f5fb;color:#415a78;text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.3px;padding:12px;border-bottom:1px solid #dbe5f0;white-space:nowrap}.conc-table td{padding:11px 12px;border-bottom:1px solid #edf1f6;font-size:12.5px;vertical-align:middle;color:#334155}.conc-table tbody tr:hover{background:#f8fbff}.conc-table tbody tr:last-child td{border-bottom:0}.conc-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;background:#e8f1ff;color:#1759a6;padding:6px 10px;font-size:11px;font-weight:800;white-space:nowrap}.conc-stats{display:grid;grid-template-columns:repeat(4,minmax(130px,1fr));gap:12px}.conc-stat{position:relative;overflow:hidden;border:1px solid #e0e8f2;border-radius:14px;padding:15px;background:linear-gradient(145deg,#fff,#f9fbff)}.conc-stat:after{content:"";position:absolute;right:-15px;top:-15px;width:65px;height:65px;border-radius:50%;background:#eaf2ff;opacity:.75}.conc-stat small{position:relative;z-index:1;display:block;color:#6d8098;font-size:11px;font-weight:800;letter-spacing:.35px}.conc-stat strong{position:relative;z-index:1;display:block;font-size:27px;color:#183e68;margin-top:7px;line-height:1.1}.conc-num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}.conc-diff{font-weight:800}.pill-coincidencia{background:#e8f7ed;color:#176534}.pill-diferencia{background:#fff1dd;color:#965600}.pill-pendiente{background:#eef2f7;color:#4a6079}
+/* Loader/fav icon: same visual language as Kardex */
+.conc-loader{position:fixed;inset:0;z-index:9998;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(243,247,253,.94);backdrop-filter:blur(4px);opacity:1;transition:opacity .35s,visibility .35s}.conc-loader.is-hidden{opacity:0;visibility:hidden;pointer-events:none}.conc-loader-logo{position:relative;width:84px;height:84px;display:flex;align-items:center;justify-content:center}.conc-loader-logo img,.conc-loader-logo svg{width:64px;height:64px;border-radius:16px;animation:concPulse 1.4s ease-in-out infinite;box-shadow:0 8px 24px rgba(29,78,216,.3)}.conc-loader-ring{position:absolute;inset:0;border-radius:50%;border:3px solid #d6e4fb;border-top-color:#2563eb;animation:concSpin 1s linear infinite}.conc-loader-text{font-size:13px;font-weight:700;color:#1e3a5f;letter-spacing:.3px}.conc-loader-bar{width:150px;height:4px;border-radius:99px;background:#dbe6f6;overflow:hidden}.conc-loader-bar i{display:block;width:40%;height:100%;background:#2563eb;border-radius:99px;animation:concSlide 1.1s ease-in-out infinite}@keyframes concSpin{to{transform:rotate(360deg)}}@keyframes concPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}@keyframes concSlide{0%{margin-left:-40%}100%{margin-left:100%}}
+/* Dropdown product search matching Kardex */
+.conc-combo{position:relative;flex:1;min-width:0;height:40px}.conc-combo-btn{width:100%;height:100%;border:0;background:transparent;padding:0;margin:0;display:flex;align-items:center;justify-content:space-between;gap:8px;font:inherit;font-size:13px;color:#0f172a;cursor:pointer;text-align:left}.conc-combo-txt{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.conc-combo-txt.is-placeholder{color:#64748b}.conc-combo-panel{position:absolute;left:-35px;right:-12px;top:calc(100% + 12px);z-index:60;background:#fff;border:1px solid #dfe8f5;border-radius:12px;box-shadow:0 16px 36px rgba(15,42,77,.2);padding:8px;min-width:280px}.conc-combo-search{display:flex;align-items:center;gap:8px;padding:0 10px;height:36px;border:1px solid #d5e0ef;border-radius:9px;margin-bottom:6px}.conc-combo-search svg{width:15px;height:15px;stroke:#475569;fill:none;stroke-width:1.8}.conc-combo-search input{flex:1;min-width:0;border:0;outline:0;font:inherit;font-size:12.5px;background:transparent}.conc-combo-list{list-style:none;margin:0;padding:0;max-height:240px;overflow-y:auto}.conc-combo-list li{padding:8px 10px;border-radius:8px;font-size:12.5px;color:#334155;cursor:pointer}.conc-combo-list li:hover,.conc-combo-list li.is-focus{background:#eef4fd;color:#1d4ed8}.conc-combo-list li.is-selected{font-weight:700;color:#1d4ed8}.conc-combo-empty{padding:12px;text-align:center;font-size:12px;color:#94a3b8}.conc-hidden{display:none!important}
+@media(max-width:850px){.conc-page{padding:14px}.conc-grid{grid-template-columns:1fr}.conc-head{align-items:flex-start}.conc-title h1{font-size:23px}.conc-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.conc-card{padding:14px}.conc-combo-panel{left:-35px;right:-12px;min-width:min(280px,80vw)}}@media(max-width:520px){.conc-stats{grid-template-columns:1fr 1fr}.conc-title-ico{width:42px;height:42px}.conc-title-ico svg{width:42px;height:42px}.conc-title h1{font-size:21px}.conc-date{display:none}}
 </style>
-<div class="conc-detail">
-    <div class="conc-head">
-        <div>
-            <h1>Comparación de inventario #{{ $reconciliacion->id }}</h1>
-            <p class="conc-muted" style="margin:6px 0 0">
-                Producto: <strong>{{ $reconciliacion->nombre ?? '—' }}</strong>
-                · Archivo: {{ $reconciliacion->archivo_origen ?? '—' }}
-                · Comparación con tolerancia de fechas de ±7 días
-            </p>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <a class="conc-btn secondary" href="{{ route('reconciliacion.index') }}">Volver al historial</a>
-            <form action="{{ route('reconciliacion.compare', $reconciliacion->id) }}" method="POST" style="margin:0">
-                @csrf
-                <button class="conc-btn" type="submit" onclick="return confirm('¿Volver a comparar esta conciliación? Se recalcularán los estados guardados; no se modificará el stock.')">Volver a comparar</button>
-            </form>
-        </div>
-    </div>
+<noscript><style>.conc-loader{display:none!important}</style></noscript>
+<div class="conc-loader" id="concLoader" role="status" aria-live="polite"><div class="conc-loader-logo"><span class="conc-loader-ring"></span><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="concLogoGradient" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b8cff"/><stop offset="1" stop-color="#1243a8"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#concLogoGradient)"/><path fill="#fff" fill-rule="evenodd" d="M17 14h15.5a18 18 0 0 1 0 36H17zM27.5 23.2v17.6h5a8.8 8.8 0 0 0 0-17.6z"/></svg></div><div class="conc-loader-text">Cargando conciliación…</div><div class="conc-loader-bar"><i></i></div></div>
 
-    @if(session('success'))
-        <div style="border-radius:10px;padding:13px 16px;margin-bottom:16px;background:#edf9f0;border:1px solid #b7e4c1;color:#176534">{{ session('success') }}</div>
-    @endif
-    @if($errors->any())
-        <div style="border-radius:10px;padding:13px 16px;margin-bottom:16px;background:#fff8f8;border:1px solid #f3b6b6;color:#a12626">
-            <ul style="margin:0;padding-left:20px">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul>
-        </div>
-    @endif
+<div class="conc-page"><div class="conc-wrap">
+ <div class="conc-head"><div class="conc-title"><div class="conc-title-ico"><svg viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5z"/><path d="m3 13 9 5 9-5M3 17l9 5 9-5"/></svg></div><div><h1>Comparación de inventario #{{ $reconciliacion->id }}</h1><p>Producto: <strong>{{ $reconciliacion->nombre ?? '—' }}</strong> · Archivo: {{ $reconciliacion->archivo_origen ?? '—' }}</p></div></div><div class="conc-head-right"><div class="conc-crumbs"><a class="conc-nav" href="/dashboard">Inicio</a><span>›</span><a class="conc-nav" href="{{ route('reconciliacion.index') }}">Conciliación</a><span>›</span><strong style="color:#0f2a4d">Detalle</strong></div><a class="conc-btn secondary conc-nav" href="{{ route('reconciliacion.index') }}">Volver al historial</a><form class="conc-loading-form" action="{{ route('reconciliacion.compare', $reconciliacion->id) }}" method="POST" style="margin:0">@csrf<button class="conc-btn" type="submit" onclick="return confirm('¿Volver a comparar esta conciliación? Se recalcularán los estados guardados; no se modificará el stock.')">↻ Volver a comparar</button></form></div></div>
+ @if(session('success'))<div class="conc-alert" style="background:#edf9f0;border:1px solid #b7e4c1;color:#176534">{{ session('success') }}</div>@endif
+ @if($errors->any())<div class="conc-alert" style="background:#fff8f8;border:1px solid #f3b6b6;color:#a12626"><ul style="margin:0;padding-left:20px">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
+ <div class="conc-card"><div class="conc-stats"><div class="conc-stat"><small>TOTAL DE MOVIMIENTOS</small><strong>{{ $conteos->total ?? 0 }}</strong></div><div class="conc-stat"><small>COINCIDENCIAS</small><strong style="color:#218044">{{ $conteos->coincidencias ?? 0 }}</strong></div><div class="conc-stat"><small>DIFERENCIAS</small><strong style="color:#b36b00">{{ $conteos->diferencias ?? 0 }}</strong></div><div class="conc-stat"><small>PENDIENTES</small><strong style="color:#5b6f85">{{ $conteos->pendientes ?? 0 }}</strong></div></div></div>
+ <div class="conc-card"><div class="conc-section-head"><div><h2>Tabla comparativa</h2><p class="conc-muted">Cada fila del CSV se compara con el movimiento de DISTAN asociado. Tolerancia de fechas: ±7 días.</p></div><form method="GET" action="{{ route('reconciliacion.show', $reconciliacion->id) }}" class="conc-actions"><label class="conc-label" for="estado" style="margin:0">Mostrar:</label><select class="conc-control" style="width:auto;min-width:190px" name="estado" id="estado"><option value="" @selected(!$estadoFiltro)>Todos los estados</option><option value="diferencia" @selected($estadoFiltro === 'diferencia')>Solo diferencias</option><option value="pendiente" @selected($estadoFiltro === 'pendiente')>Solo pendientes</option><option value="coincidencia" @selected($estadoFiltro === 'coincidencia')>Solo coincidencias</option></select><button class="conc-btn" type="submit">Filtrar</button><a class="conc-btn secondary conc-nav" href="{{ route('reconciliacion.show', $reconciliacion->id) }}">Limpiar</a></form></div>
+ <div class="conc-table-wrap"><table class="conc-table" style="min-width:1450px"><thead><tr><th>Fila CSV</th><th>Razón social</th><th>Tipo</th><th>Fecha CSV</th><th class="conc-num">Ingreso CSV</th><th class="conc-num">Salida CSV</th><th>Fuente Kardex</th><th>Referencia Kardex</th><th>Fecha Kardex</th><th class="conc-num">Cantidad Kardex</th><th class="conc-num">Diferencia cantidad</th><th>Resultado</th><th>Observación</th></tr></thead><tbody>
+ @forelse($movimientos as $m)@php $status=$m->estado_conciliacion??'pendiente';$statusLabel=$status==='coincidencia'?'Coincidencia':($status==='diferencia'?'Diferencia':'Pendiente'); @endphp<tr><td><strong>{{ $m->numero_fila }}</strong></td><td>{{ $m->razon_social ?: '—' }}</td><td>{{ $m->tipo_csv }}</td><td>{{ $m->fecha_movimiento ?: '—' }}</td><td class="conc-num">{{ number_format((float)$m->ingresos,3,'.',',') }}</td><td class="conc-num">{{ number_format((float)$m->salidas,3,'.',',') }}</td><td>{{ $m->kardex['fuente'] ?? 'Sin movimiento asociado' }}</td><td>{{ $m->kardex['referencia'] ?? '—' }}</td><td>{{ $m->kardex['fecha_kardex'] ?? '—' }}</td><td class="conc-num">{{ $m->cantidad_kardex !== null ? number_format($m->cantidad_kardex,3,'.',',') : '—' }}</td><td class="conc-num conc-diff">@if($m->diferencia_cantidad !== null){{ $m->diferencia_cantidad > 0 ? '+' : '' }}{{ number_format($m->diferencia_cantidad,3,'.',',') }}@else—@endif</td><td><span class="conc-pill pill-{{ $status }}">{{ $statusLabel }}</span></td><td style="min-width:260px">{{ $m->observacion ?: '—' }}</td></tr>@empty<tr><td colspan="13" style="text-align:center;padding:28px">No hay movimientos para el filtro seleccionado.</td></tr>@endforelse
+ </tbody></table></div><p class="conc-muted" style="margin:12px 0 0">La diferencia se calcula como cantidad CSV menos cantidad Kardex. Un valor positivo indica que el CSV registra más unidades; un valor negativo indica que DISTAN registra más.</p></div>
+</div></div>
 
-    <div class="conc-card">
-        <div class="conc-stats">
-            <div class="conc-stat"><small>TOTAL DE MOVIMIENTOS</small><strong>{{ $conteos->total ?? 0 }}</strong></div>
-            <div class="conc-stat"><small>COINCIDENCIAS</small><strong style="color:#218044">{{ $conteos->coincidencias ?? 0 }}</strong></div>
-            <div class="conc-stat"><small>DIFERENCIAS</small><strong style="color:#b36b00">{{ $conteos->diferencias ?? 0 }}</strong></div>
-            <div class="conc-stat"><small>PENDIENTES</small><strong style="color:#5b6f85">{{ $conteos->pendientes ?? 0 }}</strong></div>
-        </div>
-    </div>
+<script>
+(function(){
+ var loader=document.getElementById('concLoader');
+ function hideLoader(){if(loader)loader.classList.add('is-hidden')}
+ function showLoader(){if(loader)loader.classList.remove('is-hidden')}
+ var logoSvg='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b8cff"/><stop offset="1" stop-color="#1243a8"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#g)"/><path fill="#fff" fill-rule="evenodd" d="M17 14h15.5a18 18 0 0 1 0 36H17zM27.5 23.2v17.6h5a8.8 8.8 0 0 0 0-17.6z"/></svg>';
+ var link=document.querySelector('link[rel~="icon"]');if(!link){link=document.createElement('link');link.rel='icon';document.head.appendChild(link)}link.type='image/svg+xml';link.href='data:image/svg+xml,'+encodeURIComponent(logoSvg);
+ if(document.readyState==='complete'){setTimeout(hideLoader,250)}else{window.addEventListener('load',function(){setTimeout(hideLoader,250)});setTimeout(hideLoader,5000)}window.addEventListener('pageshow',function(e){if(e.persisted)hideLoader()});
+ document.querySelectorAll('form.conc-loading-form').forEach(function(f){f.addEventListener('submit',function(){showLoader()})});
+ document.addEventListener('click',function(e){var a=e.target.closest('a.conc-nav');if(a&&a.href&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey&&a.target!=='_blank')showLoader()});
+ var sel=document.querySelector('select[data-conc-combo]');if(!sel)return;var control=sel.closest('.conc-control-wrap');var placeholder=sel.getAttribute('data-placeholder')||'Selecciona un producto...';var wrap=document.createElement('div');wrap.className='conc-combo';wrap.innerHTML='<button type="button" class="conc-combo-btn"><span class="conc-combo-txt"></span><svg viewBox="0 0 24 24" style="width:14px;height:14px;stroke:#475569;fill:none;stroke-width:1.8"><path d="m6 9 6 6 6-6"/></svg></button><div class="conc-combo-panel conc-hidden"><div class="conc-combo-search"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg><input type="text" placeholder="Escribe para buscar..." autocomplete="off"></div><ul class="conc-combo-list"></ul></div>';
+ sel.style.display='none';control.insertBefore(wrap,sel);var btn=wrap.querySelector('.conc-combo-btn'),txt=wrap.querySelector('.conc-combo-txt'),panel=wrap.querySelector('.conc-combo-panel'),input=wrap.querySelector('input'),list=wrap.querySelector('ul'),focusIndex=-1;
+ function norm(t){return(t||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'')}
+ function current(){var o=sel.options[sel.selectedIndex];if(!o||!o.value){txt.textContent=placeholder;txt.classList.add('is-placeholder')}else{txt.textContent=o.textContent.replace(/\s+/g,' ').trim();txt.classList.remove('is-placeholder')}}
+ function paint(q){q=norm(q);list.innerHTML='';var n=0;Array.prototype.forEach.call(sel.options,function(o){var t=o.textContent.replace(/\s+/g,' ').trim();if(q&&norm(t).indexOf(q)===-1)return;var li=document.createElement('li');li.textContent=t;li.setAttribute('data-value',o.value);if(o.value===sel.value)li.classList.add('is-selected');list.appendChild(li);n++});if(!n){var empty=document.createElement('div');empty.className='conc-combo-empty';empty.textContent='Sin resultados';list.appendChild(empty)}focusIndex=-1}
+ function close(){panel.classList.add('conc-hidden');control.classList.remove('is-open')}
+ function open(){panel.classList.remove('conc-hidden');control.classList.add('is-open');input.value='';paint('');setTimeout(function(){input.focus()},0)}
+ function choose(v){sel.value=v;sel.dispatchEvent(new Event('change',{bubbles:true}));current();close()}
+ btn.addEventListener('click',function(e){e.stopPropagation();panel.classList.contains('conc-hidden')?open():close()});panel.addEventListener('click',function(e){e.stopPropagation()});list.addEventListener('click',function(e){var li=e.target.closest('li[data-value]');if(li)choose(li.getAttribute('data-value'))});input.addEventListener('input',function(){paint(input.value)});input.addEventListener('keydown',function(e){var items=Array.prototype.slice.call(list.querySelectorAll('li[data-value]'));if(e.key==='ArrowDown'||e.key==='ArrowUp'){e.preventDefault();if(!items.length)return;focusIndex=e.key==='ArrowDown'?Math.min(items.length-1,focusIndex+1):Math.max(0,focusIndex-1);items.forEach(function(li,i){li.classList.toggle('is-focus',i===focusIndex)});items[focusIndex].scrollIntoView({block:'nearest'})}else if(e.key==='Enter'){e.preventDefault();var target=items[focusIndex>=0?focusIndex:0];if(target)choose(target.getAttribute('data-value'))}else if(e.key==='Escape'){close();btn.focus()}});document.addEventListener('click',close);current();
+})();
+</script>
 
-    <div class="conc-card">
-        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px">
-            <div><h2 style="font-size:17px;font-weight:800;margin:0">Tabla comparativa</h2><p class="conc-muted" style="margin:5px 0 0">Compara cada fila del CSV con el movimiento de DISTAN asociado.</p></div>
-            <form method="GET" action="{{ route('reconciliacion.show', $reconciliacion->id) }}" class="conc-filter">
-                <label for="estado" class="conc-muted">Mostrar:</label>
-                <select name="estado" id="estado">
-                    <option value="" @selected(!$estadoFiltro)>Todos los estados</option>
-                    <option value="diferencia" @selected($estadoFiltro === 'diferencia')>Solo diferencias</option>
-                    <option value="pendiente" @selected($estadoFiltro === 'pendiente')>Solo pendientes</option>
-                    <option value="coincidencia" @selected($estadoFiltro === 'coincidencia')>Solo coincidencias</option>
-                </select>
-                <button class="conc-btn" type="submit">Filtrar</button>
-                <a class="conc-btn secondary" href="{{ route('reconciliacion.show', $reconciliacion->id) }}">Limpiar</a>
-            </form>
-        </div>
-        <div class="conc-table-wrap">
-            <table class="conc-table">
-                <thead>
-                    <tr>
-                        <th>Fila CSV</th>
-                        <th>Razón social</th>
-                        <th>Tipo</th>
-                        <th>Fecha CSV</th>
-                        <th class="conc-num">Ingreso CSV</th>
-                        <th class="conc-num">Salida CSV</th>
-                        <th>Fuente Kardex</th>
-                        <th>Referencia Kardex</th>
-                        <th>Fecha Kardex</th>
-                        <th class="conc-num">Cantidad Kardex</th>
-                        <th class="conc-num">Diferencia cantidad</th>
-                        <th>Resultado</th>
-                        <th>Observación</th>
-                    </tr>
-                </thead>
-                <tbody>
-                @forelse($movimientos as $m)
-                    @php
-                        $status = $m->estado_conciliacion ?? 'pendiente';
-                        $statusLabel = $status === 'coincidencia' ? 'Coincidencia' : ($status === 'diferencia' ? 'Diferencia' : 'Pendiente');
-                        $kardexDirection = $m->tipo_csv === 'Ingreso' ? 'Ingreso' : ($m->tipo_csv === 'Salida' ? 'Salida' : '—');
-                    @endphp
-                    <tr>
-                        <td>{{ $m->numero_fila }}</td>
-                        <td>{{ $m->razon_social ?: '—' }}</td>
-                        <td>{{ $m->tipo_csv }}</td>
-                        <td>{{ $m->fecha_movimiento ?: '—' }}</td>
-                        <td class="conc-num">{{ number_format((float)$m->ingresos, 3, '.', ',') }}</td>
-                        <td class="conc-num">{{ number_format((float)$m->salidas, 3, '.', ',') }}</td>
-                        <td>{{ $m->kardex['fuente'] ?? 'Sin movimiento asociado' }}</td>
-                        <td>{{ $m->kardex['referencia'] ?? '—' }}</td>
-                        <td>{{ $m->kardex['fecha_kardex'] ?? '—' }}</td>
-                        <td class="conc-num">{{ $m->cantidad_kardex !== null ? number_format($m->cantidad_kardex, 3, '.', ',') : '—' }}</td>
-                        <td class="conc-num conc-diff">
-                            @if($m->diferencia_cantidad !== null)
-                                {{ $m->diferencia_cantidad > 0 ? '+' : '' }}{{ number_format($m->diferencia_cantidad, 3, '.', ',') }}
-                            @else
-                                —
-                            @endif
-                        </td>
-                        <td><span class="conc-pill pill-{{ $status }}">{{ $statusLabel }}</span></td>
-                        <td style="min-width:260px">{{ $m->observacion ?: '—' }}</td>
-                    </tr>
-                @empty
-                    <tr><td colspan="13" style="text-align:center;padding:28px">No hay movimientos para el filtro seleccionado.</td></tr>
-                @endforelse
-                </tbody>
-            </table>
-        </div>
-        <p class="conc-muted" style="margin:12px 0 0">La diferencia se calcula como cantidad CSV menos cantidad Kardex. Un valor positivo indica que el CSV registra más unidades; un valor negativo indica que DISTAN registra más.</p>
-    </div>
-</div>
 @endsection
