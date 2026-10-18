@@ -2,6 +2,13 @@
 
 @section('content')
 
+@php
+    // Icono de pestaña e imagen animada de carga, siguiendo el estilo de Kardex.
+    $erpLogoUrl = null;
+    $erpLogoSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><defs><linearGradient id="erpLogoGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2b8cff"/><stop offset="1" stop-color="#1243a8"/></linearGradient></defs><rect width="64" height="64" rx="15" fill="url(#erpLogoGrad)"/><path fill="#fff" fill-rule="evenodd" d="M17 14h15.5a18 18 0 0 1 0 36H17zM27.5 23.2v17.6h5a8.8 8.8 0 0 0 0-17.6z"/></svg>';
+    $erpFavicon = $erpLogoUrl ?: 'data:image/svg+xml,' . rawurlencode($erpLogoSvg);
+@endphp
+
 <style>
 *{box-sizing:border-box;}
 .pg{padding:1.25rem;background:#f1f5f9;min-height:100vh;}
@@ -1144,7 +1151,43 @@ html, body {
     .oc-back-orders span{display:inline;}
 }
 
+
+/* Buscador desplegable de productos con el mismo comportamiento visual que Kardex */
+.erp-product-combo{position:relative;width:100%;min-width:0}
+.erp-product-native{position:absolute!important;left:0!important;bottom:0!important;width:1px!important;height:1px!important;opacity:0!important;pointer-events:none!important}
+.erp-product-trigger{width:100%;min-height:36px;display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;border:1px solid #d5e0ef;border-radius:8px;background:#fff;color:#1e293b;font:inherit;font-size:12px;text-align:left;cursor:pointer}
+.erp-product-trigger:focus{outline:0;border-color:#2563eb;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+.erp-product-trigger span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.erp-product-trigger .erp-placeholder{color:#64748b}
+.erp-product-panel{position:absolute;left:0;right:0;top:calc(100% + 6px);z-index:1000;padding:8px;background:#fff;border:1px solid #dfe8f5;border-radius:10px;box-shadow:0 16px 36px rgba(15,42,77,.2)}
+.erp-product-panel[hidden]{display:none}
+.erp-product-search{width:100%;height:36px;padding:0 10px;margin-bottom:6px;border:1px solid #d5e0ef;border-radius:8px;outline:0;font:inherit;font-size:12px}
+.erp-product-search:focus{border-color:#2563eb;box-shadow:0 0 0 2px rgba(37,99,235,.1)}
+.erp-product-options{list-style:none;margin:0;padding:0;max-height:220px;overflow-y:auto}
+.erp-product-options li{padding:8px 10px;border-radius:7px;font-size:12px;color:#334155;cursor:pointer}
+.erp-product-options li:hover,.erp-product-options li.is-active{background:#eef4fd;color:#1d4ed8}
+.erp-product-options li.is-selected{font-weight:700;color:#1d4ed8}
+.erp-product-empty{padding:12px;text-align:center;color:#94a3b8;font-size:12px}
+.erp-view-loader{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:rgba(243,247,253,.94);backdrop-filter:blur(4px);opacity:1;visibility:visible;transition:opacity .35s,visibility .35s}
+.erp-view-loader.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+.erp-view-loader-logo{position:relative;width:84px;height:84px;display:flex;align-items:center;justify-content:center}
+.erp-view-loader-logo img,.erp-view-loader-logo svg{width:64px;height:64px;border-radius:16px;animation:erpLogoPulse 1.4s ease-in-out infinite;box-shadow:0 8px 24px rgba(29,78,216,.3)}
+.erp-view-loader-ring{position:absolute;inset:0;border-radius:50%;border:3px solid #d6e4fb;border-top-color:#2563eb;animation:erpLogoSpin 1s linear infinite}
+.erp-view-loader-text{font-size:13px;font-weight:700;color:#1e3a5f;letter-spacing:.3px}
+.erp-view-loader-bar{width:150px;height:4px;border-radius:99px;background:#dbe6f6;overflow:hidden}
+.erp-view-loader-bar i{display:block;width:40%;height:100%;background:#2563eb;border-radius:99px;animation:erpLogoSlide 1.1s ease-in-out infinite}
+@keyframes erpLogoSpin{to{transform:rotate(360deg)}}@keyframes erpLogoPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.07)}}@keyframes erpLogoSlide{0%{margin-left:-40%}100%{margin-left:100%}}
+@media(max-width:600px){.erp-product-panel{min-width:0}}
+
 </style>
+<noscript><style>.erp-view-loader{display:none!important}</style></noscript>
+<div class="erp-view-loader" id="erpViewLoader" role="status" aria-live="polite">
+    <div class="erp-view-loader-logo"><span class="erp-view-loader-ring"></span>
+        @if($erpLogoUrl)<img src="{{ $erpLogoUrl }}" alt="Logo DISTAN">@else{!! $erpLogoSvg !!}@endif
+    </div>
+    <div class="erp-view-loader-text">Cargando orden...</div><div class="erp-view-loader-bar"><i></i></div>
+</div>
+
 
 <div class="pg">
 
@@ -1489,12 +1532,16 @@ html, body {
             <div class="add-grid">
                 <div>
                     <label class="flabel">Producto</label>
-                    <select name="product_id" class="finput" required>
+                    <div class="erp-product-combo" data-erp-product-combo>
+                        <select name="product_id" class="finput erp-product-native" data-erp-product-select required>
                         <option value="">Seleccionar producto</option>
                         @foreach($products as $product)
                             <option value="{{ $product->id }}">{{ $product->nombre }}</option>
                         @endforeach
                     </select>
+                        <button type="button" class="erp-product-trigger" aria-expanded="false"><span class="erp-placeholder">Buscar producto...</span><b aria-hidden="true">⌄</b></button>
+                        <div class="erp-product-panel" hidden><input type="search" class="erp-product-search" placeholder="Buscar por nombre o código..." autocomplete="off"><ul class="erp-product-options"></ul></div>
+                    </div>
                 </div>
                 <div>
                     <label class="flabel">Cantidad</label>
@@ -4632,4 +4679,33 @@ document.getElementById('modalResumenOrden')?.addEventListener('click', function
 });
 
 </script>
+
+<script>
+(function(){
+  var normalize=function(v){return (v||'').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');};
+  var loader=document.getElementById('erpViewLoader');
+  var hideLoader=function(){if(loader)loader.classList.add('is-hidden');};
+  var showLoader=function(){if(loader)loader.classList.remove('is-hidden');};
+  (function(){var href=@json($erpFavicon);var link=document.querySelector('link[rel~="icon"]');if(!link){link=document.createElement('link');link.rel='icon';document.head.appendChild(link);}if(href.indexOf('data:image/svg+xml')===0)link.type='image/svg+xml';link.href=href;})();
+  if(document.readyState==='complete'){setTimeout(hideLoader,250);}else{window.addEventListener('load',function(){setTimeout(hideLoader,250);});setTimeout(hideLoader,5000);}
+  window.addEventListener('pageshow',function(e){if(e.persisted)hideLoader();});
+  document.addEventListener('submit',function(e){if(e.target.matches('form.distan-loader-form'))showLoader();});
+  document.addEventListener('click',function(e){var a=e.target.closest('a');if(a&&a.href&&!a.target&&a.origin===location.origin&&!e.ctrlKey&&!e.metaKey&&!e.shiftKey)showLoader();});
+  document.querySelectorAll('[data-erp-product-combo]').forEach(function(combo){
+    var select=combo.querySelector('[data-erp-product-select]'),trigger=combo.querySelector('.erp-product-trigger'),label=trigger.querySelector('span'),panel=combo.querySelector('.erp-product-panel'),search=combo.querySelector('.erp-product-search'),list=combo.querySelector('.erp-product-options'),active=-1;
+    if(!select)return;
+    function render(){var q=normalize(search.value),items=Array.prototype.slice.call(select.options).filter(function(o){return o.value&&normalize(o.textContent).includes(q);});list.innerHTML='';active=-1;
+      if(!items.length){var empty=document.createElement('li');empty.className='erp-product-empty';empty.textContent='No se encontraron productos';list.appendChild(empty);return;}
+      items.forEach(function(o){var li=document.createElement('li');li.textContent=o.textContent;li.dataset.value=o.value;if(o.value===select.value)li.classList.add('is-selected');li.addEventListener('mousedown',function(ev){ev.preventDefault();select.value=o.value;select.dispatchEvent(new Event('change',{bubbles:true}));updateLabel();close();});list.appendChild(li);});
+    }
+    function updateLabel(){var opt=select.options[select.selectedIndex];if(opt&&opt.value){label.textContent=opt.textContent;label.classList.remove('erp-placeholder');}else{label.textContent='Buscar producto...';label.classList.add('erp-placeholder');}}
+    function open(){document.querySelectorAll('.erp-product-panel').forEach(function(p){if(p!==panel)p.hidden=true;});panel.hidden=false;trigger.setAttribute('aria-expanded','true');search.value='';render();search.focus();}
+    function close(){panel.hidden=true;trigger.setAttribute('aria-expanded','false');trigger.focus();}
+    trigger.addEventListener('click',function(){panel.hidden?open():close();});search.addEventListener('input',render);
+    search.addEventListener('keydown',function(e){var rows=list.querySelectorAll('li[data-value]');if(e.key==='Escape'){close();return;}if(e.key==='ArrowDown'){e.preventDefault();active=Math.min(active+1,rows.length-1);}else if(e.key==='ArrowUp'){e.preventDefault();active=Math.max(active-1,0);}else if(e.key==='Enter'&&rows.length){e.preventDefault();(rows[active>=0?active:0]).dispatchEvent(new MouseEvent('mousedown',{bubbles:true}));return;}rows.forEach(function(li,i){li.classList.toggle('is-active',i===active);});if(rows[active])rows[active].scrollIntoView({block:'nearest'});});
+    select.addEventListener('change',updateLabel);document.addEventListener('click',function(e){if(!combo.contains(e.target)&&!panel.hidden)close();});updateLabel();
+  });
+})();
+</script>
+
 @endsection
