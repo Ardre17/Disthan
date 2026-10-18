@@ -133,7 +133,7 @@ $menu = [
             ['label' => 'Movimientos', 'icon' => 'swap', 'route' => 'reports.movimientos',
              'roles' => ['admin'], 'routes' => ['reports.*'], 'paths' => ['reports', 'reportes']],
        
-             ['label' => 'Movimientos',   'icon' => 'swap',   'route' => 'kardex.index',
+             ['label' => 'Kardex',   'icon' => 'swap',   'route' => 'kardex.index',
              'title' => 'Kardex',
              'roles' => ['admin'], 'paths' => ['kardex']],
 

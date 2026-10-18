@@ -410,8 +410,8 @@ const valorPendiente = @json($chartData['valor_pendiente']);
                         <th>Cliente</th>
                         <th>Producto</th>
                         <th style="text-align:right;">Producción</th>
+                        <th style="text-align:right;">Entrada directa</th>
                         <th style="text-align:right;">Salida</th>
-                        <th style="text-align:right;">Saldo</th>
                         <th style="text-align:right;">Precio U.</th>
                         <th style="text-align:right;">Subtotal</th>
                     </tr>
@@ -540,18 +540,24 @@ const valorPendiente = @json($chartData['valor_pendiente']);
         font-weight:700;
         color:#389e0d;
     ">
-
-        @if(($mov['cantidad_entrada'] ?? 0) > 0)
-            +{{ number_format($mov['cantidad_entrada']) }} entrada
-        @elseif($mov['cantidad_produccion'] > 0)
+        @if(($mov['cantidad_produccion'] ?? 0) > 0)
             +{{ number_format($mov['cantidad_produccion']) }}
-
         @else
-
             —
-
         @endif
+    </td>
 
+    {{-- ENTRADA DIRECTA A TIENDA --}}
+    <td style="
+        text-align:right;
+        font-weight:700;
+        color:#1677ff;
+    ">
+        @if(($mov['cantidad_entrada'] ?? 0) > 0)
+            +{{ number_format($mov['cantidad_entrada']) }}
+        @else
+            —
+        @endif
     </td>
 
 
@@ -571,18 +577,6 @@ const valorPendiente = @json($chartData['valor_pendiente']);
             —
 
         @endif
-
-    </td>
-
-
-    {{-- SALDO --}}
-    <td style="
-        text-align:right;
-        font-weight:800;
-        color:#1890ff;
-    ">
-
-        {{ number_format($mov['saldo']) }}
 
     </td>
 
@@ -630,7 +624,7 @@ const valorPendiente = @json($chartData['valor_pendiente']);
 
 <tr>
 
-    <td colspan="11" style="text-align:center; padding:48px; color:#bfbfbf;">
+    <td colspan="10" style="text-align:center; padding:48px; color:#bfbfbf;">
         <p style="font-size:32px;margin:0;">📭</p>
         <p style="margin:8px 0 0;"> No hay movimientos con los filtros aplicados</p>
 
