@@ -6,7 +6,7 @@
     .kx-page  { background:#f0f2f5; min-height:100vh; padding:24px; }
     .kx-card  { background:white; border-radius:10px; box-shadow:0 1px 4px rgba(0,0,0,.07); }
 
-    .kx-kpi-grid { display:grid; grid-template-columns:repeat(5,1fr); gap:14px; margin-bottom:20px; }
+    .kx-kpi-grid { display:grid; grid-template-columns:repeat(8,minmax(0,1fr)); gap:14px; margin-bottom:20px; }
     .kx-kpi { padding:16px 18px; border-radius:10px; background:white; box-shadow:0 1px 4px rgba(0,0,0,.07); border-top:3px solid transparent; transition:transform .15s; }
     .kx-kpi:hover { transform:translateY(-2px); }
     .kx-kpi-label { font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:#8c8c8c; margin:0; }
@@ -104,6 +104,37 @@
         <span style="font-size:16px;opacity:.35;">💰</span>
     </div>
 
+    <div class="kx-kpi" style="border-top-color:#1677ff;">
+        <p class="kx-kpi-label">Solicitado</p>
+        <p class="kx-kpi-value" style="color:#1677ff;">{{ number_format($totalSolicitado) }}</p>
+        <span style="font-size:16px;opacity:.35;">🧾</span>
+    </div>
+
+    <div class="kx-kpi" style="border-top-color:#d48806;">
+        <p class="kx-kpi-label">Pendiente</p>
+        <p class="kx-kpi-value" style="color:#d48806;">{{ number_format($totalPendiente) }}</p>
+        <span style="font-size:16px;opacity:.35;">⏳</span>
+    </div>
+
+    <div class="kx-kpi" style="border-top-color:#13a8a8;">
+        <p class="kx-kpi-label">Cumplimiento</p>
+        <p class="kx-kpi-value" style="color:#13a8a8;">{{ $cumplimiento === null ? 'Sin datos' : number_format($cumplimiento, 1) . '%' }}</p>
+        <span style="font-size:16px;opacity:.35;">🎯</span>
+    </div>
+
+</div>
+
+<div class="kx-card" style="padding:14px 18px;margin-bottom:20px;display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;">
+    <div>
+        <p style="font-size:12px;color:#8c8c8c;margin:0;">Valor estimado pendiente de despacho</p>
+        <p style="font-size:22px;font-weight:800;color:#cf1322;margin:3px 0 0;">S/ {{ number_format($valorPendiente, 2) }}</p>
+        <p style="font-size:11px;color:#8c8c8c;margin:3px 0 0;">Estimado según el precio unitario registrado en cada pedido; no equivale necesariamente a una pérdida contable.</p>
+    </div>
+    @if($productId || $clientId)
+        <span style="font-size:12px;background:#e6f4ff;color:#0958d9;padding:7px 11px;border-radius:6px;">Gráfico diario activado por filtro</span>
+    @else
+        <span style="font-size:12px;background:#f5f5f5;color:#595959;padding:7px 11px;border-radius:6px;">Filtra un producto o cliente para ver la tendencia diaria</span>
+    @endif
 </div>
 
 {{-- FILTROS --}}
@@ -158,6 +189,10 @@
     $totalProduccionGrafico = collect($chartData['produccion'])->sum();
 $totalSalidasGrafico    = collect($chartData['salidas'])->sum();
 $totalFact              = collect($chartData['subtotal'])->sum();
+$totalSolicitadoGrafico = collect($chartData['solicitado'])->sum();
+$totalPendienteGrafico  = collect($chartData['pendiente'])->sum();
+$totalValorPendienteGrafico = collect($chartData['valor_pendiente'])->sum();
+$cumplimientoGrafico = $totalSolicitadoGrafico > 0 ? round((($totalSolicitadoGrafico - $totalPendienteGrafico) / $totalSolicitadoGrafico) * 100, 1) : null;
 $totalOrd               = collect($chartData['ordenes'])->sum();
 
 $eficiencia = $totalProduccionGrafico > 0
@@ -170,11 +205,11 @@ $eficiencia = $totalProduccionGrafico > 0
     {{-- Header azul --}}
     <div style="background:#1890ff;padding:12px 20px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;">
         <div style="font-size:13px;font-weight:700;color:white;">{{ $chartTitle }}</div>
-        <span style="font-size:11px;color:rgba(255,255,255,.7);">Últimos 12 meses · agrupado por mes</span>
+        <span style="font-size:11px;color:rgba(255,255,255,.85);">Tendencia diaria</span>
     </div>
 
     {{-- Mini KPIs del gráfico --}}
-<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0;border-bottom:1px solid #f0f0f0;">
+<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;border-bottom:1px solid #f0f0f0;">
 
     <div style="padding:12px 18px;border-right:1px solid #f0f0f0;">
         <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">
@@ -204,12 +239,24 @@ $eficiencia = $totalProduccionGrafico > 0
     </div>
 
     <div style="padding:12px 18px;">
-        <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">
-            Movimientos
-        </p>
-        <p style="font-size:20px;font-weight:700;color:#722ed1;margin:3px 0 0;">
-            {{ number_format($totalOrd) }}
-        </p>
+        <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Pedidos</p>
+        <p style="font-size:20px;font-weight:700;color:#722ed1;margin:3px 0 0;">{{ number_format($totalOrd) }}</p>
+    </div>
+    <div style="padding:12px 18px;border-top:1px solid #f0f0f0;">
+        <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Solicitado</p>
+        <p style="font-size:20px;font-weight:700;color:#1677ff;margin:3px 0 0;">{{ number_format($totalSolicitadoGrafico) }} u.</p>
+    </div>
+    <div style="padding:12px 18px;border-top:1px solid #f0f0f0;">
+        <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Pendiente</p>
+        <p style="font-size:20px;font-weight:700;color:#d48806;margin:3px 0 0;">{{ number_format($totalPendienteGrafico) }} u.</p>
+    </div>
+    <div style="padding:12px 18px;border-top:1px solid #f0f0f0;">
+        <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Cumplimiento</p>
+        <p style="font-size:20px;font-weight:700;color:#13a8a8;margin:3px 0 0;">{{ $cumplimientoGrafico === null ? 'Sin datos' : number_format($cumplimientoGrafico, 1) . '%' }}</p>
+    </div>
+    <div style="padding:12px 18px;border-top:1px solid #f0f0f0;">
+        <p style="font-size:10px;color:#8c8c8c;text-transform:uppercase;letter-spacing:.05em;margin:0;">Valor pendiente</p>
+        <p style="font-size:20px;font-weight:700;color:#cf1322;margin:3px 0 0;">S/ {{ number_format($totalValorPendienteGrafico, 2) }}</p>
     </div>
 
 </div>
@@ -236,6 +283,9 @@ $eficiencia = $totalProduccionGrafico > 0
 const salidas    = @json($chartData['salidas']);
 const produccion = @json($chartData['produccion']);
 const subtotales = @json($chartData['subtotal']);
+const solicitado = @json($chartData['solicitado']);
+const pendiente = @json($chartData['pendiente']);
+const valorPendiente = @json($chartData['valor_pendiente']);
 
     if (!labels.length) return;
 
@@ -245,6 +295,18 @@ const subtotales = @json($chartData['subtotal']);
         data: {
             labels,
             datasets: [
+                {
+        label: 'Solicitado',
+        data: solicitado,
+        borderColor: '#1677ff',
+        backgroundColor: 'rgba(22,119,255,.06)',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#1677ff',
+        pointRadius: 3,
+        tension: 0.3,
+        fill: false,
+        yAxisID: 'y',
+    },
                 {
         label: 'Producción',
         data: produccion,
@@ -271,6 +333,18 @@ const subtotales = @json($chartData['subtotal']);
     fill: true,
     yAxisID: 'y',
 },
+                {
+        label: 'Pendiente de despacho',
+        data: pendiente,
+        borderColor: '#d48806',
+        backgroundColor: 'rgba(212,136,6,.06)',
+        borderWidth: 2.5,
+        pointBackgroundColor: '#d48806',
+        pointRadius: 3,
+        tension: 0.3,
+        fill: false,
+        yAxisID: 'y',
+},
                 
             ]
         },
@@ -289,7 +363,8 @@ const subtotales = @json($chartData['subtotal']);
                             const idx = items[0]?.dataIndex;
                             if (idx === undefined) return '';
                             const sub = subtotales[idx] ?? 0;
-                            return ['', `💰 Facturado: S/ ${parseFloat(sub).toLocaleString('es-PE', {minimumFractionDigits:2})}`];
+                            const vp = valorPendiente[idx] ?? 0;
+                            return ['', `💰 Facturado: S/ ${parseFloat(sub).toLocaleString('es-PE', {minimumFractionDigits:2})}`, `⏳ Valor pendiente: S/ ${parseFloat(vp).toLocaleString('es-PE', {minimumFractionDigits:2})}`];
                         },
                         label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString()} u.`
                     }
@@ -347,14 +422,11 @@ const subtotales = @json($chartData['subtotal']);
 @php
 
     $esProduccion = $mov['tipo'] === 'PRODUCCIÓN';
+    $esEntrada = $mov['tipo'] === 'ENTRADA';
+    $esPendiente = $mov['tipo'] === 'PEDIDO PENDIENTE';
 
-    $tipoColor = $esProduccion
-        ? '#389e0d'
-        : '#cf1322';
-
-    $tipoBg = $esProduccion
-        ? '#f6ffed'
-        : '#fff1f0';
+    $tipoColor = ($esProduccion || $esEntrada) ? '#389e0d' : ($esPendiente ? '#d48806' : '#cf1322');
+    $tipoBg = ($esProduccion || $esEntrada) ? '#f6ffed' : ($esPendiente ? '#fffbe6' : '#fff1f0');
 
 @endphp
 
@@ -396,6 +468,10 @@ const subtotales = @json($chartData['subtotal']);
 
             @if($esProduccion)
                 🟢 PRODUCCIÓN
+            @elseif($esEntrada)
+                🟢 ENTRADA DIRECTA
+            @elseif($esPendiente)
+                🟠 PEDIDO PENDIENTE
             @else
                 🔴 SALIDA
             @endif
@@ -465,8 +541,9 @@ const subtotales = @json($chartData['subtotal']);
         color:#389e0d;
     ">
 
-        @if($mov['cantidad_produccion'] > 0)
-
+        @if(($mov['cantidad_entrada'] ?? 0) > 0)
+            +{{ number_format($mov['cantidad_entrada']) }} entrada
+        @elseif($mov['cantidad_produccion'] > 0)
             +{{ number_format($mov['cantidad_produccion']) }}
 
         @else
@@ -516,7 +593,7 @@ const subtotales = @json($chartData['subtotal']);
         color:#595959;
     ">
 
-        @if($mov['tipo'] === 'SALIDA')
+        @if(in_array($mov['tipo'], ['SALIDA', 'PEDIDO PENDIENTE']))
 
             S/ {{ number_format($mov['precio_unitario'], 2) }}
 
@@ -535,7 +612,7 @@ const subtotales = @json($chartData['subtotal']);
         font-weight:600;
     ">
 
-        @if($mov['tipo'] === 'SALIDA')
+        @if(in_array($mov['tipo'], ['SALIDA', 'PEDIDO PENDIENTE']))
 
             S/ {{ number_format($mov['subtotal'], 2) }}
 

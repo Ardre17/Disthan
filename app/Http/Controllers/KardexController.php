@@ -25,8 +25,45 @@ $perPage = 20;
 $movimientos = collect();
 
         /*
+        |--------------------------------------------------------------------------
+        | 1. INGRESOS DIRECTOS A TIENDA
+        | ProductEntry ya actualiza el stock al registrar la entrada.
+        | Aquí solo lo mostramos en el historial; no volvemos a modificar stock.
+        |--------------------------------------------------------------------------
+        */
+        $entradasQuery = ProductEntry::with(['product', 'user'])
+            ->orderBy('created_at', 'asc');
+
+        if ($productId) $entradasQuery->where('product_id', $productId);
+        if ($dateFrom) $entradasQuery->whereDate('created_at', '>=', $dateFrom);
+        if ($dateTo) $entradasQuery->whereDate('created_at', '<=', $dateTo);
+
+        foreach ($entradasQuery->get() as $entrada) {
+            $movimientos->push([
+                'fecha' => $entrada->created_at,
+                'tipo' => 'ENTRADA',
+                'numero_orden' => 'ING-' . $entrada->id,
+                'cliente' => $entrada->supplier ?: 'Ingreso directo a tienda',
+                'client_id' => null,
+                'producto' => optional($entrada->product)->nombre ?? 'Sin producto',
+                'product_id' => $entrada->product_id,
+                'cantidad_solicitada' => 0,
+                'cantidad_produccion' => 0,
+                'cantidad_entrada' => (float) $entrada->quantity,
+                'cantidad_despachada' => 0,
+                'precio_unitario' => 0,
+                'subtotal' => 0,
+                'estado_orden' => 'INGRESO DIRECTO',
+                'stock_before' => $entrada->stock_before,
+                'stock_after' => $entrada->stock_after,
+                'usuario' => optional($entrada->user)->name ?? 'Sistema',
+                'origen_id' => $entrada->id,
+            ]);
+        }
+
+        /*
 |--------------------------------------------------------------------------
-| 1. PRODUCCIÓN
+| 2. PRODUCCIÓN
 |--------------------------------------------------------------------------
 | La producción se registra al finalizar una ProductionOrder.
 | Al finalizar:
@@ -163,13 +200,13 @@ foreach ($producciones as $produccion) {
                 $cantidadDespachada =
                     (float) $detail->cantidad_despachada;
 
-                if ($cantidadDespachada <= 0) {
-                    continue;
-                }
+                $cantidadSolicitada = (float) $detail->cantidad_solicitada;
 
+                // Se conserva el detalle aunque todavía no tenga despacho,
+                // para que el pedido pendiente no desaparezca del análisis.
                 $movimientos->push([
                     'fecha'               => $order->fecha_pedido,
-                    'tipo'                => 'SALIDA',
+                    'tipo'                => $cantidadDespachada > 0 ? 'SALIDA' : 'PEDIDO PENDIENTE',
 
                     'numero_orden'        => $order->numero_orden,
 
@@ -185,9 +222,10 @@ foreach ($producciones as $produccion) {
 
                     'product_id'          => $detail->product_id,
 
-                    'cantidad_solicitada' => $detail->cantidad_solicitada,
+                    'cantidad_solicitada' => $cantidadSolicitada,
 
                     'cantidad_produccion' => 0,
+                    'cantidad_entrada' => 0,
 
                     'cantidad_despachada' => $cantidadDespachada,
 
@@ -282,6 +320,8 @@ foreach ($producciones as $produccion) {
                 'cantidad_produccion' =>
                     0,
 
+                'cantidad_entrada' => 0,
+
                 'cantidad_despachada' =>
                     (float) $movimiento->cantidad,
 
@@ -348,13 +388,13 @@ foreach ($movimientos as $index => $mov) {
     }
 
     $saldos[$productIdMovimiento] +=
+        (float) ($mov['cantidad_entrada'] ?? 0);
+
+    $saldos[$productIdMovimiento] +=
         (float) $mov['cantidad_produccion'];
 
     $saldos[$productIdMovimiento] -=
         (float) $mov['cantidad_despachada'];
-
-    $saldos[$productIdMovimiento] =
-        max(0, $saldos[$productIdMovimiento]);
 
     // Collection::put() permite modificar correctamente el elemento
     $mov['saldo'] = $saldos[$productIdMovimiento];
@@ -393,6 +433,17 @@ foreach ($movimientos as $index => $mov) {
         $totalFacturado = $movimientos
             ->where('tipo', 'SALIDA')
             ->sum('subtotal');
+        $totalSolicitado = $movimientos->sum('cantidad_solicitada');
+        $totalPendiente = $movimientos->sum(function ($mov) {
+            return max(0, (float) $mov['cantidad_solicitada'] - (float) $mov['cantidad_despachada']);
+        });
+        $valorPendiente = $movimientos->sum(function ($mov) {
+            $pendiente = max(0, (float) $mov['cantidad_solicitada'] - (float) $mov['cantidad_despachada']);
+            return $pendiente * (float) $mov['precio_unitario'];
+        });
+        $cumplimiento = $totalSolicitado > 0
+            ? round((($totalSolicitado - $totalPendiente) / $totalSolicitado) * 100, 1)
+            : null;
 
 
         /*
@@ -403,94 +454,42 @@ foreach ($movimientos as $index => $mov) {
 
         $chartData = null;
 
+        // El gráfico diario se activa al filtrar por producto o cliente.
         if ($productId || $clientId) {
-
-            $porMes = $movimientos
-                ->groupBy(
-                    fn($m) =>
-                        \Carbon\Carbon::parse(
-                            $m['fecha']
-                        )->format('Y-m')
-                )
+            $porDia = $movimientos
+                ->groupBy(fn($m) => \Carbon\Carbon::parse($m['fecha'])->format('Y-m-d'))
                 ->sortKeys()
-                ->take(-12)
                 ->map(function ($grupo) {
-
+                    $solicitado = $grupo->sum('cantidad_solicitada');
+                    $despachado = $grupo->sum('cantidad_despachada');
+                    $pendiente = $grupo->sum(function ($m) {
+                        return max(0, (float) $m['cantidad_solicitada'] - (float) $m['cantidad_despachada']);
+                    });
+                    $valorPendienteDia = $grupo->sum(function ($m) {
+                        return max(0, (float) $m['cantidad_solicitada'] - (float) $m['cantidad_despachada']) * (float) $m['precio_unitario'];
+                    });
                     return [
-                        'produccion' =>
-                            $grupo->sum(
-                                'cantidad_produccion'
-                            ),
-
-                        'salidas' =>
-                            $grupo->sum(
-                                'cantidad_despachada'
-                            ),
-
-                        'subtotal' =>
-                            $grupo->sum('subtotal'),
-
-                        'ordenes' =>
-                            $grupo
-                                ->where(
-                                    'tipo',
-                                    'SALIDA'
-                                )
-                                ->pluck(
-                                    'numero_orden'
-                                )
-                                ->unique()
-                                ->count(),
+                        'solicitado' => $solicitado,
+                        'produccion' => $grupo->sum('cantidad_produccion'),
+                        'salidas' => $despachado,
+                        'pendiente' => $pendiente,
+                        'valor_pendiente' => $valorPendienteDia,
+                        'subtotal' => $grupo->where('tipo', 'SALIDA')->sum('subtotal'),
+                        'ordenes' => $grupo->whereIn('tipo', ['SALIDA', 'PEDIDO PENDIENTE'])->pluck('numero_orden')->unique()->count(),
                     ];
                 });
 
             $chartData = [
-
-                'labels' =>
-                    $porMes->keys()
-                        ->map(
-                            fn($k) =>
-                                \Carbon\Carbon::parse(
-                                    $k . '-01'
-                                )->translatedFormat(
-                                    'M Y'
-                                )
-                        )
-                        ->values(),
-
-                'produccion' =>
-                    $porMes
-                        ->pluck('produccion')
-                        ->values(),
-
-                'salidas' =>
-                    $porMes
-                        ->pluck('salidas')
-                        ->values(),
-
-                'subtotal' =>
-                    $porMes
-                        ->pluck('subtotal')
-                        ->values(),
-
-                'ordenes' =>
-                    $porMes
-                        ->pluck('ordenes')
-                        ->values(),
-
-                'producto' =>
-                    $productId
-                        ? optional(
-                            Product::find($productId)
-                        )->nombre
-                        : null,
-
-                'cliente' =>
-                    $clientId
-                        ? optional(
-                            Client::find($clientId)
-                        )->razon_social
-                        : null,
+                'labels' => $porDia->keys()->map(fn($k) => \Carbon\Carbon::parse($k)->format('d/m/Y'))->values(),
+                'solicitado' => $porDia->pluck('solicitado')->values(),
+                'produccion' => $porDia->pluck('produccion')->values(),
+                'salidas' => $porDia->pluck('salidas')->values(),
+                'pendiente' => $porDia->pluck('pendiente')->values(),
+                'valor_pendiente' => $porDia->pluck('valor_pendiente')->values(),
+                'subtotal' => $porDia->pluck('subtotal')->values(),
+                'ordenes' => $porDia->pluck('ordenes')->values(),
+                'producto' => $productId ? optional(Product::find($productId))->nombre : null,
+                'cliente' => $clientId ? optional(Client::find($clientId))->razon_social : null,
             ];
         }
 
@@ -587,6 +586,10 @@ foreach ($movimientos as $index => $mov) {
                 'clientesActivos',
                 'productosMovidos',
                 'totalFacturado',
+                'totalSolicitado',
+                'totalPendiente',
+                'valorPendiente',
+                'cumplimiento',
 
                 'productos',
                 'clientes',
