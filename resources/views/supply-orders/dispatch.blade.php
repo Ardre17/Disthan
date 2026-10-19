@@ -1,13 +1,39 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+
+/* DISTAN ERP: identidad visual compartida y pantalla de carga */
+.distan-loading{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:rgba(243,247,253,.96);backdrop-filter:blur(4px);transition:opacity .25s ease,visibility .25s ease}
+.distan-loading.is-hidden{opacity:0;visibility:hidden;pointer-events:none}
+.distan-loading-mark{position:relative;width:76px;height:76px;display:flex;align-items:center;justify-content:center}
+.distan-loading-mark svg{width:48px;height:48px;animation:distanPulse 1.35s ease-in-out infinite}
+.distan-loading-ring{position:absolute;inset:0;border-radius:50%;border:3px solid #d6e4fb;border-top-color:#1e3a5f;animation:distanSpin .9s linear infinite}
+.distan-loading-label{font-size:13px;font-weight:700;letter-spacing:.3px;color:#1e3a5f}
+.distan-loading-track{width:150px;height:4px;border-radius:99px;background:#dbe6f6;overflow:hidden}
+.distan-loading-track i{display:block;width:38%;height:100%;background:#2563eb;border-radius:99px;animation:distanSlide 1.1s ease-in-out infinite}
+@keyframes distanSpin{to{transform:rotate(360deg)}}
+@keyframes distanPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+@keyframes distanSlide{0%{margin-left:-40%}100%{margin-left:110%}}
+
+</style>
+
+<div id="distanLoading" class="distan-loading" aria-live="polite" aria-label="Cargando DISTAN ERP">
+  <div class="distan-loading-mark">
+    <div class="distan-loading-ring"></div>
+    <svg viewBox="0 0 64 64" aria-hidden="true"><path fill="#1e3a5f" d="M32 4 57 18v28L32 60 7 46V18L32 4Zm0 7L14 21v22l18 10 18-10V21L32 11Z"/><path fill="#2563eb" d="m32 17 13 7.5v15L32 47l-13-7.5v-15L32 17Zm0 7-7 4v8l7 4 7-4v-8l-7-4Z"/></svg>
+  </div>
+  <div class="distan-loading-label">Cargando DISTAN ERP…</div>
+  <div class="distan-loading-track"><i></i></div>
+</div>
+
         <div style="display:flex; align-items:center; justify-content:space-between; gap:20px;">
             <div>
-                <h2 style="margin:0; font-size:1.5rem; font-weight:800; color:#e5f7ff;">
+                <h2 style="margin:0; font-size:1.5rem; font-weight:800; color:#1e3a5f;">
                     🚚 Registrar salida
                 </h2>
 
-                <p style="margin:5px 0 0; color:#8da5b8; font-size:0.85rem;">
+                <p style="margin:5px 0 0; color:#64748b; font-size:0.85rem;">
                     Registra los suministros que serán enviados a la planta.
                 </p>
             </div>
@@ -15,11 +41,11 @@
             <a href="{{ route('supply-orders.show', $supplyOrder) }}"
                style="
                     text-decoration:none;
-                    color:#d7e9f4;
-                    background:#102235;
-                    border:1px solid #20384d;
+                    color:#475569;
+                    background:#f1f5f9;
+                    border:1px solid #cbd5e1;
                     padding:10px 16px;
-                    border-radius:10px;
+                    border-radius:3px;
                     font-size:0.85rem;
                     font-weight:700;
                ">
@@ -45,7 +71,7 @@
                 border:1px solid #7f1d1d;
                 color:#fecaca;
                 padding:15px 18px;
-                border-radius:12px;
+                border-radius:4px;
                 margin-bottom:20px;
             ">
                 <strong>⚠ No se pudo registrar la salida</strong>
@@ -121,8 +147,8 @@
 
         {{-- RESUMEN --}}
         <div style="
-            background:#081827;
-            border:1px solid #142d40;
+            background:#ffffff;
+            border:1px solid #c9d4e0;
             border-radius:16px;
             padding:20px;
             margin-bottom:22px;
@@ -136,7 +162,7 @@
             ">
                 <div>
                     <div style="
-                        color:#91a8ba;
+                        color:#64748b;
                         font-size:0.75rem;
                         font-weight:700;
                         text-transform:uppercase;
@@ -155,19 +181,19 @@
                 </div>
 
                 <div style="text-align:right;">
-                    <div style="color:#7f9aae; font-size:0.8rem;">
+                    <div style="color:#64748b; font-size:0.8rem;">
                         Entregado
                     </div>
 
-                    <strong style="color:#55d6e8;">
+                    <strong style="color:#2563eb;">
                         {{ number_format($totalEntregado, 2) }}
                     </strong>
 
-                    <span style="color:#688094;">
+                    <span style="color:#64748b;">
                         /
                     </span>
 
-                    <strong style="color:#dbeaf2;">
+                    <strong style="color:#334155;">
                         {{ number_format($totalSolicitado, 2) }}
                     </strong>
                 </div>
@@ -176,21 +202,21 @@
 
             <div style="
                 height:9px;
-                background:#10283a;
+                background:#f8fafc;
                 border-radius:20px;
                 overflow:hidden;
             ">
                 <div style="
                     width:{{ min(100, $porcentaje) }}%;
                     height:100%;
-                    background:linear-gradient(90deg,#0891b2,#22d3ee);
+                    background:linear-gradient(90deg,#1e3a5f,#2563eb);
                     border-radius:20px;
                 "></div>
             </div>
 
             <div style="
                 margin-top:9px;
-                color:#7891a4;
+                color:#64748b;
                 font-size:0.8rem;
             ">
                 Pendiente:
@@ -209,8 +235,8 @@
             @csrf
 
             <div style="
-                background:#081827;
-                border:1px solid #142d40;
+                background:#ffffff;
+                border:1px solid #c9d4e0;
                 border-radius:16px;
                 overflow:hidden;
             ">
@@ -218,12 +244,12 @@
                 {{-- CABECERA --}}
                 <div style="
                     padding:20px 22px;
-                    border-bottom:1px solid #142d40;
+                    border-bottom:1px solid #c9d4e0;
                 ">
 
                     <h3 style="
                         margin:0;
-                        color:#e5f5fb;
+                        color:#1e3a5f;
                         font-size:1.05rem;
                         font-weight:800;
                     ">
@@ -232,7 +258,7 @@
 
                     <p style="
                         margin:5px 0 0;
-                        color:#728b9e;
+                        color:#64748b;
                         font-size:0.8rem;
                     ">
                         Ingresa solamente las cantidades que saldrán en esta entrega.
@@ -252,7 +278,7 @@
                     ">
 
                         <thead>
-                            <tr style="background:#0b1d2d;">
+                            <tr style="background:#f8fafc;">
 
                                 <th class="supply-th">
                                     SUMINISTRO
@@ -309,13 +335,13 @@
                                     $stockBajo = $stock <= $stockMinimo;
                                 @endphp
 
-                                <tr style="border-top:1px solid #142d40;">
+                                <tr style="border-top:1px solid #c9d4e0;">
 
                                     {{-- MATERIAL --}}
                                     <td style="padding:17px 18px;">
 
                                         <div style="
-                                            color:#e3f1f7;
+                                            color:#334155;
                                             font-weight:800;
                                         ">
                                             {{ $material['nombre'] ?? 'Material no encontrado' }}
@@ -323,7 +349,7 @@
 
                                         <div style="
                                             margin-top:4px;
-                                            color:#71899b;
+                                            color:#64748b;
                                             font-size:0.75rem;
                                         ">
                                             {{ $item->tipo_material }}
@@ -365,7 +391,7 @@
                                     <td>
 
                                         <span style="
-                                            color:{{ $stockBajo ? '#fb7185' : '#67e8f9' }};
+                                            color:{{ $stockBajo ? '#fb7185' : '#2563eb' }};
                                             font-weight:800;
                                         ">
                                             {{ number_format($stock, 2) }}
@@ -403,7 +429,7 @@
                                                     background:#0d2233;
                                                     color:#e8f7fc;
                                                     border:1px solid #24445a;
-                                                    border-radius:9px;
+                                                    border-radius:3px;
                                                     padding:10px 12px;
                                                     font-size:0.95rem;
                                                     font-weight:700;
@@ -449,7 +475,7 @@
                                         style="
                                             padding:50px;
                                             text-align:center;
-                                            color:#71899b;
+                                            color:#64748b;
                                         ">
                                         No hay suministros registrados en esta orden.
                                     </td>
@@ -467,7 +493,7 @@
                 {{-- OBSERVACIONES --}}
                 <div style="
                     padding:20px 22px;
-                    border-top:1px solid #142d40;
+                    border-top:1px solid #c9d4e0;
                 ">
 
                     <label style="
@@ -489,9 +515,9 @@
                             box-sizing:border-box;
                             resize:vertical;
                             background:#0a1d2c;
-                            color:#e5f5fb;
+                            color:#1e3a5f;
                             border:1px solid #203b4f;
-                            border-radius:10px;
+                            border-radius:3px;
                             padding:12px;
                             outline:none;
                         "
@@ -508,11 +534,11 @@
                     gap:15px;
                     padding:18px 22px;
                     background:#071522;
-                    border-top:1px solid #142d40;
+                    border-top:1px solid #c9d4e0;
                 ">
 
                     <div style="
-                        color:#7891a4;
+                        color:#64748b;
                         font-size:0.8rem;
                     ">
                         Los stocks se descontarán solamente al confirmar la salida.
@@ -524,9 +550,9 @@
                            style="
                                 text-decoration:none;
                                 padding:11px 18px;
-                                border-radius:9px;
+                                border-radius:3px;
                                 background:#172738;
-                                color:#c9dbe5;
+                                color:#334155;
                                 border:1px solid #294154;
                                 font-weight:700;
                                 font-size:0.85rem;
@@ -539,8 +565,8 @@
                                     border:none;
                                     cursor:pointer;
                                     padding:11px 20px;
-                                    border-radius:9px;
-                                    background:linear-gradient(135deg,#0891b2,#06b6d4);
+                                    border-radius:3px;
+                                    background:linear-gradient(135deg,#1e3a5f,#2563eb);
                                     color:white;
                                     font-weight:800;
                                     font-size:0.85rem;
@@ -562,16 +588,16 @@
     <style>
 
         .supply-info-card {
-            background:#081827;
-            border:1px solid #142d40;
-            border-radius:14px;
+            background:#ffffff;
+            border:1px solid #c9d4e0;
+            border-radius:4px;
             padding:17px 18px;
             min-width:0;
         }
 
         .supply-info-card span {
             display:block;
-            color:#647d90;
+            color:#64748b;
             font-size:0.68rem;
             font-weight:800;
             letter-spacing:.04em;
@@ -584,13 +610,13 @@
         }
 
         .supply-info-card .estado-text {
-            color:#22d3ee;
+            color:#2563eb;
         }
 
         .supply-th {
             padding:13px 18px;
             text-align:left;
-            color:#6f8799;
+            color:#64748b;
             font-size:0.68rem;
             font-weight:800;
             letter-spacing:.04em;
@@ -598,7 +624,7 @@
 
         .supply-number {
             padding:14px 18px;
-            color:#c9dbe5;
+            color:#334155;
             font-weight:700;
         }
 
@@ -643,4 +669,35 @@
         });
 
     </script>
+
+<script>
+(function () {
+    var faviconSvg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64"><path fill="#1e3a5f" d="M32 3 59 18v28L32 61 5 46V18L32 3Z"/><path fill="#fff" d="M32 13 49 23v18L32 51 15 41V23l17-10Z"/><path fill="#2563eb" d="M32 21 42 27v10L32 43 22 37V27l10-6Z"/></svg>';
+    var favicon = document.querySelector('link[rel~="icon"]');
+    if (!favicon) { favicon = document.createElement('link'); favicon.rel = 'icon'; document.head.appendChild(favicon); }
+    favicon.type = 'image/svg+xml';
+    favicon.href = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(faviconSvg);
+
+    var loader = document.getElementById('distanLoading');
+    function hideLoader(){ if(loader) loader.classList.add('is-hidden'); }
+    if (document.readyState === 'complete') { setTimeout(hideLoader, 180); }
+    else { window.addEventListener('load', function(){ setTimeout(hideLoader, 180); }, {once:true}); }
+    document.addEventListener('submit', function(event) {
+        if (event.defaultPrevented) return;
+        var form = event.target;
+        if (!(form instanceof HTMLFormElement)) return;
+        if (form.dataset.noLoading === 'true') return;
+        if (loader) loader.classList.remove('is-hidden');
+    });
+    document.addEventListener('click', function(event) {
+        var link = event.target.closest('a');
+        if (!link || link.target === '_blank' || link.hasAttribute('download')) return;
+        var href = link.getAttribute('href') || '';
+        if (!href || href.startsWith('#') || href.startsWith('javascript:') || link.dataset.noLoading === 'true') return;
+        if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+        if (loader) loader.classList.remove('is-hidden');
+    });
+})();
+</script>
+
 @endsection
