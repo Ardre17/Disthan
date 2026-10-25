@@ -1100,7 +1100,17 @@ public function stockPedidos()
 {
     $detalles = OrderDetail::with('product')
         ->whereHas('order', function ($query) {
-            $query->where('estado', '!=', 'COMPLETO');
+            $query->where('estado', '!=', 'COMPLETO')
+                ->whereIn('tipo_orden', [
+                    'LOCAL',
+                    'SUPERMERCADO',
+                    'SUPERMERCADOS',
+                    'ENCOMIENDA',
+                    'ENCOMIENDAS',
+                ]);
+        })
+        ->whereHas('product', function ($query) {
+            $query->where('activo', true);
         })
         ->get();
 
@@ -1110,6 +1120,11 @@ public function stockPedidos()
 
             $producto = $items->first()->product;
 
+            if (!$producto) {
+                return null;
+            }
+
+            // Calcular las cantidades pendientes de despacho.
             $solicitado = $items->sum(function ($item) {
                 return (float) $item->cantidad_solicitada;
             });
@@ -1118,36 +1133,72 @@ public function stockPedidos()
                 return (float) $item->cantidad_despachada;
             });
 
-            $pendiente = max(0, $solicitado - $despachado);
+            $pendiente = max(
+                0,
+                $solicitado - $despachado
+            );
 
+            // Stock actual del producto.
             $stock = (float) ($producto->stock ?? 0);
 
-            $faltante = max(0, $pendiente - $stock);
+            // Unidades que contiene cada caja.
+            $cantidadPorCaja = (float) (
+                $producto->unidadesxcaja
+                ?? $producto->cantidad_por_caja
+                ?? 0
+            );
 
+            // Unidades que faltan para atender los pedidos.
+            $faltante = max(
+                0,
+                $pendiente - $stock
+            );
+
+            // Determinar el estado del producto.
             if ($pendiente <= 0) {
+
                 $estado = 'SIN PENDIENTE';
+
             } elseif ($stock >= $pendiente) {
+
                 $estado = 'STOCK SUFICIENTE';
+
             } elseif ($stock > 0) {
+
                 $estado = 'STOCK PARCIAL';
+
             } else {
+
                 $estado = 'SOLICITAR PRODUCCIÓN';
             }
 
             return [
-                'id'          => $producto->id,
-                'codigo'      => $producto->sku ?? $producto->barcode ?? '—',
-                'nombre'      => $producto->nombre,
-                'solicitado'  => $solicitado,
-                'despachado'  => $despachado,
-                'pendiente'   => $pendiente,
-                'stock'       => $stock,
-                'faltante'    => $faltante,
-                'estado'      => $estado,
+                'id' => $producto->id,
+
+                'codigo' => $producto->sku
+                    ?? $producto->barcode
+                    ?? '—',
+
+                'nombre' => $producto->nombre,
+
+                'solicitado' => $solicitado,
+
+                'despachado' => $despachado,
+
+                'pendiente' => $pendiente,
+
+                'stock' => $stock,
+
+                'faltante' => $faltante,
+
+                'cantidad_por_caja' => $cantidadPorCaja,
+
+                'estado' => $estado,
             ];
         })
         ->filter(function ($producto) {
-            return $producto['pendiente'] > 0;
+            return $producto !== null
+                && $producto['pendiente'] > 0;
         })
         ->sortByDesc('faltante')
         ->values();
