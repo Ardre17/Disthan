@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <style>
 
-@page { margin: 26px 28px; }
+@page { margin: 34px 36px; }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 
 body {
@@ -48,7 +48,7 @@ body {
 /* SECCIONES */
 .panel { background:#eef5fd; border:1px solid #dbe7f6; border-radius:8px; padding:8px 10px; margin-bottom:10px; }
 .sec { font-size:10px; font-weight:900; color:#0f2d5c; margin-bottom:7px; }
-.sec-ic { display:inline-block; width:14px; height:14px; background:#1d4ed8; color:#fff; border-radius:3px; text-align:center; font-size:8px; line-height:14px; margin-right:5px; }
+.sec-ic { display:inline-block; width:14px; height:14px; background:#1d4ed8; color:#fff; border-radius:3px; text-align:center; font-size:8px; line-height:14px; margin-right:5px; font-family:DejaVu Sans, sans-serif; }
 .sec-ic.red { background:#dc2626; }
 .sec-ic.amb { background:#f59e0b; }
 
@@ -57,7 +57,7 @@ body {
 .kpis td { text-align:center; padding:2px 3px; }
 .kpi-n { font-size:15px; font-weight:900; color:#0f2d5c; line-height:1.1; }
 .kpi-l { font-size:7.5px; color:#475569; line-height:1.2; }
-.kpi-ic { display:inline-block; width:24px; height:24px; border-radius:6px; background:#dbe9fb; color:#1d4ed8; font-size:11px; line-height:24px; font-weight:900; }
+.kpi-ic { display:inline-block; width:24px; height:24px; border-radius:6px; background:#dbe9fb; color:#1d4ed8; font-size:9px; line-height:24px; font-weight:900; font-family:DejaVu Sans, sans-serif; }
 
 /* TABLAS */
 .tbl { width:100%; border-collapse:collapse; font-size:8.5px; background:#fff; }
@@ -179,9 +179,9 @@ body {
 
     // Estado de cada línea
     $est = function ($d) {
-        if ($d->cantidad_despachada == 0)                         return ['No despachado', 'st-no',  'row-no',  '✖'];
-        if ($d->cantidad_despachada < $d->cantidad_solicitada)    return ['Parcial',       'st-par', 'row-par', '⚠'];
-        return ['Completo', 'st-ok', '', '✔'];
+        if ($d->cantidad_despachada == 0)                         return ['No despachado', 'st-no',  'row-no',  'X'];
+        if ($d->cantidad_despachada < $d->cantidad_solicitada)    return ['Parcial',       'st-par', 'row-par', '!'];
+        return ['Completo', 'st-ok', '', 'OK'];
     };
     $cajas = function ($d) {
         $c = (int) ($d->product->cantidad_por_caja ?? 0);
@@ -335,9 +335,9 @@ body {
     // Resumen por paleta (se reutiliza abajo)
     $paletaInfo = [];
     foreach ($paletas as $nombre => $items) {
-        $pStatus = 'pc-ok'; $pTxt = 'COMPLETA'; $pEst = ['Completa', 'st-ok', '✔'];
-        if ($items->contains(fn($d) => $d->cantidad_despachada == 0))                       { $pStatus = 'pc-no';  $pTxt = 'CON INCIDENCIAS'; $pEst = ['Con incidencias', 'st-no', '✖']; }
-        elseif ($items->contains(fn($d) => $d->cantidad_despachada < $d->cantidad_solicitada)) { $pStatus = 'pc-par'; $pTxt = 'PARCIAL';         $pEst = ['Parcial', 'st-par', '⚠']; }
+        $pStatus = 'pc-ok'; $pTxt = 'COMPLETA'; $pEst = ['Completa', 'st-ok', 'OK'];
+        if ($items->contains(fn($d) => $d->cantidad_despachada == 0))                       { $pStatus = 'pc-no';  $pTxt = 'CON INCIDENCIAS'; $pEst = ['Con incidencias', 'st-no', 'X']; }
+        elseif ($items->contains(fn($d) => $d->cantidad_despachada < $d->cantidad_solicitada)) { $pStatus = 'pc-par'; $pTxt = 'PARCIAL';         $pEst = ['Parcial', 'st-par', '!']; }
         $paletaInfo[$nombre] = [
             'status' => $pStatus, 'txt' => $pTxt, 'est' => $pEst,
             'prods'  => $items->count(),
@@ -417,22 +417,22 @@ body {
 
 {{-- RESUMEN DE LA ORDEN --}}
 <div class="panel">
-    <div class="sec"><span class="sec-ic">≡</span>Resumen de la orden</div>
+    <div class="sec"><span class="sec-ic">R</span>Resumen de la orden</div>
     <table class="kpis" cellpadding="0" cellspacing="0">
         <tr>
-            <td style="width:16.6%;"><span class="kpi-ic">▣</span><div class="kpi-n">{{ $detalles->count() }}</div><div class="kpi-l">Productos<br>SKU diferentes</div></td>
-            <td style="width:16.6%;"><span class="kpi-ic">≡</span><div class="kpi-n">{{ $n($solTotal) }}</div><div class="kpi-l">Unidades<br>solicitadas</div></td>
-            <td style="width:16.6%;"><span class="kpi-ic" style="background:#d9f5e3;color:#15803d;">✔</span><div class="kpi-n">{{ $n($totalUds) }}</div><div class="kpi-l">Unidades<br>despachadas</div></td>
+            <td style="width:16.6%;"><span class="kpi-ic">P</span><div class="kpi-n">{{ $detalles->count() }}</div><div class="kpi-l">Productos<br>SKU diferentes</div></td>
+            <td style="width:16.6%;"><span class="kpi-ic">U</span><div class="kpi-n">{{ $n($solTotal) }}</div><div class="kpi-l">Unidades<br>solicitadas</div></td>
+            <td style="width:16.6%;"><span class="kpi-ic" style="background:#d9f5e3;color:#15803d;">OK</span><div class="kpi-n">{{ $n($totalUds) }}</div><div class="kpi-l">Unidades<br>despachadas</div></td>
             <td style="width:16.6%;"><span class="kpi-ic" style="background:#fde0e0;color:#dc2626;">!</span><div class="kpi-n">{{ $n($penTotal) }}</div><div class="kpi-l">Unidades<br>pendientes</div></td>
-            <td style="width:16.6%;"><span class="kpi-ic">▦</span><div class="kpi-n">{{ $paletasConNombre->count() }}</div><div class="kpi-l">Paletas<br>a despachar</div></td>
-            <td style="width:16.6%;"><span class="kpi-ic">⚖</span><div class="kpi-n">{{ number_format($pesoTotal, 2) }} kg</div><div class="kpi-l">Peso total<br>despachado</div></td>
+            <td style="width:16.6%;"><span class="kpi-ic">PL</span><div class="kpi-n">{{ $paletasConNombre->count() }}</div><div class="kpi-l">Paletas<br>a despachar</div></td>
+            <td style="width:16.6%;"><span class="kpi-ic">KG</span><div class="kpi-n">{{ number_format($pesoTotal, 2) }} kg</div><div class="kpi-l">Peso total<br>despachado</div></td>
         </tr>
     </table>
 </div>
 
 {{-- DETALLE DE PRODUCTOS (ordenado por id) --}}
 <div class="panel" style="padding-bottom:8px;">
-    <div class="sec"><span class="sec-ic">▤</span>Detalle de productos</div>
+    <div class="sec"><span class="sec-ic">D</span>Detalle de productos</div>
     <table class="tbl" cellpadding="0" cellspacing="0">
         <thead>
             <tr>
@@ -522,7 +522,7 @@ body {
 </table>
 
 {{-- DESGLOSE POR PALETAS (ordenadas P01→P02...) --}}
-<div class="sec" style="margin-bottom:6px;"><span class="sec-ic">▦</span>Desglose por paletas</div>
+<div class="sec" style="margin-bottom:6px;"><span class="sec-ic">PL</span>Desglose por paletas</div>
 
 <table style="width:100%; border-collapse:separate; border-spacing:0;" cellpadding="0" cellspacing="0">
 @foreach($paletas->chunk(2) as $par)
@@ -584,7 +584,7 @@ body {
 
 {{-- RESUMEN POR PALETAS --}}
 <div class="panel" style="margin-top:2px;">
-    <div class="sec"><span class="sec-ic">▤</span>Resumen por paletas</div>
+    <div class="sec"><span class="sec-ic">R</span>Resumen por paletas</div>
     <table class="tbl" cellpadding="0" cellspacing="0">
         <thead>
             <tr><th style="width:16%;">Paleta</th><th>Productos</th><th>Cajas</th><th>Unidades</th><th>Peso (kg)</th><th style="width:26%;">Estado</th></tr>
@@ -622,7 +622,7 @@ body {
         @if($noDesp->count())
         <td class="fcell" style="width:{{ $parcial->count() ? '50%' : '100%' }}; {{ $parcial->count() ? 'padding-right:4px;' : '' }}">
             <div class="fbox-no">
-                <div class="ftitle-no"><span class="sec-ic red">✖</span>Productos no despachados ({{ $noDesp->count() }})</div>
+                <div class="ftitle-no"><span class="sec-ic red">X</span>Productos no despachados ({{ $noDesp->count() }})</div>
                 <table class="ftbl" cellpadding="0" cellspacing="0">
                     <thead><tr><th class="no">Código</th><th class="no">Producto</th><th class="no">Solicitado</th><th class="no">Despacho</th><th class="no">Faltante</th><th class="no">Vencimiento</th></tr></thead>
                     <tbody>
@@ -644,7 +644,7 @@ body {
         @if($parcial->count())
         <td class="fcell" style="width:{{ $noDesp->count() ? '50%' : '100%' }}; {{ $noDesp->count() ? 'padding-left:4px;' : '' }}">
             <div class="fbox-par">
-                <div class="ftitle-par"><span class="sec-ic amb">⚠</span>Productos despachados parcialmente ({{ $parcial->count() }})</div>
+                <div class="ftitle-par"><span class="sec-ic amb">!</span>Productos despachados parcialmente ({{ $parcial->count() }})</div>
                 <table class="ftbl" cellpadding="0" cellspacing="0">
                     <thead><tr><th class="par">Código</th><th class="par">Producto</th><th class="par">Solicitado</th><th class="par">Despacho</th><th class="par">Faltante</th><th class="par">Vencimiento</th></tr></thead>
                     <tbody>
@@ -670,7 +670,7 @@ body {
 {{-- FALTANTES (campos originales: producto, faltante) — respaldo si el detalle no los refleja --}}
 @if(!empty($faltantes) && !$noDesp->count() && !$parcial->count())
 <div class="panel" style="margin-top:8px;">
-    <div class="sec"><span class="sec-ic red">✖</span>Productos no enviados</div>
+    <div class="sec"><span class="sec-ic red">X</span>Productos no enviados</div>
     <table class="tbl" cellpadding="0" cellspacing="0">
         <thead><tr><th style="text-align:left;">Producto</th><th>Cantidad faltante</th></tr></thead>
         <tbody>
