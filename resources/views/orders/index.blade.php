@@ -686,539 +686,190 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
 
 </div>
 
-{{-- =========================================================
-     MODAL STOCK DE PEDIDOS
-========================================================= --}}
+tabla.innerHTML = productos.map(producto => {
 
-<div id="modalStockPedidos"
-     style="
-        display:none;
-        position:fixed;
-        inset:0;
-        background:rgba(15,23,42,.60);
-        z-index:9999;
-        align-items:center;
-        justify-content:center;
-        padding:20px;
-     ">
+    let estadoColor = '#15803d';
+    let estadoBg = '#dcfce7';
+    let icono = '✅';
 
-    <div style="
-        background:#fff;
-        width:min(1100px,96vw);
-        max-height:90vh;
-        border-radius:14px;
-        box-shadow:0 25px 60px rgba(0,0,0,.30);
-        display:flex;
-        flex-direction:column;
-        overflow:hidden;
-    ">
+    const pendiente = Number(producto.pendiente || 0);
+    const stock = Number(producto.stock || 0);
+    const faltante = Number(producto.faltante || 0);
+    const cantidadPorCaja = Number(
+        producto.cantidad_por_caja || 0
+    );
 
-        {{-- CABECERA --}}
+    // Convertir unidades en cajas y unidades restantes.
+    const formatoCajas = (cantidad) => {
 
-        <div style="
-            padding:16px 20px;
-            border-bottom:1px solid #e5e7eb;
-            display:flex;
-            justify-content:space-between;
-            align-items:center;
-        ">
+        cantidad = Number(cantidad || 0);
 
-            <div>
+        if (cantidadPorCaja <= 0) {
+            return 'Sin configuración';
+        }
+
+        const cajas = Math.floor(
+            cantidad / cantidadPorCaja
+        );
+
+        const unidadesRestantes =
+            cantidad % cantidadPorCaja;
+
+        if (unidadesRestantes > 0) {
+            return `${cajas} cajas + ${unidadesRestantes} und.`;
+        }
+
+        return `${cajas} cajas`;
+    };
+
+    // Conversión decimal para comparar cantidades en cajas.
+    const cajasDecimales = (cantidad) => {
+
+        if (cantidadPorCaja <= 0) {
+            return '—';
+        }
+
+        return (
+            Number(cantidad || 0) / cantidadPorCaja
+        ).toFixed(2) + ' cajas';
+    };
+
+    if (producto.estado === 'STOCK PARCIAL') {
+
+        estadoColor = '#b45309';
+        estadoBg = '#fef3c7';
+        icono = '🟡';
+
+    } else if (
+        producto.estado === 'SOLICITAR PRODUCCIÓN'
+    ) {
+
+        estadoColor = '#b91c1c';
+        estadoBg = '#fee2e2';
+        icono = '🏭';
+    }
+
+    return `
+        <tr style="border-bottom:1px solid #f1f5f9;">
+
+            <td style="
+                padding:12px 10px;
+                font-family:monospace;
+                font-weight:700;
+            ">
+                ${producto.codigo}
+            </td>
+
+            <td style="
+                padding:12px 10px;
+                font-weight:600;
+                min-width:200px;
+            ">
+                ${producto.nombre}
+            </td>
+
+            <td style="
+                padding:12px 10px;
+                text-align:center;
+            ">
+                <div style="font-weight:700;">
+                    ${pendiente.toLocaleString()} und.
+                </div>
 
                 <div style="
-                    font-size:18px;
-                    font-weight:800;
-                    color:#1e293b;
-                ">
-                    📦 Stock de productos en pedidos
-                </div>
-
-                <div style="
-                    font-size:12px;
-                    color:#94a3b8;
-                    margin-top:3px;
-                ">
-                    Solo productos pendientes de órdenes abiertas
-                </div>
-
-            </div>
-
-            <button
-                type="button"
-                onclick="cerrarStockPedidos()"
-                style="
-                    width:32px;
-                    height:32px;
-                    border:none;
-                    border-radius:7px;
-                    background:#f1f5f9;
-                    color:#475569;
-                    font-size:20px;
-                    cursor:pointer;
-                "
-            >
-                ×
-            </button>
-
-        </div>
-
-
-        {{-- RESUMEN --}}
-
-        <div style="
-            display:grid;
-            grid-template-columns:repeat(3,1fr);
-            gap:10px;
-            padding:15px 20px;
-            background:#f8fafc;
-            border-bottom:1px solid #e5e7eb;
-        ">
-
-            <div style="
-                background:#fff;
-                border:1px solid #e2e8f0;
-                border-radius:9px;
-                padding:10px;
-                text-align:center;
-            ">
-
-                <div style="font-size:10px;color:#94a3b8;font-weight:700;">
-                    PRODUCTOS
-                </div>
-
-                <div id="stockTotalProductos"
-                     style="font-size:20px;font-weight:800;color:#1e293b;">
-                    0
-                </div>
-
-            </div>
-
-
-            <div style="
-                background:#fff;
-                border:1px solid #e2e8f0;
-                border-radius:9px;
-                padding:10px;
-                text-align:center;
-            ">
-
-                <div style="font-size:10px;color:#94a3b8;font-weight:700;">
-                    STOCK INSUFICIENTE
-                </div>
-
-                <div id="stockInsuficiente"
-                     style="font-size:20px;font-weight:800;color:#dc2626;">
-                    0
-                </div>
-
-            </div>
-
-
-            <div style="
-                background:#fff;
-                border:1px solid #e2e8f0;
-                border-radius:9px;
-                padding:10px;
-                text-align:center;
-            ">
-
-                <div style="font-size:10px;color:#94a3b8;font-weight:700;">
-                    A PRODUCIR
-                </div>
-
-                <div id="stockProducir"
-                     style="font-size:20px;font-weight:800;color:#ea580c;">
-                    0
-                </div>
-
-            </div>
-
-        </div>
-
-
-        {{-- TABLA --}}
-
-        <div style="
-            overflow:auto;
-            padding:15px 20px;
-        ">
-
-            <table style="
-                width:100%;
-                border-collapse:collapse;
-                font-size:12px;
-            ">
-
-                <thead>
-
-                    <tr style="
-                        background:#f8fafc;
-                        border-bottom:1px solid #e2e8f0;
-                    ">
-
-                        <th style="padding:10px;text-align:left;">
-                            Código
-                        </th>
-
-                        <th style="padding:10px;text-align:left;">
-                            Producto
-                        </th>
-
-                        <th style="padding:10px;text-align:center;">
-                            Pendiente
-                        </th>
-
-                        <th style="padding:10px;text-align:center;">
-                            Stock
-                        </th>
-
-                        <th style="padding:10px;text-align:center;">
-                            Faltante
-                        </th>
-
-                        <th style="padding:10px;text-align:center;">
-                            Estado
-                        </th>
-
-                    </tr>
-
-                </thead>
-
-                <tbody id="tablaStockPedidos">
-
-                    <tr>
-                        <td
-                            colspan="6"
-                            style="
-                                padding:30px;
-                                text-align:center;
-                                color:#94a3b8;
-                            "
-                        >
-                            Presiona para cargar información...
-                        </td>
-                    </tr>
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-
-        {{-- PIE --}}
-
-        <div style="
-            padding:10px 20px;
-            border-top:1px solid #e5e7eb;
-            text-align:right;
-        ">
-
-            <button
-                type="button"
-                onclick="cerrarStockPedidos()"
-                style="
-                    padding:8px 15px;
-                    border:1px solid #cbd5e1;
-                    background:#fff;
-                    color:#475569;
-                    border-radius:7px;
-                    cursor:pointer;
-                "
-            >
-                Cerrar
-            </button>
-
-        </div>
-
-    </div>
-
-</div>
-<script>
-
-function abrirStockPedidos()
-{
-    const modal = document.getElementById('modalStockPedidos');
-
-    modal.style.display = 'flex';
-
-    document.body.style.overflow = 'hidden';
-
-    cargarStockPedidos();
-}
-
-
-function cerrarStockPedidos()
-{
-    const modal = document.getElementById('modalStockPedidos');
-
-    modal.style.display = 'none';
-
-    document.body.style.overflow = '';
-}
-
-
-async function cargarStockPedidos()
-{
-    const tabla = document.getElementById('tablaStockPedidos');
-
-    tabla.innerHTML = `
-        <tr>
-            <td colspan="6"
-                style="
-                    padding:30px;
-                    text-align:center;
+                    margin-top:4px;
+                    font-size:10px;
                     color:#64748b;
                 ">
-                ⏳ Calculando stock...
+                    📦 ${formatoCajas(pendiente)}
+                </div>
+
+                <div style="
+                    margin-top:3px;
+                    font-size:10px;
+                    color:#94a3b8;
+                ">
+                    ${cajasDecimales(pendiente)}
+                </div>
             </td>
+
+            <td style="
+                padding:12px 10px;
+                text-align:center;
+            ">
+                <div style="font-weight:700;">
+                    ${stock.toLocaleString()} und.
+                </div>
+
+                <div style="
+                    margin-top:4px;
+                    font-size:10px;
+                    color:#64748b;
+                ">
+                    📦 ${formatoCajas(stock)}
+                </div>
+
+                <div style="
+                    margin-top:3px;
+                    font-size:10px;
+                    color:#94a3b8;
+                ">
+                    ${cajasDecimales(stock)}
+                </div>
+            </td>
+
+            <td style="
+                padding:12px 10px;
+                text-align:center;
+            ">
+                <div style="
+                    font-weight:800;
+                    color:${faltante > 0 ? '#dc2626' : '#15803d'};
+                ">
+                    ${faltante.toLocaleString()} und.
+                </div>
+
+                <div style="
+                    margin-top:4px;
+                    font-size:10px;
+                    color:#64748b;
+                ">
+                    📦 ${formatoCajas(faltante)}
+                </div>
+
+                <div style="
+                    margin-top:3px;
+                    font-size:10px;
+                    color:#94a3b8;
+                ">
+                    ${cajasDecimales(faltante)}
+                </div>
+            </td>
+
+            <td style="
+                padding:12px 10px;
+                text-align:center;
+            ">
+                <span style="
+                    display:inline-flex;
+                    align-items:center;
+                    gap:4px;
+                    padding:6px 9px;
+                    border-radius:999px;
+                    background:${estadoBg};
+                    color:${estadoColor};
+                    font-size:10px;
+                    font-weight:800;
+                    white-space:nowrap;
+                ">
+                    ${icono} ${producto.estado}
+                </span>
+            </td>
+
         </tr>
     `;
 
-    try {
-
-        const response = await fetch(
-            "{{ route('orders.stockPedidos') }}"
-        );
-
-        if (!response.ok) {
-            throw new Error('Error al consultar stock');
-        }
-
-        const productos = await response.json();
-
-
-        document.getElementById('stockTotalProductos').textContent =
-            productos.length;
-
-
-        const insuficientes = productos.filter(producto =>
-            producto.stock < producto.pendiente
-        ).length;
-
-
-        const producir = productos.reduce(
-            (total, producto) => total + Number(producto.faltante),
-            0
-        );
-
-
-        document.getElementById('stockInsuficiente').textContent =
-            insuficientes;
-
-
-        document.getElementById('stockProducir').textContent =
-            Number(producir).toLocaleString();
-
-
-        if (productos.length === 0) {
-
-            tabla.innerHTML = `
-                <tr>
-                    <td colspan="6"
-                        style="
-                            padding:35px;
-                            text-align:center;
-                            color:#15803d;
-                            font-weight:700;
-                        ">
-                        ✅ No hay productos pendientes en las órdenes.
-                    </td>
-                </tr>
-            `;
-
-            return;
-        }
-
-
-        tabla.innerHTML = productos.map(producto => {
-
-            let estadoColor = '#15803d';
-            let estadoBg = '#dcfce7';
-            let icono = '✅';
-
-            const cantidadPorCaja =
-    Number(producto.cantidad_por_caja || 0);
-
-const formatoCajas = (cantidad) => {
-
-    cantidad = Number(cantidad || 0);
-
-    if (cantidadPorCaja <= 0) {
-        return 'Sin configuración';
-    }
-
-    const cajas =
-        Math.floor(cantidad / cantidadPorCaja);
-
-    const unidadesRestantes =
-        cantidad % cantidadPorCaja;
-
-        
-    if (unidadesRestantes > 0) {
-
-        return `${cajas} cajas + ${unidadesRestantes} und.`;
-
-    }
-
-    return `${cajas} cajas`;
-};
-
-            if (producto.estado === 'STOCK PARCIAL') {
-
-                estadoColor = '#b45309';
-                estadoBg = '#fef3c7';
-                icono = '🟡';
-
-            } else if (producto.estado === 'SOLICITAR PRODUCCIÓN') {
-
-                estadoColor = '#b91c1c';
-                estadoBg = '#fee2e2';
-                icono = '🏭';
-
-            }
-
-
-            return `
-                <tr style="border-bottom:1px solid #f1f5f9;">
-
-                    <td style="
-                        padding:10px;
-                        font-family:monospace;
-                        font-weight:700;
-                    ">
-                        ${producto.codigo}
-                    </td>
-
-                    <td style="
-                        padding:10px;
-                        font-weight:600;
-                    ">
-                        ${producto.nombre}
-                    </td>
-    <td style="
-    padding:10px;
-    text-align:center;
-">
-    <div style="
-        font-family:monospace;
-        font-weight:700;
-        color:#1e293b;
-    ">
-        ${Number(producto.pendiente).toLocaleString()} und.
-    </div>
-
-    <div style="
-        margin-top:3px;
-        font-size:10px;
-        color:#64748b;
-    ">
-        📦 ${formatoCajas(producto.pendiente)}
-    </div>
-</td>
-
-    <div style="
-        margin-top:3px;
-        font-size:10px;
-        color:#64748b;
-    ">
-        ${producto.cantidad_por_caja > 0
-            ? (Number(producto.pendiente) / Number(producto.cantidad_por_caja)).toFixed(2)
-            : '0'} cajas
-    </div>
-</td>
-    <td style="
-    padding:10px;
-    text-align:center;
-">
-    <div style="
-        font-family:monospace;
-        font-weight:700;
-        color:#1e293b;
-    ">
-        ${Number(producto.stock).toLocaleString()} und.
-    </div>
-
-    <div style="
-        margin-top:3px;
-        font-size:10px;
-        color:#64748b;
-    ">
-        📦 ${formatoCajas(producto.stock)}
-    </div>
-</td>
-              <td style="
-    padding:10px;
-    text-align:center;
-">
-    <div style="
-        margin-top:3px;
-        font-size:10px;
-        color:#64748b;
-    ">
-        ${producto.cantidad_por_caja > 0
-            ? (Number(producto.stock) / Number(producto.cantidad_por_caja)).toFixed(2)
-            : '0'} cajas
-    </div>
-</td>
-<td style="
-    padding:10px;
-    text-align:center;
-">
-    <div style="
-        font-family:monospace;
-        font-weight:800;
-        color:${producto.faltante > 0 ? '#dc2626' : '#15803d'};
-    ">
-        ${Number(producto.faltante).toLocaleString()} und.
-    </div>
-
-    <div style="
-        margin-top:3px;
-        font-size:10px;
-        color:#64748b;
-    ">
-        📦 ${formatoCajas(producto.faltante)}
-    </div>
-</td>
-
-    <div style="
-        margin-top:3px;
-        font-size:10px;
-        color:#64748b;
-    ">
-        ${producto.cantidad_por_caja > 0
-            ? (Number(producto.faltante) / Number(producto.cantidad_por_caja)).toFixed(2)
-            : '0'} cajas
-    </div>
-</td>
-
-                    <td style="
-                        padding:10px;
-                        text-align:center;
-                    ">
-
-                        <span style="
-                            display:inline-flex;
-                            align-items:center;
-                            gap:4px;
-                            padding:5px 9px;
-                            border-radius:999px;
-                            background:${estadoBg};
-                            color:${estadoColor};
-                            font-size:10px;
-                            font-weight:800;
-                            white-space:nowrap;
-                        ">
-                            ${icono} ${producto.estado}
-                        </span>
-
-                    </td>
-
-                </tr>
-            `;
-
-        }).join('');
+}).join('');
 
 
     } catch (error) {
