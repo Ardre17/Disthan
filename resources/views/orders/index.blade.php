@@ -686,221 +686,287 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
 
 </div>
 
-tabla.innerHTML = productos.map(producto => {
+{{-- =========================================================
+     MODAL STOCK DE PEDIDOS · diseño profesional
+     La ruta debe devolver solo LOCAL, SUPERMERCADO y ENCOMIENDA.
+========================================================= --}}
+<style>
+    .sp-overlay{display:none;position:fixed;inset:0;z-index:9999;align-items:center;justify-content:center;padding:22px;background:rgba(15,23,42,.62);backdrop-filter:blur(4px)}
+    .sp-overlay.is-open{display:flex}
+    .sp-modal{width:min(1240px,97vw);max-height:92vh;display:flex;flex-direction:column;overflow:hidden;background:#fff;border:1px solid rgba(226,232,240,.9);border-radius:18px;box-shadow:0 28px 80px rgba(15,23,42,.28);color:#0f172a}
+    .sp-header{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px;border-bottom:1px solid #e8edf4;background:linear-gradient(135deg,#fff 0%,#f8fbff 100%)}
+    .sp-heading{display:flex;align-items:center;gap:13px;min-width:0}
+    .sp-icon{width:46px;height:46px;display:grid;place-items:center;flex-shrink:0;border-radius:13px;background:#e8f1ff;color:#2563eb;font-size:22px}
+    .sp-title{margin:0;font-size:19px;font-weight:800;letter-spacing:-.3px;color:#172554}
+    .sp-subtitle{margin-top:4px;font-size:12px;color:#64748b}
+    .sp-close{width:38px;height:38px;display:grid;place-items:center;flex-shrink:0;border:1px solid #e2e8f0;border-radius:10px;background:#fff;color:#64748b;font-size:22px;cursor:pointer;transition:.15s}
+    .sp-close:hover{background:#f1f5f9;color:#0f172a}
+    .sp-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:16px 24px;background:#f8fafc;border-bottom:1px solid #e8edf4}
+    .sp-kpi{display:flex;align-items:center;gap:12px;min-width:0;padding:14px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:13px}
+    .sp-kpi-icon{width:40px;height:40px;display:grid;place-items:center;flex-shrink:0;border-radius:11px;background:#eff6ff;font-size:18px}
+    .sp-kpi:nth-child(2) .sp-kpi-icon{background:#fff1f2}
+    .sp-kpi:nth-child(3) .sp-kpi-icon{background:#fff7ed}
+    .sp-kpi-label{font-size:10px;line-height:1.4;font-weight:800;letter-spacing:.07em;color:#64748b}
+    .sp-kpi-value{margin-top:3px;font-size:25px;line-height:1.1;font-weight:850;font-variant-numeric:tabular-nums;color:#0f172a}
+    .sp-kpi:nth-child(2) .sp-kpi-value{color:#dc2626}
+    .sp-kpi:nth-child(3) .sp-kpi-value{color:#ea580c}
+    .sp-toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 24px 10px}
+    .sp-toolbar-title{font-size:13px;font-weight:800;color:#1e293b}
+    .sp-toolbar-note{font-size:11px;color:#94a3b8;margin-top:3px}
+    .sp-tools{display:flex;align-items:center;gap:8px}
+    .sp-search{width:min(260px,36vw);padding:9px 12px;border:1px solid #dbe3ee;border-radius:9px;outline:none;font:inherit;font-size:12px;background:#fff}
+    .sp-search:focus{border-color:#60a5fa;box-shadow:0 0 0 3px rgba(37,99,235,.1)}
+    .sp-refresh{padding:9px 12px;border:1px solid #cfe0fb;border-radius:9px;background:#eff6ff;color:#1d4ed8;font-size:12px;font-weight:800;cursor:pointer}
+    .sp-refresh:disabled{opacity:.55;cursor:wait}
+    .sp-table-wrap{overflow:auto;padding:0 24px 18px;min-height:170px}
+    .sp-table{width:100%;min-width:800px;border-collapse:separate;border-spacing:0;font-size:12px}
+    .sp-table thead th{position:sticky;top:0;z-index:1;padding:12px 13px;text-align:left;white-space:nowrap;background:#f1f5f9;border-top:1px solid #e2e8f0;border-bottom:1px solid #dfe7f1;color:#475569;font-size:10px;font-weight:850;letter-spacing:.06em;text-transform:uppercase}
+    .sp-table thead th:first-child{border-radius:9px 0 0 0}
+    .sp-table thead th:last-child{border-radius:0 9px 0 0}
+    .sp-table th.num,.sp-table td.num{text-align:center}
+    .sp-table tbody td{padding:13px;border-bottom:1px solid #edf1f6;vertical-align:middle;background:#fff}
+    .sp-table tbody tr:hover td{background:#fafcff}
+    .sp-code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-weight:800;color:#334155;white-space:nowrap}
+    .sp-product{font-weight:750;color:#1e293b;min-width:200px}
+    .sp-unit{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:13px;font-weight:850;color:#0f172a;font-variant-numeric:tabular-nums;white-space:nowrap}
+    .sp-subqty{margin-top:4px;font-size:10px;color:#64748b;white-space:nowrap}
+    .sp-subqty strong{color:#475569}
+    .sp-short{color:#dc2626}
+    .sp-oknum{color:#15803d}
+    .sp-status{display:inline-flex;align-items:center;gap:6px;padding:6px 9px;border-radius:999px;font-size:10px;font-weight:850;white-space:nowrap}
+    .sp-status.good{background:#dcfce7;color:#166534}
+    .sp-status.partial{background:#fef3c7;color:#92400e}
+    .sp-status.bad{background:#fee2e2;color:#991b1b}
+    .sp-empty{padding:38px 16px!important;text-align:center;color:#64748b;font-size:13px}
+    .sp-empty-icon{display:block;margin-bottom:8px;font-size:25px}
+    .sp-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 24px;border-top:1px solid #e8edf4;background:#fbfcfe}
+    .sp-footnote{font-size:11px;color:#94a3b8;line-height:1.5}
+    .sp-footer-close{padding:9px 17px;border:1px solid #dbe3ee;border-radius:9px;background:#fff;color:#334155;font-size:12px;font-weight:800;cursor:pointer}
+    .sp-footer-close:hover{background:#f1f5f9}
+    @media(max-width:700px){
+        .sp-overlay{padding:8px;align-items:center}
+        .sp-modal{width:100%;max-height:96vh;border-radius:14px}
+        .sp-header{padding:14px}
+        .sp-title{font-size:16px}
+        .sp-subtitle{font-size:11px}
+        .sp-icon{width:39px;height:39px}
+        .sp-summary{gap:7px;padding:10px;grid-template-columns:repeat(3,minmax(0,1fr))}
+        .sp-kpi{display:block;padding:10px 8px;text-align:center}
+        .sp-kpi-icon{width:30px;height:30px;margin:0 auto 7px;font-size:15px}
+        .sp-kpi-label{font-size:8px;letter-spacing:.02em}
+        .sp-kpi-value{font-size:19px}
+        .sp-toolbar{align-items:stretch;flex-direction:column;padding:12px 12px 10px}
+        .sp-tools{width:100%}
+        .sp-search{width:100%;min-width:0;flex:1}
+        .sp-table-wrap{padding:0 10px 12px}
+        .sp-footer{padding:10px 12px}
+        .sp-footnote{max-width:70%}
+    }
+</style>
 
-    let estadoColor = '#15803d';
-    let estadoBg = '#dcfce7';
-    let icono = '✅';
+<div id="modalStockPedidos" class="sp-overlay" aria-hidden="true">
+    <section class="sp-modal" role="dialog" aria-modal="true" aria-labelledby="spModalTitle">
+        <header class="sp-header">
+            <div class="sp-heading">
+                <div class="sp-icon" aria-hidden="true">📦</div>
+                <div>
+                    <h2 class="sp-title" id="spModalTitle">Stock comprometido en pedidos</h2>
+                    <div class="sp-subtitle">Pedidos locales, supermercados y encomiendas pendientes de despacho</div>
+                </div>
+            </div>
+            <button type="button" class="sp-close" onclick="cerrarStockPedidos()" aria-label="Cerrar">×</button>
+        </header>
 
-    const pendiente = Number(producto.pendiente || 0);
-    const stock = Number(producto.stock || 0);
-    const faltante = Number(producto.faltante || 0);
-    const cantidadPorCaja = Number(
-        producto.cantidad_por_caja || 0
-    );
+        <div class="sp-summary">
+            <div class="sp-kpi">
+                <div class="sp-kpi-icon">🧾</div>
+                <div><div class="sp-kpi-label">PRODUCTOS PENDIENTES</div><div class="sp-kpi-value" id="stockTotalProductos">0</div></div>
+            </div>
+            <div class="sp-kpi">
+                <div class="sp-kpi-icon">⚠️</div>
+                <div><div class="sp-kpi-label">STOCK INSUFICIENTE</div><div class="sp-kpi-value" id="stockInsuficiente">0</div></div>
+            </div>
+            <div class="sp-kpi">
+                <div class="sp-kpi-icon">🏭</div>
+                <div><div class="sp-kpi-label">UNIDADES POR PRODUCIR</div><div class="sp-kpi-value" id="stockProducir">0</div></div>
+            </div>
+        </div>
 
-    // Convertir unidades en cajas y unidades restantes.
-    const formatoCajas = (cantidad) => {
+        <div class="sp-toolbar">
+            <div>
+                <div class="sp-toolbar-title">Resumen por producto</div>
+                <div class="sp-toolbar-note">Las cajas se calculan con las unidades por caja configuradas en el producto.</div>
+            </div>
+            <div class="sp-tools">
+                <input type="search" id="buscarStockPedidos" class="sp-search" placeholder="Buscar código o producto…" aria-label="Buscar código o producto">
+                <button type="button" id="btnActualizarStockPedidos" class="sp-refresh" onclick="cargarStockPedidos()">↻ Actualizar</button>
+            </div>
+        </div>
 
-        cantidad = Number(cantidad || 0);
+        <div class="sp-table-wrap">
+            <table class="sp-table">
+                <thead><tr>
+                    <th>Código</th>
+                    <th>Producto</th>
+                    <th class="num">Pendiente</th>
+                    <th class="num">Stock disponible</th>
+                    <th class="num">Faltante</th>
+                    <th>Estado</th>
+                </tr></thead>
+                <tbody id="tablaStockPedidos">
+                    <tr><td colspan="6" class="sp-empty"><span class="sp-empty-icon">📊</span>Abre el resumen para cargar los datos.</td></tr>
+                </tbody>
+            </table>
+        </div>
 
-        if (cantidadPorCaja <= 0) {
-            return 'Sin configuración';
-        }
+        <footer class="sp-footer">
+            <div class="sp-footnote">El faltante se calcula descontando el stock disponible del total pendiente.<br>Los productos sin configuración de caja mostrarán sus unidades, sin inventar equivalencias.</div>
+            <button type="button" class="sp-footer-close" onclick="cerrarStockPedidos()">Cerrar</button>
+        </footer>
+    </section>
+</div>
 
-        const cajas = Math.floor(
-            cantidad / cantidadPorCaja
-        );
+<script>
+(function () {
+    const modal = document.getElementById('modalStockPedidos');
+    const search = document.getElementById('buscarStockPedidos');
+    let stockPedidosCache = [];
 
-        const unidadesRestantes =
-            cantidad % cantidadPorCaja;
-
-        if (unidadesRestantes > 0) {
-            return `${cajas} cajas + ${unidadesRestantes} und.`;
-        }
-
-        return `${cajas} cajas`;
-    };
-
-    // Conversión decimal para comparar cantidades en cajas.
-    const cajasDecimales = (cantidad) => {
-
-        if (cantidadPorCaja <= 0) {
-            return '—';
-        }
-
-        return (
-            Number(cantidad || 0) / cantidadPorCaja
-        ).toFixed(2) + ' cajas';
-    };
-
-    if (producto.estado === 'STOCK PARCIAL') {
-
-        estadoColor = '#b45309';
-        estadoBg = '#fef3c7';
-        icono = '🟡';
-
-    } else if (
-        producto.estado === 'SOLICITAR PRODUCCIÓN'
-    ) {
-
-        estadoColor = '#b91c1c';
-        estadoBg = '#fee2e2';
-        icono = '🏭';
+    function escapeHtml(value) {
+        return String(value == null ? '' : value).replace(/[&<>"']/g, function (char) {
+            return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[char];
+        });
     }
 
-    return `
-        <tr style="border-bottom:1px solid #f1f5f9;">
+    function fmt(value) {
+        return Number(value || 0).toLocaleString('es-PE', { maximumFractionDigits: 2 });
+    }
 
-            <td style="
-                padding:12px 10px;
-                font-family:monospace;
-                font-weight:700;
-            ">
-                ${producto.codigo}
-            </td>
+    function cajaDetalle(unidades, unidadesPorCaja) {
+        const cantidad = Math.max(0, Number(unidades || 0));
+        const porCaja = Number(unidadesPorCaja || 0);
+        if (porCaja <= 0) return 'Sin configuración de caja';
 
-            <td style="
-                padding:12px 10px;
-                font-weight:600;
-                min-width:200px;
-            ">
-                ${producto.nombre}
-            </td>
+        const cajasCompletas = Math.floor(cantidad / porCaja);
+        const resto = Math.round((cantidad - cajasCompletas * porCaja) * 100) / 100;
+        const equivalencia = (cantidad / porCaja).toLocaleString('es-PE', {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 2
+        }) + ' cajas';
+        const detalle = resto > 0
+            ? `${fmt(cajasCompletas)} cajas completas + ${fmt(resto)} und.`
+            : `${fmt(cajasCompletas)} cajas completas`;
 
-            <td style="
-                padding:12px 10px;
-                text-align:center;
-            ">
-                <div style="font-weight:700;">
-                    ${pendiente.toLocaleString()} und.
-                </div>
+        return `${detalle} · ${equivalencia}`;
+    }
 
-                <div style="
-                    margin-top:4px;
-                    font-size:10px;
-                    color:#64748b;
-                ">
-                    📦 ${formatoCajas(pendiente)}
-                </div>
+    function aplicarFiltro() {
+        const q = (search.value || '').trim().toLocaleLowerCase('es-PE');
+        const filtrados = stockPedidosCache.filter(function (p) {
+            return !q || String(p.codigo || '').toLocaleLowerCase('es-PE').includes(q)
+                || String(p.nombre || '').toLocaleLowerCase('es-PE').includes(q);
+        });
+        renderTabla(filtrados);
+    }
 
-                <div style="
-                    margin-top:3px;
-                    font-size:10px;
-                    color:#94a3b8;
-                ">
-                    ${cajasDecimales(pendiente)}
-                </div>
-            </td>
+    function renderTabla(productos) {
+        const tabla = document.getElementById('tablaStockPedidos');
+        if (!productos.length) {
+            const mensaje = stockPedidosCache.length
+                ? 'No hay productos que coincidan con la búsqueda.'
+                : 'No hay productos pendientes en los tipos de pedido incluidos.';
+            tabla.innerHTML = `<tr><td colspan="6" class="sp-empty"><span class="sp-empty-icon">${stockPedidosCache.length ? '🔎' : '✅'}</span>${mensaje}</td></tr>`;
+            return;
+        }
 
-            <td style="
-                padding:12px 10px;
-                text-align:center;
-            ">
-                <div style="font-weight:700;">
-                    ${stock.toLocaleString()} und.
-                </div>
+        tabla.innerHTML = productos.map(function (producto) {
+            const pendiente = Number(producto.pendiente || 0);
+            const stock = Number(producto.stock || 0);
+            const faltante = Number(producto.faltante || 0);
+            const porCaja = Number(producto.cantidad_por_caja || 0);
 
-                <div style="
-                    margin-top:4px;
-                    font-size:10px;
-                    color:#64748b;
-                ">
-                    📦 ${formatoCajas(stock)}
-                </div>
+            let estado = String(producto.estado || 'PENDIENTE');
+            let clase = 'good';
+            let icono = '✓';
+            if (estado === 'STOCK PARCIAL') {
+                clase = 'partial'; icono = '◐';
+            } else if (estado === 'SOLICITAR PRODUCCIÓN' || faltante > 0 && stock <= 0) {
+                clase = 'bad'; icono = '🏭';
+            } else if (faltante > 0) {
+                clase = 'partial'; icono = '⚠';
+            }
 
-                <div style="
-                    margin-top:3px;
-                    font-size:10px;
-                    color:#94a3b8;
-                ">
-                    ${cajasDecimales(stock)}
-                </div>
-            </td>
-
-            <td style="
-                padding:12px 10px;
-                text-align:center;
-            ">
-                <div style="
-                    font-weight:800;
-                    color:${faltante > 0 ? '#dc2626' : '#15803d'};
-                ">
-                    ${faltante.toLocaleString()} und.
-                </div>
-
-                <div style="
-                    margin-top:4px;
-                    font-size:10px;
-                    color:#64748b;
-                ">
-                    📦 ${formatoCajas(faltante)}
-                </div>
-
-                <div style="
-                    margin-top:3px;
-                    font-size:10px;
-                    color:#94a3b8;
-                ">
-                    ${cajasDecimales(faltante)}
-                </div>
-            </td>
-
-            <td style="
-                padding:12px 10px;
-                text-align:center;
-            ">
-                <span style="
-                    display:inline-flex;
-                    align-items:center;
-                    gap:4px;
-                    padding:6px 9px;
-                    border-radius:999px;
-                    background:${estadoBg};
-                    color:${estadoColor};
-                    font-size:10px;
-                    font-weight:800;
-                    white-space:nowrap;
-                ">
-                    ${icono} ${producto.estado}
-                </span>
-            </td>
-
-        </tr>
-    `;
-
-}).join('');
-
-
-    } catch (error) {
-
-        console.error(error);
-
-        tabla.innerHTML = `
-            <tr>
-                <td colspan="6"
-                    style="
-                        padding:30px;
-                        text-align:center;
-                        color:#dc2626;
-                    ">
-                    ❌ No se pudo cargar el stock.
+            return `<tr>
+                <td><span class="sp-code">${escapeHtml(producto.codigo || '—')}</span></td>
+                <td><div class="sp-product">${escapeHtml(producto.nombre || 'Producto sin nombre')}</div></td>
+                <td class="num">
+                    <div class="sp-unit">${fmt(pendiente)} und.</div>
+                    <div class="sp-subqty">📦 ${escapeHtml(cajaDetalle(pendiente, porCaja))}</div>
                 </td>
-            </tr>
-        `;
+                <td class="num">
+                    <div class="sp-unit">${fmt(stock)} und.</div>
+                    <div class="sp-subqty">📦 ${escapeHtml(cajaDetalle(stock, porCaja))}</div>
+                </td>
+                <td class="num">
+                    <div class="sp-unit ${faltante > 0 ? 'sp-short' : 'sp-oknum'}">${fmt(faltante)} und.</div>
+                    <div class="sp-subqty">📦 ${escapeHtml(cajaDetalle(faltante, porCaja))}</div>
+                </td>
+                <td><span class="sp-status ${clase}">${icono} ${escapeHtml(estado)}</span></td>
+            </tr>`;
+        }).join('');
     }
-}
 
+    window.abrirStockPedidos = function () {
+        modal.classList.add('is-open');
+        modal.setAttribute('aria-hidden', 'false');
+        document.body.style.overflow = 'hidden';
+        cargarStockPedidos();
+    };
 
-document.getElementById('modalStockPedidos')
-    ?.addEventListener('click', function(event) {
+    window.cerrarStockPedidos = function () {
+        modal.classList.remove('is-open');
+        modal.setAttribute('aria-hidden', 'true');
+        document.body.style.overflow = '';
+    };
 
-        if (event.target === this) {
-            cerrarStockPedidos();
+    window.cargarStockPedidos = async function () {
+        const tabla = document.getElementById('tablaStockPedidos');
+        const btn = document.getElementById('btnActualizarStockPedidos');
+        btn.disabled = true;
+        tabla.innerHTML = '<tr><td colspan="6" class="sp-empty"><span class="sp-empty-icon">⏳</span>Calculando stock y equivalencias…</td></tr>';
+
+        try {
+            const response = await fetch("{{ route('orders.stockPedidos') }}", {
+                headers: {'Accept': 'application/json'},
+                credentials: 'same-origin'
+            });
+            if (!response.ok) throw new Error(`Error HTTP ${response.status} al consultar stock`);
+
+            const productos = await response.json();
+            if (!Array.isArray(productos)) throw new Error('La respuesta del servidor no tiene el formato esperado.');
+
+            stockPedidosCache = productos;
+            document.getElementById('stockTotalProductos').textContent = fmt(productos.length);
+            document.getElementById('stockInsuficiente').textContent = fmt(productos.filter(p => Number(p.stock || 0) < Number(p.pendiente || 0)).length);
+            const producir = productos.reduce((total, p) => total + Math.max(0, Number(p.faltante || 0)), 0);
+            document.getElementById('stockProducir').textContent = fmt(producir);
+            aplicarFiltro();
+        } catch (error) {
+            console.error('Stock de pedidos:', error);
+            tabla.innerHTML = '<tr><td colspan="6" class="sp-empty"><span class="sp-empty-icon">⚠️</span>No se pudo cargar el stock. Verifica tu conexión y vuelve a intentarlo.</td></tr>';
+        } finally {
+            btn.disabled = false;
         }
+    };
 
+    search.addEventListener('input', aplicarFiltro);
+    modal.addEventListener('click', function (event) {
+        if (event.target === modal) window.cerrarStockPedidos();
     });
-
+    document.addEventListener('keydown', function (event) {
+        if (event.key === 'Escape' && modal.classList.contains('is-open')) window.cerrarStockPedidos();
+    });
+})();
 </script>
 
 <script>
