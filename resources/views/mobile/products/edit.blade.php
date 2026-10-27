@@ -2,6 +2,12 @@
 <html lang="es">
 <head>
     <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="theme-color" content="#123a63">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/distan-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icons/distan-192.png') }}">
     <title>Editar producto · DISTAN Móvil</title>
     <style>
         :root{--navy:#123a63;--blue:#1769aa;--bg:#f2f5f9;--text:#172b4d;--muted:#64748b;--line:#dbe3ed}*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif}
@@ -11,12 +17,13 @@
     </style>
 </head>
 <body>
-<header><div class="wrap"><a class="back" href="{{ route('mobile.products.index') }}">← Volver al catálogo</a><div class="title">Editar producto</div><div class="sub">{{ $product->nombre }} · SKU {{ $product->sku }}</div></div></header>
+<header><div class="wrap"><a class="back" href="{{ route('mobile.products.index', ['search' => request('search', $product->barcode ?: $product->sku)]) }}">← Volver a la consulta</a><div class="title">Editar producto</div><div class="sub">{{ $product->nombre }} · SKU {{ $product->sku }}</div></div></header>
 <main>
     @if($errors->any())<div class="errors"><strong>Revisa estos datos:</strong><ul style="margin:7px 0 0;padding-left:18px">@foreach($errors->all() as $error)<li>{{ $error }}</li>@endforeach</ul></div>@endif
-    <div class="notice">El stock se muestra como solo lectura para evitar ajustes sin movimiento de almacén. Los cambios de datos del producto se reflejan también en el ERP.</div>
+    <div class="notice">Desde aquí puedes corregir el stock físico. Cada diferencia se registrará como movimiento de ENTRADA o SALIDA con el motivo «AJUSTE DE STOCK DESDE DISTAN MÓVIL». Verifica el conteo antes de guardar.</div>
     <form action="{{ route('mobile.products.update', $product) }}" method="POST" enctype="multipart/form-data">
         @csrf @method('PUT')
+        <input type="hidden" name="search_return" value="{{ request('search', $product->barcode ?: $product->sku) }}">
         <section class="card"><h2 class="section-title">Identificación</h2><div class="grid">
             <div class="field"><label for="sku">SKU *</label><input id="sku" name="sku" value="{{ old('sku',$product->sku) }}" required></div>
             <div class="field"><label for="nombre">Nombre del producto *</label><input id="nombre" name="nombre" value="{{ old('nombre',$product->nombre) }}" required></div>
@@ -34,10 +41,19 @@
             <div class="field"><label for="fecha_produccion">Fecha de producción</label><input id="fecha_produccion" type="date" name="fecha_produccion" value="{{ old('fecha_produccion',$product->fecha_produccion ? \Illuminate\Support\Carbon::parse($product->fecha_produccion)->format('Y-m-d') : '') }}"></div>
             <div class="field"><label for="fecha_vencimiento">Fecha de vencimiento</label><input id="fecha_vencimiento" type="date" name="fecha_vencimiento" value="{{ old('fecha_vencimiento',$product->fecha_vencimiento ? \Illuminate\Support\Carbon::parse($product->fecha_vencimiento)->format('Y-m-d') : '') }}"></div>
         </div></section>
-        <section class="card"><h2 class="section-title">Stock actual</h2><div class="field"><label for="stock">Stock (solo lectura)</label><input class="readonly" id="stock" value="{{ number_format((float)$product->stock,2) }}" readonly><div class="help">Para modificar stock, utiliza el módulo de movimientos o entradas del ERP.</div></div></section>
+        <section class="card"><h2 class="section-title">Ajuste de stock</h2><div class="field"><label>Stock registrado actualmente</label><input class="readonly" value="{{ number_format((float)$product->stock,2,'.','') }}" readonly></div><div class="field"><label for="stock">Cantidad física contada *</label><input id="stock" type="number" name="stock" min="0" step="0.01" value="{{ old('stock', number_format((float)$product->stock,2,'.','')) }}" inputmode="decimal" required><div class="help">Escribe el saldo total real que contaste, no la diferencia. Puedes ingresar 0 si el producto no tiene unidades.</div></div></section>
         <section class="card"><h2 class="section-title">Imagen</h2>@if($product->imagen)<img class="image" src="{{ asset('storage/'.$product->imagen) }}" alt="Imagen actual">@endif<div class="field"><label for="imagen">Cambiar imagen del producto</label><input id="imagen" type="file" name="imagen" accept="image/*" capture="environment"><div class="help">Opcional · JPG, PNG o WEBP · máximo 4 MB.</div></div></section>
         <div class="actions"><a class="cancel" href="{{ route('mobile.products.index') }}">Cancelar</a><button class="save" type="submit">Guardar cambios</button></div>
     </form>
 </main>
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register("{{ asset('sw.js') }}", { scope: '/' }).catch(function (error) {
+            console.warn('DISTAN PWA: no se pudo registrar el service worker.', error);
+        });
+    });
+}
+</script>
 </body>
 </html>

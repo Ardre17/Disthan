@@ -4,6 +4,12 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <meta name="theme-color" content="#123a63">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="manifest" href="{{ asset('manifest.webmanifest') }}">
+    <link rel="icon" type="image/png" sizes="192x192" href="{{ asset('icons/distan-192.png') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icons/distan-192.png') }}">
     <title>DISTAN Móvil · Productos</title>
     <style>
         :root{--navy:#123a63;--blue:#1769aa;--bg:#f2f5f9;--text:#172b4d;--muted:#64748b;--line:#e2e8f0;--green:#16845b}
@@ -22,16 +28,19 @@
     </style>
 </head>
 <body>
-<header><div class="top"><div class="brand">DISTAN ERP</div><div class="title">Catálogo de productos</div><div class="subtitle">Consulta rápida y edición desde tu teléfono</div></div></header>
+<header><div class="top"><div class="brand">DISTAN ERP</div><div class="title">Catálogo de productos</div><div class="subtitle">Escanea o escribe un código para consultar y ajustar stock</div></div></header>
 <main>
     @if(session('success'))<div class="notice">✓ {{ session('success') }}</div>@endif
     @if($errors->any())<div class="error">No se pudo completar la operación. Revisa los datos del producto.</div>@endif
     <form class="search" method="GET" action="{{ route('mobile.products.index') }}">
-        <input type="search" name="search" value="{{ $search }}" placeholder="Buscar por nombre, SKU, código o lote…" aria-label="Buscar productos">
-        <button type="submit">Buscar</button>
+        <input type="search" name="search" value="{{ $search }}" placeholder="Escanea o escribe el código del producto" aria-label="Código o nombre del producto" autofocus>
+        <button type="submit">Consultar</button>
         @if($search !== '')<a class="btn" href="{{ route('mobile.products.index') }}" style="background:#64748b">✕</a>@endif
     </form>
-    <div class="count">{{ $products->total() }} producto(s) encontrado(s) · mostrando hasta 20 por página</div>
+    @if($search === '')
+        <div class="empty"><div style="font-size:36px;margin-bottom:10px">▦</div><strong>Consulta un producto</strong><div style="font-size:13px;margin-top:7px">Escanea el código de barras o escríbelo arriba. Los productos aparecerán después de consultar.</div></div>
+    @else
+    <div class="count">{{ $products->total() }} resultado(s) para «{{ $search }}»</div>
     @forelse($products as $product)
         <article class="product">
             <div class="product-head">
@@ -44,13 +53,23 @@
                 <div class="detail"><div class="label">Unidades por caja</div><div class="value">{{ $product->cantidad_por_caja ?? '—' }}</div></div>
                 <div class="detail"><div class="label">Lote</div><div class="value">{{ $product->lote ?: '—' }}</div></div>
             </div>
-            <div class="product-foot"><div class="stock">Stock actual<br><strong>{{ number_format((float)$product->stock, 2) }}</strong></div><a class="btn edit" href="{{ route('mobile.products.edit', $product) }}">Editar producto →</a></div>
+            <div class="product-foot"><div class="stock">Stock actual<br><strong>{{ number_format((float)$product->stock, 2) }}</strong></div><a class="btn edit" href="{{ route('mobile.products.edit', $product) }}">Ver / ajustar →</a></div>
         </article>
     @empty
         <div class="empty"><div style="font-size:30px;margin-bottom:8px">⌕</div><strong>No se encontraron productos</strong><div style="font-size:13px;margin-top:5px">Prueba con otro nombre, SKU, código de barras o lote.</div></div>
     @endforelse
     @if($products->hasPages())<div class="pagination">{{ $products->links() }}</div>@endif
+    @endif
 </main>
 <div class="bottom">DISTAN Móvil · Los cambios se guardan en la base de datos del ERP</div>
+<script>
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function () {
+        navigator.serviceWorker.register("{{ asset('sw.js') }}", { scope: '/' }).catch(function (error) {
+            console.warn('DISTAN PWA: no se pudo registrar el service worker.', error);
+        });
+    });
+}
+</script>
 </body>
 </html>

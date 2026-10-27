@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\Movement;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\Rule;
 
@@ -26,8 +28,12 @@ class MobileProductController extends Controller
                 });
             })
             ->orderBy('nombre')
-            ->paginate(20)
-            ->withQueryString();
+            ->when($search !== '', fn ($query) => $query->paginate(20)->withQueryString());
+
+        // Sin búsqueda no consultamos ni mostramos el catálogo completo.
+        if ($search === '') {
+            $products = Product::query()->whereRaw('1 = 0')->paginate(20);
+        }
 
         return view('mobile.products.index', compact('products', 'search'));
     }
@@ -35,7 +41,6 @@ class MobileProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::where('activo', true)->orderBy('nombre')->get();
-
         return view('mobile.products.edit', compact('product', 'categories'));
     }
 
@@ -55,12 +60,12 @@ class MobileProductController extends Controller
             'cantidad_por_caja' => ['nullable', 'integer', 'min:0'],
             'peso' => ['nullable', 'numeric', 'min:0'],
             'rotacion' => ['nullable', Rule::in(['MUY_ALTA', 'ALTA', 'MEDIA', 'BAJA'])],
+            'stock' => ['required', 'numeric', 'min:0'],
             'imagen' => ['nullable', 'image', 'max:4096'],
         ]);
 
-        // El stock se muestra en el catálogo, pero no se modifica desde esta pantalla.
-        // Los ajustes de stock deben seguir registrándose por los módulos de movimientos.
-        unset($validated['imagen']);
+        $stockNuevo = (float) $validated['stock'];
+        unset($validated['stock'], $validated['imagen']);
 
         if ($request->hasFile('imagen')) {
             if ($product->imagen) {
@@ -69,10 +74,26 @@ class MobileProductController extends Controller
             $validated['imagen'] = $request->file('imagen')->store('products', 'public');
         }
 
-        $product->update($validated);
+        DB::transaction(function () use ($product, $validated, $stockNuevo) {
+            $productBloqueado = Product::whereKey($product->id)->lockForUpdate()->firstOrFail();
+            $stockAnterior = (float) $productBloqueado->stock;
+            $diferencia = round($stockNuevo - $stockAnterior, 2);
 
-        return redirect()
-            ->route('mobile.products.index')
-            ->with('success', 'Producto actualizado correctamente.');
+            $productBloqueado->fill($validated);
+            $productBloqueado->stock = $stockNuevo;
+            $productBloqueado->save();
+
+            if (abs($diferencia) > 0.00001) {
+                Movement::create([
+                    'product_id' => $productBloqueado->id,
+                    'tipo' => $diferencia > 0 ? 'ENTRADA' : 'SALIDA',
+                    'cantidad' => abs($diferencia),
+                    'motivo' => 'AJUSTE DE STOCK DESDE DISTAN MÓVIL',
+                ]);
+            }
+        });
+
+        return redirect()->route('mobile.products.index', ['search' => $request->input('search_return', $product->barcode ?: $product->sku)])
+            ->with('success', 'Producto actualizado y ajuste de stock registrado.');
     }
 }
