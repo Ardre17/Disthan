@@ -39,6 +39,7 @@ use App\Http\Controllers\OrderValidationController;
 use App\Http\Controllers\ProductionOutputController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplyOrderController;
+use App\Http\Controllers\MobileProductController;
 
 // Dentro del grupo protegido por auth en routes/web.php:
 Route::get('/conciliacion/{id}', [ReconciliacionController::class, 'show'])
@@ -353,6 +354,14 @@ Route::post('precintos/{precinto}/movimiento', [PrecintoController::class, 'movi
      ->name('precintos.movimiento');
 
 Route::prefix('warehouse')->name('warehouse.')->middleware('auth')->group(function () {
+
+// DISTAN Móvil: catálogo y edición de productos
+Route::prefix('mobile')->name('mobile.')->group(function () {
+    Route::get('/products', [MobileProductController::class, 'index'])->name('products.index');
+    Route::get('/products/{product}/edit', [MobileProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [MobileProductController::class, 'update'])->name('products.update');
+});
+
     Route::get('/',                       [WarehouseController::class, 'index'])->name('index');
     Route::post('/{location}/assign',     [WarehouseController::class, 'assign'])->name('assign');
     Route::delete('/{location}/clear',    [WarehouseController::class, 'clear'])->name('clear');
