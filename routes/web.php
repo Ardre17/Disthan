@@ -624,6 +624,21 @@ Route::prefix('preparation')
         Route::post('/{order}/finish', 'finish')
             ->name('finish');
     });
+
+
+        // DISTAN MÓVIL: catálogo de productos
+    Route::prefix('mobile')->name('mobile.')->group(function () {
+
+        Route::get('/products', [MobileProductController::class, 'index'])
+            ->name('products.index');
+
+        Route::get('/products/{product}/edit', [MobileProductController::class, 'edit'])
+            ->name('products.edit');
+
+        Route::put('/products/{product}', [MobileProductController::class, 'update'])
+            ->name('products.update');
+
+    });
 });
 
 require __DIR__.'/auth.php';
