@@ -40,6 +40,7 @@ use App\Http\Controllers\ProductionOutputController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplyOrderController;
 use App\Http\Controllers\MobileProductController;
+use App\Http\Controllers\MobileOrderController;
 
 Route::prefix('mobile')->name('mobile.')->group(function () {
     Route::get('/products', [MobileProductController::class, 'index'])->name('products.index');
