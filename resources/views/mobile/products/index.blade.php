@@ -28,6 +28,7 @@
     </style>
 </head>
 <body>
+<nav style="display:flex;gap:8px;padding:10px 14px;max-width:760px;margin:auto"><a href="{{ route('mobile.products.index') }}" style="flex:1;text-align:center;padding:10px;border-radius:10px;background:#123a63;color:#fff;text-decoration:none;font-weight:800">Productos</a><a href="{{ route('mobile.orders.index') }}" style="flex:1;text-align:center;padding:10px;border-radius:10px;background:#fff;border:1px solid #dbe3ed;color:#123a63;text-decoration:none;font-weight:800">Pedidos</a></nav>
 <header><div class="top"><div class="brand">DISTAN ERP</div><div class="title">Catálogo de productos</div><div class="subtitle">Escanea o escribe un código para consultar y ajustar stock</div></div></header>
 <main>
     @if(session('success'))<div class="notice">✓ {{ session('success') }}</div>@endif

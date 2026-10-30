@@ -41,6 +41,14 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplyOrderController;
 use App\Http\Controllers\MobileProductController;
 
+Route::prefix('mobile')->name('mobile.')->group(function () {
+    Route::get('/products', [MobileProductController::class, 'index'])->name('products.index');
+    Route::get('/products/{product}/edit', [MobileProductController::class, 'edit'])->name('products.edit');
+    Route::put('/products/{product}', [MobileProductController::class, 'update'])->name('products.update');
+    Route::get('/orders', [MobileOrderController::class, 'index'])->name('orders.index');
+    Route::get('/orders/{order}', [MobileOrderController::class, 'show'])->name('orders.show');
+});
+
 // Dentro del grupo protegido por auth en routes/web.php:
 Route::get('/conciliacion/{id}', [ReconciliacionController::class, 'show'])
     ->whereNumber('id')
