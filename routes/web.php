@@ -42,12 +42,15 @@ use App\Http\Controllers\SupplyOrderController;
 use App\Http\Controllers\MobileProductController;
 use App\Http\Controllers\MobileOrderController;
 
+// Añadir DENTRO del grupo existente protegido por auth. Si ya hay rutas mobile.products, conservar solo una copia.
 Route::prefix('mobile')->name('mobile.')->group(function () {
+    Route::get('/', [MobileOrderController::class, 'home'])->name('home');
     Route::get('/products', [MobileProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product}/edit', [MobileProductController::class, 'edit'])->name('products.edit');
     Route::put('/products/{product}', [MobileProductController::class, 'update'])->name('products.update');
     Route::get('/orders', [MobileOrderController::class, 'index'])->name('orders.index');
     Route::get('/orders/{order}', [MobileOrderController::class, 'show'])->name('orders.show');
+    Route::post('/orders/{order}/prepare/{detail}', [MobileOrderController::class, 'savePreparation'])->name('orders.prepare');
 });
 
 // Dentro del grupo protegido por auth en routes/web.php:
