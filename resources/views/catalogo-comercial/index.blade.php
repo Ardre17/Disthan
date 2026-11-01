@@ -329,7 +329,7 @@
     background: #fff; color: #17385f; font-size: 25px; line-height: 1;
     cursor: pointer; box-shadow: 0 3px 12px rgba(0,0,0,.15);
 }
-#clProductModal .cl-modal-content { min-height: 220px; }
+#clProductModal .cl-modal-content { min-height: 220px; height: 100%; }
 #clProductModal .cl-modal-loading {
     padding: 50px 20px; text-align: center; color: #17385f; font-weight: 700;
 }
@@ -349,7 +349,7 @@ body.cl-modal-open { overflow: hidden; }
     <div class="cl-modal-panel" role="document">
         <button type="button" class="cl-modal-close" id="clModalClose" aria-label="Cerrar ventana">×</button>
         <div class="cl-modal-content" id="clModalContent">
-            <div class="cl-modal-loading">Cargando detalle del producto…</div>
+            <div class="cl-modal-loading">Selecciona un producto para ver su detalle.</div>
         </div>
     </div>
 </div>
@@ -420,55 +420,45 @@ body.cl-modal-open { overflow: hidden; }
     var previousFocus = null;
 
     function closeProductModal() {
-        if (!productModal) return;
+        if (!productModal || productModal.hidden) return;
         productModal.hidden = true;
         productModal.setAttribute('aria-hidden', 'true');
         document.body.classList.remove('cl-modal-open');
-        modalContent.innerHTML = '<div class="cl-modal-loading">Cargando detalle del producto…</div>';
+        // Destruir el iframe detiene cualquier carga pendiente y evita dejar el modal cargando.
+        modalContent.innerHTML = '<div class="cl-modal-loading">Selecciona un producto para ver su detalle.</div>';
         if (previousFocus && typeof previousFocus.focus === 'function') previousFocus.focus();
     }
 
     function openProductModal(url, trigger) {
+        if (!productModal || !modalContent) return;
         previousFocus = trigger;
         productModal.hidden = false;
         productModal.setAttribute('aria-hidden', 'false');
         document.body.classList.add('cl-modal-open');
         modalContent.innerHTML = '<div class="cl-modal-loading">Cargando detalle del producto…</div>';
-        modalClose.focus();
 
         var modalUrl = new URL(url, window.location.href);
         modalUrl.searchParams.set('modal', '1');
 
-        fetch(modalUrl.toString(), {
-            headers: { 'X-Requested-With': 'XMLHttpRequest', 'Accept': 'text/html' },
-            credentials: 'same-origin'
-        })
-        .then(function (response) {
-            if (!response.ok) throw new Error('No se pudo cargar el detalle (HTTP ' + response.status + ').');
-            return response.text();
-        })
-        .then(function (markup) {
-            var parsed = new DOMParser().parseFromString(markup, 'text/html');
-            // La vista show en modo modal devuelve el contenido de la ficha, sin la página exterior.
-            var embedded = parsed.querySelector('.pd-modal');
-            if (embedded) {
-                modalContent.innerHTML = '';
-                Array.prototype.slice.call(parsed.querySelectorAll('style[data-pd], head style')).forEach(function (node) {
-                    modalContent.appendChild(node.cloneNode(true));
-                });
-                modalContent.appendChild(embedded.cloneNode(true));
-            } else {
-                // Respaldo si el servidor devuelve la página completa.
-                modalContent.innerHTML = markup;
-            }
-        })
-        .catch(function (error) {
-            modalContent.innerHTML = '<div class="cl-modal-loading" role="alert">' +
-                'No se pudo cargar el detalle del producto.<br><small>' +
-                String(error.message || 'Error inesperado') +
-                '</small></div>';
+        var frame = document.createElement('iframe');
+        frame.title = 'Detalle comercial del producto';
+        frame.src = modalUrl.toString();
+        frame.style.cssText = 'display:block;width:100%;height:100%;min-height:600px;border:0;background:#eef3fa;';
+        frame.setAttribute('loading', 'eager');
+        frame.addEventListener('load', function () {
+            // Si el contenido ya cargó, mostrarlo sin sustituir el iframe.
+            frame.style.visibility = 'visible';
         });
+        modalContent.innerHTML = '';
+        modalContent.appendChild(frame);
+        modalClose.focus();
     }
+
+    if (modalClose) modalClose.addEventListener('click', function (event) {
+        event.preventDefault();
+        event.stopPropagation();
+        closeProductModal();
+    });
 
     document.addEventListener('click', function (event) {
         var link = event.target.closest('a.detail');
@@ -477,12 +467,9 @@ body.cl-modal-open { overflow: hidden; }
             openProductModal(link.href, link);
             return;
         }
-        if (event.target === productModal || event.target === modalClose) {
-            closeProductModal();
-        }
+        if (event.target === productModal) closeProductModal();
     });
 
-    if (modalClose) modalClose.addEventListener('click', closeProductModal);
     document.addEventListener('keydown', function (event) {
         if (event.key === 'Escape' && productModal && !productModal.hidden) {
             closeProductModal();
