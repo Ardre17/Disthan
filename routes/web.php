@@ -41,6 +41,17 @@ use App\Http\Controllers\ReportController;
 use App\Http\Controllers\SupplyOrderController;
 use App\Http\Controllers\MobileProductController;
 use App\Http\Controllers\MobileOrderController;
+use App\Http\Controllers\CatalogoComercialController;
+
+Route::prefix('catalogo-comercial')
+    ->name('catalogo.publico.')
+    ->controller(CatalogoComercialController::class)
+    ->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('/productos/{product}', 'show')
+            ->whereNumber('product')
+            ->name('show');
+    });
 
 // Añadir DENTRO del grupo existente protegido por auth. Si ya hay rutas mobile.products, conservar solo una copia.
 Route::prefix('mobile')->name('mobile.')->group(function () {
