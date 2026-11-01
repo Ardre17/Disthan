@@ -185,7 +185,7 @@ body{margin:0;background:linear-gradient(180deg,#dfe9f6,#eef3fa);color:#203047;f
 }
 </style>
 
-<div class="pd-modal {{ $pdEmbed ? 'pd-in-modal' : '' }}" role="document">
+<div class="pd-modal {{ $pdEmbed ? 'pd-in-modal' : '' }}" role="document" aria-label="Detalle del producto">
 
 {{-- Íconos (propios, no dependen de librerías) --}}
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
