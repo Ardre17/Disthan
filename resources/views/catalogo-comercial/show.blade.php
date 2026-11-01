@@ -299,14 +299,38 @@ body{margin:0;background:linear-gradient(180deg,#dfe9f6,#eef3fa);color:#203047;f
 <section class="pd-card"><h2><svg class="pd-ic"><use href="#pd-i-chart"/></svg> Indicadores Comerciales</h2>
     <div class="pd-ind">
         <div class="pd-ind-row">
-            <svg class="pd-ic {{ $variation === null ? '' : ($variation < 0 ? 'negative' : 'positive') }}"><use href="{{ $variation !== null && $variation < 0 ? '#pd-i-tdown' : '#pd-i-tup' }}"/></svg>
-            <div class="pd-ind-lab">Variación vs. mes anterior@if($pdPrev !== null && $pdActual !== null)<small>({{ number_format($pdPrev,0) }} → {{ number_format($pdActual,0) }} und.)</small>@endif</div>
-            <div class="pd-ind-val">@if($variation === null)<span style="font-size:13px;color:#64748b;">Sin base para comparar</span>@else<span class="{{ $variation < 0 ? 'negative' : 'positive' }}">{{ $variation > 0 ? '+' : '' }}{{ number_format($variation,1) }} %</span>@endif</div>
+            <svg class="pd-ic {{ $variation === null ? '' : ($variation < 0 ? 'negative' : 'positive') }}">
+                <use href="{{ $variation !== null && $variation < 0 ? '#pd-i-tdown' : '#pd-i-tup' }}"/>
+            </svg>
+            <div class="pd-ind-lab">
+                Variación vs. mes anterior
+                @if ($pdPrev !== null && $pdActual !== null)
+                    <small>({{ number_format($pdPrev, 0) }} → {{ number_format($pdActual, 0) }} und.)</small>
+                @endif
+            </div>
+            <div class="pd-ind-val">
+                @if ($variation === null)
+                    <span style="font-size:13px;color:#64748b;">Sin base para comparar</span>
+                @else
+                    <span class="{{ $variation < 0 ? 'negative' : 'positive' }}">
+                        {{ $variation > 0 ? '+' : '' }}{{ number_format($variation, 1) }} %
+                    </span>
+                @endif
+            </div>
         </div>
         <div class="pd-ind-row">
             <svg class="pd-ic" style="color:#1769aa;"><use href="#pd-i-pie"/></svg>
-            <div class="pd-ind-lab">Participación estimada en movimiento de {{ $pdCategoria }}<small>(mismo periodo)</small></div>
-            <div class="pd-ind-val" style="color:#17385f;">@if($categoryShare === null)<span style="font-size:13px;color:#64748b;">Sin datos</span>@else{{ number_format($categoryShare,1) }} %@endif</div>
+            <div class="pd-ind-lab">
+                Participación estimada en movimiento de {{ $pdCategoria }}
+                <small>(mismo periodo)</small>
+            </div>
+            <div class="pd-ind-val" style="color:#17385f;">
+                @if ($categoryShare === null)
+                    <span style="font-size:13px;color:#64748b;">Sin datos</span>
+                @else
+                    {{ number_format($categoryShare, 1) }} %
+                @endif
+            </div>
         </div>
         <div class="pd-ind-row">
             <svg class="pd-ic" style="color:#d98a0a;"><use href="#pd-i-wave"/></svg>
