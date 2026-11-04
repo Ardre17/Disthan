@@ -306,7 +306,7 @@
         @empty<tr><td colspan="10" class="empty">No se encontraron productos con esos filtros.</td></tr>@endforelse
 
         {{-- Materia prima integrada en la misma tabla; se muestra una sola vez al final de la paginación. --}}
-        @if(!request()->filled('category_id') && $products->currentPage() === $products->lastPage())
+        @if(!request()->filled('category_id') && $products->currentPage() === 1)
             @foreach(($rawMaterials ?? collect()) as $material)
                 @php
                     $materialStock = (float) ($material->stock ?? 0);
@@ -334,7 +334,7 @@
         <div class="tfoot">
             <div class="info">
                 Mostrando {{ $products->count() }} de {{ number_format($products->total()) }} productos
-                @if($products->currentPage() === $products->lastPage() && !request()->filled('category_id'))
+                @if($products->currentPage() === 1 && !request()->filled('category_id'))
                     · {{ ($rawMaterials ?? collect())->count() }} materias primas
                 @endif
                 · Página {{ $products->currentPage() }} de {{ max(1, $products->lastPage()) }}

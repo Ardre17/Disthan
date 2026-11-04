@@ -16,7 +16,7 @@ class CatalogoComercialController extends Controller
 {
     private const TIPOS_ORDEN = [
         'LOCAL', 'SUPERMERCADO', 'SUPERMERCADOS',
-        'ENCOMIENDA', 'ENCOMIENDAS',
+        'ENCOMIENDA', 'ENCOMIENDAS','EXPORTACION','EXPORTACIONES'
     ];
 
     /** Normaliza nombres para comparar inventarios sin depender de tildes o puntuación. */
@@ -158,10 +158,11 @@ class CatalogoComercialController extends Controller
             ->select('category_id')->selectRaw('COUNT(*) AS total')
             ->groupBy('category_id')->pluck('total', 'category_id');
 
+        // Igual que el módulo original de Materia Prima: incluir todos los registros.
+        // No filtrar por active, porque puede estar en false o NULL en registros existentes.
         $rawMaterials = RawMaterial::query()
-            ->where('active', true)
             ->orderBy('name')
-            ->get(['id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status']);
+            ->get(['id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status', 'cantidad_por_caja']);
 
         return view('catalogo-comercial.index', compact(
             'categories', 'products', 'totalActivos', 'conStock', 'stockBajo', 'agotados',
