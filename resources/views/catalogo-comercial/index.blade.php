@@ -260,7 +260,7 @@
     </form>
 
     <section class="tablebox">
-        <div class="scroll"><table><thead><tr><th>SKU</th><th>Producto / Material</th><th>Peso/Presentación</th><th class="c">Stock físico DISTAN</th><th class="c">Comprometido en pedidos</th><th class="c">No comprometido</th><th class="c">Materia Prima</th><th class="c">Dalsa / Cajas</th><th class="c">Joselito / Cajas</th><th class="c">Estado</th><th></th></tr></thead><tbody id="clBody">
+        <div class="scroll"><table><thead><tr><th>SKU</th><th>Producto / Material</th><th>Peso/Presentación</th><th class="c">Stock físico DISTAN</th><th class="c">Comprometido en pedidos</th><th class="c">No comprometido</th><th class="c">Materia Prima</th><th class="c">Dalsa/Cajas</th><th class="c">Joselito/Cajas</th><th class="c">Estado</th><th></th></tr></thead><tbody id="clBody">
         @forelse($products as $product)
             @php
                 $stock = (float)($product->stock ?? 0);
@@ -306,7 +306,7 @@
             </tr>
         @empty<tr><td colspan="11" class="empty">No se encontraron productos con esos filtros.</td></tr>@endforelse
 
-        {{-- Materia prima integrada como filas propias; aparece también al filtrar por categoría, en la primera página. --}}
+        {{-- Materia prima integrada en la misma tabla; visible también al filtrar categorías. --}}
         @if($products->currentPage() === 1)
             @foreach(($rawMaterials ?? collect()) as $material)
                 @php
@@ -315,10 +315,10 @@
                     $materialStatusClass = $materialStock <= 0 ? 'out' : (($materialMin > 0 && $materialStock <= $materialMin) ? 'low' : 'ok');
                     $materialStatusLabel = $materialStock <= 0 ? 'Agotado' : (($materialMin > 0 && $materialStock <= $materialMin) ? 'Stock bajo' : 'Disponible');
                 @endphp
-                <tr class="raw-material-row">
+                <tr class="cr raw-material-row" data-nombre="{{ mb_strtolower($material->name) }}" data-marca="materia prima" data-stock="0" data-comp="0" data-nocomp="0">
                     <td><div class="sku">{{ $material->code ?: '—' }}</div><div class="sub">MATERIA PRIMA</div></td>
                     <td><div class="product"><div class="icon">🧱</div><div><div class="pname">{{ $material->name }}</div><span class="kind">MATERIA PRIMA</span><div class="sub">{{ $material->category ?: 'Sin categoría' }}</div></div></div></td>
-                    <td>{{ $material->unit ?: '—' }}</td>
+                    <td>{{ $material->unit ?: '—' }}<div class="sub">{{ (int)($material->cantidad_por_caja ?? 0) > 0 ? number_format((float)$material->cantidad_por_caja, 0) . ' unidades/caja' : '—' }}</div></td>
                     <td class="c"><span class="muted">—</span></td>
                     <td class="c"><span class="muted">—</span></td>
                     <td class="c"><span class="muted">—</span></td>
@@ -405,10 +405,10 @@
             'comp-desc':   function (a, b) { return b.dataset.comp - a.dataset.comp; },
             'nocomp-desc': function (a, b) { return b.dataset.nocomp - a.dataset.nocomp; }
         };
-        if (keys[orden]) list.sort(keys[orden]);
+        list.sort(keys[orden] || keys['nombre']);
         list.forEach(function (tr) {
             body.appendChild(tr);
-            var ok = !marca || tr.dataset.marca === marca;
+            var ok = tr.classList.contains('raw-material-row') || !marca || tr.dataset.marca === marca;
             tr.style.display = ok ? '' : 'none';
             if (ok) visibles++;
         });
@@ -416,6 +416,7 @@
     }
     $('clMarca').addEventListener('change', aplicar);
     $('clOrden').addEventListener('change', aplicar);
+    aplicar(); // Ordena productos y materias primas juntos desde la carga inicial.
 })();
 </script>
 </body></html>
