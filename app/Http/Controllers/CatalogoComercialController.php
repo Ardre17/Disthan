@@ -16,7 +16,7 @@ class CatalogoComercialController extends Controller
 {
     private const TIPOS_ORDEN = [
         'LOCAL', 'SUPERMERCADO', 'SUPERMERCADOS',
-        'ENCOMIENDA', 'ENCOMIENDAS','EXPORTACION','EXPORTACIONES'
+        'ENCOMIENDA', 'ENCOMIENDAS','EXPORTACION','EXPORTACIONES',
     ];
 
     /** Normaliza nombres para comparar inventarios sin depender de tildes o puntuación. */
@@ -162,7 +162,7 @@ class CatalogoComercialController extends Controller
         // No filtrar por active, porque puede estar en false o NULL en registros existentes.
         $rawMaterials = RawMaterial::query()
             ->orderBy('name')
-            ->get(['id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status', 'cantidad_por_caja']);
+            ->get(['id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status']);
 
         return view('catalogo-comercial.index', compact(
             'categories', 'products', 'totalActivos', 'conStock', 'stockBajo', 'agotados',
