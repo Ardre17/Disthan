@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Category;
 use App\Models\OrderDetail;
 use App\Models\Product;
+use App\Models\DalsaItem;
+use App\Models\JoselitoItem;
+use App\Models\RawMaterial;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -15,6 +18,60 @@ class CatalogoComercialController extends Controller
         'LOCAL', 'SUPERMERCADO', 'SUPERMERCADOS',
         'ENCOMIENDA', 'ENCOMIENDAS',
     ];
+
+    /** Normaliza nombres para comparar inventarios sin depender de tildes o puntuación. */
+    private function normalizarNombreInventario($nombre): string
+    {
+        $nombre = mb_strtolower(trim((string) $nombre), 'UTF-8');
+        $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $nombre);
+        if ($ascii !== false) $nombre = $ascii;
+        $nombre = preg_replace('/[^a-z0-9]+/i', ' ', $nombre);
+        return trim(preg_replace('/\s+/', ' ', $nombre));
+    }
+
+    /** Devuelve el ID solo ante coincidencia exacta o aproximada inequívoca. */
+    private function buscarProductoCoincidente($nombre, $productosPorNombre)
+    {
+        $normalizado = $this->normalizarNombreInventario($nombre);
+        if ($normalizado === '') return null;
+        if (isset($productosPorNombre[$normalizado])) {
+            $ids = (array) $productosPorNombre[$normalizado];
+            return count($ids) === 1 ? $ids[0] : null;
+        }
+
+        $mejorId = null;
+        $mejorPuntaje = 0;
+        $segundoPuntaje = 0;
+        foreach ($productosPorNombre as $candidato => $ids) {
+            $ids = (array) $ids;
+            if (count($ids) !== 1) continue;
+            $id = $ids[0];
+            similar_text($normalizado, $candidato, $porcentaje);
+            if ($porcentaje > $mejorPuntaje) {
+                $segundoPuntaje = $mejorPuntaje;
+                $mejorPuntaje = $porcentaje;
+                $mejorId = $id;
+            } elseif ($porcentaje > $segundoPuntaje) {
+                $segundoPuntaje = $porcentaje;
+            }
+        }
+
+        // Umbral conservador y diferencia mínima para evitar asignaciones ambiguas.
+        return ($mejorPuntaje >= 92 && ($mejorPuntaje - $segundoPuntaje) >= 4)
+            ? $mejorId
+            : null;
+    }
+
+    private function existenciasExternasPorProducto($items, $productosPorNombre): array
+    {
+        $totales = [];
+        foreach ($items as $item) {
+            $productoId = $this->buscarProductoCoincidente($item->nombre, $productosPorNombre);
+            if ($productoId === null) continue;
+            $totales[$productoId] = ($totales[$productoId] ?? 0) + (float) $item->cantidad_actual;
+        }
+        return $totales;
+    }
 
     private function compromisosPorProducto()
     {
@@ -76,8 +133,22 @@ class CatalogoComercialController extends Controller
         }
 
         $products = $query->orderBy('nombre')->paginate(20)->withQueryString();
+
+        // Relaciona los nombres de Dalsa/Joselito con el catálogo usando normalización
+        // y similitud conservadora. Los registros ambiguos quedan sin asignar.
+        $productosPorNombre = Product::query()->where('activo', true)->get(['id', 'nombre'])
+            ->groupBy(fn ($product) => $this->normalizarNombreInventario($product->nombre))
+            ->map(fn ($group) => $group->pluck('id')->all())
+            ->all();
+        $dalsaItems = DalsaItem::todos()->get(['nombre', 'cantidad_actual']);
+        $joselitoItems = JoselitoItem::todos()->get(['nombre', 'cantidad_actual']);
+        $dalsaPorProducto = $this->existenciasExternasPorProducto($dalsaItems, $productosPorNombre);
+        $joselitoPorProducto = $this->existenciasExternasPorProducto($joselitoItems, $productosPorNombre);
+
         $commitments = $this->compromisosPorProducto();
-        $products->getCollection()->transform(function ($product) use ($commitments) {
+        $products->getCollection()->transform(function ($product) use ($commitments, $dalsaPorProducto, $joselitoPorProducto) {
+            $product->stock_dalsa_catalogo = (float) ($dalsaPorProducto[$product->id] ?? 0);
+            $product->stock_joselito_catalogo = (float) ($joselitoPorProducto[$product->id] ?? 0);
             $product->comprometido_catalogo = (float) ($commitments[$product->id] ?? 0);
             $product->no_comprometido_catalogo = max(0, (float) ($product->stock ?? 0) - $product->comprometido_catalogo);
             return $product;
@@ -87,8 +158,14 @@ class CatalogoComercialController extends Controller
             ->select('category_id')->selectRaw('COUNT(*) AS total')
             ->groupBy('category_id')->pluck('total', 'category_id');
 
+        $rawMaterials = RawMaterial::query()
+            ->where('active', true)
+            ->orderBy('name')
+            ->get(['id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status']);
+
         return view('catalogo-comercial.index', compact(
-            'categories', 'products', 'totalActivos', 'conStock', 'stockBajo', 'agotados', 'categoryCounts'
+            'categories', 'products', 'totalActivos', 'conStock', 'stockBajo', 'agotados',
+            'categoryCounts', 'rawMaterials'
         ));
     }
 

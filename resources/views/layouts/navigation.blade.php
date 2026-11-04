@@ -105,10 +105,6 @@ $menu = [
             ['label' => 'Pedidos', 'icon' => 'box','roles' => ['admin'], 'href' => '/pedidos',
              'roles' => ['operario'], 'paths' => ['pedidos'], 'not' => ['validacion', 'validation']],
 
-            ['label' => 'Comparar pedidos TSI vs DISTAN', 'icon' => 'swap',
-             'route' => 'orders.comparar-tsi', 'roles' => ['admin'],
-             'routes' => ['orders.comparar-tsi'], 'paths' => ['comparar-pedidos-tsi']],
-
             ['label' => 'Historial', 'icon' => 'clock', 'href' => '/historial',
              'paths' => ['historial']],
 
