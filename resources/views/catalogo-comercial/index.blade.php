@@ -108,7 +108,7 @@
         .toolbar{display:flex;gap:10px;align-items:center;margin:8px 0 16px;flex-wrap:wrap}
         .search{flex:1;min-width:260px;display:flex;gap:9px;position:relative}
         .search svg{position:absolute;left:13px;top:50%;transform:translateY(-50%);width:18px;height:18px;color:#64748b;pointer-events:none}
-                .search input,.toolbar select{border:1px solid #d5deea;border-radius:10px;padding:12px 13px;background:#fff;color:var(--ink);font:inherit;outline:none}
+        .search input,.toolbar select{border:1px solid #d5deea;border-radius:10px;padding:12px 13px;background:#fff;color:var(--ink);font:inherit;outline:none}
         .search input{width:100%;padding-left:40px}
         .search input:focus,.toolbar select:focus{border-color:#4a95dc;box-shadow:0 0 0 3px rgba(74,149,220,.15)}
         .toolbar select{min-width:150px;cursor:pointer}
@@ -126,6 +126,7 @@
         tbody tr:hover{background:#f1f7fe}
         tbody tr.raw-material-row{background:#f4f8fc;border-top:2px solid #d7e5f4}
         tbody tr.raw-material-row .icon{background:#e5effa}
+        .kind{display:inline-block;margin-top:3px;padding:2px 7px;border-radius:6px;background:#e6effa;color:#285783;font-size:10px;font-weight:800;letter-spacing:.3px}
         .sku{font-weight:800;color:#213d60;font-variant-numeric:tabular-nums}
         .sub{font-size:11px;color:var(--muted);margin-top:2px;font-variant-numeric:tabular-nums}
         .product{display:flex;align-items:center;gap:11px;min-width:230px}
@@ -219,226 +220,180 @@
             <div><div class="label">Agotados</div><strong>{{ number_format($agotados) }}</strong></div>
         </div>
     </section>
-        {{-- Categorías --}}
-    <section class="categories" id="clCategories">
-        <a href="{{ request()->url() }}" class="cat {{ !request('categoria') ? 'active' : '' }}">
-            <span class="ci">📦</span><b>Todos</b><em>Catálogo</em>
+
+    <nav class="categories" id="clCats">
+        <a class="cat {{ !request('category_id') ? 'active' : '' }}" href="{{ route('catalogo.publico.index', request()->except('category_id','page')) }}">
+            <span class="ci"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg></span>
+            <b>Todos</b><em>{{ $totalActivos }}</em>
         </a>
-        @foreach($catMarcas as $marca)
-            <a href="{{ request()->fullUrlWithQuery(['categoria' => $marca]) }}" class="cat {{ request('categoria') === $marca ? 'active' : '' }}">
-                <span class="ci">{{ $catIcon($marca) }}</span>
-                <b>{{ $marca }}</b><em>Marca</em>
+        @foreach($categories as $category)
+            <a class="cat {{ (string)request('category_id') === (string)$category->id ? 'active' : '' }}" href="{{ route('catalogo.publico.index', array_merge(request()->except('page'), ['category_id'=>$category->id])) }}">
+                <span class="ci">{{ $catIcon($category->nombre) }}</span>
+                <b>{{ $category->nombre }}</b><em>{{ $categoryCounts[$category->id] ?? 0 }}</em>
             </a>
         @endforeach
-    </section>
+    </nav>
 
-    {{-- Filtros --}}
-    <form class="toolbar" method="GET" action="{{ request()->url() }}">
-        @if(request('categoria'))
-            <input type="hidden" name="categoria" value="{{ request('categoria') }}">
-        @endif
+    <form class="toolbar" method="GET" action="{{ route('catalogo.publico.index') }}">
+        @if(request('category_id'))<input type="hidden" name="category_id" value="{{ request('category_id') }}">@endif
         <div class="search">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-            <input type="search" name="buscar" value="{{ request('buscar') }}" placeholder="Buscar por producto, SKU o código...">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="search" name="q" value="{{ request('q') }}" placeholder="Buscar por nombre, SKU, marca o código de barras...">
+            <button class="btn" type="submit">Buscar</button>
         </div>
-        <select name="estado">
-            <option value="">Todos los estados</option>
-            <option value="stock" {{ request('estado') === 'stock' ? 'selected' : '' }}>Con stock</option>
-            <option value="bajo" {{ request('estado') === 'bajo' ? 'selected' : '' }}>Stock bajo</option>
-            <option value="agotado" {{ request('estado') === 'agotado' ? 'selected' : '' }}>Agotados</option>
+        <select name="estado" aria-label="Filtrar disponibilidad" onchange="window.clShow&&window.clShow();this.form.submit()"><option value="">Disponibilidad</option><option value="disponible" @selected(request('estado')==='disponible')>Disponible</option><option value="bajo" @selected(request('estado')==='bajo')>Stock bajo</option><option value="agotado" @selected(request('estado')==='agotado')>Agotado</option></select>
+
+        {{-- Filtro y orden sobre los productos de esta página (no cambian la consulta del servidor) --}}
+        <select id="clMarca" aria-label="Filtrar por marca" title="Marcas de los productos de esta página">
+            <option value="">Marca</option>
+            @foreach($catMarcas as $mk)<option value="{{ mb_strtolower($mk) }}">{{ $mk }}</option>@endforeach
         </select>
-        <button type="submit" class="btn">Filtrar</button>
-        <a href="{{ request()->url() }}" class="btn light">Limpiar</a>
+        <select id="clOrden" aria-label="Ordenar por" title="Ordena los productos de esta página">
+            <option value="">Ordenar por</option>
+            <option value="nombre">Nombre (A-Z)</option>
+            <option value="stock-desc">Stock físico (mayor)</option>
+            <option value="stock-asc">Stock físico (menor)</option>
+            <option value="comp-desc">Comprometido (mayor)</option>
+            <option value="nocomp-desc">No comprometido (mayor)</option>
+        </select>
+        @if(request()->hasAny(['q','estado','category_id']))<a class="btn light" href="{{ route('catalogo.publico.index') }}">Limpiar</a>@endif
     </form>
 
-    {{-- Tabla de productos e inventarios externos --}}
     <section class="tablebox">
-        <div class="scroll">
-            <table id="clTable">
-                <thead>
-                    <tr>
-                        <th>SKU</th>
-                        <th>Producto / Material</th>
-                        <th class="c">Peso / Presentación</th>
-                        <th class="c">Stock DISTAN</th>
-                        <th class="c">Comprometido</th>
-                        <th class="c">Dalsa</th>
-                        <th class="c">Joselito</th>
-                        <th class="c">Estado</th>
-                        <th class="c">Detalle</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($products as $p)
-                        @php
-                            $stock = (float) ($p->stock ?? 0);
-                            $committed = (float) ($p->comprometido ?? $p->stock_comprometido ?? 0);
-                            $available = max(0, $stock - $committed);
-                            $threshold = (float) ($p->minimum_stock ?? $p->stock_minimo ?? 0);
-                            $state = $stock <= 0 ? 'out' : (($threshold > 0 && $available <= $threshold) ? 'low' : 'ok');
-                            $stateText = $state === 'out' ? 'Agotado' : ($state === 'low' ? 'Stock bajo' : 'Disponible');
-                            $img = $catImg($p);
+        <div class="scroll"><table><thead><tr><th>SKU</th><th>Producto / Material</th><th>Peso/Presentación</th><th class="c">Stock físico DISTAN</th><th class="c">Comprometido en pedidos</th><th class="c">No comprometido</th><th class="c">Dalsa</th><th class="c">Joselito</th><th class="c">Estado</th><th></th></tr></thead><tbody id="clBody">
+        @forelse($products as $product)
+            @php
+                $stock = (float)($product->stock ?? 0);
+                $min = (float)($product->stock_minimo ?? 0);
+                $statusClass = $stock <= 0 ? 'out' : (($min > 0 && $stock <= $min) ? 'low' : 'ok');
+                $statusText = $stock <= 0 ? 'AGOTADO' : (($min > 0 && $stock <= $min) ? 'STOCK BAJO' : 'DISPONIBLE');
+                $statusLabel = $stock <= 0 ? 'Agotado' : (($min > 0 && $stock <= $min) ? 'Stock bajo' : 'Disponible');
+                $pImg = $catImg($product);
+                $pEmoji = $catIcon(optional($product->category)->nombre);
+                $pPeso = $product->peso ? rtrim(rtrim(number_format((float)$product->peso, 3, '.', ''), '0'), '.') : null;
+            @endphp
+            <tr class="cr"
+                data-nombre="{{ mb_strtolower($product->nombre) }}"
+                data-marca="{{ mb_strtolower((string) $product->marca) }}"
+                data-stock="{{ $stock }}"
+                data-comp="{{ (float)$product->comprometido_catalogo }}"
+                data-nocomp="{{ (float)$product->no_comprometido_catalogo }}">
+                <td><div class="sku">{{ $product->sku ?: '—' }}</div><div class="sub">U: {{ $product->barcode ?: '—' }}</div><div class="sub">C: {{ $product->box_barcode ?: '—' }}</div></td>
+                <td><div class="product"><div class="icon">@if($pImg)<img src="{{ $pImg }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('{{ $pEmoji }}'))">@else{{ $pEmoji }}@endif</div><div><div class="pname">{{ $product->nombre }}</div><div class="sub">{{ $product->marca ?: 'Sin marca' }} · {{ optional($product->category)->nombre ?: 'Sin categoría' }}</div></div></div></td>
+                <td>{{ $pPeso ? 'x ' . $pPeso . ' g.' : '—' }}<div class="sub">{{ (int)($product->cantidad_por_caja ?? 0) }} unidades/caja</div></td>
+                <td class="c"><span class="num">{{ number_format($stock, 0) }}</span></td>
+                <td class="c"><span class="num">{{ number_format((float)$product->comprometido_catalogo, 0) }}</span></td>
+                <td class="c"><span class="num">{{ number_format((float)$product->no_comprometido_catalogo, 0) }}</span></td>
+                <td class="c"><span class="num">{{ number_format((float)($product->stock_dalsa_catalogo ?? 0), 0) }}</span></td>
+                <td class="c"><span class="num">{{ number_format((float)($product->stock_joselito_catalogo ?? 0), 0) }}</span></td>
+                <td class="c"><span class="status {{ $statusClass }}" title="{{ $statusText }}"><i></i>{{ $statusLabel }}</span></td>
+                <td><a class="detail" href="{{ route('catalogo.publico.show', $product) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Detalle</a></td>
+            </tr>
+        @empty<tr><td colspan="10" class="empty">No se encontraron productos con esos filtros.</td></tr>@endforelse
 
-                            // Cantidades que el controlador asocia por coincidencia normalizada.
-                            $dalsaQty = (float) ($p->dalsa_stock ?? 0);
-                            $joselitoQty = (float) ($p->joselito_stock ?? 0);
-                        @endphp
-                        <tr>
-                            <td>
-                                <div class="sku">{{ $p->sku ?? $p->codigo ?? '—' }}</div>
-                                <div class="sub">{{ $p->codigo_barras ?? $p->barcode ?? '' }}</div>
-                            </td>
-                            <td>
-                                <div class="product">
-                                    <div class="icon">
-                                        @if($img)
-                                            <img src="{{ $img }}" alt="{{ $p->nombre ?? $p->name ?? 'Producto' }}" loading="lazy">
-                                        @else
-                                            {{ $catIcon($p->categoria ?? $p->marca ?? '') }}
-                                        @endif
-                                    </div>
-                                    <div>
-                                        <div class="pname">{{ $p->nombre ?? $p->name ?? 'Producto sin nombre' }}</div>
-                                        <div class="sub">{{ $p->marca ?? $p->categoria ?? 'Sin categoría' }}</div>
-                                    </div>
-                                </div>
-                            </td>
-                            <td class="c">{{ $p->peso ?? $p->presentacion ?? $p->unidad ?? '—' }}</td>
-                            <td class="c"><span class="num">{{ number_format($stock, 2) }}</span></td>
-                            <td class="c"><span class="num">{{ number_format($committed, 2) }}</span></td>
-                            <td class="c"><span class="num">{{ number_format($dalsaQty, 2) }}</span></td>
-                            <td class="c"><span class="num">{{ number_format($joselitoQty, 2) }}</span></td>
-                            <td class="c"><span class="status {{ $state }}"><i></i>{{ $stateText }}</span></td>
-                            <td class="c">
-                                <a href="{{ route('catalogo-comercial.show', $p->id) }}" class="detail">
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
-                                    Ver
-                                </a>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="9" class="empty">No se encontraron productos con los filtros seleccionados.</td></tr>
-                    @endforelse
-
-                    {{-- Materia prima: registros en la misma tabla --}}
-                    @if($products->currentPage() === $products->lastPage())
-                        @foreach(($rawMaterials ?? collect()) as $material)
-                            @php
-                                $materialStock = (float) ($material->stock ?? 0);
-                            @endphp
-                            <tr class="raw-material-row">
-                                <td>
-                                    <div class="sku">{{ $material->code ?? '—' }}</div>
-                                    <div class="sub">MATERIA PRIMA</div>
-                                </td>
-                                <td>
-                                    <div class="product">
-                                        <div class="icon">🧱</div>
-                                        <div>
-                                            <div class="pname">{{ $material->name }}</div>
-                                            <div class="sub">Materia prima · {{ $material->category ?? 'Sin categoría' }}</div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td class="c">{{ $material->unit ?? '—' }}</td>
-                                <td class="c"><span class="num">{{ number_format($materialStock, 2) }}</span></td>
-                                <td class="c"><span class="muted">—</span></td>
-                                <td class="c"><span class="muted">—</span></td>
-                                <td class="c"><span class="muted">—</span></td>
-                                <td class="c">
-                                    @if($materialStock <= 0)
-                                        <span class="status out"><i></i>Agotado</span>
-                                    @elseif(isset($material->minimum_stock) && $materialStock <= (float) $material->minimum_stock)
-                                        <span class="status low"><i></i>Stock bajo</span>
-                                    @else
-                                        <span class="status ok"><i></i>Disponible</span>
-                                    @endif
-                                </td>
-                                <td class="c"><span class="muted">Materia prima</span></td>
-                            </tr>
-                        @endforeach
-                    @endif
-                </tbody>
-            </table>
-        </div>
+        {{-- Materia prima integrada en la misma tabla; se muestra una sola vez al final de la paginación. --}}
+        @if($products->currentPage() === $products->lastPage())
+            @foreach(($rawMaterials ?? collect()) as $material)
+                @php
+                    $materialStock = (float) ($material->stock ?? 0);
+                    $materialMin = (float) ($material->minimum_stock ?? 0);
+                    $materialStatusClass = $materialStock <= 0 ? 'out' : (($materialMin > 0 && $materialStock <= $materialMin) ? 'low' : 'ok');
+                    $materialStatusLabel = $materialStock <= 0 ? 'Agotado' : (($materialMin > 0 && $materialStock <= $materialMin) ? 'Stock bajo' : 'Disponible');
+                @endphp
+                <tr class="raw-material-row">
+                    <td><div class="sku">{{ $material->code ?: '—' }}</div><div class="sub">MATERIA PRIMA</div></td>
+                    <td><div class="product"><div class="icon">🧱</div><div><div class="pname">{{ $material->name }}</div><span class="kind">MATERIA PRIMA</span><div class="sub">{{ $material->category ?: 'Sin categoría' }}</div></div></div></td>
+                    <td>{{ $material->unit ?: '—' }}<div class="sub">{{ (int)($material->cantidad_por_caja ?? 0) > 0 ? number_format((float)$material->cantidad_por_caja, 0) . ' unidades/caja' : '—' }}</div></td>
+                    <td class="c"><span class="num">{{ number_format($materialStock, 2) }}</span></td>
+                    <td class="c"><span class="muted">—</span></td>
+                    <td class="c"><span class="muted">—</span></td>
+                    <td class="c"><span class="muted">—</span></td>
+                    <td class="c"><span class="muted">—</span></td>
+                    <td class="c"><span class="status {{ $materialStatusClass }}"><i></i>{{ $materialStatusLabel }}</span></td>
+                    <td class="c"><span class="muted">—</span></td>
+                </tr>
+            @endforeach
+        @endif
+        </tbody></table></div>
+        <div class="nomatch" id="clNoMatch">Ningún producto de esta página coincide con la marca seleccionada.</div>
 
         <div class="tfoot">
-            <div class="info">
-                Mostrando {{ $products->firstItem() ?? 0 }}–{{ $products->lastItem() ?? 0 }}
-                de {{ $products->total() }} productos
-                @if($products->currentPage() === $products->lastPage())
-                    · {{ ($rawMaterials ?? collect())->count() }} materiales
-                @endif
-            </div>
-            <nav class="pager" aria-label="Paginación">
-                @if($products->onFirstPage())
-                    <span class="pg off">‹</span>
-                @else
-                    <a class="pg" href="{{ $products->previousPageUrl() }}">‹</a>
-                @endif
-
-                @foreach($catPages as $page)
-                    @if($loop->first && $page > 1)
-                        <span class="gap">…</span>
-                    @endif
-                    <a class="pg {{ $page === $cp ? 'on' : '' }}" href="{{ $products->url($page) }}">{{ $page }}</a>
-                    @if($loop->last && $page < $lp)
-                        <span class="gap">…</span>
-                    @endif
+            <div class="info">Mostrando {{ $products->count() }} de {{ number_format($products->total()) }} productos@if($products->currentPage() === $products->lastPage()) · {{ ($rawMaterials ?? collect())->count() }} materias primas@endif · Página {{ $products->currentPage() }} de {{ max(1,$products->lastPage()) }}</div>
+            @if($products->lastPage() > 1)
+            <div class="pager">
+                <a class="pg {{ $products->onFirstPage() ? 'off' : '' }}" href="{{ $products->onFirstPage() ? '#' : request()->fullUrlWithQuery(['page' => $cp - 1]) }}" title="Anterior">«</a>
+                @php $prev = 0; @endphp
+                @foreach($catPages as $pn)
+                    @if($pn - $prev > 1)<span class="gap">…</span>@endif
+                    <a class="pg {{ $pn === $cp ? 'on' : '' }}" href="{{ request()->fullUrlWithQuery(['page' => $pn]) }}">{{ $pn }}</a>
+                    @php $prev = $pn; @endphp
                 @endforeach
-
-                @if($products->hasMorePages())
-                    <a class="pg" href="{{ $products->nextPageUrl() }}">›</a>
-                @else
-                    <span class="pg off">›</span>
-                @endif
-            </nav>
+                <a class="pg {{ $products->hasMorePages() ? '' : 'off' }}" href="{{ $products->hasMorePages() ? request()->fullUrlWithQuery(['page' => $cp + 1]) : '#' }}" title="Siguiente">»</a>
+            </div>
+            @endif
         </div>
     </section>
-
-    <div class="foot">DISTAN ERP · Catálogo comercial · Información de consulta</div>
+    <p class="foot">Los compromisos son informativos y no modifican el stock físico. La disponibilidad no comprometida es una referencia para apoyar decisiones comerciales.</p>
 </main>
+
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    // Ocultar pantalla de carga cuando el contenido esté listo.
-    const loader = document.getElementById('clLoader');
+(function () {
+    function $(id) { return document.getElementById(id); }
 
-    function hideLoader() {
-        if (loader) {
-            loader.classList.add('hide');
-        }
+    /* ── Pantalla de carga ── */
+    var loader = $('clLoader');
+    function hide() { if (loader) { loader.classList.add('hide'); loader.style.opacity = ''; loader.style.visibility = ''; } }
+    function show() {
+        if (!loader) return;
+        loader.style.animation = 'none';
+        loader.style.opacity = '1'; loader.style.visibility = 'visible';
+        loader.classList.remove('hide');
     }
+    window.clShow = show;
+    if (document.readyState === 'complete') setTimeout(hide, 250);
+    else window.addEventListener('load', function () { setTimeout(hide, 350); });
+    window.addEventListener('pageshow', function (e) { if (e.persisted) hide(); });
 
-    window.addEventListener('load', hideLoader);
-    setTimeout(hideLoader, 2500);
+    // Se muestra de nuevo al buscar, filtrar, cambiar de categoría o de página
+    document.addEventListener('submit', function (e) { if (!e.defaultPrevented) show(); });
+    document.addEventListener('click', function (e) {
+        var a = e.target.closest ? e.target.closest('a[href]') : null;
+        if (!a || e.defaultPrevented || e.ctrlKey || e.metaKey || e.shiftKey || e.button === 1) return;
+        var h = a.getAttribute('href') || '';
+        if (!h || h.charAt(0) === '#' || a.target === '_blank' || a.hasAttribute('download') || a.classList.contains('off')) return;
+        show();
+    });
 
-    // Mostrar u ocultar categorías.
-    const burger = document.getElementById('clBurger');
-    const categories = document.getElementById('clCategories');
+    /* ── Menú: muestra/oculta las categorías ── */
+    if ($('clBurger')) $('clBurger').addEventListener('click', function () { $('clCats').classList.toggle('collapsed'); });
 
-    if (burger && categories) {
-        burger.addEventListener('click', function () {
-            categories.classList.toggle('collapsed');
+    /* ── Marca + orden sobre los productos de la página ── */
+    var body = $('clBody');
+    if (!body) return;
+    var rows = Array.prototype.slice.call(body.querySelectorAll('tr.cr'));
+    var original = rows.slice();
+
+    function aplicar() {
+        var marca = $('clMarca').value, orden = $('clOrden').value, visibles = 0;
+        var list = original.slice();
+        var keys = {
+            'nombre':      function (a, b) { return a.dataset.nombre.localeCompare(b.dataset.nombre, 'es'); },
+            'stock-desc':  function (a, b) { return b.dataset.stock - a.dataset.stock; },
+            'stock-asc':   function (a, b) { return a.dataset.stock - b.dataset.stock; },
+            'comp-desc':   function (a, b) { return b.dataset.comp - a.dataset.comp; },
+            'nocomp-desc': function (a, b) { return b.dataset.nocomp - a.dataset.nocomp; }
+        };
+        if (keys[orden]) list.sort(keys[orden]);
+        list.forEach(function (tr) {
+            body.appendChild(tr);
+            var ok = !marca || tr.dataset.marca === marca;
+            tr.style.display = ok ? '' : 'none';
+            if (ok) visibles++;
         });
+        $('clNoMatch').style.display = (rows.length && !visibles) ? 'block' : 'none';
     }
-
-    // Búsqueda rápida dentro de los registros que ya están cargados.
-    const searchInput = document.querySelector('input[name="buscar"]');
-    const table = document.getElementById('clTable');
-
-    if (searchInput && table) {
-        searchInput.addEventListener('input', function () {
-            const term = this.value.toLocaleLowerCase('es').trim();
-            const rows = table.querySelectorAll('tbody tr');
-
-            rows.forEach(function (row) {
-                const text = row.textContent.toLocaleLowerCase('es');
-                row.style.display = text.includes(term) ? '' : 'none';
-            });
-        });
-    }
-});
+    $('clMarca').addEventListener('change', aplicar);
+    $('clOrden').addEventListener('change', aplicar);
+})();
 </script>
-
-</body>
-</html>
+</body></html>
