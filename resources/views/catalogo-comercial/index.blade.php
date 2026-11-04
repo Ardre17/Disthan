@@ -260,7 +260,7 @@
     </form>
 
     <section class="tablebox">
-        <div class="scroll"><table><thead><tr><th>SKU</th><th>Producto / Material</th><th>Peso/Presentación</th><th class="c">Stock físico DISTAN</th><th class="c">Comprometido en pedidos</th><th class="c">No comprometido</th><th class="c">Dalsa</th><th class="c">Joselito</th><th class="c">Estado</th><th></th></tr></thead><tbody id="clBody">
+        <div class="scroll"><table><thead><tr><th>SKU</th><th>Producto / Material</th><th>Peso/Presentación</th><th class="c">Stock físico DISTAN</th><th class="c">Comprometido en pedidos</th><th class="c">No comprometido</th><th class="c">Dalsa / Cajas</th><th class="c">Joselito / Cajas</th><th class="c">Estado</th><th></th></tr></thead><tbody id="clBody">
         @forelse($products as $product)
             @php
                 $stock = (float)($product->stock ?? 0);
@@ -279,7 +279,21 @@
                 data-comp="{{ (float)$product->comprometido_catalogo }}"
                 data-nocomp="{{ (float)$product->no_comprometido_catalogo }}">
                 <td><div class="sku">{{ $product->sku ?: '—' }}</div><div class="sub">U: {{ $product->barcode ?: '—' }}</div><div class="sub">C: {{ $product->box_barcode ?: '—' }}</div></td>
-                <td><div class="product"><div class="icon">@if($pImg)<img src="{{ $pImg }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('{{ $pEmoji }}'))">@else{{ $pEmoji }}@endif</div><div><div class="pname">{{ $product->nombre }}</div><div class="sub">{{ $product->marca ?: 'Sin marca' }} · {{ optional($product->category)->nombre ?: 'Sin categoría' }}</div></div></div></td>
+                <td>
+                    <div class="product">
+                        <div class="icon">
+                            @if($pImg)
+                                <img src="{{ $pImg }}" alt="" loading="lazy">
+                            @else
+                                {{ $pEmoji }}
+                            @endif
+                        </div>
+                        <div>
+                            <div class="pname">{{ $product->nombre }}</div>
+                            <div class="sub">{{ $product->marca ?: 'Sin marca' }} · {{ optional($product->category)->nombre ?: 'Sin categoría' }}</div>
+                        </div>
+                    </div>
+                </td>
                 <td>{{ $pPeso ? 'x ' . $pPeso . ' g.' : '—' }}<div class="sub">{{ (int)($product->cantidad_por_caja ?? 0) }} unidades/caja</div></td>
                 <td class="c"><span class="num">{{ number_format($stock, 0) }}</span></td>
                 <td class="c"><span class="num">{{ number_format((float)$product->comprometido_catalogo, 0) }}</span></td>
@@ -318,7 +332,13 @@
         <div class="nomatch" id="clNoMatch">Ningún producto de esta página coincide con la marca seleccionada.</div>
 
         <div class="tfoot">
-            <div class="info">Mostrando {{ $products->count() }} de {{ number_format($products->total()) }} productos@if($products->currentPage() === $products->lastPage()) @if(!request()->filled('category_id')) · {{ ($rawMaterials ?? collect())->count() }} materias primas@endif@endif · Página {{ $products->currentPage() }} de {{ max(1,$products->lastPage()) }}</div>
+            <div class="info">
+                Mostrando {{ $products->count() }} de {{ number_format($products->total()) }} productos
+                @if($products->currentPage() === $products->lastPage() && !request()->filled('category_id'))
+                    · {{ ($rawMaterials ?? collect())->count() }} materias primas
+                @endif
+                · Página {{ $products->currentPage() }} de {{ max(1, $products->lastPage()) }}
+            </div>
             @if($products->lastPage() > 1)
             <div class="pager">
                 <a class="pg {{ $products->onFirstPage() ? 'off' : '' }}" href="{{ $products->onFirstPage() ? '#' : request()->fullUrlWithQuery(['page' => $cp - 1]) }}" title="Anterior">«</a>
