@@ -292,7 +292,7 @@
         @empty<tr><td colspan="10" class="empty">No se encontraron productos con esos filtros.</td></tr>@endforelse
 
         {{-- Materia prima integrada en la misma tabla; se muestra una sola vez al final de la paginación. --}}
-        @if($products->currentPage() === $products->lastPage())
+        @if(!request()->filled('category_id') && $products->currentPage() === $products->lastPage())
             @foreach(($rawMaterials ?? collect()) as $material)
                 @php
                     $materialStock = (float) ($material->stock ?? 0);
@@ -318,7 +318,7 @@
         <div class="nomatch" id="clNoMatch">Ningún producto de esta página coincide con la marca seleccionada.</div>
 
         <div class="tfoot">
-            <div class="info">Mostrando {{ $products->count() }} de {{ number_format($products->total()) }} productos@if($products->currentPage() === $products->lastPage()) · {{ ($rawMaterials ?? collect())->count() }} materias primas@endif · Página {{ $products->currentPage() }} de {{ max(1,$products->lastPage()) }}</div>
+            <div class="info">Mostrando {{ $products->count() }} de {{ number_format($products->total()) }} productos@if($products->currentPage() === $products->lastPage()) @if(!request()->filled('category_id')) · {{ ($rawMaterials ?? collect())->count() }} materias primas@endif@endif · Página {{ $products->currentPage() }} de {{ max(1,$products->lastPage()) }}</div>
             @if($products->lastPage() > 1)
             <div class="pager">
                 <a class="pg {{ $products->onFirstPage() ? 'off' : '' }}" href="{{ $products->onFirstPage() ? '#' : request()->fullUrlWithQuery(['page' => $cp - 1]) }}" title="Anterior">«</a>
