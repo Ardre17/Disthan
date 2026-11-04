@@ -260,7 +260,7 @@
     </form>
 
     <section class="tablebox">
-        <div class="scroll"><table><thead><tr><th>SKU</th><th>Producto / Material</th><th>Peso/Presentación</th><th class="c">Stock físico DISTAN</th><th class="c">Comprometido en pedidos</th><th class="c">No comprometido</th><th class="c">Materia Prima</th><th class="c">Dalsa</th><th class="c">Joselito</th><th class="c">Estado</th><th></th></tr></thead><tbody id="clBody">
+        <div class="scroll"><table><thead><tr><th>SKU</th><th>Producto / Material</th><th>Peso/Presentación</th><th class="c">Stock físico DISTAN</th><th class="c">Comprometido en pedidos</th><th class="c">No comprometido</th><th class="c">Materia Prima</th><th class="c">Dalsa / Cajas</th><th class="c">Joselito / Cajas</th><th class="c">Estado</th><th></th></tr></thead><tbody id="clBody">
         @forelse($products as $product)
             @php
                 $stock = (float)($product->stock ?? 0);
