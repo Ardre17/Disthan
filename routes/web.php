@@ -498,6 +498,16 @@ Route::get(
     // ÓRDENES
     Route::resource('orders', OrderController::class);
 
+    // Comparación visual TSI vs DISTAN (requiere sesión en DISTAN)
+    Route::get('/comparar-pedidos-tsi', function () {
+        $orders = \App\Models\Order::where('estado', '!=', 'COMPLETO')
+            ->latest()
+            ->get();
+
+        return view('orders.comparar-tsi', compact('orders'));
+    })->name('orders.comparar-tsi');
+
+
 
     Route::get('/warehouse-map', [WarehouseMapController::class, 'index'])
         ->name('warehouse.map');
