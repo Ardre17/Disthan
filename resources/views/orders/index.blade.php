@@ -365,38 +365,7 @@ body.po-modal-open{overflow:hidden;}
     </div>
 </div>
 
-{{-- ══════════ FILTROS ══════════ --}}
-<div class="po-bar">
-    <div class="po-pills">
-        <a class="po-pill {{ !$poEstReq ? 'on' : '' }}" href="{{ request()->fullUrlWithQuery(['estado' => null, 'page' => null]) }}">Todos @if(!$poEstReq)<em>{{ $total }}</em>@endif</a>
-        <a class="po-pill {{ $poEstReq === 'PARCIAL' ? 'on' : '' }}" href="{{ request()->fullUrlWithQuery(['estado' => 'PARCIAL', 'page' => null]) }}">En preparación @if($poEstReq === 'PARCIAL')<em>{{ $total }}</em>@endif</a>
-        <a class="po-pill {{ $poEstReq === 'COMPLETO' ? 'on' : '' }}" href="{{ request()->fullUrlWithQuery(['estado' => 'COMPLETO', 'page' => null]) }}">Completados @if($poEstReq === 'COMPLETO')<em>{{ $total }}</em>@endif</a>
-        <a class="po-pill {{ $poEstReq === 'INCOMPLETO' ? 'on' : '' }}" href="{{ request()->fullUrlWithQuery(['estado' => 'INCOMPLETO', 'page' => null]) }}">Incompletos @if($poEstReq === 'INCOMPLETO')<em>{{ $total }}</em>@endif</a>
-    </div>
-
-    {{-- Formulario GET original: fecha_inicio, fecha_fin, estado --}}
-    <form method="GET" class="po-form">
-        <div>
-            <label>Desde</label>
-            <input type="date" name="fecha_inicio" class="finput" value="{{ request('fecha_inicio') }}">
-        </div>
-        <div>
-            <label>Hasta</label>
-            <input type="date" name="fecha_fin" class="finput" value="{{ request('fecha_fin') }}">
-        </div>
-        <div>
-            <label>Estado</label>
-            <select name="estado" class="finput">
-                <option value="">Todos</option>
-                @foreach(['COMPLETO','PARCIAL','INCOMPLETO'] as $e)
-                    <option value="{{ $e }}" @selected(request('estado')===$e)>{{ $e }}</option>
-                @endforeach
-            </select>
-        </div>
-        <button type="submit" class="po-btn blue sm" style="height:36px;"><svg class="po-i"><use href="#po-search"/></svg> Buscar</button>
-        <a href="{{ url()->current() }}" class="po-lim" style="height:36px;">Limpiar</a>
-    </form>
-</div>
+{{-- Se retiran temporalmente los filtros por estado y fecha; se conserva el buscador de pedidos. --}}
 
 {{-- ══════════ LISTA DISTAN + PANEL TSI + DETALLE EMERGENTE ══════════ --}}
 <div class="po-grid">
@@ -1194,11 +1163,8 @@ function poExportSel() {
     setTimeout(function () { URL.revokeObjectURL(a.href); }, 1000);
 }
 
-/* ── Init: selecciona la primera orden de la página ── */
-(function () {
-    var first = poRows()[0];
-    if (first) poSel(first.dataset.oid, false);
-})();
+/* ── Init: no seleccionar ni abrir pedidos automáticamente. ── */
+PO_SEL = null;
 </script>
 
 @endsection
