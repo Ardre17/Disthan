@@ -125,8 +125,15 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
 .po-lim{display:inline-flex;align-items:center;padding:9px 14px;border-radius:9px;font-size:12.5px;font-weight:700;background:#eef2f7;color:#334155;text-decoration:none;}
 
 /* Layout */
-.po-grid{display:grid;grid-template-columns:minmax(0,1.02fr) minmax(0,1fr);gap:14px;align-items:start;}
-@media(max-width:1180px){.po-grid{grid-template-columns:1fr;}}
+.po-grid{display:grid;grid-template-columns:minmax(250px,27fr) minmax(0,73fr);gap:14px;align-items:stretch;min-height:calc(100vh - 245px);}
+.po-grid > div:first-child{min-width:0;}
+.po-tsi-panel{min-width:0;display:flex;flex-direction:column;background:#fff;border:1px solid var(--po-line);border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(15,23,42,.04);height:calc(100vh - 245px);min-height:620px;}
+.po-tsi-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 14px;border-bottom:1px solid var(--po-line);background:#f8fafc;}
+.po-tsi-head strong{font-size:13px;color:#1e293b;}
+.po-tsi-head a{font-size:12px;font-weight:700;color:var(--po-blue);text-decoration:none;white-space:nowrap;}
+.po-tsi-frame{display:block;width:100%;height:100%;flex:1;border:0;background:#fff;}
+@media(max-width:1180px){.po-grid{grid-template-columns:minmax(230px,30fr) minmax(0,70fr);}}
+@media(max-width:760px){.po-grid{grid-template-columns:1fr;min-height:0}.po-tsi-panel{height:72vh;min-height:480px;}.po-grid > div:first-child{order:1}.po-tsi-panel{order:2;}}
 .po-side{position:sticky;top:calc(var(--tn-h,176px) + 12px);display:flex;flex-direction:column;gap:12px;}
 @media(max-width:1180px){.po-side{position:static;}}
 
@@ -229,6 +236,18 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
 .po-actions .po-btn{padding:12px 20px;}
 @media(max-width:620px){.po-actions .po-btn{flex:1;justify-content:center;}}
 .po-nodet{padding:40px 20px;text-align:center;color:var(--po-muted);}
+
+/* Detalle de pedido en ventana emergente */
+.po-detail-overlay{display:none;position:fixed;inset:0;z-index:1200;background:rgba(15,23,42,.58);backdrop-filter:blur(3px);padding:22px;align-items:center;justify-content:center;}
+.po-detail-overlay.open{display:flex;}
+.po-detail-dialog{position:relative;width:min(1280px,98vw);max-height:94vh;overflow:auto;background:#f8fafc;border:1px solid #dbeafe;border-radius:18px;padding:18px;box-shadow:0 24px 70px rgba(15,23,42,.3);}
+.po-detail-close{position:sticky;top:0;float:right;z-index:5;width:38px;height:38px;border:1px solid #dbe3ef;border-radius:10px;background:#fff;color:#475569;font-size:26px;line-height:1;cursor:pointer;margin:-7px -7px 8px 8px;}
+.po-detail-dialog .po-side{position:static;display:flex;flex-direction:column;gap:12px;clear:both;}
+.po-detail-dialog .po-det{display:none;}
+.po-detail-dialog .po-det.on{display:block;}
+.po-detail-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap;padding:14px 4px 2px;}
+body.po-modal-open{overflow:hidden;}
+@media(max-width:700px){.po-detail-overlay{padding:7px;align-items:flex-start}.po-detail-dialog{width:100%;max-height:98vh;padding:12px;border-radius:13px}.po-detail-actions{display:grid;grid-template-columns:1fr 1fr}.po-detail-actions .po-btn{justify-content:center}}
 </style>
 
 
@@ -379,7 +398,7 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
     </form>
 </div>
 
-{{-- ══════════ LISTA + DETALLE ══════════ --}}
+{{-- ══════════ LISTA DISTAN + PANEL TSI + DETALLE EMERGENTE ══════════ --}}
 <div class="po-grid">
 
     {{-- ───────── Lista ───────── --}}
@@ -403,7 +422,6 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
                         <th style="width:34px;"><input type="checkbox" id="poAll" onclick="poToggleAll(this)" title="Seleccionar visibles"></th>
                         <th>Pedido</th>
                         <th>Cliente</th>
-                        <th>Fecha</th>
                         <th class="c">Productos</th>
                         <th>Estado</th>
                         <th class="c">Acciones</th>
@@ -427,7 +445,6 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
                         <td onclick="event.stopPropagation()"><input type="checkbox" class="po-chk" onclick="poChkChange()"></td>
                         <td class="po-ped">{{ $order->numero_orden }}</td>
                         <td>{{ $rCli }}</td>
-                        <td class="po-num">{{ $poFecha($order->fecha_pedido) }}</td>
                         <td class="c po-num">{{ $rItems }}</td>
                         <td><span class="po-chip {{ $rCls }}">{{ $rIc }} {{ $rTxt }}</span></td>
                         <td onclick="event.stopPropagation()">
@@ -438,7 +455,7 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="7" style="text-align:center;color:#94a3b8;padding:28px;">No hay órdenes para los filtros seleccionados.</td></tr>
+                    <tr><td colspan="6" style="text-align:center;color:#94a3b8;padding:28px;">No hay órdenes para los filtros seleccionados.</td></tr>
                 @endforelse
                 </tbody>
             </table>
@@ -456,8 +473,27 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
         </div>
     </div>
 
-    {{-- ───────── Detalle de la orden seleccionada ───────── --}}
-    <aside class="po-side">
+    {{-- TSI ocupa el panel principal; DISTAN queda como lista lateral --}}
+    <section class="po-tsi-panel" aria-label="Sistema TSI">
+        <div class="po-tsi-head">
+            <strong>TSI · Sistema de pedidos</strong>
+            <a href="https://core.erp.gtsi.pe/login" target="_blank" rel="noopener noreferrer">Abrir en otra pestaña ↗</a>
+        </div>
+        <iframe
+            class="po-tsi-frame"
+            src="https://core.erp.gtsi.pe/login"
+            title="Sistema TSI"
+            loading="eager"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="clipboard-read; clipboard-write">
+        </iframe>
+    </section>
+
+    {{-- El detalle se presenta como ventana emergente --}}
+    <div class="po-detail-overlay" id="poDetailModal" aria-hidden="true">
+      <div class="po-detail-dialog" role="dialog" aria-modal="true" aria-label="Detalle del pedido">
+        <button type="button" class="po-detail-close" onclick="poCerrarDetalle()" aria-label="Cerrar detalle">×</button>
+        <aside class="po-side">
 
         <div class="po-card po-nodet" id="poNoDet" style="{{ $orders->count() ? 'display:none;' : '' }}">
             <div style="font-size:34px;">📋</div>
@@ -652,15 +688,15 @@ hr.div{border:none;border-top:1px solid #f1f5f9;}
             </div>
         </div>
         @endforeach
-    </aside>
-</div>
-
-{{-- ══════════ ACCIONES SOBRE LA ORDEN SELECCIONADA ══════════ --}}
-<div class="po-actions">
-    <button type="button" class="po-btn red" onclick="poEliminarSel()">🗑 Eliminar orden</button>
-    <button type="button" class="po-btn white" onclick="poPicking()"><svg class="po-i"><use href="#po-printer"/></svg> Imprimir picking</button>
-    <a href="#" id="poLnkEdit" class="po-btn white"><svg class="po-i"><use href="#po-edit"/></svg> Controlar</a>
-    <a href="#" id="poLnkOp" class="po-btn green"><svg class="po-i"><use href="#po-truck"/></svg> Armado</a>
+        </aside>
+        <div class="po-detail-actions">
+            <button type="button" class="po-btn red" onclick="poEliminarSel()">🗑 Eliminar orden</button>
+            <button type="button" class="po-btn white" onclick="poPicking()"><svg class="po-i"><use href="#po-printer"/></svg> Imprimir picking</button>
+            <a href="#" id="poLnkEdit" class="po-btn white"><svg class="po-i"><use href="#po-edit"/></svg> Controlar</a>
+            <a href="#" id="poLnkOp" class="po-btn green"><svg class="po-i"><use href="#po-truck"/></svg> Armado</a>
+        </div>
+      </div>
+    </div>
 </div>
 
 {{-- Formularios de eliminación (mismos action / method / confirmación del original) --}}
@@ -980,7 +1016,33 @@ function poEsc(s) { return String(s == null ? '' : s).replace(/[&<>"]/g, functio
 function poRows() { return Array.prototype.slice.call(document.querySelectorAll('#poTabla tbody tr.po-row')); }
 function poPanel(id) { return document.querySelector('.po-det[data-oid="' + id + '"]'); }
 
-/* ── Selección de la orden (lista ↔ panel) ── */
+/* ── Ventana emergente del detalle ── */
+function poAbrirDetalle() {
+    var modal = document.getElementById('poDetailModal');
+    if (!modal) return;
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden', 'false');
+    document.body.classList.add('po-modal-open');
+}
+function poCerrarDetalle() {
+    var modal = document.getElementById('poDetailModal');
+    if (!modal) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden', 'true');
+    document.body.classList.remove('po-modal-open');
+}
+(function () {
+    var modal = document.getElementById('poDetailModal');
+    if (!modal) return;
+    modal.addEventListener('click', function (ev) {
+        if (ev.target === modal) poCerrarDetalle();
+    });
+    document.addEventListener('keydown', function (ev) {
+        if (ev.key === 'Escape' && modal.classList.contains('open')) poCerrarDetalle();
+    });
+})();
+
+/* ── Selección de la orden (lista → ventana de detalle) ── */
 function poSel(id, scroll) {
     PO_SEL = id;
     poRows().forEach(function (r) { r.classList.toggle('sel', r.dataset.oid == id); });
@@ -992,9 +1054,14 @@ function poSel(id, scroll) {
     });
     document.getElementById('poNoDet').style.display = found ? 'none' : '';
     var e = document.getElementById('poLnkEdit'), o = document.getElementById('poLnkOp');
-    if (found) { e.href = found.dataset.edit; o.href = found.dataset.operario; }
-    else { e.href = '#'; o.href = '#'; }
-    if (scroll && found && window.innerWidth < 1180) found.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (found) {
+        e.href = found.dataset.edit;
+        o.href = found.dataset.operario;
+        poAbrirDetalle();
+    } else {
+        e.href = '#'; o.href = '#';
+        poCerrarDetalle();
+    }
 }
 document.querySelector('#poTabla tbody').addEventListener('click', function (e) {
     var tr = e.target.closest('tr.po-row');
