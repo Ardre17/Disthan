@@ -160,16 +160,33 @@ class CatalogoComercialController extends Controller
 
         // Igual que el módulo original de Materia Prima: incluir todos los registros.
         // No filtrar por active, porque puede estar en false o NULL en registros existentes.
-        // Leer directamente la tabla para incluir todos los materiales, sin scopes del modelo.
-        // Se seleccionan únicamente columnas existentes; cantidad_por_caja no existe en PostgreSQL.
-        $rawMaterials = DB::table('raw_materials')
-            ->select('id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status')
+        $rawMaterials = RawMaterial::query()
             ->orderBy('name')
-            ->get();
+            ->get(['id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status', 'cantidad_por_caja']);
+
+        // Integrar Materia Prima en la fila del producto equivalente, igual que Dalsa/Joselito.
+        // Se acumulan registros con el mismo producto; los nombres ambiguos o sin coincidencia
+        // permanecen como materiales independientes para no perder existencias.
+        $materiaPrimaPorProducto = [];
+        $materiasPrimasSinProducto = collect();
+        foreach ($rawMaterials as $material) {
+            $productoId = $this->buscarProductoCoincidente($material->name, $productosPorNombre);
+            if ($productoId === null) {
+                $materiasPrimasSinProducto->push($material);
+                continue;
+            }
+            $materiaPrimaPorProducto[$productoId] = ($materiaPrimaPorProducto[$productoId] ?? 0)
+                + (float) $material->stock;
+        }
+
+        $products->getCollection()->transform(function ($product) use ($materiaPrimaPorProducto) {
+            $product->stock_materia_prima_catalogo = (float) ($materiaPrimaPorProducto[$product->id] ?? 0);
+            return $product;
+        });
 
         return view('catalogo-comercial.index', compact(
             'categories', 'products', 'totalActivos', 'conStock', 'stockBajo', 'agotados',
-            'categoryCounts', 'rawMaterials'
+            'categoryCounts', 'rawMaterials', 'materiasPrimasSinProducto'
         ));
     }
 

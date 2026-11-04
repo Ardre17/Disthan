@@ -276,6 +276,7 @@
                 data-nombre="{{ mb_strtolower($product->nombre) }}"
                 data-marca="{{ mb_strtolower((string) $product->marca) }}"
                 data-stock="{{ $stock }}"
+                data-materia="{{ (float)($product->stock_materia_prima_catalogo ?? 0) }}"
                 data-comp="{{ (float)$product->comprometido_catalogo }}"
                 data-nocomp="{{ (float)$product->no_comprometido_catalogo }}">
                 <td><div class="sku">{{ $product->sku ?: '—' }}</div><div class="sub">U: {{ $product->barcode ?: '—' }}</div><div class="sub">C: {{ $product->box_barcode ?: '—' }}</div></td>
@@ -298,7 +299,7 @@
                 <td class="c"><span class="num">{{ number_format($stock, 0) }}</span></td>
                 <td class="c"><span class="num">{{ number_format((float)$product->comprometido_catalogo, 0) }}</span></td>
                 <td class="c"><span class="num">{{ number_format((float)$product->no_comprometido_catalogo, 0) }}</span></td>
-                <td class="c"><span class="muted">—</span></td>
+                <td class="c"><span class="num">{{ number_format((float)($product->stock_materia_prima_catalogo ?? 0), 2) }}</span></td>
                 <td class="c"><span class="num">{{ number_format((float)($product->stock_dalsa_catalogo ?? 0), 0) }}</span></td>
                 <td class="c"><span class="num">{{ number_format((float)($product->stock_joselito_catalogo ?? 0), 0) }}</span></td>
                 <td class="c"><span class="status {{ $statusClass }}" title="{{ $statusText }}"><i></i>{{ $statusLabel }}</span></td>
@@ -306,16 +307,16 @@
             </tr>
         @empty<tr><td colspan="11" class="empty">No se encontraron productos con esos filtros.</td></tr>@endforelse
 
-        {{-- Materia prima integrada en la misma tabla; visible también al filtrar categorías. --}}
-        @if($products->currentPage() === 1)
-            @foreach(($rawMaterials ?? collect()) as $material)
+        {{-- Materia prima integrada en la misma tabla; se muestra una sola vez al final de la paginación. --}}
+        @if(!request()->filled('category_id') && $products->currentPage() === 1)
+            @foreach(($materiasPrimasSinProducto ?? collect()) as $material)
                 @php
                     $materialStock = (float) ($material->stock ?? 0);
                     $materialMin = (float) ($material->minimum_stock ?? 0);
                     $materialStatusClass = $materialStock <= 0 ? 'out' : (($materialMin > 0 && $materialStock <= $materialMin) ? 'low' : 'ok');
                     $materialStatusLabel = $materialStock <= 0 ? 'Agotado' : (($materialMin > 0 && $materialStock <= $materialMin) ? 'Stock bajo' : 'Disponible');
                 @endphp
-                <tr class="cr raw-material-row" data-nombre="{{ mb_strtolower($material->name) }}" data-marca="materia prima" data-stock="0" data-comp="0" data-nocomp="0">
+                <tr class="raw-material-row">
                     <td><div class="sku">{{ $material->code ?: '—' }}</div><div class="sub">MATERIA PRIMA</div></td>
                     <td><div class="product"><div class="icon">🧱</div><div><div class="pname">{{ $material->name }}</div><span class="kind">MATERIA PRIMA</span><div class="sub">{{ $material->category ?: 'Sin categoría' }}</div></div></div></td>
                     <td>{{ $material->unit ?: '—' }}<div class="sub">{{ (int)($material->cantidad_por_caja ?? 0) > 0 ? number_format((float)$material->cantidad_por_caja, 0) . ' unidades/caja' : '—' }}</div></td>
@@ -337,7 +338,7 @@
             <div class="info">
                 Mostrando {{ $products->count() }} de {{ number_format($products->total()) }} productos
                 @if($products->currentPage() === 1)
-                    · {{ ($rawMaterials ?? collect())->count() }} materias primas
+                    · {{ ($rawMaterials ?? collect())->count() }} materias primas ({{ ($materiasPrimasSinProducto ?? collect())->count() }} sin producto asociado)
                 @endif
                 · Página {{ $products->currentPage() }} de {{ max(1, $products->lastPage()) }}
             </div>
@@ -405,10 +406,10 @@
             'comp-desc':   function (a, b) { return b.dataset.comp - a.dataset.comp; },
             'nocomp-desc': function (a, b) { return b.dataset.nocomp - a.dataset.nocomp; }
         };
-        list.sort(keys[orden] || keys['nombre']);
+        if (keys[orden]) list.sort(keys[orden]);
         list.forEach(function (tr) {
             body.appendChild(tr);
-            var ok = tr.classList.contains('raw-material-row') || !marca || tr.dataset.marca === marca;
+            var ok = !marca || tr.dataset.marca === marca;
             tr.style.display = ok ? '' : 'none';
             if (ok) visibles++;
         });
@@ -416,7 +417,6 @@
     }
     $('clMarca').addEventListener('change', aplicar);
     $('clOrden').addEventListener('change', aplicar);
-    aplicar(); // Ordena productos y materias primas juntos desde la carga inicial.
 })();
 </script>
 </body></html>
