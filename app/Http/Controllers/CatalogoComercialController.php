@@ -160,9 +160,12 @@ class CatalogoComercialController extends Controller
 
         // Igual que el módulo original de Materia Prima: incluir todos los registros.
         // No filtrar por active, porque puede estar en false o NULL en registros existentes.
-        $rawMaterials = RawMaterial::query()
+        // Leer directamente la tabla para incluir todos los materiales, sin scopes del modelo.
+        // Se seleccionan únicamente columnas existentes; cantidad_por_caja no existe en PostgreSQL.
+        $rawMaterials = DB::table('raw_materials')
+            ->select('id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status')
             ->orderBy('name')
-            ->get(['id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status']);
+            ->get();
 
         return view('catalogo-comercial.index', compact(
             'categories', 'products', 'totalActivos', 'conStock', 'stockBajo', 'agotados',

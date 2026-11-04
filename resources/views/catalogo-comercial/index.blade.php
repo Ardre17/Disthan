@@ -260,7 +260,7 @@
     </form>
 
     <section class="tablebox">
-        <div class="scroll"><table><thead><tr><th>SKU</th><th>Producto / Material</th><th>Peso/Presentación</th><th class="c">Stock físico DISTAN</th><th class="c">Comprometido en pedidos</th><th class="c">No comprometido</th><th class="c">Dalsa / Cajas</th><th class="c">Joselito / Cajas</th><th class="c">Estado</th><th></th></tr></thead><tbody id="clBody">
+        <div class="scroll"><table><thead><tr><th>SKU</th><th>Producto / Material</th><th>Peso/Presentación</th><th class="c">Stock físico DISTAN</th><th class="c">Comprometido en pedidos</th><th class="c">No comprometido</th><th class="c">Materia Prima</th><th class="c">Dalsa</th><th class="c">Joselito</th><th class="c">Estado</th><th></th></tr></thead><tbody id="clBody">
         @forelse($products as $product)
             @php
                 $stock = (float)($product->stock ?? 0);
@@ -298,14 +298,15 @@
                 <td class="c"><span class="num">{{ number_format($stock, 0) }}</span></td>
                 <td class="c"><span class="num">{{ number_format((float)$product->comprometido_catalogo, 0) }}</span></td>
                 <td class="c"><span class="num">{{ number_format((float)$product->no_comprometido_catalogo, 0) }}</span></td>
+                <td class="c"><span class="muted">—</span></td>
                 <td class="c"><span class="num">{{ number_format((float)($product->stock_dalsa_catalogo ?? 0), 0) }}</span></td>
                 <td class="c"><span class="num">{{ number_format((float)($product->stock_joselito_catalogo ?? 0), 0) }}</span></td>
                 <td class="c"><span class="status {{ $statusClass }}" title="{{ $statusText }}"><i></i>{{ $statusLabel }}</span></td>
                 <td><a class="detail" href="{{ route('catalogo.publico.show', $product) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Detalle</a></td>
             </tr>
-        @empty<tr><td colspan="10" class="empty">No se encontraron productos con esos filtros.</td></tr>@endforelse
+        @empty<tr><td colspan="11" class="empty">No se encontraron productos con esos filtros.</td></tr>@endforelse
 
-        {{-- Materia prima integrada en la misma tabla; se muestra una sola vez al final de la paginación. --}}
+        {{-- Materia prima integrada como filas propias; solo aparece en Todos y en la primera página. --}}
         @if(!request()->filled('category_id') && $products->currentPage() === 1)
             @foreach(($rawMaterials ?? collect()) as $material)
                 @php
@@ -317,10 +318,11 @@
                 <tr class="raw-material-row">
                     <td><div class="sku">{{ $material->code ?: '—' }}</div><div class="sub">MATERIA PRIMA</div></td>
                     <td><div class="product"><div class="icon">🧱</div><div><div class="pname">{{ $material->name }}</div><span class="kind">MATERIA PRIMA</span><div class="sub">{{ $material->category ?: 'Sin categoría' }}</div></div></div></td>
-                    <td>{{ $material->unit ?: '—' }}<div class="sub">{{ (int)($material->cantidad_por_caja ?? 0) > 0 ? number_format((float)$material->cantidad_por_caja, 0) . ' unidades/caja' : '—' }}</div></td>
+                    <td>{{ $material->unit ?: '—' }}</td>
+                    <td class="c"><span class="muted">—</span></td>
+                    <td class="c"><span class="muted">—</span></td>
+                    <td class="c"><span class="muted">—</span></td>
                     <td class="c"><span class="num">{{ number_format($materialStock, 2) }}</span></td>
-                    <td class="c"><span class="muted">—</span></td>
-                    <td class="c"><span class="muted">—</span></td>
                     <td class="c"><span class="muted">—</span></td>
                     <td class="c"><span class="muted">—</span></td>
                     <td class="c"><span class="status {{ $materialStatusClass }}"><i></i>{{ $materialStatusLabel }}</span></td>
