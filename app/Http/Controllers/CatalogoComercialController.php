@@ -162,7 +162,7 @@ class CatalogoComercialController extends Controller
         // No filtrar por active, porque puede estar en false o NULL en registros existentes.
         $rawMaterials = RawMaterial::query()
             ->orderBy('name')
-            ->get(['id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status', 'cantidad_por_caja']);
+            ->get(['id', 'code', 'name', 'category', 'unit', 'stock', 'minimum_stock', 'status']);
 
         // Integrar Materia Prima en la fila del producto equivalente, igual que Dalsa/Joselito.
         // Se acumulan registros con el mismo producto; los nombres ambiguos o sin coincidencia
