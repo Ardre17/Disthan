@@ -36,5 +36,8 @@
         @yield('content')
     </div>
 
+    {{-- WhatsApp flotante global: disponible en todos los módulos --}}
+    @include('components.whatsapp-widget')
+
 </body>
 </html>
