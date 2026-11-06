@@ -56,7 +56,7 @@
             height: 100%;
 
             background-image:
-                url("/images/login/login-background-octubre.png");
+                url("/images/login/login-background-noviembre.png");
 
             background-position: center center;
             background-repeat: no-repeat;
@@ -532,32 +532,7 @@
         .btn-production span {
             font-size: 16px;
         }
-
-
-        /* =====================================================
-           ILUSTRACION HALLOWEEN DEL FORMULARIO
-        ===================================================== */
-
-        .login-season-art {
-            display: block;
-
-            width: calc(100% + 76px);
-
-            height: 150px;
-
-            margin-left: -38px;
-
-            margin-top: 19px;
-
-            object-fit: cover;
-
-            object-position: center;
-
-            border: none;
-        }
-
-
-        /* =====================================================
+/* =====================================================
            FOOTER ANTIGUO
         ===================================================== */
 
@@ -589,13 +564,7 @@
             }
 
             .btn-production,
-            .login-season-art {
-                width: calc(100% + 64px);
-
-                margin-left: -32px;
-            }
-
-            .login-logo img {
+.login-logo img {
                 width: 90%;
             }
         }
@@ -645,12 +614,7 @@
             }
 
             .btn-production,
-            .login-season-art {
-                width: calc(100% + 60px);
-
-                margin-left: -30px;
-            }
-        }
+}
 
 
         /* =====================================================
@@ -713,18 +677,7 @@
 
                 gap: 8px;
             }
-
-            .login-season-art {
-                height: 125px;
-
-                width: calc(100% + 40px);
-
-                margin-left: -20px;
-
-                margin-top: 17px;
-            }
-
-            .btn-production {
+.btn-production {
                 width: calc(100% + 40px);
 
                 margin-left: -20px;
@@ -768,7 +721,7 @@
 <body>
 
     {{-- =====================================================
-         FONDO DE TEMPORADA
+         FONDO DE TEMPORADA — NOVIEMBRE
     ====================================================== --}}
 
     <div class="login-background"></div>
@@ -986,19 +939,7 @@
 
                     </form>
 
-
-                    {{-- =================================================
-                         IMAGEN INFERIOR DE HALLOWEEN
-                    ================================================== --}}
-
-                    <img
-                        class="login-season-art"
-                        src="{{ asset('images/login/halloween-card-bottom.png') }}"
-                        alt=""
-                    >
-
-
-                    {{-- =================================================
+{{-- =================================================
                          REGISTRAR SALIDA DE PRODUCCION
                          DEBAJO DEL LOGIN
                     ================================================== --}}
