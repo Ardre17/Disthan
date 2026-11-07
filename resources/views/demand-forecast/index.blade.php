@@ -40,7 +40,7 @@
         <div class="df-table-wrap">
             <table class="df-table">
                 <thead><tr>
-                    <th>Producto</th><th>Stock</th><th>Demanda diaria</th><th>7 días</th><th>15 días</th><th>30 días</th><th>Pendiente</th><th>En producción</th><th>Cobertura</th><th>Mín. recomendado</th><th>Stock objetivo</th><th>Producir</th><th>Parámetros</th>
+                    <th>Producto</th><th>Stock físico</th><th>Demanda diaria</th><th>7 días</th><th>15 días</th><th>30 días</th><th>Pendiente abierto</th><th>Disponible</th><th>En producción</th><th>Cobertura</th><th>Mín. recomendado</th><th>Stock objetivo</th><th>Producir</th><th>Parámetros</th>
                 </tr></thead>
                 <tbody>
                 @forelse($products as $product)
@@ -52,9 +52,10 @@
                         <td>{{ number_format($product->forecast['demand_15d'],0) }}</td>
                         <td>{{ number_format($product->forecast['demand_30d'],0) }}</td>
                         <td class="df-alert">{{ number_format($product->forecast['pending'],0) }}</td>
+                        <td class="df-num">{{ number_format($product->forecast['available_stock'],0) }}</td>
                         <td>{{ number_format($product->forecast['in_production'],0) }}</td>
                         <td class="{{ $product->forecast['coverage_days'] !== null && $product->forecast['coverage_days'] <= 7 ? 'df-bad' : '' }}">{{ $product->forecast['coverage_days'] !== null ? $product->forecast['coverage_days'].' días' : 'Sin demanda' }}</td>
-                        <td>{{ number_format($product->forecast['recommended_minimum'],0) }}<br><small class="df-muted">Aprobado: {{ $product->forecast['approved_minimum'] !== null ? number_format($product->forecast['approved_minimum'],0) : 'Sin definir' }}</small></td>
+                        <td>{{ number_format($product->forecast['minimum_to_use'],0) }}<br><small class="df-muted">Calculado: {{ number_format($product->forecast['recommended_minimum'],0) }} · Aprobado: {{ $product->forecast['approved_minimum'] !== null ? number_format($product->forecast['approved_minimum'],0) : 'Sin definir' }}</small></td>
                         <td class="df-num">{{ number_format($product->forecast['target_stock'],0) }}</td>
                         <td class="df-num {{ $product->forecast['to_produce'] > 0 ? 'df-alert' : 'df-good' }}">{{ number_format($product->forecast['to_produce'],0) }}</td>
                         <td>
@@ -71,12 +72,12 @@
                         </td>
                     </tr>
                 @empty
-                    <tr><td colspan="13" class="df-muted">No hay productos que coincidan con los filtros.</td></tr>
+                    <tr><td colspan="14" class="df-muted">No hay productos que coincidan con los filtros.</td></tr>
                 @endforelse
                 </tbody>
             </table>
         </div>
-        <p class="df-muted" style="margin:12px 0 0">La demanda usa cantidades solicitadas. Los pendientes vigentes se descuentan de la disponibilidad para calcular producción, no se suman otra vez al historial. Producción en proceso se muestra por separado y se considera como entrada futura estimada.</p>
+        <p class="df-muted" style="margin:12px 0 0">La demanda histórica incluye órdenes no anuladas, incluso COMPLETO. Los compromisos pendientes solo incluyen órdenes PARCIAL e INCOMPLETO. La producción en proceso se muestra por separado y no se suma al stock físico disponible.</p>
     </div>
 </div>
 @endsection

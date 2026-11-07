@@ -10,9 +10,13 @@ use Illuminate\Support\Facades\DB;
 class DemandForecastService
 {
     /**
-     * Forecast demand from valid orders in the last 180 days.
-     * Recent 28-day daily rate receives 60%; previous 152-day rate receives 40%.
-     * Order quantities are used as demand; dispatched quantities are not substituted.
+     * Proyecta demanda con 180 días de historial:
+     * - últimos 28 días: 60 % de ponderación
+     * - 152 días anteriores: 40 % de ponderación
+     *
+     * El historial utiliza cantidades solicitadas de órdenes no anuladas,
+     * incluidas las órdenes COMPLETO. El saldo pendiente operativo, en cambio,
+     * solo considera órdenes PARCIAL e INCOMPLETO.
      */
     public function products(?string $search = null, ?int $categoryId = null)
     {
@@ -26,39 +30,60 @@ class DemandForecastService
             ->with(['category', 'forecastSetting'])
             ->where('activo', true)
             ->when($search, fn ($q) => $q->where(function ($w) use ($search) {
-                $w->whereRaw('LOWER(nombre) LIKE ?', ['%' . mb_strtolower($search) . '%'])
-                  ->orWhereRaw("LOWER(COALESCE(sku, '')) LIKE ?", ['%' . mb_strtolower($search) . '%']);
+                $term = '%' . mb_strtolower($search) . '%';
+                $w->whereRaw('LOWER(nombre) LIKE ?', [$term])
+                    ->orWhereRaw("LOWER(COALESCE(sku, '')) LIKE ?", [$term]);
             }))
             ->when($categoryId, fn ($q) => $q->where('category_id', $categoryId))
-            ->orderBy('nombre')->get();
+            ->orderBy('nombre')
+            ->get();
 
         $productIds = $products->pluck('id');
-        $base = DB::table('order_details as od')
+
+        // Historial: las órdenes COMPLETO también representan demanda histórica.
+        // Solo se excluyen estados de anulación/eliminación.
+        $historicalOrders = DB::table('order_details as od')
             ->join('orders as o', 'o.id', '=', 'od.order_id')
             ->whereIn('od.product_id', $productIds)
-            ->whereNotIn(DB::raw('UPPER(COALESCE(o.estado, \'\'))'), ['ANULADO', 'CANCELADO', 'CANCELADA', 'ELIMINADO'])
+            ->whereNotIn(DB::raw("UPPER(COALESCE(o.estado, ''))"), [
+                'ANULADO', 'ANULADA', 'CANCELADO', 'CANCELADA', 'ELIMINADO',
+            ])
             ->whereBetween('o.fecha_pedido', [$historyStart, $recentEnd]);
 
-        $recent = (clone $base)->whereBetween('o.fecha_pedido', [$recentStart, $recentEnd])
-            ->select('od.product_id', DB::raw('SUM(od.cantidad_solicitada) as qty'))
-            ->groupBy('od.product_id')->pluck('qty', 'product_id');
+        $recent = (clone $historicalOrders)
+            ->whereBetween('o.fecha_pedido', [$recentStart, $recentEnd])
+            ->select('od.product_id', DB::raw('SUM(COALESCE(od.cantidad_solicitada, 0)) as qty'))
+            ->groupBy('od.product_id')
+            ->pluck('qty', 'product_id');
 
-        $previous = (clone $base)->whereBetween('o.fecha_pedido', [$historyStart, $historyEnd])
-            ->select('od.product_id', DB::raw('SUM(od.cantidad_solicitada) as qty'))
-            ->groupBy('od.product_id')->pluck('qty', 'product_id');
+        $previous = (clone $historicalOrders)
+            ->whereBetween('o.fecha_pedido', [$historyStart, $historyEnd])
+            ->select('od.product_id', DB::raw('SUM(COALESCE(od.cantidad_solicitada, 0)) as qty'))
+            ->groupBy('od.product_id')
+            ->pluck('qty', 'product_id');
 
+        // Compromisos futuros: por regla operativa de DISTAN, solo órdenes
+        // PARCIAL e INCOMPLETO siguen pendientes de preparación/despacho.
+        // COMPLETO queda excluido aunque sus detalles tengan saldo no despachado.
         $openPending = DB::table('order_details as od')
             ->join('orders as o', 'o.id', '=', 'od.order_id')
             ->whereIn('od.product_id', $productIds)
-            ->whereNotIn(DB::raw('UPPER(COALESCE(o.estado, \'\'))'), ['COMPLETO', 'ANULADO', 'CANCELADO', 'CANCELADA', 'ELIMINADO'])
-            ->select('od.product_id', DB::raw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0) - COALESCE(od.cantidad_despachada,0),0)) as pending'))
-            ->groupBy('od.product_id')->pluck('pending', 'product_id');
+            ->whereIn(DB::raw('UPPER(COALESCE(o.estado, \'\'))'), ['PARCIAL', 'INCOMPLETO'])
+            ->select(
+                'od.product_id',
+                DB::raw('SUM(GREATEST(COALESCE(od.cantidad_solicitada, 0) - COALESCE(od.cantidad_despachada, 0), 0)) as pending')
+            )
+            ->groupBy('od.product_id')
+            ->pluck('pending', 'product_id');
 
+        // Se muestra por separado. No se suma al stock físico disponible,
+        // porque EN_PRODUCCION todavía no es inventario terminado.
         $production = DB::table('production_orders')
             ->whereIn('product_id', $productIds)
             ->where('status', 'EN_PRODUCCION')
-            ->select('product_id', DB::raw('SUM(produced_quantity) as qty'))
-            ->groupBy('product_id')->pluck('qty', 'product_id');
+            ->select('product_id', DB::raw('SUM(COALESCE(produced_quantity, 0)) as qty'))
+            ->groupBy('product_id')
+            ->pluck('qty', 'product_id');
 
         return $products->map(function (Product $product) use ($recent, $previous, $openPending, $production) {
             $recentDaily = (float) ($recent[$product->id] ?? 0) / 28;
@@ -74,10 +99,19 @@ class DemandForecastService
             $inProduction = (float) ($production[$product->id] ?? 0);
 
             $securityStock = $daily * $safety;
-            $recommendedMinimum = ($daily * $lead) + $securityStock;
-            $targetStock = ($daily * $coverage) + $securityStock;
-            $effectiveStock = max(0, $stock - $pending) + $inProduction;
-            $toProduce = max(0, $targetStock - $effectiveStock);
+            $calculatedMinimum = ($daily * $lead) + $securityStock;
+            $approvedMinimum = $setting?->approved_min_stock !== null
+                ? (float) $setting->approved_min_stock
+                : null;
+            $minimumToUse = $approvedMinimum ?? $calculatedMinimum;
+
+            // La producción en proceso no se considera stock disponible.
+            $availableStock = max(0, $stock - $pending);
+
+            // El objetivo de cobertura nunca queda por debajo del mínimo aprobado.
+            $coverageTarget = ($daily * $coverage) + $securityStock;
+            $targetStock = max($coverageTarget, $minimumToUse);
+            $toProduce = max(0, $targetStock - $availableStock);
 
             $product->forecast = [
                 'recent_daily' => round($recentDaily, 2),
@@ -86,11 +120,14 @@ class DemandForecastService
                 'demand_7d' => round($daily * 7, 2),
                 'demand_15d' => round($daily * 15, 2),
                 'demand_30d' => round($daily * 30, 2),
+                'stock' => round($stock, 2),
                 'pending' => round($pending, 2),
+                'available_stock' => round($availableStock, 2),
                 'in_production' => round($inProduction, 2),
                 'security_stock' => round($securityStock, 2),
-                'recommended_minimum' => round($recommendedMinimum, 2),
-                'approved_minimum' => $setting?->approved_min_stock,
+                'recommended_minimum' => round($calculatedMinimum, 2),
+                'approved_minimum' => $approvedMinimum,
+                'minimum_to_use' => round($minimumToUse, 2),
                 'target_stock' => round($targetStock, 2),
                 'coverage_days' => $daily > 0 ? round($stock / $daily, 1) : null,
                 'to_produce' => round($toProduce, 2),
