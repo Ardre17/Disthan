@@ -23,6 +23,78 @@
     @if(session('success'))<div class="alert alert-success">{{ session('success') }}</div>@endif
     @if($errors->any())<div class="alert alert-danger">{{ $errors->first() }}</div>@endif
 
+    <div class="df-filters" style="margin:0 0 16px">
+        <a class="df-btn" href="{{ route('demand-forecast.index') }}" style="background:{{ request('section') === 'supermarkets' ? '#64748b' : '#1459a6' }}">Demanda y stock</a>
+        <a class="df-btn" href="{{ route('demand-forecast.index', ['section' => 'supermarkets']) }}" style="background:{{ request('section') === 'supermarkets' ? '#1459a6' : '#64748b' }}">Supermercados</a>
+    </div>
+
+    @if(request('section') === 'supermarkets')
+        <div class="df-kpis">
+            <div class="df-card df-kpi"><small>Supermercados con actividad</small><strong>{{ $supermarketData['summary']['clients'] }}</strong></div>
+            <div class="df-card df-kpi"><small>Órdenes en últimos 180 días</small><strong>{{ $supermarketData['summary']['orders'] }}</strong></div>
+            <div class="df-card df-kpi"><small>Órdenes todavía abiertas</small><strong>{{ $supermarketData['summary']['pending_orders'] }}</strong></div>
+            <div class="df-card df-kpi"><small>Unidades pendientes</small><strong>{{ number_format($supermarketData['summary']['pending_units'], 0) }}</strong></div>
+        </div>
+
+        <div class="df-card">
+            <h2 style="font-size:17px;font-weight:750;margin:0 0 5px">Planificación por supermercado</h2>
+            <p class="df-muted">Frecuencia y cantidades calculadas con despachos reales de los últimos 180 días. Los compromisos abiertos se muestran por separado.</p>
+            <div class="df-table-wrap">
+                <table class="df-table">
+                    <thead><tr><th>Supermercado</th><th>Órdenes</th><th>Último pedido</th><th>Frecuencia media</th><th>Próximo pedido estimado</th><th>Unidades despachadas</th><th>Promedio por orden</th><th>Órdenes abiertas</th><th>Unidades pendientes</th></tr></thead>
+                    <tbody>
+                    @forelse($supermarketData['clients'] as $client)
+                        <tr>
+                            <td><strong>{{ $client['client_name'] }}</strong></td>
+                            <td>{{ $client['order_count'] }}</td>
+                            <td>{{ $client['last_order'] ? $client['last_order']->format('d/m/Y') : 'Sin historial' }}</td>
+                            <td>{{ $client['average_interval'] !== null ? number_format($client['average_interval'], 1).' días' : 'Insuficiente historial' }}</td>
+                            <td>
+                                @if($client['next_order'])
+                                    <strong>{{ $client['next_order']->format('d/m/Y') }}</strong>
+                                    @if($client['days_until_next'] < 0)<br><small class="df-bad">Atrasado {{ abs($client['days_until_next']) }} días</small>
+                                    @elseif($client['days_until_next'] <= 3)<br><small class="df-alert">Próximo en {{ $client['days_until_next'] }} días</small>@endif
+                                @else
+                                    <span class="df-muted">Por calcular</span>
+                                @endif
+                            </td>
+                            <td class="df-num">{{ number_format($client['total_dispatched'], 0) }}</td>
+                            <td>{{ number_format($client['average_order_quantity'], 1) }}</td>
+                            <td>{{ $client['pending_orders'] }}</td>
+                            <td class="df-alert">{{ number_format($client['pending_units'], 0) }}</td>
+                        </tr>
+                        <tr><td colspan="9" style="padding:8px 12px 16px;background:#fafbfd">
+                            <details>
+                                <summary style="cursor:pointer;color:#1459a6;font-weight:650">Ver productos y cantidades habituales de {{ $client['client_name'] }}</summary>
+                                <div class="df-table-wrap" style="margin-top:10px">
+                                    <table class="df-table" style="min-width:750px;background:white">
+                                        <thead><tr><th>Producto</th><th>SKU</th><th>Órdenes con despacho</th><th>Total despachado</th><th>Promedio por orden</th><th>Frecuencia producto</th><th>Último despacho</th><th>Pendiente abierto</th></tr></thead>
+                                        <tbody>
+                                        @forelse($client['products'] as $item)
+                                            <tr>
+                                                <td>{{ $item['name'] }}</td><td>{{ $item['sku'] }}</td><td>{{ $item['orders'] }}</td>
+                                                <td>{{ number_format($item['total_dispatched'], 0) }}</td><td>{{ number_format($item['average_quantity'], 1) }}</td>
+                                                <td>{{ $item['frequency_days'] ? $item['frequency_days'].' días' : 'Sin patrón' }}</td>
+                                                <td>{{ $item['last_order'] ? $item['last_order']->format('d/m/Y') : '—' }}</td>
+                                                <td class="df-alert">{{ number_format($item['pending'], 0) }}</td>
+                                            </tr>
+                                        @empty
+                                            <tr><td colspan="8" class="df-muted">Este cliente todavía no tiene productos despachados en el periodo.</td></tr>
+                                        @endforelse
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </details>
+                        </td></tr>
+                    @empty
+                        <tr><td colspan="9" class="df-muted">No hay órdenes de tipo SUPERMERCADO en los últimos 180 días.</td></tr>
+                    @endforelse
+                    </tbody>
+                </table>
+            </div>
+            <p class="df-muted" style="margin-top:12px">La fecha del próximo pedido es una estimación basada en el intervalo promedio entre fechas de pedido. No representa una orden confirmada.</p>
+        </div>
+    @else
     <div class="df-kpis">
         <div class="df-card df-kpi"><small>Productos analizados</small><strong>{{ $summary['products'] }}</strong></div>
         <div class="df-card df-kpi"><small>Cobertura crítica (≤ 7 días)</small><strong class="df-bad">{{ $summary['critical'] }}</strong></div>
@@ -79,5 +151,6 @@
         </div>
         <p class="df-muted" style="margin:12px 0 0">La demanda histórica incluye órdenes no anuladas, incluso COMPLETO. Los compromisos pendientes solo incluyen órdenes PARCIAL e INCOMPLETO. La producción en proceso se muestra por separado y no se suma al stock físico disponible.</p>
     </div>
+    @endif
 </div>
 @endsection

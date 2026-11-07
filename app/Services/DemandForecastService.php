@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Order;
 use App\Models\Product;
 use App\Models\ProductForecastSetting;
 use Illuminate\Support\Carbon;
@@ -10,13 +11,9 @@ use Illuminate\Support\Facades\DB;
 class DemandForecastService
 {
     /**
-     * Proyecta demanda con 180 días de historial:
-     * - últimos 28 días: 60 % de ponderación
-     * - 152 días anteriores: 40 % de ponderación
-     *
-     * El historial utiliza cantidades solicitadas de órdenes no anuladas,
-     * incluidas las órdenes COMPLETO. El saldo pendiente operativo, en cambio,
-     * solo considera órdenes PARCIAL e INCOMPLETO.
+     * Proyecta demanda con 180 días de historial usando cantidades realmente
+     * despachadas: en DISTAN una orden COMPLETO puede cerrarse aunque algunos
+     * productos solicitados finalmente no hayan salido.
      */
     public function products(?string $search = null, ?int $categoryId = null)
     {
@@ -40,8 +37,6 @@ class DemandForecastService
 
         $productIds = $products->pluck('id');
 
-        // Historial: las órdenes COMPLETO también representan demanda histórica.
-        // Solo se excluyen estados de anulación/eliminación.
         $historicalOrders = DB::table('order_details as od')
             ->join('orders as o', 'o.id', '=', 'od.order_id')
             ->whereIn('od.product_id', $productIds)
@@ -50,34 +45,30 @@ class DemandForecastService
             ])
             ->whereBetween('o.fecha_pedido', [$historyStart, $recentEnd]);
 
+        // Demanda histórica real: cantidad despachada, no cantidad solicitada.
         $recent = (clone $historicalOrders)
             ->whereBetween('o.fecha_pedido', [$recentStart, $recentEnd])
-            ->select('od.product_id', DB::raw('SUM(COALESCE(od.cantidad_solicitada, 0)) as qty'))
+            ->select('od.product_id', DB::raw('SUM(COALESCE(od.cantidad_despachada, 0)) as qty'))
             ->groupBy('od.product_id')
             ->pluck('qty', 'product_id');
 
         $previous = (clone $historicalOrders)
             ->whereBetween('o.fecha_pedido', [$historyStart, $historyEnd])
-            ->select('od.product_id', DB::raw('SUM(COALESCE(od.cantidad_solicitada, 0)) as qty'))
+            ->select('od.product_id', DB::raw('SUM(COALESCE(od.cantidad_despachada, 0)) as qty'))
             ->groupBy('od.product_id')
             ->pluck('qty', 'product_id');
 
-        // Compromisos futuros: por regla operativa de DISTAN, solo órdenes
-        // PARCIAL e INCOMPLETO siguen pendientes de preparación/despacho.
-        // COMPLETO queda excluido aunque sus detalles tengan saldo no despachado.
+        // Compromisos futuros: únicamente órdenes todavía abiertas.
         $openPending = DB::table('order_details as od')
             ->join('orders as o', 'o.id', '=', 'od.order_id')
             ->whereIn('od.product_id', $productIds)
-            ->whereIn(DB::raw('UPPER(COALESCE(o.estado, \'\'))'), ['PARCIAL', 'INCOMPLETO'])
-            ->select(
-                'od.product_id',
-                DB::raw('SUM(GREATEST(COALESCE(od.cantidad_solicitada, 0) - COALESCE(od.cantidad_despachada, 0), 0)) as pending')
-            )
+            ->whereIn(DB::raw("UPPER(COALESCE(o.estado, ''))"), ['PARCIAL', 'INCOMPLETO'])
+            ->select('od.product_id', DB::raw(
+                'SUM(GREATEST(COALESCE(od.cantidad_solicitada, 0) - COALESCE(od.cantidad_despachada, 0), 0)) as pending'
+            ))
             ->groupBy('od.product_id')
             ->pluck('pending', 'product_id');
 
-        // Se muestra por separado. No se suma al stock físico disponible,
-        // porque EN_PRODUCCION todavía no es inventario terminado.
         $production = DB::table('production_orders')
             ->whereIn('product_id', $productIds)
             ->where('status', 'EN_PRODUCCION')
@@ -104,11 +95,7 @@ class DemandForecastService
                 ? (float) $setting->approved_min_stock
                 : null;
             $minimumToUse = $approvedMinimum ?? $calculatedMinimum;
-
-            // La producción en proceso no se considera stock disponible.
             $availableStock = max(0, $stock - $pending);
-
-            // El objetivo de cobertura nunca queda por debajo del mínimo aprobado.
             $coverageTarget = ($daily * $coverage) + $securityStock;
             $targetStock = max($coverageTarget, $minimumToUse);
             $toProduce = max(0, $targetStock - $availableStock);
@@ -139,6 +126,169 @@ class DemandForecastService
 
             return $product;
         });
+    }
+
+    /**
+     * Resumen de clientes SUPERMERCADO y comportamiento por producto.
+     * Usa cantidades despachadas para estimar consumo habitual y mantiene
+     * los saldos de órdenes abiertas en un bloque separado.
+     */
+    public function supermarkets()
+    {
+        $today = Carbon::today();
+        $historyStart = $today->copy()->subDays(179)->startOfDay();
+
+        $orders = Order::query()
+            ->with(['client', 'details.product'])
+            ->whereRaw("UPPER(COALESCE(tipo_orden, '')) = ?", ['SUPERMERCADO'])
+            ->whereNotIn(DB::raw("UPPER(COALESCE(estado, ''))"), [
+                'ANULADO', 'ANULADA', 'CANCELADO', 'CANCELADA', 'ELIMINADO',
+            ])
+            ->whereDate('fecha_pedido', '>=', $historyStart->toDateString())
+            ->orderBy('fecha_pedido')
+            ->get();
+
+        // Solo estas órdenes mantienen compromisos de preparación/despacho.
+        $openOrders = Order::query()
+            ->with(['client', 'details.product'])
+            ->whereRaw("UPPER(COALESCE(tipo_orden, '')) = ?", ['SUPERMERCADO'])
+            ->whereIn(DB::raw("UPPER(COALESCE(estado, ''))"), ['PARCIAL', 'INCOMPLETO'])
+            ->get();
+
+        $clientIds = $orders->pluck('client_id')
+            ->merge($openOrders->pluck('client_id'))
+            ->filter()->unique()->values();
+
+        $clients = $clientIds->map(function ($clientId) use ($orders, $openOrders, $today) {
+            $clientOrders = $orders->where('client_id', $clientId)->sortBy('fecha_pedido')->values();
+            $clientOpenOrders = $openOrders->where('client_id', $clientId)->values();
+            $client = $clientOrders->first()?->client ?? $clientOpenOrders->first()?->client;
+
+            // Frecuencia general del cliente: días entre fechas distintas de pedido.
+            $distinctDates = $clientOrders
+                ->map(fn ($order) => Carbon::parse($order->fecha_pedido)->toDateString())
+                ->unique()->sort()->values();
+            $intervals = [];
+            for ($i = 1; $i < $distinctDates->count(); $i++) {
+                $intervals[] = Carbon::parse($distinctDates[$i - 1])->diffInDays(Carbon::parse($distinctDates[$i]));
+            }
+            $averageInterval = count($intervals) ? array_sum($intervals) / count($intervals) : null;
+            $lastOrderDate = $distinctDates->last() ? Carbon::parse($distinctDates->last())->startOfDay() : null;
+            $nextDate = ($lastOrderDate && $averageInterval !== null)
+                ? $lastOrderDate->copy()->addDays((int) round($averageInterval))
+                : null;
+
+            // Historial por producto: solo unidades efectivamente despachadas.
+            $productGroups = [];
+            $totalDispatched = 0.0;
+            foreach ($clientOrders as $order) {
+                foreach ($order->details as $detail) {
+                    $qty = (float) ($detail->cantidad_despachada ?? 0);
+                    if (!$detail->product) continue;
+                    $pid = $detail->product_id;
+                    if (!isset($productGroups[$pid])) {
+                        $productGroups[$pid] = [
+                            'product_id' => $pid,
+                            'name' => $detail->product->nombre,
+                            'sku' => $detail->product->sku,
+                            'order_ids' => [],
+                            'total_dispatched' => 0.0,
+                            'dates' => [],
+                        ];
+                    }
+                    if ($qty > 0) {
+                        $productGroups[$pid]['order_ids'][] = $order->id;
+                        $productGroups[$pid]['total_dispatched'] += $qty;
+                        $productGroups[$pid]['dates'][] = Carbon::parse($order->fecha_pedido)->toDateString();
+                        $totalDispatched += $qty;
+                    }
+                }
+            }
+
+            // Añade productos que solo aparecen en órdenes abiertas, aunque no tengan historial despachado.
+            $pendingUnits = 0.0;
+            foreach ($clientOpenOrders as $order) {
+                foreach ($order->details as $detail) {
+                    if (!$detail->product) continue;
+                    $pendingQty = max(0,
+                        (float) ($detail->cantidad_solicitada ?? 0)
+                        - (float) ($detail->cantidad_despachada ?? 0)
+                    );
+                    if ($pendingQty <= 0) continue;
+                    $pid = $detail->product_id;
+                    $pendingUnits += $pendingQty;
+                    if (!isset($productGroups[$pid])) {
+                        $productGroups[$pid] = [
+                            'product_id' => $pid,
+                            'name' => $detail->product->nombre,
+                            'sku' => $detail->product->sku,
+                            'order_ids' => [],
+                            'total_dispatched' => 0.0,
+                            'dates' => [],
+                        ];
+                    }
+                }
+            }
+
+            $productRows = collect($productGroups)->map(function ($item) use ($clientOpenOrders) {
+                $dates = collect($item['dates'])->unique()->sort()->values();
+                $gaps = [];
+                for ($i = 1; $i < $dates->count(); $i++) {
+                    $gaps[] = Carbon::parse($dates[$i - 1])->diffInDays(Carbon::parse($dates[$i]));
+                }
+                $frequency = count($gaps) ? (int) round(array_sum($gaps) / count($gaps)) : null;
+                $last = $dates->last() ? Carbon::parse($dates->last()) : null;
+                $pending = 0.0;
+                foreach ($clientOpenOrders as $openOrder) {
+                    foreach ($openOrder->details as $detail) {
+                        if ((int) $detail->product_id === (int) $item['product_id']) {
+                            $pending += max(0,
+                                (float) ($detail->cantidad_solicitada ?? 0)
+                                - (float) ($detail->cantidad_despachada ?? 0)
+                            );
+                        }
+                    }
+                }
+                $orderCount = count(array_unique($item['order_ids']));
+                return [
+                    'product_id' => $item['product_id'],
+                    'name' => $item['name'],
+                    'sku' => $item['sku'],
+                    'orders' => $orderCount,
+                    'total_dispatched' => $item['total_dispatched'],
+                    'average_quantity' => $orderCount > 0 ? $item['total_dispatched'] / $orderCount : 0,
+                    'frequency_days' => $frequency,
+                    'last_order' => $last,
+                    'next_order' => ($last && $frequency) ? $last->copy()->addDays($frequency) : null,
+                    'pending' => $pending,
+                ];
+            })->sortBy('name')->values();
+
+            return [
+                'client_id' => $clientId,
+                'client_name' => $client?->nombre_comercial ?: ($client?->razon_social ?: 'Cliente #' . $clientId),
+                'order_count' => $clientOrders->count(),
+                'last_order' => $lastOrderDate,
+                'average_interval' => $averageInterval !== null ? round($averageInterval, 1) : null,
+                'next_order' => $nextDate,
+                'days_until_next' => $nextDate ? (int) $today->diffInDays($nextDate, false) : null,
+                'total_dispatched' => $totalDispatched,
+                'average_order_quantity' => $clientOrders->count() ? $totalDispatched / $clientOrders->count() : 0,
+                'pending_orders' => $clientOpenOrders->count(),
+                'pending_units' => $pendingUnits,
+                'products' => $productRows,
+            ];
+        })->sortBy('client_name')->values();
+
+        return [
+            'clients' => $clients,
+            'summary' => [
+                'clients' => $clients->count(),
+                'orders' => $orders->count(),
+                'pending_orders' => $openOrders->count(),
+                'pending_units' => $clients->sum('pending_units'),
+            ],
+        ];
     }
 
     public function saveSettings(Product $product, array $data, ?int $userId): ProductForecastSetting
