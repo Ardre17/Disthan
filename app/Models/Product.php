@@ -49,6 +49,11 @@ class Product extends Model
 {
     return $this->hasMany(OrderDetail::class);
 }
+
+    public function forecastSetting()
+    {
+        return $this->hasOne(ProductForecastSetting::class);
+    }
  public function locations()
 {
     return $this->hasMany(WarehouseLocation::class);

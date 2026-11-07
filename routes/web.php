@@ -595,6 +595,12 @@ Route::get(
 
     Route::middleware(['auth'])->group(function () {
 
+    // Agregar dentro del grupo Route::middleware('auth')->group(function () { ... })
+    Route::get('/planificacion-demanda', [\App\Http\Controllers\DemandForecastController::class, 'index'])
+        ->name('demand-forecast.index');
+    Route::put('/planificacion-demanda/productos/{product}/configuracion', [\App\Http\Controllers\DemandForecastController::class, 'updateSettings'])
+        ->name('demand-forecast.settings');
+
     /*
     |--------------------------------------------------------------------------
     | CONTEO FÍSICO (inventario físico con historial de diferencias)
