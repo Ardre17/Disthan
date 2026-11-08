@@ -8,7 +8,7 @@
 .df-kpi{padding:16px}.df-kpi small{color:#718096}.df-kpi strong{display:block;font-size:25px;margin-top:5px}
 .df-card{padding:16px;margin-bottom:16px}.df-filters{display:flex;gap:9px;flex-wrap:wrap;margin-bottom:12px}.df-input{border:1px solid #d6deea;border-radius:8px;padding:9px 11px;background:#fff}
 .df-btn{background:#1459a6;color:#fff;border:0;border-radius:8px;padding:9px 13px;text-decoration:none;cursor:pointer}.df-table-wrap{overflow:auto}table.df-table{width:100%;border-collapse:collapse;min-width:1050px} .df-table th{text-align:left;color:#64748b;font-size:11px;text-transform:uppercase;letter-spacing:.04em;background:#f7f9fc}
-.df-table th,.df-table td{padding:11px 10px;border-bottom:1px solid #edf0f5;white-space:nowrap}.df-num{font-variant-numeric:tabular-nums;font-weight:650}.df-alert{color:#b45309}.df-good{color:#15803d}.df-bad{color:#b91c1c}.df-pill{padding:4px 8px;border-radius:20px;background:#eef4fb;color:#315b89;font-size:11px}
+.df-table th,.df-table td{padding:11px 10px;border-bottom:1px solid #edf0f5;white-space:nowrap}.df-num{font-variant-numeric:tabular-nums;font-weight:650}.df-alert{color:#b45309}.df-good{color:#15803d}.df-bad{color:#b91c1c}.df-pill{padding:4px 8px;border-radius:20px;background:#eef4fb;color:#315b89;font-size:11px}.df-status{display:inline-block;padding:4px 8px;border-radius:20px;font-size:11px;font-weight:650;background:#eef2f7;color:#475569}.df-status-good{background:#dcfce7;color:#166534}.df-status-warn{background:#fef3c7;color:#92400e}.df-status-bad{background:#fee2e2;color:#991b1b}
 @media(max-width:700px){.df-wrap{padding:12px}.df-head{padding:15px}.df-title{font-size:18px}}
 </style>
 <div class="df-wrap">
@@ -38,16 +38,41 @@
         </div>
         <div class="df-card">
             <h2 style="font-size:17px;font-weight:750;margin:0 0 5px">Predicción de pedidos por cliente</h2>
-            <p class="df-muted">Incluye únicamente órdenes LOCAL y ENCOMIENDA. La demanda se analiza con cantidades solicitadas y despachadas; los saldos de órdenes PARCIAL e INCOMPLETO se muestran como compromisos abiertos.</p>
+            <p class="df-muted">Incluye únicamente órdenes LOCAL y ENCOMIENDA. La siguiente orden se estima con el promedio de lo realmente despachado por producto; los faltantes no se acumulan. Los pedidos abiertos se muestran aparte.</p>
+            <div class="df-kpis" style="margin:12px 0">
+                <div class="df-card df-kpi"><small>Despachados últimos 7 días</small><strong>{{ $clientData['summary']['group_counts']['recently_dispatched'] }}</strong></div>
+                <div class="df-card df-kpi"><small>Próximos a pedir</small><strong>{{ $clientData['summary']['group_counts']['due_soon'] }}</strong></div>
+                <div class="df-card df-kpi"><small>Baja frecuencia</small><strong>{{ $clientData['summary']['group_counts']['low_frequency'] }}</strong></div>
+                <div class="df-card df-kpi"><small>Sin pedidos por más de 90 días</small><strong>{{ $clientData['summary']['group_counts']['inactive_90'] }}</strong></div>
+            </div>
+            <form method="GET" class="df-filters">
+                <input type="hidden" name="section" value="clients">
+                <select class="df-input" name="client_group" onchange="this.form.submit()">
+                    <option value="all" @selected($clientData['selected_group'] === 'all')>Todos los clientes</option>
+                    <option value="recently_dispatched" @selected($clientData['selected_group'] === 'recently_dispatched')>Despachados últimos 7 días</option>
+                    <option value="due_soon" @selected($clientData['selected_group'] === 'due_soon')>Próximos a pedir / atrasados</option>
+                    <option value="low_frequency" @selected($clientData['selected_group'] === 'low_frequency')>Baja frecuencia (más de 30 días)</option>
+                    <option value="inactive_90" @selected($clientData['selected_group'] === 'inactive_90')>Sin pedidos por más de 90 días</option>
+                    <option value="follow_up" @selected($clientData['selected_group'] === 'follow_up')>En seguimiento</option>
+                </select>
+            </form>
             <div class="df-table-wrap">
                 <table class="df-table">
-                    <thead><tr><th>Cliente</th><th>Órdenes</th><th>Último pedido</th><th>Frecuencia habitual</th><th>Próximo pedido estimado</th><th>Total solicitado</th><th>Total despachado</th><th>Promedio despachado / orden</th><th>Órdenes abiertas</th><th>Unidades pendientes</th></tr></thead>
+                    <thead><tr><th>Cliente</th><th>Estado de planificación</th><th>Órdenes</th><th>Último pedido</th><th>Último despacho</th><th>Frecuencia habitual</th><th>Próximo pedido estimado</th><th>Total solicitado</th><th>Total despachado</th><th>Promedio despachado / orden</th><th>Órdenes abiertas</th><th>Unidades pendientes</th></tr></thead>
                     <tbody>
                     @forelse($clientData['clients'] as $client)
                         <tr>
                             <td><strong>{{ $client['client_name'] }}</strong></td>
+                            <td>
+                                @if($client['planning_group'] === 'recently_dispatched')<span class="df-status df-status-good">Despachado reciente</span>
+                                @elseif($client['planning_group'] === 'due_soon')<span class="df-status df-status-warn">Próximo a pedir</span>
+                                @elseif($client['planning_group'] === 'low_frequency')<span class="df-status">Baja frecuencia</span>
+                                @elseif($client['planning_group'] === 'inactive_90')<span class="df-status df-status-bad">Inactivo +90 días</span>
+                                @else<span class="df-status">En seguimiento</span>@endif
+                            </td>
                             <td>{{ $client['order_count'] }}</td>
                             <td>{{ $client['last_order'] ? $client['last_order']->format('d/m/Y') : 'Sin historial' }}</td>
+                            <td>{{ $client['last_dispatch_date'] ? $client['last_dispatch_date']->format('d/m/Y') : 'Sin despacho' }}</td>
                             <td>{{ $client['average_interval'] !== null ? number_format($client['average_interval'], 1).' días' : 'Insuficiente historial' }}</td>
                             <td>
                                 @if($client['next_order'])
@@ -62,12 +87,12 @@
                             <td>{{ $client['pending_orders'] }}</td>
                             <td class="df-alert">{{ number_format($client['pending_units'], 0) }}</td>
                         </tr>
-                        <tr><td colspan="10" style="padding:8px 12px 16px;background:#fafbfd">
+                        <tr><td colspan="12" style="padding:8px 12px 16px;background:#fafbfd">
                             <details>
                                 <summary style="cursor:pointer;color:#1459a6;font-weight:650">Ver productos y proyección de {{ $client['client_name'] }}</summary>
                                 <div class="df-table-wrap" style="margin-top:10px">
                                     <table class="df-table" style="min-width:1150px;background:white">
-                                        <thead><tr><th>Producto</th><th>Órdenes con solicitud</th><th>Total solicitado</th><th>Total despachado</th><th>No atendido</th><th>Atención (%)</th><th>Promedio solicitado</th><th>Frecuencia</th><th>Última recepción</th><th>Ciclos acumulados</th><th>Siguiente orden estimada</th><th>Adicional descontando pendiente</th><th>Pendiente abierto</th></tr></thead>
+                                        <thead><tr><th>Producto</th><th>Órdenes con solicitud</th><th>Total solicitado</th><th>Total despachado</th><th>No atendido</th><th>Atención (%)</th><th>Promedio despachado por orden</th><th>Frecuencia</th><th>Última recepción</th><th>Ciclos acumulados</th><th>Siguiente orden estimada</th><th>Adicional descontando pendiente</th><th>Pendiente abierto</th></tr></thead>
                                         <tbody>
                                         @forelse($client['products'] as $item)
                                             <tr>
@@ -88,11 +113,11 @@
                                 </div>
                             </details>
                         </td></tr>
-                    @empty<tr><td colspan="10" class="df-muted">No hay órdenes LOCAL o ENCOMIENDA en los últimos 180 días.</td></tr>@endforelse
+                    @empty<tr><td colspan="12" class="df-muted">No hay clientes para este grupo o no hay órdenes LOCAL / ENCOMIENDA en el historial.</td></tr>@endforelse
                     </tbody>
                 </table>
             </div>
-            <p class="df-muted" style="margin-top:12px">La fecha estimada se calcula con la frecuencia histórica de pedidos de cada cliente. El detalle por producto combina cantidades solicitadas y despachadas; los pedidos completos con faltantes aportan información de demanda, pero no generan compromisos futuros. Solo órdenes PARCIAL e INCOMPLETO cuentan como pendientes operativos. La estimación es orientativa y no representa un pedido confirmado.</p>
+            <p class="df-muted" style="margin-top:12px">Para LOCAL y ENCOMIENDA, la siguiente orden por producto utiliza el promedio aritmético de lo despachado en las órdenes donde se solicitó ese producto, incluyendo como cero las órdenes donde no se logró despachar. Las cantidades no atendidas no se acumulan ni se agregan a la proyección. Los pedidos PARCIAL e INCOMPLETO se muestran como compromisos abiertos y se descuentan de la necesidad adicional. Los grupos se clasifican por último despacho, fecha estimada de compra, frecuencia histórica e inactividad superior a 90 días. La sección de supermercados mantiene su cálculo independiente.</p>
         </div>
     @elseif(request('section') === 'supermarkets')
         <div class="df-kpis">

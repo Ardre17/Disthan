@@ -18,6 +18,17 @@ class DemandForecastController extends Controller
 
         if ($request->input('section') === 'clients') {
             $clientData = $forecast->clients();
+            $allowedGroups = ['all', 'recently_dispatched', 'due_soon', 'low_frequency', 'inactive_90', 'follow_up'];
+            $selectedGroup = $request->input('client_group', 'all');
+            if (!in_array($selectedGroup, $allowedGroups, true)) {
+                $selectedGroup = 'all';
+            }
+            if ($selectedGroup !== 'all') {
+                $clientData['clients'] = $clientData['clients']
+                    ->where('planning_group', $selectedGroup)
+                    ->values();
+            }
+            $clientData['selected_group'] = $selectedGroup;
             return view('demand-forecast.index', compact('clientData'));
         }
 

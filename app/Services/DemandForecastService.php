@@ -131,20 +131,20 @@ class DemandForecastService
     /** Atajo para mantener la sección independiente de supermercados. */
     public function supermarkets()
     {
-        return $this->customerPlanning(['SUPERMERCADO']);
+        return $this->customerPlanning(['SUPERMERCADO'], true);
     }
 
     /** Planificación individual para clientes LOCAL y ENCOMIENDA. */
     public function clients()
     {
-        return $this->customerPlanning(['LOCAL', 'ENCOMIENDA']);
+        return $this->customerPlanning(['LOCAL', 'ENCOMIENDA'], false);
     }
 
     /**
      * Analiza la frecuencia, demanda solicitada, despacho y pendientes por cliente.
      * Los compromisos futuros solo proceden de órdenes PARCIAL e INCOMPLETO.
      */
-    private function customerPlanning(array $types)
+    private function customerPlanning(array $types, bool $isSupermarket = true)
     {
         $today = Carbon::today();
         $historyStart = $today->copy()->subDays(179)->startOfDay();
@@ -182,14 +182,18 @@ class DemandForecastService
             ->merge($openOrders->pluck('client_id'))
             ->filter()->unique()->values();
 
-        $clients = $clientIds->map(function ($clientId) use ($orders, $allOrders, $openOrders, $today) {
+        $clients = $clientIds->map(function ($clientId) use ($orders, $allOrders, $openOrders, $today, $isSupermarket) {
             $clientOrders = $orders->where('client_id', $clientId)->sortBy('fecha_pedido')->values();
             $clientAllOrders = $allOrders->where('client_id', $clientId)->sortBy('fecha_pedido')->values();
             $clientOpenOrders = $openOrders->where('client_id', $clientId)->values();
             $client = $clientOrders->first()?->client ?? $clientOpenOrders->first()?->client ?? $clientAllOrders->first()?->client;
 
             // Frecuencia general del cliente: días entre fechas distintas de pedido.
-            $distinctDates = $clientOrders
+            // En clientes LOCAL/ENCOMIENDA usamos todo el historial para no perder
+            // la frecuencia ni marcar como nuevos a clientes que llevan meses inactivos.
+            // La rama de supermercados conserva exactamente su ventana anterior.
+            $frequencyOrders = $isSupermarket ? $clientOrders : $clientAllOrders;
+            $distinctDates = $frequencyOrders
                 ->map(fn ($order) => Carbon::parse($order->fecha_pedido)->toDateString())
                 ->unique()->sort()->values();
             $intervals = [];
@@ -414,16 +418,27 @@ class DemandForecastService
                     ? $recentRequestOrders
                     : $allRequestOrders;
 
-                // El promedio se basa en lo que el supermercado pidió, no solo en lo que DISTAN logró despachar.
-                // La cantidad despachada y la diferencia no atendida se muestran por separado.
-                $requestedQuantities = $requestObservations
-                    ->pluck('requested')->map(fn ($quantity) => (float) $quantity)
-                    ->filter(fn ($quantity) => $quantity > 0)->values()->all();
-                $averageQuantity = count($requestedQuantities) > 0
-                    ? $this->medianValue($requestedQuantities)
-                    : 0.0;
-                if ($averageQuantity <= 0 && $lastReceivedQuantity > 0) {
-                    $averageQuantity = $lastReceivedQuantity;
+                if ($isSupermarket) {
+                    // NO CAMBIAR: supermercados conservan su estimación basada en solicitudes,
+                    // mediana y acumulación desde la última recepción.
+                    $requestedQuantities = $requestObservations
+                        ->pluck('requested')->map(fn ($quantity) => (float) $quantity)
+                        ->filter(fn ($quantity) => $quantity > 0)->values()->all();
+                    $averageQuantity = count($requestedQuantities) > 0
+                        ? $this->medianValue($requestedQuantities)
+                        : 0.0;
+                    if ($averageQuantity <= 0 && $lastReceivedQuantity > 0) {
+                        $averageQuantity = $lastReceivedQuantity;
+                    }
+                } else {
+                    // Clientes LOCAL/ENCOMIENDA: promedio de lo realmente despachado
+                    // por orden en que se solicitó el producto. Las órdenes con cero
+                    // despacho cuentan como cero; los faltantes NO se acumulan ni se suman.
+                    $dispatchedObservations = $requestObservations
+                        ->pluck('dispatched')->map(fn ($quantity) => (float) $quantity)->values();
+                    $averageQuantity = $dispatchedObservations->count() > 0
+                        ? (float) $dispatchedObservations->avg()
+                        : 0.0;
                 }
 
                 $totalRequested = (float) $allRequestOrders->sum('requested');
@@ -462,19 +477,27 @@ class DemandForecastService
                     $elapsedCycles = max(1, $elapsedCycles);
                 }
 
-                // Una entrega extraordinaria puede moderar solo una parte de la proyección,
-                // pero nunca reducirla por debajo de un ciclo habitual.
-                $extraDeliveryCredit = min(
-                    max(0, $lastReceivedQuantity - $averageQuantity),
-                    $averageQuantity
-                );
-                $coveredCycles = $averageQuantity > 0 && $extraDeliveryCredit > 0 ? 1 : 0;
-                $cyclesDue = $elapsedCycles + 1; // incluye la siguiente orden que todavía podría solicitarse.
-                $expectedNextOrder = $averageQuantity > 0
-                    ? max($averageQuantity, ($averageQuantity * $cyclesDue) - $extraDeliveryCredit) + $lastRequestUnfulfilled
-                    : $lastRequestUnfulfilled;
-                // Los pendientes abiertos se descuentan solo de la necesidad adicional; los saldos de órdenes
-                // COMPLETO sirven como señal histórica, no como compromiso futuro.
+                if ($isSupermarket) {
+                    // Lógica de supermercados intacta: acumulación potencial desde última recepción.
+                    $extraDeliveryCredit = min(
+                        max(0, $lastReceivedQuantity - $averageQuantity),
+                        $averageQuantity
+                    );
+                    $coveredCycles = $averageQuantity > 0 && $extraDeliveryCredit > 0 ? 1 : 0;
+                    $cyclesDue = $elapsedCycles + 1;
+                    $expectedNextOrder = $averageQuantity > 0
+                        ? max($averageQuantity, ($averageQuantity * $cyclesDue) - $extraDeliveryCredit) + $lastRequestUnfulfilled
+                        : $lastRequestUnfulfilled;
+                } else {
+                    // Clientes: una sola orden estimada, basada exclusivamente en el promedio
+                    // de cantidades despachadas. No se acumulan faltantes ni ciclos omitidos.
+                    $extraDeliveryCredit = 0.0;
+                    $coveredCycles = 0;
+                    $cyclesDue = 1;
+                    $expectedNextOrder = $averageQuantity;
+                }
+                // Los pedidos abiertos se muestran por separado y se descuentan de la necesidad
+                // adicional para evitar duplicar una cantidad que ya está comprometida.
                 $expectedAdditional = max(0, $expectedNextOrder - $pending);
                 $quantityPerBox = (float) ($item['quantity_per_box'] ?? 0);
                 $expectedBoxes = $quantityPerBox > 0
@@ -512,16 +535,65 @@ class DemandForecastService
                 ];
             })->sortBy('name')->values();
 
+            // Fecha del último despacho real del cliente (no solo fecha de pedido).
+            $lastDispatchDate = null;
+            foreach ($clientAllOrders as $dispatchOrder) {
+                foreach ($dispatchOrder->details as $dispatchDetail) {
+                    if ((float) ($dispatchDetail->cantidad_despachada ?? 0) <= 0) continue;
+                    $dispatchDateValue = $dispatchDetail->fecha_preparacion
+                        ?: ($dispatchOrder->fecha_entrega ?: $dispatchOrder->fecha_pedido);
+                    $dispatchDate = Carbon::parse($dispatchDateValue)->startOfDay();
+                    if (!$lastDispatchDate || $dispatchDate->gt($lastDispatchDate)) {
+                        $lastDispatchDate = $dispatchDate;
+                    }
+                }
+            }
+
+            $lastOrderDateForStatus = $isSupermarket
+                ? $lastOrderDate
+                : ($distinctDates->last() ? Carbon::parse($distinctDates->last())->startOfDay() : null);
+            $totalDispatchedForSummary = $totalDispatched;
+            if (!$isSupermarket) {
+                $totalDispatchedForSummary = 0.0;
+                foreach ($clientAllOrders as $summaryOrder) {
+                    foreach ($summaryOrder->details as $summaryDetail) {
+                        $totalDispatchedForSummary += (float) ($summaryDetail->cantidad_despachada ?? 0);
+                    }
+                }
+            }
+            $daysSinceLastOrder = $lastOrderDateForStatus
+                ? (int) $lastOrderDateForStatus->diffInDays($today)
+                : null;
+            $daysSinceLastDispatch = $lastDispatchDate
+                ? (int) $lastDispatchDate->diffInDays($today)
+                : null;
+            $planningGroup = 'follow_up';
+            if (!$isSupermarket) {
+                if ($daysSinceLastDispatch !== null && $daysSinceLastDispatch <= 7) {
+                    $planningGroup = 'recently_dispatched';
+                } elseif ($daysSinceLastOrder !== null && $daysSinceLastOrder > 90) {
+                    $planningGroup = 'inactive_90';
+                } elseif ($nextDate && (int) $today->diffInDays($nextDate, false) <= 7) {
+                    $planningGroup = 'due_soon';
+                } elseif ($averageInterval !== null && $averageInterval > 30) {
+                    $planningGroup = 'low_frequency';
+                }
+            }
+
             return [
                 'client_id' => $clientId,
                 'client_name' => $client?->nombre_comercial ?: ($client?->razon_social ?: 'Cliente #' . $clientId),
+                'last_dispatch_date' => $lastDispatchDate,
+                'days_since_last_order' => $daysSinceLastOrder,
+                'days_since_last_dispatch' => $daysSinceLastDispatch,
+                'planning_group' => $planningGroup,
                 'order_count' => $clientOrders->count(),
-                'last_order' => $lastOrderDate,
+                'last_order' => $lastOrderDateForStatus,
                 'average_interval' => $averageInterval !== null ? round($averageInterval, 1) : null,
                 'next_order' => $nextDate,
                 'days_until_next' => $nextDate ? (int) $today->diffInDays($nextDate, false) : null,
                 'total_requested' => $productRows->sum('total_requested'),
-                'total_dispatched' => $totalDispatched,
+                'total_dispatched' => $totalDispatchedForSummary,
                 'average_order_quantity' => $clientOrders->count() ? $totalDispatched / $clientOrders->count() : 0,
                 'pending_orders' => $clientOpenOrders->count(),
                 'pending_units' => $pendingUnits,
@@ -536,6 +608,13 @@ class DemandForecastService
                 'orders' => $orders->count(),
                 'pending_orders' => $openOrders->count(),
                 'pending_units' => $clients->sum('pending_units'),
+                'group_counts' => [
+                    'recently_dispatched' => $clients->where('planning_group', 'recently_dispatched')->count(),
+                    'due_soon' => $clients->where('planning_group', 'due_soon')->count(),
+                    'low_frequency' => $clients->where('planning_group', 'low_frequency')->count(),
+                    'inactive_90' => $clients->where('planning_group', 'inactive_90')->count(),
+                    'follow_up' => $clients->where('planning_group', 'follow_up')->count(),
+                ],
             ],
         ];
     }
