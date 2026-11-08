@@ -81,7 +81,7 @@
             @endif
         </div>
     </div>
-    <div class="df-loader-brand">DISTAN<small>ERP · JOYBER PERÚ</small></div>
+    <div class="df-loader-brand">DISTAN<small>ERP · Logistico</small></div>
     <div class="df-loader-bar"><span></span></div>
     <div class="df-loader-msg">Cargando proyección de demanda…</div>
 </div>
