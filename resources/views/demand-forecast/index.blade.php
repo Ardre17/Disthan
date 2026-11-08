@@ -68,7 +68,7 @@
                                 <summary style="cursor:pointer;color:#1459a6;font-weight:650">Ver productos y cantidades habituales de {{ $client['client_name'] }}</summary>
                                 <div class="df-table-wrap" style="margin-top:10px">
                                     <table class="df-table" style="min-width:750px;background:white">
-                                        <thead><tr><th>Producto</th><th>SKU</th><th>Órdenes con despacho</th><th>Total despachado</th><th>Cantidad habitual (mediana)</th><th>Frecuencia</th><th>Última recepción estimada</th><th>Última recepción (unid.)</th><th>Ciclos cubiertos por última recepción</th><th>Ciclos transcurridos</th><th>Siguiente orden estimada</th><th>Adicional descontando pendiente</th><th>Pendiente abierto</th></tr></thead>
+                                        <thead><tr><th>Producto</th><th>SKU</th><th>Órdenes con despacho</th><th>Total despachado</th><th>Cantidad habitual (mediana)</th><th>Frecuencia</th><th>Última recepción estimada</th><th>Última recepción (unid.)</th><th>Ajuste por entrega extraordinaria</th><th>Ciclos transcurridos</th><th>Siguiente orden estimada</th><th>Adicional descontando pendiente</th><th>Pendiente abierto</th></tr></thead>
                                         <tbody>
                                         @forelse($client['products'] as $item)
                                             <tr>
@@ -77,7 +77,7 @@
                                                 <td>{{ $item['frequency_days'] ? $item['frequency_days'].' días' : 'Sin patrón' }}</td>
                                                 <td>{{ $item['last_order'] ? $item['last_order']->format('d/m/Y') : 'Sin despacho' }}</td>
                                                 <td>{{ number_format($item['last_received_quantity'], 1) }}</td>
-                                                <td>{{ $item['average_quantity'] > 0 ? $item['covered_cycles'] : '—' }}</td>
+                                                <td>{{ number_format($item['extra_delivery_credit'], 1) }} unid.</td>
                                                 <td>{{ $item['last_order'] ? $item['elapsed_cycles'] : '—' }}</td>
                                                 <td class="df-num">{{ number_format($item['expected_next_order'], 1) }} @if($item['expected_boxes'] !== null)<br><small class="df-muted">≈ {{ $item['expected_boxes'] }} cajas</small>@endif</td>
                                                 <td class="df-good">{{ number_format($item['expected_additional'], 1) }} @if($item['additional_boxes'] !== null)<br><small class="df-muted">≈ {{ $item['additional_boxes'] }} cajas</small>@endif</td>
