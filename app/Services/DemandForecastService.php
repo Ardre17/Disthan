@@ -148,6 +148,17 @@ class DemandForecastService
             ->orderBy('fecha_pedido')
             ->get();
 
+        // Historial completo para localizar la última recepción aunque haya ocurrido
+        // hace más de 180 días. Los promedios habituales siguen usando la ventana de 180 días.
+        $allOrders = Order::query()
+            ->with(['client', 'details.product'])
+            ->whereRaw("UPPER(COALESCE(tipo_orden, '')) = ?", ['SUPERMERCADO'])
+            ->whereNotIn(DB::raw("UPPER(COALESCE(estado, ''))"), [
+                'ANULADO', 'ANULADA', 'CANCELADO', 'CANCELADA', 'ELIMINADO',
+            ])
+            ->orderBy('fecha_pedido')
+            ->get();
+
         // Solo estas órdenes mantienen compromisos de preparación/despacho.
         $openOrders = Order::query()
             ->with(['client', 'details.product'])
@@ -159,8 +170,9 @@ class DemandForecastService
             ->merge($openOrders->pluck('client_id'))
             ->filter()->unique()->values();
 
-        $clients = $clientIds->map(function ($clientId) use ($orders, $openOrders, $today) {
+        $clients = $clientIds->map(function ($clientId) use ($orders, $allOrders, $openOrders, $today) {
             $clientOrders = $orders->where('client_id', $clientId)->sortBy('fecha_pedido')->values();
+            $clientAllOrders = $allOrders->where('client_id', $clientId)->sortBy('fecha_pedido')->values();
             $clientOpenOrders = $openOrders->where('client_id', $clientId)->values();
             $client = $clientOrders->first()?->client ?? $clientOpenOrders->first()?->client;
 
@@ -179,33 +191,44 @@ class DemandForecastService
                 : null;
 
             // Historial por producto: solo unidades efectivamente despachadas.
+            // DISTAN no tiene un campo único de fecha_recepcion/despacho; usamos
+            // fecha_preparacion del detalle y, como respaldo, fecha_entrega/fecha_pedido.
             $productGroups = [];
             $totalDispatched = 0.0;
             foreach ($clientOrders as $order) {
                 foreach ($order->details as $detail) {
                     $qty = (float) ($detail->cantidad_despachada ?? 0);
-                    if (!$detail->product) continue;
+                    if (!$detail->product || $qty <= 0) continue;
+
                     $pid = $detail->product_id;
+                    $dateValue = $detail->fecha_preparacion
+                        ?: ($order->fecha_entrega ?: $order->fecha_pedido);
+                    $receivedDate = Carbon::parse($dateValue)->toDateString();
+
                     if (!isset($productGroups[$pid])) {
                         $productGroups[$pid] = [
                             'product_id' => $pid,
                             'name' => $detail->product->nombre,
                             'sku' => $detail->product->sku,
-                            'order_ids' => [],
+                            'dispatches' => [],
                             'total_dispatched' => 0.0,
-                            'dates' => [],
                         ];
                     }
-                    if ($qty > 0) {
-                        $productGroups[$pid]['order_ids'][] = $order->id;
-                        $productGroups[$pid]['total_dispatched'] += $qty;
-                        $productGroups[$pid]['dates'][] = Carbon::parse($order->fecha_pedido)->toDateString();
-                        $totalDispatched += $qty;
+
+                    // Agrupar líneas del mismo producto dentro de una misma orden.
+                    if (!isset($productGroups[$pid]['dispatches'][$order->id])) {
+                        $productGroups[$pid]['dispatches'][$order->id] = [
+                            'quantity' => 0.0,
+                            'date' => $receivedDate,
+                        ];
                     }
+                    $productGroups[$pid]['dispatches'][$order->id]['quantity'] += $qty;
+                    $productGroups[$pid]['total_dispatched'] += $qty;
+                    $totalDispatched += $qty;
                 }
             }
 
-            // Añade productos que solo aparecen en órdenes abiertas, aunque no tengan historial despachado.
+            // Añade productos que solo aparecen en órdenes abiertas.
             $pendingUnits = 0.0;
             foreach ($clientOpenOrders as $order) {
                 foreach ($order->details as $detail) {
@@ -215,6 +238,7 @@ class DemandForecastService
                         - (float) ($detail->cantidad_despachada ?? 0)
                     );
                     if ($pendingQty <= 0) continue;
+
                     $pid = $detail->product_id;
                     $pendingUnits += $pendingQty;
                     if (!isset($productGroups[$pid])) {
@@ -222,22 +246,47 @@ class DemandForecastService
                             'product_id' => $pid,
                             'name' => $detail->product->nombre,
                             'sku' => $detail->product->sku,
-                            'order_ids' => [],
+                            'dispatches' => [],
                             'total_dispatched' => 0.0,
-                            'dates' => [],
                         ];
                     }
                 }
             }
 
-            $productRows = collect($productGroups)->map(function ($item) use ($clientOpenOrders) {
-                $dates = collect($item['dates'])->unique()->sort()->values();
+            // Última fecha de despacho/recepción estimada usando todo el historial,
+            // incluso si el último movimiento ocurrió antes de la ventana de 180 días.
+            $lastReceivedByProduct = [];
+            foreach ($clientAllOrders as $historicalOrder) {
+                foreach ($historicalOrder->details as $historicalDetail) {
+                    if (!$historicalDetail->product || (float) ($historicalDetail->cantidad_despachada ?? 0) <= 0) continue;
+                    $dateValue = $historicalDetail->fecha_preparacion
+                        ?: ($historicalOrder->fecha_entrega ?: $historicalOrder->fecha_pedido);
+                    $date = Carbon::parse($dateValue)->toDateString();
+                    $pid = (int) $historicalDetail->product_id;
+                    if (!isset($lastReceivedByProduct[$pid]) || $date > $lastReceivedByProduct[$pid]) {
+                        $lastReceivedByProduct[$pid] = $date;
+                    }
+                }
+            }
+
+            $productRows = collect($productGroups)->map(function ($item) use ($clientOpenOrders, $averageInterval, $today, $lastReceivedByProduct) {
+                $dispatches = collect($item['dispatches'])->sortBy('date')->values();
+                $dates = $dispatches->pluck('date')->unique()->sort()->values();
                 $gaps = [];
                 for ($i = 1; $i < $dates->count(); $i++) {
                     $gaps[] = Carbon::parse($dates[$i - 1])->diffInDays(Carbon::parse($dates[$i]));
                 }
-                $frequency = count($gaps) ? (int) round(array_sum($gaps) / count($gaps)) : null;
-                $last = $dates->last() ? Carbon::parse($dates->last()) : null;
+
+                $productFrequency = count($gaps)
+                    ? (int) round(array_sum($gaps) / count($gaps))
+                    : null;
+                // Si el producto solo tiene una fecha de despacho, usamos la frecuencia
+                // general del supermercado como referencia secundaria.
+                $frequency = $productFrequency ?: ($averageInterval !== null ? (int) round($averageInterval) : null);
+                $lastReceivedValue = $lastReceivedByProduct[(int) $item['product_id']] ?? $dates->last();
+                $lastReceived = $lastReceivedValue ? Carbon::parse($lastReceivedValue)->startOfDay() : null;
+                $daysSinceReceived = $lastReceived ? max(0, (int) $lastReceived->diffInDays($today)) : null;
+
                 $pending = 0.0;
                 foreach ($clientOpenOrders as $openOrder) {
                     foreach ($openOrder->details as $detail) {
@@ -249,17 +298,34 @@ class DemandForecastService
                         }
                     }
                 }
-                $orderCount = count(array_unique($item['order_ids']));
+
+                $orderCount = $dispatches->count();
+                $averageQuantity = $orderCount > 0
+                    ? (float) $item['total_dispatched'] / $orderCount
+                    : 0.0;
+
+                // Acumula una cantidad promedio por cada ciclo de compra transcurrido
+                // desde el último despacho/recepción registrado.
+                $elapsedCycles = ($frequency && $daysSinceReceived !== null)
+                    ? max(1, (int) ceil($daysSinceReceived / max(1, $frequency)))
+                    : 1;
+                $expectedNextOrder = $averageQuantity * $elapsedCycles;
+                // Cantidad adicional que todavía no estaría cubierta por una orden abierta.
+                $expectedAdditional = max(0, $expectedNextOrder - $pending);
+
                 return [
                     'product_id' => $item['product_id'],
                     'name' => $item['name'],
                     'sku' => $item['sku'],
                     'orders' => $orderCount,
                     'total_dispatched' => $item['total_dispatched'],
-                    'average_quantity' => $orderCount > 0 ? $item['total_dispatched'] / $orderCount : 0,
+                    'average_quantity' => $averageQuantity,
                     'frequency_days' => $frequency,
-                    'last_order' => $last,
-                    'next_order' => ($last && $frequency) ? $last->copy()->addDays($frequency) : null,
+                    'last_order' => $lastReceived,
+                    'days_since_received' => $daysSinceReceived,
+                    'elapsed_cycles' => $elapsedCycles,
+                    'expected_next_order' => $expectedNextOrder,
+                    'expected_additional' => $expectedAdditional,
                     'pending' => $pending,
                 ];
             })->sortBy('name')->values();

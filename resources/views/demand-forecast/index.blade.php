@@ -68,18 +68,21 @@
                                 <summary style="cursor:pointer;color:#1459a6;font-weight:650">Ver productos y cantidades habituales de {{ $client['client_name'] }}</summary>
                                 <div class="df-table-wrap" style="margin-top:10px">
                                     <table class="df-table" style="min-width:750px;background:white">
-                                        <thead><tr><th>Producto</th><th>SKU</th><th>Órdenes con despacho</th><th>Total despachado</th><th>Promedio por orden</th><th>Frecuencia producto</th><th>Último despacho</th><th>Pendiente abierto</th></tr></thead>
+                                        <thead><tr><th>Producto</th><th>SKU</th><th>Órdenes con despacho</th><th>Total despachado</th><th>Promedio por orden</th><th>Frecuencia</th><th>Última recepción estimada</th><th>Ciclos acumulados</th><th>Promedio para siguiente orden</th><th>Adicional descontando pendiente</th><th>Pendiente abierto</th></tr></thead>
                                         <tbody>
                                         @forelse($client['products'] as $item)
                                             <tr>
                                                 <td>{{ $item['name'] }}</td><td>{{ $item['sku'] }}</td><td>{{ $item['orders'] }}</td>
                                                 <td>{{ number_format($item['total_dispatched'], 0) }}</td><td>{{ number_format($item['average_quantity'], 1) }}</td>
                                                 <td>{{ $item['frequency_days'] ? $item['frequency_days'].' días' : 'Sin patrón' }}</td>
-                                                <td>{{ $item['last_order'] ? $item['last_order']->format('d/m/Y') : '—' }}</td>
+                                                <td>{{ $item['last_order'] ? $item['last_order']->format('d/m/Y') : 'Sin despacho' }}</td>
+                                                <td>{{ $item['orders'] > 0 ? $item['elapsed_cycles'] : '—' }}</td>
+                                                <td class="df-num">{{ number_format($item['expected_next_order'], 1) }}</td>
+                                                <td class="df-good">{{ number_format($item['expected_additional'], 1) }}</td>
                                                 <td class="df-alert">{{ number_format($item['pending'], 0) }}</td>
                                             </tr>
                                         @empty
-                                            <tr><td colspan="8" class="df-muted">Este cliente todavía no tiene productos despachados en el periodo.</td></tr>
+                                            <tr><td colspan="11" class="df-muted">Este cliente todavía no tiene productos despachados en el periodo.</td></tr>
                                         @endforelse
                                         </tbody>
                                     </table>
@@ -92,7 +95,7 @@
                     </tbody>
                 </table>
             </div>
-            <p class="df-muted" style="margin-top:12px">La fecha del próximo pedido es una estimación basada en el intervalo promedio entre fechas de pedido. No representa una orden confirmada.</p>
+            <p class="df-muted" style="margin-top:12px">El promedio para la siguiente orden acumula una cantidad promedio por cada ciclo transcurrido desde la última recepción estimada. La columna “Adicional descontando pendiente” resta los saldos de órdenes abiertas para evitar duplicar compromisos. La fecha de recepción se aproxima con la fecha de preparación del detalle y, si no existe, con la fecha de entrega o pedido; no representa una recepción confirmada.</p>
         </div>
     @else
     <div class="df-kpis">
