@@ -210,6 +210,7 @@ class DemandForecastService
                             'product_id' => $pid,
                             'name' => $detail->product->nombre,
                             'sku' => $detail->product->sku,
+                            'quantity_per_box' => (float) ($detail->product->cantidad_por_caja ?? 0),
                             'dispatches' => [],
                             'total_dispatched' => 0.0,
                         ];
@@ -246,6 +247,7 @@ class DemandForecastService
                             'product_id' => $pid,
                             'name' => $detail->product->nombre,
                             'sku' => $detail->product->sku,
+                            'quantity_per_box' => (float) ($detail->product->cantidad_por_caja ?? 0),
                             'dispatches' => [],
                             'total_dispatched' => 0.0,
                         ];
@@ -253,23 +255,45 @@ class DemandForecastService
                 }
             }
 
-            // Última fecha de despacho/recepción estimada usando todo el historial,
-            // incluso si el último movimiento ocurrió antes de la ventana de 180 días.
+            // Última recepción estimada y cantidad entregada en esa recepción,
+            // consultando todo el historial, aunque sea anterior a 180 días.
+            // Se agrupan líneas del mismo producto dentro de la misma orden.
             $lastReceivedByProduct = [];
             foreach ($clientAllOrders as $historicalOrder) {
+                $dispatchByProductInOrder = [];
                 foreach ($historicalOrder->details as $historicalDetail) {
-                    if (!$historicalDetail->product || (float) ($historicalDetail->cantidad_despachada ?? 0) <= 0) continue;
+                    $qty = (float) ($historicalDetail->cantidad_despachada ?? 0);
+                    if (!$historicalDetail->product || $qty <= 0) continue;
+
                     $dateValue = $historicalDetail->fecha_preparacion
                         ?: ($historicalOrder->fecha_entrega ?: $historicalOrder->fecha_pedido);
                     $date = Carbon::parse($dateValue)->toDateString();
                     $pid = (int) $historicalDetail->product_id;
-                    if (!isset($lastReceivedByProduct[$pid]) || $date > $lastReceivedByProduct[$pid]) {
-                        $lastReceivedByProduct[$pid] = $date;
+
+                    if (!isset($dispatchByProductInOrder[$pid])) {
+                        $dispatchByProductInOrder[$pid] = ['date' => $date, 'quantity' => 0.0];
+                    }
+                    $dispatchByProductInOrder[$pid]['quantity'] += $qty;
+                    if ($date > $dispatchByProductInOrder[$pid]['date']) {
+                        $dispatchByProductInOrder[$pid]['date'] = $date;
+                    }
+                }
+
+                foreach ($dispatchByProductInOrder as $pid => $dispatch) {
+                    $previous = $lastReceivedByProduct[$pid] ?? null;
+                    if (!$previous || $dispatch['date'] >= $previous['date']) {
+                        $lastReceivedByProduct[$pid] = $dispatch;
                     }
                 }
             }
 
-            $productRows = collect($productGroups)->map(function ($item) use ($clientOpenOrders, $averageInterval, $today, $lastReceivedByProduct) {
+            // La frecuencia del supermercado representa el ciclo de compra incluso
+            // cuando omite un producto en una semana. Usamos la mediana de intervalos
+            // para que una demora aislada no cambie demasiado el patrón semanal.
+            $typicalClientInterval = count($intervals) ? (int) round($this->medianValue($intervals)) : 7;
+            $typicalClientInterval = max(1, $typicalClientInterval);
+
+            $productRows = collect($productGroups)->map(function ($item) use ($clientOpenOrders, $typicalClientInterval, $today, $lastReceivedByProduct) {
                 $dispatches = collect($item['dispatches'])->sortBy('date')->values();
                 $dates = $dispatches->pluck('date')->unique()->sort()->values();
                 $gaps = [];
@@ -277,14 +301,14 @@ class DemandForecastService
                     $gaps[] = Carbon::parse($dates[$i - 1])->diffInDays(Carbon::parse($dates[$i]));
                 }
 
-                $productFrequency = count($gaps)
-                    ? (int) round(array_sum($gaps) / count($gaps))
-                    : null;
-                // Si el producto solo tiene una fecha de despacho, usamos la frecuencia
-                // general del supermercado como referencia secundaria.
-                $frequency = $productFrequency ?: ($averageInterval !== null ? (int) round($averageInterval) : null);
-                $lastReceivedValue = $lastReceivedByProduct[(int) $item['product_id']] ?? $dates->last();
+                // Se usa la cadencia del supermercado, no los huecos entre despachos
+                // de este producto: si lo omite una semana, esa semana también acumula
+                // demanda potencial.
+                $frequency = $typicalClientInterval;
+                $lastReceipt = $lastReceivedByProduct[(int) $item['product_id']] ?? null;
+                $lastReceivedValue = $lastReceipt['date'] ?? $dates->last();
                 $lastReceived = $lastReceivedValue ? Carbon::parse($lastReceivedValue)->startOfDay() : null;
+                $lastReceivedQuantity = (float) ($lastReceipt['quantity'] ?? 0);
                 $daysSinceReceived = $lastReceived ? max(0, (int) $lastReceived->diffInDays($today)) : null;
 
                 $pending = 0.0;
@@ -300,18 +324,47 @@ class DemandForecastService
                 }
 
                 $orderCount = $dispatches->count();
-                $averageQuantity = $orderCount > 0
-                    ? (float) $item['total_dispatched'] / $orderCount
-                    : 0.0;
+                $dispatchQuantities = $dispatches->pluck('quantity')
+                    ->map(fn ($quantity) => (float) $quantity)
+                    ->values()->all();
 
-                // Acumula una cantidad promedio por cada ciclo de compra transcurrido
-                // desde el último despacho/recepción registrado.
-                $elapsedCycles = ($frequency && $daysSinceReceived !== null)
-                    ? max(1, (int) ceil($daysSinceReceived / max(1, $frequency)))
+                // La mediana evita que una entrega extraordinaria eleve el patrón
+                // habitual de todas las órdenes siguientes.
+                $averageQuantity = $orderCount > 0
+                    ? $this->medianValue($dispatchQuantities)
+                    : 0.0;
+                // Si no hubo despacho dentro de los últimos 180 días, se conserva
+                // como referencia la última recepción histórica conocida.
+                if ($averageQuantity <= 0 && $lastReceivedQuantity > 0) {
+                    $averageQuantity = $lastReceivedQuantity;
+                }
+
+                // Una entrega grande cubre varias semanas. Ejemplo: si el patrón
+                // habitual es 5 cajas y la última recepción fue de 15, se estima
+                // una cobertura de 3 ciclos antes de acumular una nueva orden.
+                $coveredCycles = $averageQuantity > 0
+                    ? max(1, (int) ceil($lastReceivedQuantity / $averageQuantity))
                     : 1;
-                $expectedNextOrder = $averageQuantity * $elapsedCycles;
-                // Cantidad adicional que todavía no estaría cubierta por una orden abierta.
+
+                // Cuenta ciclos semanales transcurridos desde la última recepción.
+                // Una semana sin pedido también acumula demanda potencial.
+                $elapsedCycles = ($frequency && $daysSinceReceived !== null)
+                    ? max(1, (int) floor($daysSinceReceived / max(1, $frequency)))
+                    : 1;
+
+                // Se estima solo la demanda que ya habría vencido después de agotar
+                // la cobertura de la última entrega. No es un pedido confirmado.
+                $cyclesDue = max(0, $elapsedCycles - $coveredCycles + 1);
+                $expectedNextOrder = $averageQuantity * $cyclesDue;
+                // Las cantidades ya comprometidas en órdenes abiertas no se duplican.
                 $expectedAdditional = max(0, $expectedNextOrder - $pending);
+                $quantityPerBox = (float) ($item['quantity_per_box'] ?? 0);
+                $expectedBoxes = $quantityPerBox > 0
+                    ? (int) ceil($expectedNextOrder / $quantityPerBox)
+                    : null;
+                $additionalBoxes = $quantityPerBox > 0
+                    ? (int) ceil($expectedAdditional / $quantityPerBox)
+                    : null;
 
                 return [
                     'product_id' => $item['product_id'],
@@ -321,6 +374,12 @@ class DemandForecastService
                     'total_dispatched' => $item['total_dispatched'],
                     'average_quantity' => $averageQuantity,
                     'frequency_days' => $frequency,
+                    'last_received_quantity' => $lastReceivedQuantity,
+                    'covered_cycles' => $coveredCycles,
+                    'cycles_due' => $cyclesDue,
+                    'quantity_per_box' => $quantityPerBox,
+                    'expected_boxes' => $expectedBoxes,
+                    'additional_boxes' => $additionalBoxes,
                     'last_order' => $lastReceived,
                     'days_since_received' => $daysSinceReceived,
                     'elapsed_cycles' => $elapsedCycles,
@@ -355,6 +414,21 @@ class DemandForecastService
                 'pending_units' => $clients->sum('pending_units'),
             ],
         ];
+    }
+
+    /** Calcula la mediana de una lista numérica sin dejar que valores extremos dominen. */
+    private function medianValue(array $values): float
+    {
+        $values = array_values(array_filter(array_map('floatval', $values), fn ($value) => is_finite($value)));
+        if (!$values) return 0.0;
+
+        sort($values, SORT_NUMERIC);
+        $count = count($values);
+        $middle = intdiv($count, 2);
+
+        return $count % 2 === 1
+            ? (float) $values[$middle]
+            : ((float) $values[$middle - 1] + (float) $values[$middle]) / 2;
     }
 
     public function saveSettings(Product $product, array $data, ?int $userId): ProductForecastSetting

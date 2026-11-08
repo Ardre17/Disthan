@@ -68,7 +68,7 @@
                                 <summary style="cursor:pointer;color:#1459a6;font-weight:650">Ver productos y cantidades habituales de {{ $client['client_name'] }}</summary>
                                 <div class="df-table-wrap" style="margin-top:10px">
                                     <table class="df-table" style="min-width:750px;background:white">
-                                        <thead><tr><th>Producto</th><th>SKU</th><th>Órdenes con despacho</th><th>Total despachado</th><th>Promedio por orden</th><th>Frecuencia</th><th>Última recepción estimada</th><th>Ciclos acumulados</th><th>Promedio para siguiente orden</th><th>Adicional descontando pendiente</th><th>Pendiente abierto</th></tr></thead>
+                                        <thead><tr><th>Producto</th><th>SKU</th><th>Órdenes con despacho</th><th>Total despachado</th><th>Cantidad habitual (mediana)</th><th>Frecuencia</th><th>Última recepción estimada</th><th>Última recepción (unid.)</th><th>Ciclos cubiertos por última recepción</th><th>Ciclos transcurridos</th><th>Siguiente orden estimada</th><th>Adicional descontando pendiente</th><th>Pendiente abierto</th></tr></thead>
                                         <tbody>
                                         @forelse($client['products'] as $item)
                                             <tr>
@@ -76,13 +76,15 @@
                                                 <td>{{ number_format($item['total_dispatched'], 0) }}</td><td>{{ number_format($item['average_quantity'], 1) }}</td>
                                                 <td>{{ $item['frequency_days'] ? $item['frequency_days'].' días' : 'Sin patrón' }}</td>
                                                 <td>{{ $item['last_order'] ? $item['last_order']->format('d/m/Y') : 'Sin despacho' }}</td>
-                                                <td>{{ $item['orders'] > 0 ? $item['elapsed_cycles'] : '—' }}</td>
-                                                <td class="df-num">{{ number_format($item['expected_next_order'], 1) }}</td>
-                                                <td class="df-good">{{ number_format($item['expected_additional'], 1) }}</td>
+                                                <td>{{ number_format($item['last_received_quantity'], 1) }}</td>
+                                                <td>{{ $item['average_quantity'] > 0 ? $item['covered_cycles'] : '—' }}</td>
+                                                <td>{{ $item['last_order'] ? $item['elapsed_cycles'] : '—' }}</td>
+                                                <td class="df-num">{{ number_format($item['expected_next_order'], 1) }} @if($item['expected_boxes'] !== null)<br><small class="df-muted">≈ {{ $item['expected_boxes'] }} cajas</small>@endif</td>
+                                                <td class="df-good">{{ number_format($item['expected_additional'], 1) }} @if($item['additional_boxes'] !== null)<br><small class="df-muted">≈ {{ $item['additional_boxes'] }} cajas</small>@endif</td>
                                                 <td class="df-alert">{{ number_format($item['pending'], 0) }}</td>
                                             </tr>
                                         @empty
-                                            <tr><td colspan="11" class="df-muted">Este cliente todavía no tiene productos despachados en el periodo.</td></tr>
+                                            <tr><td colspan="13" class="df-muted">Este cliente todavía no tiene productos despachados en el periodo.</td></tr>
                                         @endforelse
                                         </tbody>
                                     </table>
@@ -95,7 +97,7 @@
                     </tbody>
                 </table>
             </div>
-            <p class="df-muted" style="margin-top:12px">El promedio para la siguiente orden acumula una cantidad promedio por cada ciclo transcurrido desde la última recepción estimada. La columna “Adicional descontando pendiente” resta los saldos de órdenes abiertas para evitar duplicar compromisos. La fecha de recepción se aproxima con la fecha de preparación del detalle y, si no existe, con la fecha de entrega o pedido; no representa una recepción confirmada.</p>
+            <p class="df-muted" style="margin-top:12px">La cantidad habitual se calcula con la mediana de las recepciones para reducir el efecto de entregas extraordinariamente grandes. La última entrega se convierte en ciclos de cobertura: si normalmente recibe 5 unidades por semana y la última recepción fue de 15, se estima que cubre 3 semanas. Después de agotar esa cobertura, cada ciclo semanal sin recepción acumula demanda potencial, incluso si el supermercado no generó una orden para ese producto. Esta cifra es una estimación, no un pedido confirmado. “Adicional descontando pendiente” resta los saldos de órdenes abiertas para evitar duplicar compromisos. La fecha de recepción se aproxima con la fecha de preparación del detalle y, si no existe, con la fecha de entrega o pedido; no representa una recepción confirmada. La equivalencia en cajas utiliza cantidad_por_caja del producto.</p>
         </div>
     @else
     <div class="df-kpis">
