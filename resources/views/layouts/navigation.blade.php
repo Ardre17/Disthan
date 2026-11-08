@@ -88,8 +88,8 @@ $menu = [
             ['label' => 'Producción', 'icon' => 'factory', 'route' => 'production-orders.index',
              'roles' => ['admin'], 'routes' => ['production-orders.*'], 'paths' => ['production', 'produccion']],
 
-            ['label' => 'Proyectado', 'icon' => 'trend',   'route' => 'products.proyectado',
-             'roles' => ['admin'], 'paths' => ['proyectado']],
+            ['label' => 'Proyectado', 'icon' => 'trend',   'route' => 'demand-forecast.index',
+             'paths' => ['index']],
 
              ['label' => 'Materia Prima', 'icon' => 'flask',  'route' => 'raw-materials.index',
              'roles' => ['admin'], 'paths' => ['raw-materials']],
