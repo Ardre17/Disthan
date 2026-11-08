@@ -382,7 +382,7 @@ class DemandForecastService
             $typicalClientInterval = count($intervals) ? (int) round($this->medianValue($intervals)) : 7;
             $typicalClientInterval = max(1, $typicalClientInterval);
 
-            $productRows = collect($productGroups)->map(function ($item) use ($clientOpenOrders, $clientAllOrders, $typicalClientInterval, $today, $lastReceivedByProduct) {
+            $productRows = collect($productGroups)->map(function ($item) use ($clientOpenOrders, $clientAllOrders, $typicalClientInterval, $today, $lastReceivedByProduct, $isSupermarket) {
                 $dispatches = collect($item['dispatches'])->sortBy('date')->values();
                 $dates = $dispatches->pluck('date')->unique()->sort()->values();
                 $gaps = [];
