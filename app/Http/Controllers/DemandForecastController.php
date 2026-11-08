@@ -11,9 +11,18 @@ class DemandForecastController extends Controller
 {
     public function index(Request $request, DemandForecastService $forecast)
     {
+        if ($request->input('section') === 'supermarkets') {
+            $supermarketData = $forecast->supermarkets();
+            return view('demand-forecast.index', compact('supermarketData'));
+        }
+
+        if ($request->input('section') === 'clients') {
+            $clientData = $forecast->clients();
+            return view('demand-forecast.index', compact('clientData'));
+        }
+
         $products = $forecast->products($request->input('q'), $request->integer('category_id'));
         $categories = Category::orderBy('nombre')->get();
-        $supermarketData = $forecast->supermarkets();
 
         $summary = [
             'products' => $products->count(),
@@ -22,7 +31,7 @@ class DemandForecastController extends Controller
             'pending' => $products->sum(fn ($p) => $p->forecast['pending']),
         ];
 
-        return view('demand-forecast.index', compact('products', 'categories', 'summary', 'supermarketData'));
+        return view('demand-forecast.index', compact('products', 'categories', 'summary'));
     }
 
     public function updateSettings(Request $request, Product $product, DemandForecastService $forecast)

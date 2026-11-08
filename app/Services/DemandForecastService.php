@@ -128,19 +128,30 @@ class DemandForecastService
         });
     }
 
-    /**
-     * Resumen de clientes SUPERMERCADO y comportamiento por producto.
-     * Usa cantidades despachadas para estimar consumo habitual y mantiene
-     * los saldos de órdenes abiertas en un bloque separado.
-     */
+    /** Atajo para mantener la sección independiente de supermercados. */
     public function supermarkets()
+    {
+        return $this->customerPlanning(['SUPERMERCADO']);
+    }
+
+    /** Planificación individual para clientes LOCAL y ENCOMIENDA. */
+    public function clients()
+    {
+        return $this->customerPlanning(['LOCAL', 'ENCOMIENDA']);
+    }
+
+    /**
+     * Analiza la frecuencia, demanda solicitada, despacho y pendientes por cliente.
+     * Los compromisos futuros solo proceden de órdenes PARCIAL e INCOMPLETO.
+     */
+    private function customerPlanning(array $types)
     {
         $today = Carbon::today();
         $historyStart = $today->copy()->subDays(179)->startOfDay();
 
         $orders = Order::query()
             ->with(['client', 'details.product'])
-            ->whereRaw("UPPER(COALESCE(tipo_orden, '')) = ?", ['SUPERMERCADO'])
+            ->whereIn(DB::raw("UPPER(COALESCE(tipo_orden, ''))"), $types)
             ->whereNotIn(DB::raw("UPPER(COALESCE(estado, ''))"), [
                 'ANULADO', 'ANULADA', 'CANCELADO', 'CANCELADA', 'ELIMINADO',
             ])
@@ -152,7 +163,7 @@ class DemandForecastService
         // hace más de 180 días. Los promedios habituales siguen usando la ventana de 180 días.
         $allOrders = Order::query()
             ->with(['client', 'details.product'])
-            ->whereRaw("UPPER(COALESCE(tipo_orden, '')) = ?", ['SUPERMERCADO'])
+            ->whereIn(DB::raw("UPPER(COALESCE(tipo_orden, ''))"), $types)
             ->whereNotIn(DB::raw("UPPER(COALESCE(estado, ''))"), [
                 'ANULADO', 'ANULADA', 'CANCELADO', 'CANCELADA', 'ELIMINADO',
             ])
@@ -162,7 +173,7 @@ class DemandForecastService
         // Solo estas órdenes mantienen compromisos de preparación/despacho.
         $openOrders = Order::query()
             ->with(['client', 'details.product'])
-            ->whereRaw("UPPER(COALESCE(tipo_orden, '')) = ?", ['SUPERMERCADO'])
+            ->whereIn(DB::raw("UPPER(COALESCE(tipo_orden, ''))"), $types)
             ->whereIn(DB::raw("UPPER(COALESCE(estado, ''))"), ['PARCIAL', 'INCOMPLETO'])
             ->get();
 
@@ -509,6 +520,7 @@ class DemandForecastService
                 'average_interval' => $averageInterval !== null ? round($averageInterval, 1) : null,
                 'next_order' => $nextDate,
                 'days_until_next' => $nextDate ? (int) $today->diffInDays($nextDate, false) : null,
+                'total_requested' => $productRows->sum('total_requested'),
                 'total_dispatched' => $totalDispatched,
                 'average_order_quantity' => $clientOrders->count() ? $totalDispatched / $clientOrders->count() : 0,
                 'pending_orders' => $clientOpenOrders->count(),
