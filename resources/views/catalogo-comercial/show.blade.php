@@ -44,6 +44,14 @@ elseif ($variation >= 15)     { $pdTend = ['Movimiento en alza', 'up', 'pd-i-tup
 else                          { $pdTend = ['Movimiento estable', 'flat', 'pd-i-wave']; }
 
 $pdCategoria = optional($product->category)->nombre ?: 'Sin categoría';
+
+// En la vista mostramos únicamente los 5 lotes/fechas de vencimiento más recientes.
+$pdLotsTotal = collect($lots)->count();
+$pdLots = collect($lots)
+    ->sortByDesc(fn ($lot) => $lot->fecha_vencimiento
+        ? \Carbon\Carbon::parse($lot->fecha_vencimiento)->timestamp
+        : 0)
+    ->take(5);
 @endphp
 @if(!$pdEmbed)
 <!DOCTYPE html>
@@ -264,8 +272,8 @@ body{margin:0;background:linear-gradient(180deg,#dfe9f6,#eef3fa);color:#203047;f
     </div>
 </section>
 
-<section class="pd-card"><h2><svg class="pd-ic"><use href="#pd-i-factory"/></svg> Lotes y vencimientos registrados en pedidos</h2><p class="muted" style="margin:-4px 0 8px;">Estos datos provienen de lotes/fechas guardados en detalles de pedidos; no representan necesariamente todas las existencias físicas por lote.</p>
-@if($lots->isEmpty())<div class="muted">No hay lotes o fechas de vencimiento adicionales registrados en los detalles de pedidos.</div>@else<div class="tablewrap"><table><thead><tr><th>Lote</th><th>Fecha de vencimiento</th><th>Referencias en pedidos</th><th>Estado de fecha</th></tr></thead><tbody>@foreach($lots as $lot)@php $days=$lot->fecha_vencimiento?\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($lot->fecha_vencimiento), false):null; @endphp<tr><td>{{ $lot->lote ?: '—' }}</td><td>{{ $lot->fecha_vencimiento ? \Carbon\Carbon::parse($lot->fecha_vencimiento)->format('d/m/Y') : '—' }}</td><td>{{ $lot->referencias }}</td><td>@if($days===null)—@elseif($days<0)<span class="status out">VENCIDO</span>@elseif($days<=60)<span class="status low">PRÓXIMO A VENCER · {{ (int) $days }} días</span>@else<span class="status ok">VIGENTE · {{ (int) $days }} días</span>@endif</td></tr>@endforeach</tbody></table></div>@endif
+<section class="pd-card"><h2><svg class="pd-ic"><use href="#pd-i-factory"/></svg> Lotes y vencimientos registrados en pedidos</h2><p class="muted" style="margin:-4px 0 8px;">Estos datos provienen de lotes/fechas guardados en detalles de pedidos; no representan necesariamente todas las existencias físicas por lote. Se muestran las 5 fechas de vencimiento más recientes.</p>
+@if($pdLots->isEmpty())<div class="muted">No hay lotes o fechas de vencimiento adicionales registrados en los detalles de pedidos.</div>@else<div class="tablewrap"><table><thead><tr><th>Lote</th><th>Fecha de vencimiento</th><th>Referencias en pedidos</th><th>Estado de fecha</th></tr></thead><tbody>@foreach($pdLots as $lot)@php $days=$lot->fecha_vencimiento?\Carbon\Carbon::today()->diffInDays(\Carbon\Carbon::parse($lot->fecha_vencimiento), false):null; @endphp<tr><td>{{ $lot->lote ?: '—' }}</td><td>{{ $lot->fecha_vencimiento ? \Carbon\Carbon::parse($lot->fecha_vencimiento)->format('d/m/Y') : '—' }}</td><td>{{ $lot->referencias }}</td><td>@if($days===null)—@elseif($days<0)<span class="status out">VENCIDO</span>@elseif($days<=60)<span class="status low">PRÓXIMO A VENCER · {{ (int) $days }} días</span>@else<span class="status ok">VIGENTE · {{ (int) $days }} días</span>@endif</td></tr>@endforeach</tbody></table></div>@if($pdLotsTotal > 5)<div class="muted" style="margin-top:8px;">Mostrando 5 de {{ $pdLotsTotal }} registros.</div>@endif@endif
 </section>
 </div>
 
