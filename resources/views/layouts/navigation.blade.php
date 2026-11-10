@@ -86,13 +86,13 @@ $menu = [
         'label' => 'Producción', 'icon' => 'grid','roles' => ['admin'], 'color' => '#2f6fd0', 'group' => true,
         'items' => [
             ['label' => 'Producción', 'icon' => 'factory', 'route' => 'production-orders.index',
-             'roles' => ['admin'], 'routes' => ['production-orders.*'], 'paths' => ['production', 'produccion']],
+             'roles' => ['admin','gerencia'], 'routes' => ['production-orders.*'], 'paths' => ['production', 'produccion']],
 
             ['label' => 'Proyectado', 'icon' => 'trend',   'route' => 'demand-forecast.index',
              'paths' => ['index']],
 
              ['label' => 'Materia Prima', 'icon' => 'flask',  'route' => 'raw-materials.index',
-             'roles' => ['admin'], 'paths' => ['raw-materials']],
+             'roles' => ['admin','gerencia'], 'paths' => ['raw-materials']],
         ],
     ],
 

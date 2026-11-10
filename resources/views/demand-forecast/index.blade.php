@@ -58,7 +58,21 @@
 .df-table-wrap{overflow:auto;border:1px solid #edf1f6;border-radius:11px}table.df-table{width:100%;border-collapse:separate;border-spacing:0;min-width:1050px;background:#fff}table.df-table th{text-align:left;color:#64748b;font-size:10px;text-transform:uppercase;letter-spacing:.045em;background:#f7f9fc;font-weight:800;position:sticky;top:0;z-index:1} .df-table th,.df-table td{padding:12px 11px;border-bottom:1px solid #edf0f5;white-space:nowrap}.df-table tbody tr:hover{background:#f8fbff}.df-table tbody tr:last-child td{border-bottom:0}.df-num{font-variant-numeric:tabular-nums;font-weight:700;color:#263b59;font-family:var(--df-mono);font-size:12px}.df-alert{color:#b45309}.df-good{color:#15803d}.df-bad{color:#b91c1c}.df-pill{padding:6px 10px;border-radius:20px;background:#eaf2ff;color:#315b89;font-size:11px;font-weight:700}.df-status{display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border-radius:20px;font-size:10px;font-weight:750;background:#eef2f7;color:#475569}.df-status-good{background:#dcfce7;color:#166534}.df-status-warn{background:#fef3c7;color:#92400e}.df-status-bad{background:#fee2e2;color:#991b1b}.df-table details summary{cursor:pointer;color:#1d4ed8;font-weight:700;padding:4px 0}.df-table details[open] summary{margin-bottom:10px}.df-table details .df-table-wrap{box-shadow:0 3px 12px rgba(30,55,90,.04)}.df-note{font-size:10px;line-height:1.65;color:#8190a4;margin:13px 2px 0}.df-empty{padding:24px;text-align:center;color:#94a3b8}
 .df-table .df-row-bad td:first-child{box-shadow:inset 3px 0 0 #dc2626}.df-table .df-row-warn td:first-child{box-shadow:inset 3px 0 0 #d97706}
 .df-bar{height:5px;border-radius:5px;background:#e8edf5;margin-top:6px;min-width:70px;overflow:hidden}.df-bar span{display:block;height:100%;border-radius:5px}.df-bar-good span{background:#16a34a}.df-bar-warn span{background:#f59e0b}.df-bar-bad span{background:#dc2626}
-.df-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}.df-count{font-size:11px;color:#64748b;background:#f1f5f9;border-radius:20px;padding:5px 11px;font-weight:700}.df-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:#64748b;font-weight:650}.df-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
+.df-toolbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin:0 0 12px}
+.df-priority-filters{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.df-priority-btn{display:inline-flex;align-items:center;gap:9px;padding:9px 13px;border:1px solid #dfe6ef;border-radius:10px;background:#fff;color:#475569;font-size:11px;font-weight:750;cursor:pointer;transition:.15s}
+.df-priority-btn:hover{border-color:#93b4df;background:#f8fbff}
+.df-priority-btn b{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 6px;border-radius:20px;background:#edf2f8;color:#475569;font-family:var(--df-mono);font-size:10px}
+.df-priority-btn.is-active{border-color:#172b4d;background:#172b4d;color:#fff}
+.df-priority-btn.is-active b{background:rgba(255,255,255,.18);color:#fff}
+.df-priority-btn[data-priority-filter="critical"]:not(.is-active) b{background:#fee2e2;color:#991b1b}
+.df-priority-btn[data-priority-filter="attention"]:not(.is-active) b{background:#fef3c7;color:#92400e}
+.df-priority-btn[data-priority-filter="optimal"]:not(.is-active) b{background:#dcfce7;color:#166534}
+.df-priority-btn[data-priority-filter="none"]:not(.is-active) b{background:#e2e8f0;color:#475569}
+.df-filter-empty{display:none;padding:22px;text-align:center;color:#8290a3;background:#fafbfd;border:1px dashed #d9e1ec;border-radius:10px}
+.df-sm-products-scroll{height:360px;max-height:360px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;position:relative}
+.df-sm-products-scroll table.df-table thead th{position:sticky;top:0;z-index:5;background:#f7f9fc}
+.df-count{font-size:11px;color:#64748b;background:#f1f5f9;border-radius:20px;padding:5px 11px;font-weight:700}.df-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:#64748b;font-weight:650}.df-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
 .df-priority{display:flex;flex-direction:column;gap:11px}.df-prio-item{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:11px;align-items:center;padding:10px 12px;border:1px solid #edf1f6;border-radius:11px;background:#fbfcfe}.df-prio-rank{width:26px;height:26px;border-radius:8px;background:#172b4d;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800;font-family:var(--df-mono)}.df-prio-name{font-weight:750;color:#172b4d;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.df-prio-sub{font-size:10px;color:#8290a3;margin-top:2px}.df-prio-val{text-align:right;font-family:var(--df-mono);font-weight:800;color:#b45309;font-size:13px}.df-prio-val small{display:block;font-size:9px;color:#94a3b8;font-weight:600;font-family:inherit}
 .df-method{margin-top:14px;border:1px dashed #d3dcea;border-radius:11px;background:#fafbfd;padding:2px 14px}.df-method summary{cursor:pointer;font-weight:750;font-size:11px;color:#475569;padding:10px 0}.df-method[open] summary{border-bottom:1px solid #edf1f6;margin-bottom:6px}
 .df-loader{position:fixed;inset:0;z-index:99999;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px;background:linear-gradient(135deg,#0f2342 0%,#172b4d 55%,#244d80 100%);transition:opacity .45s ease,visibility .45s ease}.df-loader.df-hide{opacity:0;visibility:hidden;pointer-events:none}
@@ -358,8 +372,8 @@
                         <tr><td colspan="9" style="padding:8px 12px 16px;background:#fafbfd">
                             <details>
                                 <summary style="cursor:pointer;color:#1459a6;font-weight:650">Ver productos y cantidades habituales de {{ $client['client_name'] }}</summary>
-                                <div class="df-table-wrap" style="margin-top:10px">
-                                    <table class="df-table" style="min-width:750px;background:white">
+                                <div class="df-table-wrap df-sm-products-scroll" style="margin-top:10px">
+                                    <table class="df-table" style="min-width:1150px;background:white">
                                         <thead><tr><th>Producto</th><th>SKU</th><th>Órdenes con solicitud</th><th>Total solicitado</th><th>Total despachado</th><th>Atención (%)</th><th>Promedio solicitado por orden</th><th>Frecuencia</th><th>Última recepción estimada</th><th>Última recepción (unid.)</th><th>Último faltante solicitado</th><th>Ciclos acumulados</th><th>Siguiente orden estimada</th><th>Adicional descontando pendiente</th><th>Pendiente abierto</th></tr></thead>
                                         <tbody>
                                         @forelse($client['products'] as $item)
@@ -482,12 +496,29 @@
             <button class="df-btn">Filtrar</button>
             <a class="df-btn" style="background:#64748b" href="{{ route('demand-forecast.index') }}">Limpiar</a>
         </form>
+        <div class="df-priority-filters" role="group" aria-label="Agrupar productos por nivel de cobertura">
+            <button type="button" class="df-priority-btn is-active" data-priority-filter="all">
+                Todos <b>{{ $products->count() }}</b>
+            </button>
+            <button type="button" class="df-priority-btn" data-priority-filter="critical">
+                Crítico <b>{{ $dfCov['crit'] }}</b>
+            </button>
+            <button type="button" class="df-priority-btn" data-priority-filter="attention">
+                Atención <b>{{ $dfCov['warn'] }}</b>
+            </button>
+            <button type="button" class="df-priority-btn" data-priority-filter="optimal">
+                Óptimo <b>{{ $dfCov['ok'] + $dfCov['high'] }}</b>
+            </button>
+            <button type="button" class="df-priority-btn" data-priority-filter="none">
+                Sin demanda <b>{{ $dfCov['none'] }}</b>
+            </button>
+        </div>
         <div class="df-toolbar">
-            <span class="df-count">{{ $products->count() }} producto(s) en el listado</span>
+            <span class="df-count" id="dfProductCount" data-total="{{ $products->count() }}">{{ $products->count() }} producto(s) en el listado</span>
             <div class="df-legend"><span><i style="background:#dc2626"></i>Cobertura ≤ 7 días</span><span><i style="background:#f59e0b"></i>8–15 días / por producir</span><span><i style="background:#16a34a"></i>Óptima</span></div>
         </div>
-        <div class="df-table-wrap">
-            <table class="df-table">
+        <div class="df-table-wrap" id="dfProductsTableWrap">
+            <table class="df-table" id="dfProductsTable">
                 <thead><tr>
                     <th>Producto</th><th>Stock físico</th><th>Demanda diaria</th><th>7 días</th><th>15 días</th><th>30 días</th><th>Pendiente abierto</th><th>Disponible</th><th>En producción</th><th>Cobertura</th><th>Mín. recomendado</th><th>Stock objetivo</th><th>Producir</th><th>Parámetros</th>
                 </tr></thead>
@@ -498,8 +529,9 @@
                         $dfCdCls = $dfCd === null ? '' : ($dfCd <= 7 ? 'bad' : ($dfCd <= 15 ? 'warn' : 'good'));
                         $dfCdPct = $dfCd === null ? 0 : min(100, ($dfCd / 30) * 100);
                         $dfRow = ($dfCd !== null && $dfCd <= 7) ? 'df-row-bad' : (((float) $product->forecast['to_produce'] > 0) ? 'df-row-warn' : '');
+                        $dfPriority = $dfCd === null ? 'none' : ($dfCd <= 7 ? 'critical' : ($dfCd <= 15 ? 'attention' : 'optimal'));
                     @endphp
-                    <tr class="{{ $dfRow }}">
+                    <tr class="{{ $dfRow }}" data-df-priority="{{ $dfPriority }}">
                         <td><strong>{{ $product->nombre }}</strong><br><span class="df-muted">{{ $product->sku }}</span></td>
                         <td class="df-num">{{ number_format($product->stock,0) }}</td>
                         <td class="df-num">{{ number_format($product->forecast['daily_demand'],2) }}</td>
@@ -538,6 +570,7 @@
                 </tbody>
             </table>
         </div>
+        <div class="df-filter-empty" id="dfProductFilterEmpty">No hay productos en este grupo de cobertura.</div>
         <details class="df-method">
             <summary>Metodología y supuestos del cálculo</summary>
             <p class="df-note" style="margin-top:6px">La demanda histórica incluye órdenes no anuladas, incluso COMPLETO. Los compromisos pendientes solo incluyen órdenes PARCIAL e INCOMPLETO. La producción en proceso se muestra por separado y no se suma al stock físico disponible.</p>
@@ -568,6 +601,48 @@
     window.addEventListener('pageshow', function (e) { if (e.persisted) { loader.classList.add('df-hide'); } });
 })();
 </script>
+
+<script>
+/* Filtro visual de productos por nivel de cobertura: no modifica cálculos ni datos. */
+document.addEventListener('DOMContentLoaded', function () {
+    const buttons = document.querySelectorAll('[data-priority-filter]');
+    const table = document.getElementById('dfProductsTable');
+    if (!buttons.length || !table) return;
+
+    const rows = Array.from(table.querySelectorAll('tbody tr[data-df-priority]'));
+    const count = document.getElementById('dfProductCount');
+    const empty = document.getElementById('dfProductFilterEmpty');
+
+    buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            const filter = button.getAttribute('data-priority-filter');
+            let visible = 0;
+
+            rows.forEach(function (row) {
+                const show = filter === 'all' || row.getAttribute('data-df-priority') === filter;
+                row.hidden = !show;
+                if (show) visible++;
+            });
+
+            buttons.forEach(function (item) {
+                const active = item === button;
+                item.classList.toggle('is-active', active);
+                item.setAttribute('aria-pressed', active ? 'true' : 'false');
+            });
+
+            if (count) {
+                count.textContent = visible + ' producto(s) en el grupo seleccionado';
+            }
+            if (empty) empty.style.display = visible === 0 ? 'block' : 'none';
+        });
+    });
+
+    buttons.forEach(function (button) {
+        button.setAttribute('aria-pressed', button.classList.contains('is-active') ? 'true' : 'false');
+    });
+});
+</script>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
