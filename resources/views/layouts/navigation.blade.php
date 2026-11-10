@@ -75,10 +75,10 @@ $menu = [
              'paths' => ['cajas']],
 
             ['label' => 'Joselito',      'icon' => 'building', 'route' => 'joselito.index',
-             'roles' => ['admin'], 'paths' => ['joselito']],
+             'roles' => ['admin','gerencia'], 'paths' => ['joselito']],
 
             ['label' => 'Dalsa',         'icon' => 'factory',  'route' => 'dalsa.index',
-             'roles' => ['admin'], 'paths' => ['dalsa']],
+             'roles' => ['admin','gerencia'], 'paths' => ['dalsa']],
         ],
     ],
 
@@ -112,7 +112,7 @@ $menu = [
              'roles' => ['admin'], 'routes' => ['orders.validation.*'], 'paths' => ['validacion-pedidos']],
 
             ['label' => 'Rechazos', 'icon' => 'undo', 'route' => 'rechazos.index',
-             'roles' => ['admin'], 'paths' => ['rechazos']],
+             'roles' => ['admin','gerencia'], 'paths' => ['rechazos']],
         ],
     ],
 
@@ -120,10 +120,10 @@ $menu = [
         'label' => 'Comercial', 'icon' => 'users', 'color' => '#2f6fd0', 'group' => true,
         'items' => [
             ['label' => 'Clientes',    'icon' => 'user',  'href' => '/clients',
-             'roles' => ['admin'], 'paths' => ['clients']],
+             'roles' => ['admin','gerencia'], 'paths' => ['clients']],
 
             ['label' => 'Proveedores', 'icon' => 'truck','roles' => ['admin'], 'href' => '/proveedores',
-             'roles' => ['admin'], 'paths' => ['proveedores']],
+             'roles' => ['admin','gerencia'], 'paths' => ['proveedores']],
         ],
     ],
 
@@ -131,11 +131,11 @@ $menu = [
         'label' => 'Reportes', 'icon' => 'bars', 'color' => '#2f6fd0','roles' => ['admin'], 'group' => true,
         'items' => [
             ['label' => 'Movimientos', 'icon' => 'swap', 'route' => 'reports.movimientos',
-             'roles' => ['admin'], 'routes' => ['reports.*'], 'paths' => ['reports', 'reportes']],
+             'roles' => ['admin','gerencia'], 'routes' => ['reports.*'], 'paths' => ['reports', 'reportes']],
        
              ['label' => 'Kardex',   'icon' => 'swap',   'route' => 'kardex.index',
              'title' => 'Kardex',
-             'roles' => ['admin'], 'paths' => ['kardex']],
+             'roles' => ['admin','gerencia'], 'paths' => ['kardex']],
 
              ['label' => 'Conciliación', 'icon' => 'check', 'route' => 'reconciliacion.index',
              'title' => 'Conciliación de inventario',
@@ -153,7 +153,7 @@ $menu = [
              'roles' => ['admin'], 'routes' => ['stockcount.*'], 'paths' => ['conteo-fisico']],
 
             ['label' => 'Desmedros',     'icon' => 'ban',    'route' => 'desmedros.index',
-             'roles' => ['admin'], 'routes' => ['desmedros.*'], 'paths' => ['desmedros']],
+             'roles' => ['admin','gerencia'], 'routes' => ['desmedros.*'], 'paths' => ['desmedros']],
              ],
     ],
 
