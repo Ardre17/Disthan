@@ -1238,6 +1238,12 @@ html, body {
     $ocSumSol  = (float) $order->details->sum('cantidad_solicitada');
     $ocSumDesp = (float) $order->details->sum('cantidad_despachada');
     $ocSumPend = max($ocSumSol - $ocSumDesp, 0);
+    $ocMontoPerdida = (float) $order->details->sum(function ($d) {
+        $despachado = (float) $d->cantidad_despachada;
+        if ($despachado <= 0) return 0;
+        $pendiente = max((float) $d->cantidad_solicitada - $despachado, 0);
+        return round($pendiente * (float) $d->precio_unitario, 2);
+    });
     $ocAvance  = $ocSumSol > 0 ? round(($ocSumDesp / $ocSumSol) * 100, 1) : 0;
 
     $ocMaxNum = $paletas->keys()->map(fn($k) => (int) preg_replace('/\D/', '', (string) $k))->max() ?? 0;
@@ -1641,6 +1647,7 @@ html, body {
                         <th>Últ. despacho</th>
                         <th>Armó</th>
                         <th>Subtotal</th>
+                        <th>Monto de pérdida</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -1775,6 +1782,15 @@ html, body {
                         </td>
 
                         <td class="oc-num" style="font-weight:700;white-space:nowrap;">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</td>
+
+                        @php
+                            $ocPerdidaItem = (float) $detail->cantidad_despachada > 0
+                                ? max((float) $detail->cantidad_solicitada - (float) $detail->cantidad_despachada, 0) * (float) $detail->precio_unitario
+                                : 0;
+                        @endphp
+                        <td class="oc-num" style="font-weight:800;white-space:nowrap;color:#dc2626;background:#fef2f2;">
+                            S/ {{ number_format($ocPerdidaItem, 2) }}
+                        </td>
 
                         <td>
                             <div class="oc-acts">
@@ -2312,10 +2328,18 @@ html, body {
 
         {{-- PIE --}}
         <div style="
-            padding:10px 15px;
+            padding:12px 15px;
             border-top:1px solid #e5e7eb;
-            text-align:right;
+            display:flex;
+            align-items:center;
+            justify-content:space-between;
+            gap:12px;
+            flex-wrap:wrap;
         ">
+            <div style="font-size:13px;font-weight:800;color:#991b1b;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:9px 12px;">
+                Total de pérdida por productos no despachados:
+                <span style="font-size:15px;white-space:nowrap;">S/ {{ number_format($ocMontoPerdida, 2) }}</span>
+            </div>
 
             <button
                 type="button"
@@ -4642,10 +4666,10 @@ function ocNuevaPaleta(){
     document.getElementById('ocPaletas')?.scrollIntoView({behavior:'smooth',block:'center'});
 }
 function ocExportCSV(){
-    const rows=[['#','Producto','SKU','Solicitado','Despachado','Pendiente','Avance','Lote','Vencimiento','Paleta','Ubicación','Últ. despacho','Armó','Subtotal']];
+    const rows=[['#','Producto','SKU','Solicitado','Despachado','Pendiente','Avance','Lote','Vencimiento','Paleta','Ubicación','Últ. despacho','Armó','Subtotal','Monto de pérdida']];
     document.querySelectorAll('#ocTabla tbody tr.oc-row').forEach(tr=>{
-        if(tr.style.display==='none')return;const c=tr.children;if(!c||c.length<16)return;
-        rows.push([0,1,2,3,4,5,6,7,8,10,11,12,13,14].map(i=>(c[i]?.innerText||'').replace(/\s+/g,' ').trim()));
+        if(tr.style.display==='none')return;const c=tr.children;if(!c||c.length<17)return;
+        rows.push([0,1,2,3,4,5,6,7,8,10,11,12,13,14,15].map(i=>(c[i]?.innerText||'').replace(/\s+/g,' ').trim()));
     });
     const csv=rows.map(r=>r.map(v=>'"'+String(v).replace(/"/g,'""')+'"').join(',')).join('\n');
     const blob=new Blob(["\ufeff"+csv],{type:'text/csv;charset=utf-8;'});
