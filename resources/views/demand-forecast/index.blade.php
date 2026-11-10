@@ -71,11 +71,21 @@
 .df-priority-btn[data-priority-filter="none"]:not(.is-active) b{background:#e2e8f0;color:#475569}
 .df-filter-empty{display:none;padding:22px;text-align:center;color:#8290a3;background:#fafbfd;border:1px dashed #d9e1ec;border-radius:10px}
 .df-supermarket-master-table{width:100%;table-layout:fixed}
+/* Encabezados fijos para las tablas principales de productos y clientes */
+.df-products-scroll,.df-clients-scroll{max-height:520px;overflow:auto!important;position:relative;overscroll-behavior:contain;scrollbar-gutter:stable}
+.df-products-scroll table.df-table thead th,.df-clients-scroll table.df-table thead th,.df-client-products-scroll table.df-table thead th{position:sticky;top:0;z-index:8;background:#f7f9fc;box-shadow:0 1px 0 #e5eaf1}
+.df-client-products-scroll{max-height:340px;overflow:auto!important;position:relative;overscroll-behavior:contain;scrollbar-gutter:stable}
+.df-products-scroll table.df-table{min-width:1250px}
+.df-clients-scroll table.df-table{min-width:1250px}
 .df-supermarket-master-table>tbody>tr>td{min-width:0;max-width:0;overflow:hidden}
 .df-sm-horizontal-scroll{display:block;width:100%;max-width:100%;min-width:0;height:16px;overflow-x:auto;overflow-y:hidden;margin-top:10px;margin-bottom:2px;border-radius:8px;background:#f1f5f9;scrollbar-width:thin}
 .df-sm-horizontal-scroll-inner{height:1px;min-width:1150px}
 .df-sm-products-scroll{display:block;width:100%;max-width:100%;min-width:0;height:360px;max-height:360px;overflow-x:auto!important;overflow-y:auto!important;overscroll-behavior:contain;scrollbar-gutter:stable;position:relative;box-sizing:border-box}
 .df-sm-products-scroll table.df-table{width:max-content;min-width:1150px;max-width:none;background:white}
+.df-products-scroll{height:460px;max-height:460px;overflow:auto;position:relative;overscroll-behavior:contain;scrollbar-gutter:stable}
+.df-products-scroll table.df-table thead th,.df-clients-scroll table.df-table thead th,.df-client-products-scroll table.df-table thead th{position:sticky;top:0;z-index:5;background:#f7f9fc}
+.df-clients-scroll{height:460px;max-height:460px;overflow:auto;position:relative;overscroll-behavior:contain;scrollbar-gutter:stable}
+.df-client-products-scroll{height:360px;max-height:360px;overflow:auto;position:relative;overscroll-behavior:contain;scrollbar-gutter:stable}
 .df-sm-products-scroll table.df-table thead th{position:sticky;top:0;z-index:5;background:#f7f9fc}
 .df-count{font-size:11px;color:#64748b;background:#f1f5f9;border-radius:20px;padding:5px 11px;font-weight:700}.df-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:#64748b;font-weight:650}.df-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
 .df-priority{display:flex;flex-direction:column;gap:11px}.df-prio-item{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:11px;align-items:center;padding:10px 12px;border:1px solid #edf1f6;border-radius:11px;background:#fbfcfe}.df-prio-rank{width:26px;height:26px;border-radius:8px;background:#172b4d;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800;font-family:var(--df-mono)}.df-prio-name{font-weight:750;color:#172b4d;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.df-prio-sub{font-size:10px;color:#8290a3;margin-top:2px}.df-prio-val{text-align:right;font-family:var(--df-mono);font-weight:800;color:#b45309;font-size:13px}.df-prio-val small{display:block;font-size:9px;color:#94a3b8;font-weight:600;font-family:inherit}
@@ -227,7 +237,7 @@
                 <span class="df-count">{{ $dfCl->count() }} cliente(s) en el listado</span>
                 <div class="df-legend"><span><i style="background:#dc2626"></i>Inactivo +90 días</span><span><i style="background:#d97706"></i>Próximo a pedir</span></div>
             </div>
-            <div class="df-table-wrap">
+            <div class="df-table-wrap df-clients-scroll">
                 <table class="df-table">
                     <thead><tr><th>Cliente</th><th>Estado de planificación</th><th>Órdenes</th><th>Último pedido</th><th>Último despacho</th><th>Frecuencia habitual</th><th>Próximo pedido estimado</th><th>Total solicitado</th><th>Total despachado</th><th>Promedio despachado / orden</th><th>Órdenes abiertas</th><th>Unidades pendientes</th></tr></thead>
                     <tbody>
@@ -261,7 +271,7 @@
                         <tr><td colspan="12" style="padding:8px 12px 16px;background:#fafbfd">
                             <details>
                                 <summary style="cursor:pointer;color:#1459a6;font-weight:650">Ver productos y proyección de {{ $client['client_name'] }}</summary>
-                                <div class="df-table-wrap" style="margin-top:10px">
+                                <div class="df-table-wrap df-client-products-scroll" style="margin-top:10px">
                                     <table class="df-table" style="min-width:1150px;background:white">
                                         <thead><tr><th>Producto</th><th>Órdenes con solicitud</th><th>Total solicitado</th><th>Total despachado</th><th>No atendido</th><th>Atención (%)</th><th>Promedio despachado por orden</th><th>Frecuencia</th><th>Última recepción</th><th>Ciclos acumulados</th><th>Siguiente orden estimada</th><th>Adicional descontando pendiente</th><th>Pendiente abierto</th></tr></thead>
                                         <tbody>
@@ -525,7 +535,7 @@
             <span class="df-count" id="dfProductCount" data-total="{{ $products->count() }}">{{ $products->count() }} producto(s) en el listado</span>
             <div class="df-legend"><span><i style="background:#dc2626"></i>Cobertura ≤ 7 días</span><span><i style="background:#f59e0b"></i>8–15 días / por producir</span><span><i style="background:#16a34a"></i>Óptima</span></div>
         </div>
-        <div class="df-table-wrap" id="dfProductsTableWrap">
+        <div class="df-table-wrap df-products-scroll" id="dfProductsTableWrap">
             <table class="df-table" id="dfProductsTable">
                 <thead><tr>
                     <th>Producto</th><th>Stock físico</th><th>Demanda diaria</th><th>7 días</th><th>15 días</th><th>30 días</th><th>Pendiente abierto</th><th>Disponible</th><th>En producción</th><th>Cobertura</th><th>Mín. recomendado</th><th>Stock objetivo</th><th>Producir</th><th>Parámetros</th>
