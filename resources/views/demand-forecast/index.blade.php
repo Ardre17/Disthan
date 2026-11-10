@@ -70,7 +70,12 @@
 .df-priority-btn[data-priority-filter="optimal"]:not(.is-active) b{background:#dcfce7;color:#166534}
 .df-priority-btn[data-priority-filter="none"]:not(.is-active) b{background:#e2e8f0;color:#475569}
 .df-filter-empty{display:none;padding:22px;text-align:center;color:#8290a3;background:#fafbfd;border:1px dashed #d9e1ec;border-radius:10px}
-.df-sm-products-scroll{height:360px;max-height:360px;overflow:auto;overscroll-behavior:contain;scrollbar-gutter:stable;position:relative}
+.df-supermarket-master-table{width:100%;table-layout:fixed}
+.df-supermarket-master-table>tbody>tr>td{min-width:0;max-width:0;overflow:hidden}
+.df-sm-horizontal-scroll{display:block;width:100%;max-width:100%;min-width:0;height:16px;overflow-x:auto;overflow-y:hidden;margin-top:10px;margin-bottom:2px;border-radius:8px;background:#f1f5f9;scrollbar-width:thin}
+.df-sm-horizontal-scroll-inner{height:1px;min-width:1150px}
+.df-sm-products-scroll{display:block;width:100%;max-width:100%;min-width:0;height:360px;max-height:360px;overflow-x:auto!important;overflow-y:auto!important;overscroll-behavior:contain;scrollbar-gutter:stable;position:relative;box-sizing:border-box}
+.df-sm-products-scroll table.df-table{width:max-content;min-width:1150px;max-width:none;background:white}
 .df-sm-products-scroll table.df-table thead th{position:sticky;top:0;z-index:5;background:#f7f9fc}
 .df-count{font-size:11px;color:#64748b;background:#f1f5f9;border-radius:20px;padding:5px 11px;font-weight:700}.df-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:10px;color:#64748b;font-weight:650}.df-legend i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:5px}
 .df-priority{display:flex;flex-direction:column;gap:11px}.df-prio-item{display:grid;grid-template-columns:26px minmax(0,1fr) auto;gap:11px;align-items:center;padding:10px 12px;border:1px solid #edf1f6;border-radius:11px;background:#fbfcfe}.df-prio-rank{width:26px;height:26px;border-radius:8px;background:#172b4d;color:#fff;display:grid;place-items:center;font-size:11px;font-weight:800;font-family:var(--df-mono)}.df-prio-name{font-weight:750;color:#172b4d;font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.df-prio-sub{font-size:10px;color:#8290a3;margin-top:2px}.df-prio-val{text-align:right;font-family:var(--df-mono);font-weight:800;color:#b45309;font-size:13px}.df-prio-val small{display:block;font-size:9px;color:#94a3b8;font-weight:600;font-family:inherit}
@@ -346,7 +351,7 @@
                 <div class="df-legend"><span><i style="background:#16a34a"></i>Atención ≥ 90%</span><span><i style="background:#f59e0b"></i>70–89%</span><span><i style="background:#dc2626"></i>&lt; 70%</span></div>
             </div>
             <div class="df-table-wrap">
-                <table class="df-table">
+                <table class="df-table df-supermarket-master-table">
                     <thead><tr><th>Supermercado</th><th>Órdenes</th><th>Último pedido</th><th>Frecuencia media</th><th>Próximo pedido estimado</th><th>Unidades despachadas</th><th>Promedio por orden</th><th>Órdenes abiertas</th><th>Unidades pendientes</th></tr></thead>
                     <tbody>
                     @forelse($supermarketData['clients'] as $client)
@@ -372,8 +377,11 @@
                         <tr><td colspan="9" style="padding:8px 12px 16px;background:#fafbfd">
                             <details>
                                 <summary style="cursor:pointer;color:#1459a6;font-weight:650">Ver productos y cantidades habituales de {{ $client['client_name'] }}</summary>
-                                <div class="df-table-wrap df-sm-products-scroll" style="margin-top:10px">
-                                    <table class="df-table" style="min-width:1150px;background:white">
+                                <div class="df-sm-horizontal-scroll" aria-label="Desplazamiento horizontal de productos" tabindex="0">
+                                    <div class="df-sm-horizontal-scroll-inner"></div>
+                                </div>
+                                <div class="df-table-wrap df-sm-products-scroll">
+                                    <table class="df-table">
                                         <thead><tr><th>Producto</th><th>SKU</th><th>Órdenes con solicitud</th><th>Total solicitado</th><th>Total despachado</th><th>Atención (%)</th><th>Promedio solicitado por orden</th><th>Frecuencia</th><th>Última recepción estimada</th><th>Última recepción (unid.)</th><th>Último faltante solicitado</th><th>Ciclos acumulados</th><th>Siguiente orden estimada</th><th>Adicional descontando pendiente</th><th>Pendiente abierto</th></tr></thead>
                                         <tbody>
                                         @forelse($client['products'] as $item)
@@ -643,6 +651,50 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 </script>
 
+<script>
+(function () {
+    function initSupermarketHorizontalScroll() {
+        document.querySelectorAll('.df-sm-products-scroll').forEach(function (body) {
+            var top = body.previousElementSibling;
+            if (!top || !top.classList.contains('df-sm-horizontal-scroll') || top.dataset.bound === '1') return;
+            var inner = top.querySelector('.df-sm-horizontal-scroll-inner');
+            var table = body.querySelector('table');
+            if (!inner || !table) return;
+            var syncWidth = function () {
+                inner.style.width = Math.max(table.scrollWidth, body.clientWidth) + 'px';
+            };
+            syncWidth();
+            top.dataset.bound = '1';
+            var syncing = false;
+            top.addEventListener('scroll', function () {
+                if (syncing) return;
+                syncing = true;
+                body.scrollLeft = top.scrollLeft;
+                syncing = false;
+            }, { passive: true });
+            body.addEventListener('scroll', function () {
+                if (syncing) return;
+                syncing = true;
+                top.scrollLeft = body.scrollLeft;
+                syncing = false;
+            }, { passive: true });
+            var details = body.closest('details');
+            if (details) details.addEventListener('toggle', function () {
+                if (details.open) {
+                    syncWidth();
+                    top.scrollLeft = body.scrollLeft;
+                }
+            });
+            if (window.ResizeObserver) new ResizeObserver(syncWidth).observe(body);
+        });
+    }
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initSupermarketHorizontalScroll);
+    } else {
+        initSupermarketHorizontalScroll();
+    }
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
