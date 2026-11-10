@@ -1239,8 +1239,8 @@ html, body {
     $ocSumDesp = (float) $order->details->sum('cantidad_despachada');
     $ocSumPend = max($ocSumSol - $ocSumDesp, 0);
     $ocMontoPerdida = (float) $order->details->sum(function ($d) {
+        if (!(bool) ($d->despacho_confirmado ?? false)) return 0;
         $despachado = (float) $d->cantidad_despachada;
-        if ($despachado <= 0) return 0;
         $pendiente = max((float) $d->cantidad_solicitada - $despachado, 0);
         return round($pendiente * (float) $d->precio_unitario, 2);
     });
@@ -1784,8 +1784,12 @@ html, body {
                         <td class="oc-num" style="font-weight:700;white-space:nowrap;">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</td>
 
                         @php
-                            $ocPerdidaItem = (float) $detail->cantidad_despachada > 0
-                                ? max((float) $detail->cantidad_solicitada - (float) $detail->cantidad_despachada, 0) * (float) $detail->precio_unitario
+                            $ocPerdidaItem = (bool) ($detail->despacho_confirmado ?? false)
+                                ? round(
+                                    max((float) $detail->cantidad_solicitada - (float) $detail->cantidad_despachada, 0)
+                                    * (float) $detail->precio_unitario,
+                                    2
+                                )
                                 : 0;
                         @endphp
                         <td class="oc-num" style="font-weight:800;white-space:nowrap;color:#dc2626;background:#fef2f2;">
@@ -2029,6 +2033,9 @@ html, body {
             <span>Subtotal <b>S/ {{ number_format($order->subtotal,2) }}</b></span>
             <span>IGV (18%) <b>S/ {{ number_format($order->igv,2) }}</b></span>
             <span class="tot">Total <b>S/ {{ number_format($order->total,2) }}</b></span>
+            <span style="color:#dc2626;background:#fef2f2;border:1px solid #fecaca;border-radius:8px;padding:8px 10px;font-weight:700;">
+                Total de pérdida <b style="margin-left:8px;">S/ {{ number_format($ocMontoPerdida,2) }}</b>
+            </span>
         </div>
     </div>
 

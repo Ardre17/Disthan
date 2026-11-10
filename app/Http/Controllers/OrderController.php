@@ -1329,11 +1329,11 @@ public function edit(Order $order)
         'bultos.detalles.product'
     ]);
 
-    // Recalcular cada detalle con los valores actuales.
+    // Recalcular subtotales despachados. La pérdida solo aplica
+    // cuando el despacho fue confirmado explícitamente (incluido un cero).
     foreach ($order->details as $detail) {
         $cantidad = (float) ($detail->cantidad_despachada ?? 0);
         $precio = (float) ($detail->precio_unitario ?? 0);
-
         $subtotalDetalle = round($cantidad * $precio, 2);
 
         if ((float) $detail->subtotal !== $subtotalDetalle) {
@@ -1443,6 +1443,8 @@ public function updateDetail(Request $request, OrderDetail $detail)
     $updateData = [
         'cantidad_solicitada' => $cantidadSolicitada,
         'cantidad_despachada' => $cantidadDespachada,
+        // Distingue un cero confirmado de un despacho aún pendiente.
+        'despacho_confirmado' => $request->exists('cantidad_despachada'),
         'precio_unitario' => $precio,
         'estado_item' => $estado,
         'subtotal' => $subtotal,

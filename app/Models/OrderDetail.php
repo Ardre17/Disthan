@@ -13,6 +13,7 @@ class OrderDetail extends Model
 
     'cantidad_solicitada',
     'cantidad_despachada',
+    'despacho_confirmado',
 
     // PREPARACIÓN
     'cantidad_preparada',
