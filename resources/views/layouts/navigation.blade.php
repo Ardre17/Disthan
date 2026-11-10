@@ -72,7 +72,7 @@ $menu = [
              'roles' => ['admin'], 'paths' => ['precintos']],
 
             ['label' => 'Cajas',         'icon' => 'box',    'route' => 'cajas.index',
-             'paths' => ['cajas']],
+             'roles' => ['admin','operario'],'paths' => ['cajas']],
 
             ['label' => 'Joselito',      'icon' => 'building', 'route' => 'joselito.index',
              'roles' => ['admin','gerencia'], 'paths' => ['joselito']],
