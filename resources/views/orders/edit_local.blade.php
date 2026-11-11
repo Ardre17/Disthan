@@ -1096,7 +1096,12 @@ hr.dv{border-top-color:#e8eef6;}
                     <td>
                         <div class="lc-acts">
                             <button type="button" class="lc-ic" title="Ver / editar lote y vencimiento"
-                                    onclick="abrirModalLote({{ $item->id }}, '{{ addslashes($loteItem ?? '') }}', '{{ $item->fecha_produccion ? \\Carbon\\Carbon::parse($item->fecha_produccion)->format('Y-m-d') : '' }}', '{{ $fechaVenc ? \\Carbon\\Carbon::parse($fechaVenc)->format('Y-m-d') : '' }}')">
+                                    onclick="abrirModalLote(
+                                        {{ $item->id }},
+                                        @js($loteItem ?? ''),
+                                        @js($item->fecha_produccion ? \Carbon\Carbon::parse($item->fecha_produccion)->format('Y-m-d') : ''),
+                                        @js($fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('Y-m-d') : '')
+                                    )"
                                 <svg class="lc-i"><use href="#lc-eye"/></svg>
                             </button>
                             <button type="button" class="lc-ic btn-edit" title="Editar cantidades y precio"
