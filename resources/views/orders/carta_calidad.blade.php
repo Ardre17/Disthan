@@ -3,307 +3,75 @@
 <head>
 <meta charset="UTF-8">
 <style>
-
-@page {
-    margin: 30mm 25mm;
-}
-
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-body {
-    font-family: DejaVu Sans, sans-serif;
-    font-size: 10px;
-    color: #1e293b;
-    background: #fff;
-    line-height: 1.5;
-    padding: 0 20px;
-}
-
-/* ── Header ── */
-.header-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-bottom: 3px solid #1e3a5f;
-    padding-bottom: 12px;
-    margin-bottom: 16px;
-}
-.logo-block {
-    background: #1e3a5f;
-    color: #fff;
-    padding: 8px 14px;
-    border-radius: 4px;
-    display: inline-block;
-}
-.logo-name {
-    font-size: 18px;
-    font-weight: 900;
-    letter-spacing: 2px;
-}
-.logo-sub {
-    font-size: 8px;
-    color: #93c5fd;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    margin-top: 2px;
-}
-.doc-title {
-    font-size: 16px;
-    font-weight: 900;
-    color: #1e3a5f;
-    letter-spacing: .5px;
-}
-.doc-subtitle {
-    font-size: 9px;
-    color: #64748b;
-    margin-top: 3px;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-}
-.doc-num {
-    font-size: 12px;
-    font-weight: 700;
-    color: #475569;
-    margin-top: 4px;
-}
-.cert-badge {
-    background: #7c3aed;
-    color: #fff;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 8px 14px;
-    border-radius: 4px;
-    text-align: center;
-    letter-spacing: .06em;
-    text-transform: uppercase;
-}
-
-/* ── Info strip ── */
-.info-strip {
-    width: 100%;
-    border-collapse: collapse;
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    margin-bottom: 14px;
-    border-radius: 4px;
-}
-.info-strip td {
-    padding: 8px 12px;
-    border-right: 1px solid #e2e8f0;
-    vertical-align: top;
-}
-.info-strip td:last-child { border-right: none; }
-.info-label {
-    font-size: 8px;
-    font-weight: 700;
-    color: #94a3b8;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    margin-bottom: 2px;
-}
-.info-value {
-    font-size: 11px;
-    font-weight: 700;
-    color: #1e293b;
-}
-
-/* ── Sección título ── */
-.sec-title {
-    font-size: 9px;
-    font-weight: 800;
-    color: #fff;
-    background: #1e3a5f;
-    padding: 5px 10px;
-    text-transform: uppercase;
-    letter-spacing: .08em;
-    margin-bottom: 0;
-}
-
-/* ── Declaración de calidad ── */
-.declaracion {
-    background: #f0fdf4;
-    border: 1px solid #bbf7d0;
-    border-left: 4px solid #22c55e;
-    padding: 10px 14px;
-    margin-bottom: 14px;
-    font-size: 10px;
-    color: #166534;
-    line-height: 1.7;
-}
-.declaracion strong {
-    font-weight: 800;
-    font-size: 11px;
-}
-
-/* ── Tabla de productos ── */
-.tbl {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 9.5px;
-    margin-bottom: 6px;
-}
-.tbl thead th {
-    background: #1e3a5f;
-    color: #fff;
-    padding: 7px 9px;
-    text-align: left;
-    font-size: 8.5px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-}
-.tbl thead th.center { text-align: center; }
-.tbl tbody td {
-    padding: 7px 9px;
-    border-bottom: 1px solid #f1f5f9;
-    vertical-align: middle;
-}
-.tbl tbody td.center { text-align: center; }
-.tbl tbody tr:nth-child(even) td { background: #f8fafc; }
-.tbl tfoot td {
-    padding: 7px 9px;
-    background: #1e3a5f;
-    color: #fff;
-    font-weight: 700;
-    font-size: 10px;
-}
-.tbl tfoot td.center { text-align: center; }
-
-/* Nota al pie de tabla */
-.tbl-note {
-    font-size: 8px;
-    color: #94a3b8;
-    font-style: italic;
-    margin-bottom: 16px;
-}
-
-/* Badges estado */
-.badge-completo { color: #166534; font-weight: 800; }
-.badge-parcial  { color: #92400e; font-weight: 800; }
-
-/* Fecha vencimiento colores */
-.venc-ok   { color: #166534; font-weight: 700; }
-.venc-prox { color: #92400e; font-weight: 700; }
-.venc-venc { color: #b91c1c; font-weight: 700; }
-
-/* ── Condiciones ── */
-.condiciones {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 16px;
-}
-.condiciones td {
-    width: 50%;
-    padding: 6px 10px;
-    vertical-align: top;
-    font-size: 9px;
-    color: #475569;
-}
-.condicion-item {
-    display: flex;
-    align-items: flex-start;
-    margin-bottom: 4px;
-}
-.condicion-bullet {
-    color: #22c55e;
-    font-weight: 900;
-    margin-right: 5px;
-    flex-shrink: 0;
-}
-
-/* ── Firmas ── */
-.firma-section {
-    margin-top: 20px;
-    width: 100%;
-    border-collapse: collapse;
-}
-.firma-section td {
-    width: 33.3%;
-    text-align: center;
-    padding-top: 32px;
-    border-top: 1px solid #334155;
-    font-size: 9px;
-    color: #475569;
-    font-weight: 600;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-.firma-cargo {
-    font-size: 8px;
-    color: #94a3b8;
-    margin-top: 2px;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-}
-
-/* ── Sello de calidad ── */
-.sello {
-    border: 3px solid #7c3aed;
-    border-radius: 50%;
-    width: 80px;
-    height: 80px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    margin: 0 auto;
-}
-.sello-inner {
-    font-size: 8px;
-    font-weight: 800;
-    color: #7c3aed;
-    text-transform: uppercase;
-    letter-spacing: .04em;
-    line-height: 1.3;
-}
-
-/* ── Footer ── */
-.footer-table {
-    width: 100%;
-    border-collapse: collapse;
-    border-top: 1px solid #e2e8f0;
-    margin-top: 16px;
-    padding-top: 8px;
-}
-.footer-table td {
-    font-size: 8px;
-    color: #94a3b8;
-    padding-top: 6px;
-}
-.footer-table td:last-child { text-align: right; }
-
-/* ── Número de documento ── */
-.doc-number-box {
-    background: #7c3aed;
-    color: #fff;
-    font-size: 11px;
-    font-weight: 800;
-    padding: 4px 12px;
-    border-radius: 3px;
-    display: inline-block;
-    margin-top: 4px;
-    letter-spacing: 1px;
-}
-
+@page { size: A4 portrait; margin: 15mm 14mm 16mm 14mm; }
+* { box-sizing: border-box; }
+body { font-family: DejaVu Sans, sans-serif; font-size: 9px; color: #263445; background: #fff; line-height: 1.45; margin: 0; }
+.header { width: 100%; border-collapse: collapse; border-bottom: 3px solid #17324d; margin-bottom: 15px; }
+.header td { padding: 0 0 12px 0; vertical-align: middle; }
+.brand { width: 118px; }
+.brand-mark { background: #17324d; color: #fff; padding: 11px 12px; text-align: center; }
+.brand-name { font-size: 19px; font-weight: bold; letter-spacing: 2px; }
+.brand-caption { color: #c4d5e3; font-size: 7px; letter-spacing: 1px; text-transform: uppercase; }
+.heading { padding-left: 17px !important; }
+.eyebrow { color: #688096; font-size: 7px; font-weight: bold; letter-spacing: 1.3px; text-transform: uppercase; }
+.doc-title { color: #17324d; font-size: 19px; font-weight: bold; margin-top: 3px; }
+.doc-subtitle { color: #647789; font-size: 8px; margin-top: 3px; text-transform: uppercase; letter-spacing: .6px; }
+.doc-code { color: #17324d; font-size: 9px; font-weight: bold; margin-top: 7px; }
+.header-side { width: 105px; text-align: right; }
+.status-box { display: inline-block; border: 1px solid #b7c8d5; color: #31536d; padding: 7px 9px; text-align: center; font-size: 7px; font-weight: bold; letter-spacing: .7px; text-transform: uppercase; }
+.status-box strong { display: block; font-size: 10px; margin-top: 2px; }
+.meta { width: 100%; border-collapse: collapse; margin-bottom: 15px; }
+.meta td { border: 1px solid #d9e1e8; background: #f5f8fa; padding: 8px 9px; vertical-align: top; }
+.meta-label { color: #728496; font-size: 7px; font-weight: bold; text-transform: uppercase; letter-spacing: .7px; margin-bottom: 3px; }
+.meta-value { color: #1f3448; font-size: 9px; font-weight: bold; }
+.section-heading { background: #17324d; color: #fff; padding: 7px 10px; font-size: 8px; font-weight: bold; letter-spacing: .8px; text-transform: uppercase; margin: 14px 0 0 0; }
+.declaration { border: 1px solid #d5e0e7; border-left: 3px solid #527b70; background: #f7faf9; padding: 11px 13px; color: #405365; font-size: 8.5px; line-height: 1.65; margin-bottom: 13px; }
+.declaration strong { color: #17324d; }
+.products { width: 100%; border-collapse: collapse; table-layout: fixed; font-size: 7.5px; }
+.products thead { display: table-header-group; }
+.products thead th { background: #eaf0f4; color: #29445b; border-bottom: 1px solid #b9c8d3; padding: 8px 4px; text-align: center; font-size: 7px; font-weight: bold; text-transform: uppercase; }
+.products tbody td { border-bottom: 1px solid #e1e7ec; padding: 8px 4px; vertical-align: middle; overflow-wrap: break-word; }
+.products tbody tr:nth-child(even) td { background: #fafcfd; }
+.products tfoot td { background: #17324d; color: #fff; padding: 8px 5px; font-weight: bold; font-size: 8px; }
+.center { text-align: center; }
+.product-name { color: #1e3448; font-weight: bold; font-size: 7.7px; }
+.sku { color: #778999; font-size: 6.8px; margin-top: 3px; }
+.lot { color: #294d69; font-weight: bold; }
+.quantity { color: #17324d; font-weight: bold; font-size: 9px; }
+.weight { color: #405f75; }
+.badge-completo { color: #356c58; font-weight: bold; }
+.badge-parcial { color: #9a6a2c; font-weight: bold; }
+.venc-ok { color: #356c58; font-weight: bold; }
+.venc-prox { color: #9a6a2c; font-weight: bold; }
+.venc-venc { color: #a74646; font-weight: bold; }
+.days { color: #7b8c99; font-size: 6.5px; }
+.table-note { color: #7b8c99; font-size: 7px; font-style: italic; margin: 6px 0 13px; }
+.summary { width: 100%; border-collapse: collapse; margin: 0 0 14px; }
+.summary td { border: 1px solid #dce4e9; padding: 7px 9px; }
+.summary-label { color: #718496; font-size: 7px; text-transform: uppercase; font-weight: bold; }
+.summary-value { color: #17324d; font-size: 10px; font-weight: bold; margin-top: 2px; }
+.conditions { width: 100%; border-collapse: collapse; margin: 0 0 14px; }
+.conditions td { width: 50%; vertical-align: top; padding: 8px 10px; border: 1px solid #e0e7ec; color: #485d6e; font-size: 7.5px; line-height: 1.8; }
+.check { color: #527b70; font-weight: bold; }
+.signatures { width: 100%; border-collapse: collapse; margin-top: 22px; page-break-inside: avoid; }
+.signatures td { width: 33.33%; text-align: center; vertical-align: bottom; padding: 0 8px; }
+.signature-line { border-top: 1px solid #718392; padding-top: 7px; color: #29445b; font-size: 7.5px; font-weight: bold; }
+.signature-role { color: #788a98; font-size: 6.5px; text-transform: uppercase; letter-spacing: .5px; margin-top: 3px; }
+.quality-seal { border: 2px solid #527b70; color: #527b70; width: 66px; height: 66px; margin: 0 auto 8px; text-align: center; font-size: 7px; font-weight: bold; padding-top: 17px; line-height: 1.5; }
+.footer { width: 100%; border-collapse: collapse; border-top: 1px solid #d8e1e7; margin-top: 17px; page-break-inside: avoid; }
+.footer td { padding-top: 7px; color: #8393a0; font-size: 6.5px; vertical-align: top; }
+.footer td:last-child { text-align: right; }
 </style>
 </head>
 <body>
 
 @php
     $detalles  = $order->details()->with('product')->where('cantidad_despachada', '>', 0)->get();
-
-    // Hora/fecha reales de Perú (evita que salga la hora del servidor en UTC)
     $ahora        = \Carbon\Carbon::now('America/Lima');
     $fechaEmision = $ahora->format('d/m/Y');
     $horaEmision  = $ahora->format('H:i');
-
     $totalUds     = $detalles->sum('cantidad_despachada');
     $totalLineas  = $detalles->count();
-
-    // Calcular estado de vencimientos
     $sinFecha  = 0;
     $vigentes  = 0;
     $proximos  = 0;
@@ -316,60 +84,57 @@ body {
         elseif ($dias <= 30) $proximos++;
         else                 $vigentes++;
     }
+    $pesoTotalGeneral = $detalles->sum(fn($d) => ($d->product->peso ?? 0) * $d->cantidad_despachada / 1000);
 @endphp
 
-{{-- ══ HEADER ══ --}}
-<table class="header-table" cellpadding="0" cellspacing="0">
+<table class="header" cellpadding="0" cellspacing="0">
     <tr>
-        <td style="width:140px; vertical-align:middle;">
-            <div class="logo-block">
-                <div class="logo-name">DISTAN</div>
-                <div class="logo-sub">Perú · Distribución</div>
+        <td class="brand">
+            <div class="brand-mark">
+                <div class="brand-name">DISTAN</div>
+                <div class="brand-caption">Perú · Distribución</div>
             </div>
         </td>
-        <td style="vertical-align:middle; padding-left:16px;">
+        <td class="heading">
+            <div class="eyebrow">Documento de aseguramiento y trazabilidad</div>
             <div class="doc-title">Carta de Calidad</div>
-            <div class="doc-subtitle">Certificado de despacho · Pedido Local</div>
-            <div class="doc-num">Orden: {{ $order->numero_orden }}</div>
-            <div class="doc-number-box">CC-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</div>
+            <div class="doc-subtitle">Certificado de despacho · Pedido local</div>
+            <div class="doc-code">ORDEN: {{ $order->numero_orden }} &nbsp; | &nbsp; CC-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}</div>
         </td>
-        <td style="width:110px; vertical-align:middle; text-align:right;">
-            <div class="cert-badge">
-                🏅 Cert.<br>Calidad
-            </div>
+        <td class="header-side">
+            <div class="status-box">Control documental<strong>CALIDAD</strong></div>
         </td>
     </tr>
 </table>
 
-{{-- ══ INFO STRIP ══ --}}
-<table class="info-strip" cellpadding="0" cellspacing="0">
+<table class="meta" cellpadding="0" cellspacing="0">
     <tr>
-        <td style="width:35%;">
-            <div class="info-label">Cliente</div>
-            <div class="info-value">{{ $order->client?->razon_social ?? '—' }}</div>
+        <td style="width:40%;">
+            <div class="meta-label">Cliente</div>
+            <div class="meta-value">{{ $order->client?->razon_social ?? '—' }}</div>
         </td>
         <td style="width:20%;">
-            <div class="info-label">Fecha de emisión</div>
-            <div class="info-value">{{ $fechaEmision }}</div>
+            <div class="meta-label">Fecha de emisión</div>
+            <div class="meta-value">{{ $fechaEmision }}</div>
         </td>
-        <td style="width:20%;">
-            <div class="info-label">Hora</div>
-            <div class="info-value">{{ $horaEmision }}</div>
+        <td style="width:16%;">
+            <div class="meta-label">Hora</div>
+            <div class="meta-value">{{ $horaEmision }}</div>
         </td>
         <td style="width:12%;">
-            <div class="info-label">Líneas</div>
-            <div class="info-value">{{ $totalLineas }}</div>
+            <div class="meta-label">Líneas</div>
+            <div class="meta-value">{{ $totalLineas }}</div>
         </td>
-        <td style="width:13%;">
-            <div class="info-label">Total u.</div>
-            <div class="info-value">{{ number_format($totalUds) }}</div>
+        <td style="width:12%;">
+            <div class="meta-label">Total unidades</div>
+            <div class="meta-value">{{ number_format($totalUds) }}</div>
         </td>
     </tr>
 </table>
 
-{{-- ══ DECLARACIÓN DE CALIDAD ══ --}}
-<div class="declaracion">
-    <strong>VALLE FERTILS.A.C.</strong> declara que los productos descritos en el presente documento
+<div class="section-heading">Declaración de calidad</div>
+<div class="declaration">
+    <strong>VALLE FERTIL S.A.C.</strong> declara que los productos descritos en el presente documento
     han sido inspeccionados, verificados y despachados bajo los estándares de calidad establecidos por la empresa,
     cumpliendo con las normas de manipulación, almacenamiento y trazabilidad vigentes.
     Este certificado acredita que los productos entregados al cliente
@@ -378,19 +143,18 @@ body {
     con sus respectivas fechas de vencimiento y lotes de producción debidamente registrados.
 </div>
 
-{{-- ══ TABLA DE PRODUCTOS ══ --}}
-<div class="sec-title">📦 Detalle de productos despachados</div>
-<table class="tbl" cellpadding="0" cellspacing="0">
+<div class="section-heading">Detalle de productos despachados</div>
+<table class="products" cellpadding="0" cellspacing="0">
     <thead>
         <tr>
-            <th style="width:4%;" class="center">#</th>
-            <th style="width:27%;">Producto</th>
-            <th style="width:10%;" class="center">Lote</th>
-            <th style="width:12%;" class="center">Fecha prod.</th>
-            <th style="width:13%;" class="center">Vencimiento</th>
-            <th style="width:10%;" class="center">Despachado</th>
-            <th style="width:13%;" class="center">Peso total*</th>
-            <th style="width:11%;" class="center">Estado</th>
+            <th style="width:4%;">#</th>
+            <th style="width:25%; text-align:left;">Producto</th>
+            <th style="width:10%;">Lote</th>
+            <th style="width:11%;">Fecha prod.</th>
+            <th style="width:13%;">Vencimiento</th>
+            <th style="width:11%;">Despachado</th>
+            <th style="width:13%;">Peso total*</th>
+            <th style="width:13%;">Estado</th>
         </tr>
     </thead>
     <tbody>
@@ -402,111 +166,95 @@ body {
         $vencClass = '';
         $vencIcon  = '';
         if ($diasVenc !== null) {
-            if ($diasVenc < 0)       { $vencClass = 'venc-venc'; $vencIcon = '🔴 '; }
-            elseif ($diasVenc <= 30) { $vencClass = 'venc-prox'; $vencIcon = '🟡 '; }
-            else                     { $vencClass = 'venc-ok';   $vencIcon = '🟢 '; }
+            if ($diasVenc < 0)       { $vencClass = 'venc-venc'; $vencIcon = 'VENC. '; }
+            elseif ($diasVenc <= 30) { $vencClass = 'venc-prox'; $vencIcon = 'PRÓX. '; }
+            else                     { $vencClass = 'venc-ok';   $vencIcon = ''; }
         }
         $pesoTotal = ($d->product->peso ?? 0) * $d->cantidad_despachada / 1000;
         $estadoD   = $d->cantidad_despachada >= $d->cantidad_solicitada ? 'COMPLETO' : 'PARCIAL';
     @endphp
     <tr>
-        <td class="center" style="color:#94a3b8;font-size:8px;">{{ $i + 1 }}</td>
-        <td style="font-weight:600;color:#0f172a;">
-            {{ $d->product->nombre }}
+        <td class="center" style="color:#8293a0;">{{ $i + 1 }}</td>
+        <td>
+            <div class="product-name">{{ $d->product->nombre }}</div>
             @if($d->product->sku)
-            <br><span style="font-size:8px;color:#94a3b8;font-weight:400;">SKU: {{ $d->product->sku }}</span>
+                <div class="sku">SKU: {{ $d->product->sku }}</div>
             @endif
         </td>
-        <td class="center" style="font-weight:700;font-size:9px;color:#1e3a5f;">
-            {{ $d->lote ?? '—' }}
-        </td>
-        <td class="center" style="color:#475569;">
-            {{ $fp ? \Carbon\Carbon::parse($fp)->format('d/m/Y') : '—' }}
-        </td>
+        <td class="center lot">{{ $d->lote ?? '—' }}</td>
+        <td class="center">{{ $fp ? \Carbon\Carbon::parse($fp)->format('d/m/Y') : '—' }}</td>
         <td class="center">
-            <span class="{{ $vencClass }}">
-                {{ $vencIcon }}{{ $fv ? \Carbon\Carbon::parse($fv)->format('d/m/Y') : '—' }}
-            </span>
+            <span class="{{ $vencClass }}">{{ $vencIcon }}{{ $fv ? \Carbon\Carbon::parse($fv)->format('d/m/Y') : '—' }}</span>
             @if($diasVenc !== null && $diasVenc >= 0)
-            <br><span style="font-size:8px;color:#94a3b8;">({{ $diasVenc }} días)</span>
+                <br><span class="days">{{ $diasVenc }} días</span>
             @endif
         </td>
-        <td class="center" style="font-weight:800;font-size:12px;color:#1e3a5f;">
-            {{ number_format($d->cantidad_despachada, 0) }}
-        </td>
-        <td class="center" style="color:#0369a1;">
-            {{ number_format($pesoTotal, 3) }} kg
-        </td>
-        <td class="center">
-            <span class="{{ $estadoD === 'COMPLETO' ? 'badge-completo' : 'badge-parcial' }}">
-                {{ $estadoD }}
-            </span>
-        </td>
+        <td class="center quantity">{{ number_format($d->cantidad_despachada, 0) }}</td>
+        <td class="center weight">{{ number_format($pesoTotal, 3) }} kg</td>
+        <td class="center"><span class="{{ $estadoD === 'COMPLETO' ? 'badge-completo' : 'badge-parcial' }}">{{ $estadoD }}</span></td>
     </tr>
     @endforeach
     </tbody>
     <tfoot>
         <tr>
-            <td colspan="5" style="text-align:right;font-size:9px;">TOTALES</td>
+            <td colspan="5" style="text-align:right;">TOTALES</td>
             <td class="center">{{ number_format($totalUds, 0) }} u.</td>
-            <td class="center">
-                {{ number_format($detalles->sum(fn($d) => ($d->product->peso ?? 0) * $d->cantidad_despachada / 1000), 3) }} kg
-            </td>
+            <td class="center">{{ number_format($pesoTotalGeneral, 3) }} kg</td>
             <td></td>
         </tr>
     </tfoot>
 </table>
-<div class="tbl-note">* El peso total es aproximado/referencial; puede variar ligeramente según el producto y no representa un valor exacto.</div>
+<div class="table-note">* El peso total es aproximado/referencial; puede variar ligeramente según el producto y no representa un valor exacto.</div>
 
-{{-- ══ CONDICIONES DE CALIDAD ══ --}}
-<div class="sec-title" style="margin-bottom:8px;">✅ Condiciones de calidad certificadas</div>
-<table class="condiciones" cellpadding="0" cellspacing="0">
+
+
+<div class="section-heading">Condiciones de calidad certificadas</div>
+<table class="conditions" cellpadding="0" cellspacing="0">
     <tr>
         <td>
-            <div class="condicion-item"><span class="condicion-bullet">✓</span> Productos inspeccionados previo al despacho</div>
-            <div class="condicion-item"><span class="condicion-bullet">✓</span> Temperatura y almacenamiento controlados</div>
-            <div class="condicion-item"><span class="condicion-bullet">✓</span> Embalaje íntegro y en buenas condiciones</div>
-            <div class="condicion-item"><span class="condicion-bullet">✓</span> Lotes de producción verificados y registrados</div>
+            <span class="check">✓</span> Productos inspeccionados previo al despacho<br>
+            <span class="check">✓</span> Temperatura y almacenamiento controlados<br>
+            <span class="check">✓</span> Embalaje íntegro y en buenas condiciones<br>
+            <span class="check">✓</span> Lotes de producción verificados y registrados
         </td>
         <td>
-            <div class="condicion-item"><span class="condicion-bullet">✓</span> Fechas de vencimiento dentro del rango aceptable</div>
-            <div class="condicion-item"><span class="condicion-bullet">✓</span> Pesos y cantidades verificados contra la orden</div>
-            <div class="condicion-item"><span class="condicion-bullet">✓</span> Producto libre de daños físicos visibles</div>
-            <div class="condicion-item"><span class="condicion-bullet">✓</span> Trazabilidad completa disponible en sistema ERP</div>
+            <span class="check">✓</span> Fechas de vencimiento dentro del rango aceptable<br>
+            <span class="check">✓</span> Pesos y cantidades verificados contra la orden<br>
+            <span class="check">✓</span> Producto libre de daños físicos visibles<br>
+            <span class="check">✓</span> Trazabilidad completa disponible en sistema ERP
         </td>
     </tr>
 </table>
 
-{{-- ══ FIRMAS ══ --}}
-<table class="firma-section" cellpadding="0" cellspacing="0">
+<table class="signatures" cellpadding="0" cellspacing="0">
     <tr>
         <td>
-            <div class="sello">
-                <div class="sello-inner">CERT.<br>CALIDAD<br>✓</div>
-            </div>
-            <div style="margin-top:6px;font-size:9px;color:#7c3aed;font-weight:700;">Sello de calidad</div>
-            <div class="firma-cargo">Control de calidad</div>
+            <div class="quality-seal">CONTROL<br>DE CALIDAD<br>✓</div>
+            <div class="signature-line">Sello de calidad</div>
+            <div class="signature-role">Control de calidad</div>
         </td>
         <td>
-            <div style="font-size:9px;font-weight:700;color:#1e293b;">Responsable de despacho</div>
-            <div class="firma-cargo">Almacén · VALLE FERTIL/div>
+            <div style="height:74px;"></div>
+            <div class="signature-line">Responsable de despacho</div>
+            <div class="signature-role">Almacén · VALLE FERTIL</div>
         </td>
         <td>
-            <div style="font-size:9px;font-weight:700;color:#1e293b;">Recibido conforme</div>
-            <div class="firma-cargo">{{ $order->client?->razon_social ?? 'Cliente' }}</div>
+            <div style="height:74px;"></div>
+            <div class="signature-line">Recibido conforme</div>
+            <div class="signature-role">{{ $order->client?->razon_social ?? 'Cliente' }}</div>
         </td>
     </tr>
 </table>
 
-{{-- ══ FOOTER ══ --}}
-<table class="footer-table" cellpadding="0" cellspacing="0">
+<table class="footer" cellpadding="0" cellspacing="0">
     <tr>
         <td>
-            VALLE FERTIL S.A.C. · Carta de Calidad Nº CC-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}
-            · Generado el {{ $ahora->format('d/m/Y \a \l\a\s H:i') }}
+            VALLE FERTIL S.A.C. · Carta de Calidad Nº CC-{{ str_pad($order->id, 6, '0', STR_PAD_LEFT) }}<br>
+            Generado el {{ $ahora->format('d/m/Y \\a \\l\\a\\s H:i') }}
         </td>
         <td>
-            {{ $order->numero_orden }} · Este documento detalla la información de los productos
+            {{ $order->numero_orden }}<br>
+            Documento de trazabilidad de productos despachados
         </td>
     </tr>
 </table>
