@@ -583,9 +583,8 @@ public function storeImportPdf(Request $request)
                     'estado_item' => 'INCOMPLETO',
 
                     'lote' => $producto->lote,
-
-                    'fecha_vencimiento' =>
-                        $producto->fecha_vencimiento,
+                    'fecha_produccion' => $producto->fecha_produccion,
+                    'fecha_vencimiento' => $producto->fecha_vencimiento,
                 ]);
             }
 
@@ -801,12 +800,18 @@ public function etiqueta(OrderDetail $item)
 {
     $validated = $request->validate([
         'lote' => 'nullable|string|max:100',
+        'fecha_produccion' => 'nullable|date',
         'fecha_vencimiento' => 'nullable|date',
     ]);
 
+    // Guardar únicamente en el detalle de esta orden.
+    // No se modifica la ficha maestra de products.
     $item->update($validated);
 
-    return back()->with('success', 'Lote y vencimiento actualizados correctamente.');
+    return back()->with(
+        'success',
+        'Lote, fecha de producción y fecha de vencimiento actualizados correctamente.'
+    );
 }
     public function cartaCalidad(Order $order)
 {
@@ -1086,8 +1091,10 @@ public function pdfEncomienda(Order $order)
         'estado_item' =>
             'INCOMPLETO',
 
-        // 🔥 Snapshot del lote/vencimiento del producto al momento de agregarlo
+        // Snapshot de trazabilidad del producto al momento de agregarlo.
+        // Las modificaciones posteriores se guardan solo en este detalle.
         'lote' => $product->lote,
+        'fecha_produccion' => $product->fecha_produccion,
         'fecha_vencimiento' => $product->fecha_vencimiento,
     ]);
 

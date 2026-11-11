@@ -182,7 +182,7 @@ hr.dv{border:none;border-top:1px solid #e2e8f0;margin:.65rem 0;}
 
 /* ── Modal lote/vencimiento ── */
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:center;justify-content:center;padding:1rem;}
-.modal-box{background:#fff;border-radius:6px;width:100%;max-width:380px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+.modal-box{background:#fff;border-radius:6px;width:100%;max-width:430px;overflow:hidden;box-shadow:0 10px 30px rgba(0,0,0,.25);}
 .modal-head{background:#1e3a5f;padding:.7rem 1rem;display:flex;justify-content:space-between;align-items:center;}
 .modal-head span{color:#fff;font-size:13px;font-weight:700;}
 .modal-head button{background:none;border:none;color:#93c5fd;font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;}
@@ -1096,7 +1096,7 @@ hr.dv{border-top-color:#e8eef6;}
                     <td>
                         <div class="lc-acts">
                             <button type="button" class="lc-ic" title="Ver / editar lote y vencimiento"
-                                    onclick="abrirModalLote({{ $item->id }}, '{{ addslashes($loteItem ?? '') }}', '{{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('Y-m-d') : '' }}')">
+                                    onclick="abrirModalLote({{ $item->id }}, '{{ addslashes($loteItem ?? '') }}', '{{ $item->fecha_produccion ? \\Carbon\\Carbon::parse($item->fecha_produccion)->format('Y-m-d') : '' }}', '{{ $fechaVenc ? \\Carbon\\Carbon::parse($fechaVenc)->format('Y-m-d') : '' }}')">
                                 <svg class="lc-i"><use href="#lc-eye"/></svg>
                             </button>
                             <button type="button" class="lc-ic btn-edit" title="Editar cantidades y precio"
@@ -1301,15 +1301,17 @@ hr.dv{border-top-color:#e8eef6;}
         </div>
         <div class="modal-body">
             <div class="modal-warn">
-                ⚠️ <strong>Esta edición solo debe hacerse en casos extraordinarios.</strong>
-                Si la fecha no coincide con el producto, ve a registrarla correctamente en la vista
-                <strong>Productos</strong> para mantener la información actualizada.
+                ℹ️ Estos datos corresponden a <strong>este producto dentro de este pedido local</strong>.
+                Los cambios se guardarán en el detalle de la orden y no modificarán la ficha general de Productos.
             </div>
             <form id="formLote" method="POST" action="">
                 @csrf
                 @method('PUT')
                 <label class="flabel">Lote</label>
                 <input type="text" name="lote" id="loteInput" class="finput" style="margin-bottom:10px;" maxlength="100" placeholder="Ej: L-2026-045">
+
+                <label class="flabel">Fecha de producción</label>
+                <input type="date" name="fecha_produccion" id="fechaProdInput" class="finput" style="margin-bottom:10px;">
 
                 <label class="flabel">Fecha de vencimiento</label>
                 <input type="date" name="fecha_vencimiento" id="fechaVencInput" class="finput" style="margin-bottom:14px;">
@@ -1355,10 +1357,11 @@ function editar(id) {
 }
 
 /* ── Modal lote / vencimiento ── */
-function abrirModalLote(id, lote, fecha) {
+function abrirModalLote(id, lote, fechaProduccion, fechaVencimiento) {
     document.getElementById('formLote').action = '/order-details/' + id + '/lote';
     document.getElementById('loteInput').value = lote || '';
-    document.getElementById('fechaVencInput').value = fecha || '';
+    document.getElementById('fechaProdInput').value = fechaProduccion || '';
+    document.getElementById('fechaVencInput').value = fechaVencimiento || '';
     document.getElementById('modalLote').style.display = 'flex';
 }
 function cerrarModalLote() {

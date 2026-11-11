@@ -309,7 +309,7 @@ body {
     $proximos  = 0;
     $vencidos  = 0;
     foreach ($detalles as $d) {
-        $fv = $d->fecha_vencimiento ?? $d->product->fecha_vencimiento;
+        $fv = $d->fecha_vencimiento;
         if (!$fv) { $sinFecha++; continue; }
         $dias = $ahora->diffInDays(\Carbon\Carbon::parse($fv), false);
         if ($dias < 0)       $vencidos++;
@@ -396,8 +396,8 @@ body {
     <tbody>
     @foreach($detalles as $i => $d)
     @php
-        $fv       = $d->fecha_vencimiento ?? $d->product->fecha_vencimiento;
-        $fp       = $d->product->fecha_produccion;
+        $fv       = $d->fecha_vencimiento;
+        $fp       = $d->fecha_produccion;
         $diasVenc = $fv ? (int) round($ahora->diffInDays(\Carbon\Carbon::parse($fv), false)) : null;
         $vencClass = '';
         $vencIcon  = '';
@@ -418,7 +418,7 @@ body {
             @endif
         </td>
         <td class="center" style="font-weight:700;font-size:9px;color:#1e3a5f;">
-            {{ $d->product->lote ?? '—' }}
+            {{ $d->lote ?? '—' }}
         </td>
         <td class="center" style="color:#475569;">
             {{ $fp ? \Carbon\Carbon::parse($fp)->format('d/m/Y') : '—' }}
