@@ -1095,14 +1095,17 @@ hr.dv{border-top-color:#e8eef6;}
 
                     <td>
                         <div class="lc-acts">
-                            <button type="button" class="lc-ic" title="Ver / editar lote y vencimiento"
-                                    onclick="abrirModalLote(
-                                        {{ $item->id }},
-                                        @js($loteItem ?? ''),
-                                        @js($item->fecha_produccion ? \Carbon\Carbon::parse($item->fecha_produccion)->format('Y-m-d') : ''),
-                                        @js($fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('Y-m-d') : '')
-                                    )"
-                                <svg class="lc-i"><use href="#lc-eye"/></svg>
+                            <button
+                                type="button"
+                                class="lc-ic lc-fechas"
+                                title="Editar lote, fecha de producción y vencimiento"
+                                data-item-id="{{ $item->id }}"
+                                data-lote="{{ $loteItem ?? '' }}"
+                                data-fecha-produccion="{{ $item->fecha_produccion ? \Carbon\Carbon::parse($item->fecha_produccion)->format('Y-m-d') : '' }}"
+                                data-fecha-vencimiento="{{ $fechaVenc ? \Carbon\Carbon::parse($fechaVenc)->format('Y-m-d') : '' }}"
+                                onclick="abrirModalLoteDesdeBoton(this)"
+                                style="width:auto;padding:0 10px;gap:5px;background:#eef2ff;color:#4338ca;border:1px solid #c7d2fe;font-size:11px;font-weight:700;white-space:nowrap;">
+                                🗓️ Fechas
                             </button>
                             <button type="button" class="lc-ic btn-edit" title="Editar cantidades y precio"
                                     onclick="editar({{ $item->id }})">
@@ -1301,7 +1304,7 @@ hr.dv{border-top-color:#e8eef6;}
 <div id="modalLote" class="modal-overlay">
     <div class="modal-box">
         <div class="modal-head">
-            <span>🏷️ Editar lote y vencimiento</span>
+            <span>🏷️ Editar lote y fechas</span>
             <button type="button" onclick="cerrarModalLote()">✕</button>
         </div>
         <div class="modal-body">
@@ -1362,6 +1365,15 @@ function editar(id) {
 }
 
 /* ── Modal lote / vencimiento ── */
+function abrirModalLoteDesdeBoton(boton) {
+    abrirModalLote(
+        boton.dataset.itemId,
+        boton.dataset.lote || '',
+        boton.dataset.fechaProduccion || '',
+        boton.dataset.fechaVencimiento || ''
+    );
+}
+
 function abrirModalLote(id, lote, fechaProduccion, fechaVencimiento) {
     document.getElementById('formLote').action = '/order-details/' + id + '/lote';
     document.getElementById('loteInput').value = lote || '';
