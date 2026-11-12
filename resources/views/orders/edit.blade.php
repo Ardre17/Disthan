@@ -901,6 +901,41 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .oc-tbl th{background:#f1f5f9;color:#334155;font-size:11.5px;font-weight:700;text-align:left;padding:10px;white-space:nowrap;}
 .oc-tbl td{padding:9px 10px;border-bottom:1px solid #eef2f7;vertical-align:middle;}
 .oc-tbl tr.oc-row:hover td{background:#fafcff;}
+/* Resaltado de pérdida total: despacho confirmado con cero unidades */
+.oc-tbl tr.oc-row.oc-row-perdida > td,
+.oc-tbl tr.oc-row.oc-row-perdida:hover > td,
+.oc-tbl tr.oc-row.oc-row-perdida-preview > td,
+.oc-tbl tr.oc-row.oc-row-perdida-preview:hover > td{
+    background:#fff1f2 !important;
+    border-bottom-color:#fecaca;
+}
+.oc-tbl tr.oc-row.oc-row-perdida > td:first-child,
+.oc-tbl tr.oc-row.oc-row-perdida-preview > td:first-child{
+    box-shadow:inset 4px 0 0 #dc2626;
+}
+.oc-tbl tr.oc-row.oc-row-perdida .oc-pname,
+.oc-tbl tr.oc-row.oc-row-perdida-preview .oc-pname{
+    color:#991b1b;
+}
+.oc-loss-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    margin-top:4px;
+    padding:3px 7px;
+    border:1px solid #fecaca;
+    border-radius:5px;
+    background:#fee2e2;
+    color:#991b1b;
+    font-size:9px;
+    font-weight:800;
+    line-height:1.2;
+    letter-spacing:.025em;
+    white-space:nowrap;
+}
+.oc-loss-badge::before{content:'!';display:inline-flex;align-items:center;justify-content:center;width:13px;height:13px;border-radius:50%;background:#dc2626;color:#fff;font-size:9px;}
+.oc-row-perdida .oc-loss-zero,
+.oc-row-perdida-preview .oc-loss-zero{color:#b91c1c !important;font-weight:900 !important;}
 .oc-tbl .c{text-align:center;}
 .oc-prod{display:flex;align-items:center;gap:10px;min-width:200px;}
 .oc-thumb{width:42px;height:42px;border-radius:8px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;overflow:hidden;font-size:20px;flex-shrink:0;}
@@ -1669,6 +1704,8 @@ html, body {
                         $ocSol  = (float) $detail->cantidad_solicitada;
                         $ocDesp = (float) $detail->cantidad_despachada;
                         $ocPend = max($ocSol - $ocDesp, 0);
+                        $ocDespachoConfirmado = (bool) ($detail->despacho_confirmado ?? false);
+                        $ocPerdidaConfirmada = $ocDespachoConfirmado && $ocSol > 0 && $ocDesp <= 0;
 
                         $ocVenc = $detail->fecha_vencimiento ?? ($detail->product->fecha_vencimiento ?? null);
                         $ocVencado = $ocVenc && \Carbon\Carbon::parse($ocVenc)->isPast();
@@ -1689,8 +1726,10 @@ html, body {
                         $ocUlt  = $ocDesp > 0 ? $detail->updated_at : null;
                     @endphp
 
-                    <tr class="oc-row"
+                    <tr class="oc-row{{ $ocPerdidaConfirmada ? ' oc-row-perdida' : '' }}"
                         id="producto-{{ $detail->product->barcode }}"
+                        data-order-detail="{{ $detail->id }}"
+                        data-perdida-confirmada="{{ $ocDespachoConfirmado ? '1' : '0' }}"
                         data-barcode="{{ $detail->product->barcode }}"
                         data-box-barcode="{{ $detail->product->box_barcode }}"
                         data-estado="{{ $s }}"
@@ -1704,6 +1743,9 @@ html, body {
                                 <div class="oc-thumb">@if($ocImg)<img src="{{ $ocImg }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">@else 📦 @endif</div>
                                 <div>
                                     <div class="oc-pname">{{ $detail->product->nombre }}</div>
+                                    @if($ocPerdidaConfirmada)
+                                        <span class="oc-loss-badge" data-loss-badge>PÉRDIDA TOTAL</span>
+                                    @endif
                                     @if(!empty($detail->product->marca))<div class="oc-pmarca">Marca: {{ $detail->product->marca }}</div>@endif
                                 </div>
                             </div>
@@ -1711,7 +1753,7 @@ html, body {
 
                         <td class="oc-num" style="color:#64748b;">{{ $detail->product->sku }}</td>
                         <td class="c oc-num" style="font-weight:700;">{{ $ocN($ocSol) }}</td>
-                        <td class="c oc-num" style="font-weight:700;color:{{ $s === 'COMPLETO' ? '#16a34a' : '#0f172a' }};">{{ $ocN($ocDesp) }}</td>
+                        <td class="c oc-num{{ $ocPerdidaConfirmada ? ' oc-loss-zero' : '' }}" style="font-weight:700;color:{{ $ocPerdidaConfirmada ? '#b91c1c' : ($s === 'COMPLETO' ? '#16a34a' : '#0f172a') }};">{{ $ocN($ocDesp) }}</td>
                         <td class="c oc-num" style="font-weight:700;color:{{ $ocPend > 0 ? '#f59e0b' : '#16a34a' }};">{{ $ocN($ocPend) }}</td>
 
                         <td>
@@ -1832,7 +1874,7 @@ html, body {
                     </tr>
 
                     {{-- Fila expandible: info del producto + formulario original de edición --}}
-                    <tr class="oc-detail" id="oc-det-{{ $detail->id }}">
+                    <tr class="oc-detail" id="oc-det-{{ $detail->id }}" data-order-detail="{{ $detail->id }}">
                         <td colspan="16">
                             <div class="oc-panel">
 
@@ -4736,6 +4778,87 @@ document.getElementById('modalResumenOrden')?.addEventListener('click', function
     search.addEventListener('keydown',function(e){var rows=list.querySelectorAll('li[data-value]');if(e.key==='Escape'){close();return;}if(e.key==='ArrowDown'){e.preventDefault();active=Math.min(active+1,rows.length-1);}else if(e.key==='ArrowUp'){e.preventDefault();active=Math.max(active-1,0);}else if(e.key==='Enter'&&rows.length){e.preventDefault();(rows[active>=0?active:0]).dispatchEvent(new MouseEvent('mousedown',{bubbles:true}));return;}rows.forEach(function(li,i){li.classList.toggle('is-active',i===active);});if(rows[active])rows[active].scrollIntoView({block:'nearest'});});
     select.addEventListener('change',updateLabel);document.addEventListener('click',function(e){if(!combo.contains(e.target)&&!panel.hidden)close();});updateLabel();
   });
+})();
+</script>
+
+
+<script>
+(function () {
+    function actualizarEstadoPerdida(form) {
+        if (!form || !form.matches('form[data-detail-form]')) return;
+
+        const detailRow = form.closest('.oc-detail');
+        const detailId = detailRow ? detailRow.dataset.orderDetail : null;
+        if (!detailId) return;
+
+        const row = document.querySelector('.oc-row[data-order-detail="' + detailId + '"]');
+        if (!row) return;
+
+        const solicitadoInput = form.querySelector('[name="cantidad_solicitada"]');
+        const despachadoInput = form.querySelector('[name="cantidad_despachada"]');
+        const precioInput = form.querySelector('[name="precio_unitario"]');
+        if (!solicitadoInput || !despachadoInput) return;
+
+        const solicitado = Math.max(parseFloat(solicitadoInput.value) || 0, 0);
+        const despachado = Math.max(parseFloat(despachadoInput.value) || 0, 0);
+        const precio = Math.max(parseFloat(precioInput ? precioInput.value : 0) || 0, 0);
+        const confirmado = row.dataset.perdidaConfirmada === '1';
+        const perdidaTotal = solicitado > 0 && despachado <= 0;
+        const perdidaParcial = solicitado > despachado && despachado > 0;
+        const marcarRojo = perdidaTotal;
+
+        row.classList.toggle('oc-row-perdida', marcarRojo && confirmado);
+        row.classList.toggle('oc-row-perdida-preview', marcarRojo && !confirmado);
+
+        const nombre = row.querySelector('.oc-pname');
+        let badge = nombre ? nombre.parentElement.querySelector('[data-loss-badge]') : null;
+        if (marcarRojo && nombre) {
+            if (!badge) {
+                badge = document.createElement('span');
+                badge.className = 'oc-loss-badge';
+                badge.setAttribute('data-loss-badge', '');
+                nombre.insertAdjacentElement('afterend', badge);
+            }
+            badge.textContent = confirmado ? 'PÉRDIDA TOTAL' : 'PÉRDIDA TOTAL · POR CONFIRMAR';
+        } else if (badge) {
+            badge.remove();
+        }
+
+        const despachadoCell = row.children[4];
+        if (despachadoCell) {
+            despachadoCell.classList.toggle('oc-loss-zero', marcarRojo);
+            despachadoCell.style.color = marcarRojo ? '#b91c1c' : '';
+        }
+
+        // Actualiza el importe de pérdida en pantalla con los valores editados.
+        const perdida = confirmado || marcarRojo || perdidaParcial
+            ? Math.max(solicitado - despachado, 0) * precio
+            : 0;
+        const perdidaCell = row.children[15];
+        if (perdidaCell) {
+            const importe = new Intl.NumberFormat('es-PE', {
+                minimumFractionDigits: 2,
+                maximumFractionDigits: 2
+            }).format(perdida);
+            perdidaCell.textContent = 'S/ ' + importe;
+        }
+    }
+
+    document.addEventListener('input', function (event) {
+        const form = event.target.closest('form[data-detail-form]');
+        if (!form) return;
+        if (['cantidad_solicitada', 'cantidad_despachada', 'precio_unitario'].includes(event.target.name)) {
+            actualizarEstadoPerdida(form);
+        }
+    });
+
+    document.addEventListener('change', function (event) {
+        const form = event.target.closest('form[data-detail-form]');
+        if (!form) return;
+        if (['cantidad_solicitada', 'cantidad_despachada', 'precio_unitario'].includes(event.target.name)) {
+            actualizarEstadoPerdida(form);
+        }
+    });
 })();
 </script>
 
