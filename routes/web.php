@@ -268,6 +268,8 @@ Route::get('/bultos/{bulto}/etiqueta',[OrderController::class, 'etiquetaBulto'])
 
 Route::get('/order-details/{item}/etiqueta-local',[OrderController::class, 'etiquetaLocal'])
     ->name('orders.etiqueta.local');
+Route::get('/order-details/{item}/etiqueta', [OrderController::class, 'etiqueta'])
+    ->name('orders.etiqueta');
 
 Route::get('/orders/{order}/pallet/{paleta}/pdf',[OrderController::class,'palletPdf'])
     ->name('orders.pallet.pdf');
