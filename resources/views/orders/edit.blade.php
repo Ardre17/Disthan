@@ -2164,7 +2164,7 @@ html, body {
                 <div>Unidades: <span id="etUnidades"></span></div>
             </div>
         </div>
-        <div class="et-actions" data-etiqueta-url-template="{{ route('orders.details.etiqueta', ['item' => '__ID__']) }}">
+        <div class="et-actions" data-etiqueta-url-template="{{ route('orders.etiqueta', ['item' => '__ID__']) }}">
             <a id="etPdfLink" href="#" target="_blank" class="btn btn-gray">🖨 Generar PDF</a>
             <button type="button" class="btn btn-gray" onclick="document.getElementById('etOverlay').classList.remove('open')">Cerrar</button>
         </div>
