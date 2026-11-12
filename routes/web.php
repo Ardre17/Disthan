@@ -268,8 +268,6 @@ Route::get('/bultos/{bulto}/etiqueta',[OrderController::class, 'etiquetaBulto'])
 
 Route::get('/order-details/{item}/etiqueta-local',[OrderController::class, 'etiquetaLocal'])
     ->name('orders.etiqueta.local');
-Route::get('/order-details/{item}/etiqueta', [OrderController::class, 'etiqueta'])
-    ->name('orders.etiqueta');
 
 Route::get('/orders/{order}/pallet/{paleta}/pdf',[OrderController::class,'palletPdf'])
     ->name('orders.pallet.pdf');
@@ -282,10 +280,6 @@ Route::post('/exportacion/{order}/pallet', [ExportController::class, 'storePalle
 
 Route::put('/exportacion/pallets/{pallet}/capacidad', [ExportController::class, 'actualizarCapacidadPallet'])
     ->name('exportacion.pallet.capacidad');
-
-Route::get('/order-details/{item}/etiqueta', [OrderController::class, 'etiqueta'])->name('orders.etiqueta');
-Route::get('/order-details/{item}/etiqueta', [App\Http\Controllers\OrderController::class, 'etiqueta'])
-    ->name('orders.details.etiqueta');
 
 Route::put('/order-details/{item}/lote', [OrderController::class, 'updateLote'])->name('orderDetails.updateLote');
 
