@@ -55,6 +55,18 @@
         $conteoCat[$k] = ($conteoCat[$k] ?? 0) + 1;
     }
 
+    // Datos simples para el análisis de rotación (se preparan aquí para evitar
+    // expresiones PHP complejas dentro de la directiva Blade @json).
+    $productosRotacionJson = $products->map(function ($p) {
+        return [
+            'id' => (string) $p->id,
+            'nombre' => $p->nombre,
+            'sku' => $p->sku,
+            'stock' => (float) ($p->stock ?? 0),
+            'stock_minimo' => (float) ($p->stock_minimo ?? 0),
+        ];
+    })->values();
+
     // Pestaña activa si llega ?category_id=
     $catActiva = '';
 
@@ -858,10 +870,7 @@ document.addEventListener('keydown', function(e){
 ========================================================= */
 var datosRotacion = @json($rotacionAnalisis ?? []);
 var materiasPrimasPorProducto = @json($materiasPrimasPorProducto ?? []);
-var productosRotacion = @json($products->map(function($p){ return [
-    'id' => (string) $p->id, 'nombre' => $p->nombre, 'sku' => $p->sku,
-    'stock' => (float) ($p->stock ?? 0), 'stock_minimo' => (float) ($p->stock_minimo ?? 0)
-]; })->values());
+var productosRotacion = @json($productosRotacionJson);
 var rotacionOrden = {campo:'salidas', direccion:'desc'};
 var rotacionListaVisible = [];
 
