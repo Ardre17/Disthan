@@ -158,6 +158,12 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
 .op-table tbody tr:first-child td:first-child{ border-top-left-radius:0; }
 .op-table tbody tr td:first-child{ box-shadow:inset 4px 0 0 var(--lc,transparent); }
 .op-table tbody tr:hover{ background:#f9fbfe; }
+.op-table tbody tr.op-sin-stock{ background:#fff0f0; }
+.op-table tbody tr.op-sin-stock td{ border-bottom-color:#fecaca; }
+.op-table tbody tr.op-sin-stock .op-pname{ color:#b91c1c; }
+.op-stock-badge{ display:inline-flex; align-items:center; gap:4px; margin-top:5px; padding:3px 8px; border-radius:999px; background:#fee2e2; color:#b91c1c; font-size:10px; font-weight:800; letter-spacing:.03em; }
+.op-stock-badge.has-stock{ background:#dcfce7; color:#166534; }
+.op-icon-btn:disabled{ opacity:.35; cursor:not-allowed; }
 .op-table tr.op-flash{ animation:opFlash 1.5s ease; }
 @keyframes opFlash{ 0%,60%{ background:#dce8ff; } 100%{ background:transparent; } }
 .op-st{ width:24px; height:24px; border-radius:50%; display:inline-flex; align-items:center; justify-content:center; color:#fff; }
@@ -570,13 +576,14 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
             $cajasDespachadas   = $porCaja > 0 ? intdiv((int) $item->cantidad_despachada, $porCaja) : 0;
             $sueltasDespachadas = $porCaja > 0 ? ((int) $item->cantidad_despachada % $porCaja) : 0;
         @endphp
-        <tr id="item-{{ $item->id }}" style="--lc:{{ $lc }};">
+        <tr id="item-{{ $item->id }}" class="{{ (float) ($item->product->stock ?? 0) <= 0 && $pend > 0 ? 'op-sin-stock' : '' }}" style="--lc:{{ $lc }};">
             <td data-label="#">{{ $loop->iteration }}</td>
             <td data-label="Estado">
                 <span class="op-st {{ $stCls }}" id="st-{{ $item->id }}" title="{{ $stLbl }}"><svg class="ic"><use href="{{ $stIcon }}"/></svg></span>
             </td>
             <td class="op-td-prod" data-label="Producto">
                 <div class="op-pname">{{ $item->product->nombre }}</div>
+                <span id="stock-badge-{{ $item->id }}" class="op-stock-badge {{ (float) ($item->product->stock ?? 0) > 0 ? 'has-stock' : '' }}">{{ (float) ($item->product->stock ?? 0) > 0 ? 'STOCK: ' . rtrim(rtrim(number_format((float) $item->product->stock, 2, '.', ''), '0'), '.') : 'SIN STOCK' }}</span>
                 @if($esSuper)
                     <div class="op-psub">Paleta: <strong id="paleta-{{ $item->id }}">{{ $item->paleta ?: '—' }}</strong></div>
                 @elseif($item->paleta)
@@ -636,7 +643,7 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
                         @js($item->lote),
                         @js($item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('Y-m-d') : '')
                     )"><svg class="ic sm"><use href="#i-edit"/></svg></button>
-                    <button type="button" class="op-icon-btn" title="Seleccionar producto" aria-label="Seleccionar producto" onclick="seleccionarPorId({{ $item->id }})"><svg class="ic sm"><use href="#i-chevron"/></svg></button>
+                    <button type="button" class="op-icon-btn" title="{{ (float) ($item->product->stock ?? 0) <= 0 && $pend > 0 ? 'Producto sin stock' : 'Seleccionar producto' }}" aria-label="Seleccionar producto" {{ (float) ($item->product->stock ?? 0) <= 0 && $pend > 0 ? 'disabled' : '' }} onclick="seleccionarPorId({{ $item->id }})"><svg class="ic sm"><use href="#i-chevron"/></svg></button>
                     @if($esSuper)
                         {{-- Supermercados: utiliza etiqueta-barra.blade.php (ruta orders.etiqueta) --}}
                         <a href="{{ route('orders.etiqueta', $item) }}"
@@ -766,6 +773,10 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
 let detalles = @json($order->details->load('product'));
 let scanner  = document.getElementById('scanner');
 let activoActual = null;
+
+document.addEventListener('DOMContentLoaded', () => {
+    detalles.forEach(item => actualizarStockUI(item));
+});
 
 function byId(id){ return document.getElementById(id); }
 
@@ -983,10 +994,17 @@ function pintarOctogonos(item){
 
 function mostrarActivo(item){
     activoActual = item;
+    const stockActual = parseFloat(item.product?.stock) || 0;
+    const stockCero = stockActual <= 0;
+    const cantidadInput = byId('activoCantidad');
+    const guardarBtn = byId('btnGuardar');
+    if(cantidadInput) cantidadInput.disabled = stockCero;
+    if(guardarBtn) guardarBtn.disabled = stockCero;
 
     byId('activoNombre').textContent    = item.product.nombre;
     byId('activoSku').textContent       = item.product.sku ?? '—';
-    byId('activoStock').textContent     = item.product.stock ?? '—';
+    byId('activoStock').textContent     = fmtNum(item.product.stock ?? 0);
+    byId('activoStock').style.color = stockCero ? '#b91c1c' : 'var(--op-text)';
     byId('activoPeso').textContent      = item.product.peso
         ? (item.product.peso / 1000).toFixed(3) + ' kg' : '—';
     byId('activoUbicacion').textContent = item.ubicacion || '—';
@@ -1066,6 +1084,30 @@ function actualizarCajasUI(item){
     }
 }
 
+function actualizarStockUI(item){
+    const stock = parseFloat(item.product?.stock) || 0;
+    const pendiente = Math.max(0, (parseFloat(item.cantidad_solicitada) || 0) - (parseFloat(item.cantidad_despachada) || 0));
+    const sinStock = stock <= 0 && pendiente > 0;
+    const row = byId('item-' + item.id);
+    if(row) row.classList.toggle('op-sin-stock', sinStock);
+    const badge = byId('stock-badge-' + item.id);
+    if(badge){
+        badge.textContent = stock > 0 ? 'STOCK: ' + fmtNum(stock) : 'SIN STOCK';
+        badge.classList.toggle('has-stock', stock > 0);
+    }
+    const boton = row?.querySelector('button[onclick*="seleccionarPorId"]');
+    if(boton){
+        boton.disabled = sinStock;
+        boton.title = sinStock ? 'Producto sin stock' : 'Seleccionar producto';
+    }
+    if(activoActual && activoActual.id === item.id){
+        byId('activoStock').textContent = fmtNum(stock);
+        byId('activoStock').style.color = stock <= 0 ? '#b91c1c' : 'var(--op-text)';
+        byId('activoCantidad').disabled = stock <= 0;
+        byId('btnGuardar').disabled = stock <= 0;
+    }
+}
+
 function actualizarItemUI(item){
     const sol = parseFloat(item.cantidad_solicitada) || 0;
     const des = parseFloat(item.cantidad_despachada) || 0;
@@ -1098,6 +1140,7 @@ function actualizarItemUI(item){
     }
 
     actualizarCajasUI(item);
+    actualizarStockUI(item);
 }
 
 function resaltarFila(id){
@@ -1114,6 +1157,12 @@ function resaltarFila(id){
 // =====================================
 function seleccionarItem(item){
     const sol = parseFloat(item.cantidad_solicitada) || 0;
+    const desActual = parseFloat(item.cantidad_despachada) || 0;
+    const stockActual = parseFloat(item.product?.stock) || 0;
+    if(stockActual <= 0 && desActual < sol){
+        showToast('⛔ ' + item.product.nombre + ' — SIN STOCK. No es necesario prepararlo.', 'ter');
+        return false;
+    }
     const des = parseFloat(item.cantidad_despachada) || 0;
     const pct = sol > 0 ? (des / sol) * 100 : 0;
 
@@ -1197,13 +1246,24 @@ function guardarDespacho(){
     const item = activoActual;
     const btn = byId('btnGuardar');
 
+    const stockDisponible = parseFloat(item.product?.stock) || 0;
+    const cantidadActual = parseFloat(item.cantidad_despachada) || 0;
     const cantidad = parseFloat(byId('activoCantidad').value);
+    if(cantidad > cantidadActual && stockDisponible <= 0){
+        showToast('⛔ Producto SIN STOCK. No se puede aumentar el despacho.', 'ter');
+        return;
+    }
     if(isNaN(cantidad) || cantidad < 0){
         showToast('⚠ Cantidad inválida', 'twk');
         return;
     }
     if(cantidad > parseFloat(item.cantidad_solicitada)){
         showToast('⚠ Supera la cantidad solicitada (' + item.cantidad_solicitada + ')', 'twk');
+        return;
+    }
+    const adicionalSolicitado = cantidad - cantidadActual;
+    if(adicionalSolicitado > stockDisponible){
+        showToast('⚠ Stock disponible: ' + fmtNum(stockDisponible) + '. Solo puedes aumentar hasta esa cantidad.', 'twk');
         return;
     }
 
@@ -1238,13 +1298,21 @@ function guardarDespacho(){
     })
     .then(async res => {
         const texto = await res.text();
+        let data = {};
+        try { data = JSON.parse(texto); } catch(e) {}
         if(!res.ok){
-            throw new Error('HTTP ' + res.status + ': ' + texto);
+            throw new Error(data.message || data.errors?.cantidad_despachada?.[0] || ('HTTP ' + res.status));
         }
-        try { return JSON.parse(texto); } catch(e) { return {}; }
+        return data;
     })
-    .then(() => {
+    .then((respuesta) => {
+        const cantidadAnterior = parseFloat(item.cantidad_despachada) || 0;
         item.cantidad_despachada = cantidad;
+        if(respuesta && typeof respuesta.stock !== 'undefined'){
+            item.product.stock = parseFloat(respuesta.stock) || 0;
+        } else {
+            item.product.stock = Math.max(0, (parseFloat(item.product.stock) || 0) - (cantidad - cantidadAnterior));
+        }
         item.personal_despacho = personal;
         if(paletaInput){ item.paleta = paleta; }
 
@@ -1275,7 +1343,7 @@ function guardarDespacho(){
     })
     .catch(error => {
         console.error('❌ ERROR AL GUARDAR:', error);
-        showToast('❌ Error al guardar. Revisa la consola.', 'ter');
+        showToast('❌ ' + (error.message || 'No se pudo guardar el despacho.'), 'ter');
     })
     .finally(() => {
         setBtnLoading(btn, false);

@@ -1401,146 +1401,167 @@ public function edit(Order $order)
 
 public function updateDetail(Request $request, OrderDetail $detail)
 {
-    $cantidadSolicitada = (float) $request->input('cantidad_solicitada');
-    $cantidadDespachada = (float) $request->input('cantidad_despachada');
-    $precio = (float) $request->input('precio_unitario');
+    $validated = $request->validate([
+        'cantidad_solicitada' => ['required', 'numeric', 'gte:0'],
+        'cantidad_despachada' => ['required', 'numeric', 'gte:0'],
+        'precio_unitario' => ['required', 'numeric', 'gte:0'],
+        'personal_despacho' => ['nullable', 'string', 'max:255'],
+        'paleta' => ['nullable', 'string', 'max:100'],
+        'lote' => ['sometimes', 'nullable', 'string', 'max:100'],
+        'fecha_vencimiento' => ['sometimes', 'nullable', 'date'],
+        'nivel' => ['sometimes', 'nullable', 'string', 'max:100'],
+        'ubicacion' => ['sometimes', 'nullable', 'string', 'max:255'],
+    ]);
 
-    $subtotal = $cantidadDespachada * $precio;
+    try {
+        $resultado = \DB::transaction(function () use ($request, $detail, $validated) {
+            // Bloquear detalle y producto durante la operación para evitar
+            // que dos operarios consuman simultáneamente el mismo stock.
+            $detalle = OrderDetail::whereKey($detail->id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-    // 🔥 ESTADO DEL ITEM
-    if ($cantidadDespachada <= 0) {
-        $estado = 'INCOMPLETO';
-    } elseif ($cantidadDespachada < $cantidadSolicitada) {
-        $estado = 'PARCIAL';
-    } else {
-        $estado = 'COMPLETO';
-    }
+            $producto = Product::whereKey($detalle->product_id)
+                ->lockForUpdate()
+                ->firstOrFail();
 
-    // 🔥 CONTROL DE STOCK
-    $producto = $detail->product;
+            $cantidadSolicitada = (float) $validated['cantidad_solicitada'];
+            $cantidadDespachada = (float) $validated['cantidad_despachada'];
+            $precio = (float) $validated['precio_unitario'];
+            $cantidadAntes = (float) ($detalle->cantidad_despachada ?? 0);
+            $diferencia = $cantidadDespachada - $cantidadAntes;
 
-    $cantidadAntes = $detail->cantidad_despachada ?? 0;
-    $cantidadNueva = $cantidadDespachada;
+            if ($cantidadDespachada > $cantidadSolicitada) {
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cantidad_despachada' => 'La cantidad despachada no puede superar la cantidad solicitada.',
+                ]);
+            }
 
-    $diferencia = $cantidadNueva - $cantidadAntes;
+            $stockDisponible = (float) ($producto->stock ?? 0);
 
-    if ($diferencia > 0) {
+            if ($diferencia > 0 && $stockDisponible < $diferencia) {
+                $mensaje = $stockDisponible <= 0
+                    ? 'Producto SIN STOCK. No se puede registrar un despacho adicional.'
+                    : 'Stock insuficiente. Disponible: ' . $stockDisponible . ' | Adicional solicitado: ' . $diferencia;
 
-        if ($producto->stock <= 0) {
-            return back()->with('error', '❌ Sin stock disponible. Crear orden de producción');
+                throw \Illuminate\Validation\ValidationException::withMessages([
+                    'cantidad_despachada' => $mensaje,
+                ]);
+            }
+
+            // Si se reduce un despacho previamente registrado, se devuelve stock.
+            if ($diferencia > 0) {
+                $producto->stock = $stockDisponible - $diferencia;
+                $producto->save();
+            } elseif ($diferencia < 0) {
+                $producto->stock = $stockDisponible + abs($diferencia);
+                $producto->save();
+            }
+
+            if ($cantidadDespachada <= 0) {
+                $estado = 'INCOMPLETO';
+            } elseif ($cantidadDespachada < $cantidadSolicitada) {
+                $estado = 'PARCIAL';
+            } else {
+                $estado = 'COMPLETO';
+            }
+
+            $updateData = [
+                'cantidad_solicitada' => $cantidadSolicitada,
+                'cantidad_despachada' => $cantidadDespachada,
+                'despacho_confirmado' => $request->exists('cantidad_despachada'),
+                'precio_unitario' => $precio,
+                'estado_item' => $estado,
+                'subtotal' => round($cantidadDespachada * $precio, 2),
+            ];
+
+            foreach (['paleta', 'lote', 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
+                if ($request->has($campo)) {
+                    $updateData[$campo] = $request->input($campo);
+                }
+            }
+
+            if (array_key_exists('paleta', $updateData)) {
+                $nuevaPaleta = strtoupper(trim((string) $updateData['paleta']));
+                $paletaActual = strtoupper(trim((string) $detalle->paleta));
+
+                if ($nuevaPaleta !== '' && $nuevaPaleta !== $paletaActual) {
+                    $countActual = $detalle->order->details()
+                        ->where('id', '!=', $detalle->id)
+                        ->whereRaw('UPPER(paleta) = ?', [$nuevaPaleta])
+                        ->count();
+
+                    if ($countActual >= 10) {
+                        throw \Illuminate\Validation\ValidationException::withMessages([
+                            'paleta' => "La paleta {$nuevaPaleta} ya tiene {$countActual} ítems (máximo 10).",
+                        ]);
+                    }
+                }
+
+                $updateData['paleta'] = $nuevaPaleta;
+            }
+
+            $detalle->update($updateData);
+
+            if ($request->filled('personal_despacho')) {
+                $detalle->personal_despacho = trim((string) $request->input('personal_despacho'));
+                $detalle->save();
+            }
+
+            $order = Order::whereKey($detalle->order_id)->lockForUpdate()->firstOrFail();
+            $estadoAnterior = $order->estado;
+            $order->subtotal = (float) $order->details()->sum('subtotal');
+            $order->igv = round($order->subtotal * 0.18, 2);
+            $order->total = $order->subtotal + $order->igv;
+
+            if ($order->tipo_orden != 'ENCOMIENDA') {
+                $items = $order->details()->get();
+                $totalSolicitado = (float) $items->sum('cantidad_solicitada');
+                $totalDespachado = (float) $items->sum('cantidad_despachada');
+
+                if ($totalDespachado <= 0) {
+                    $order->estado = 'INCOMPLETO';
+                } elseif ($totalDespachado >= $totalSolicitado) {
+                    $order->estado = 'COMPLETO';
+                } else {
+                    $order->estado = 'PARCIAL';
+                }
+
+                if ($order->estado === 'COMPLETO' && $estadoAnterior !== 'COMPLETO') {
+                    $order->fecha_cierre = now();
+                } elseif ($order->estado !== 'COMPLETO' && $estadoAnterior === 'COMPLETO') {
+                    $order->fecha_cierre = null;
+                }
+            }
+
+            $order->save();
+
+            return [
+                'success' => true,
+                'estado' => $estado,
+                'stock' => (float) ($producto->fresh()->stock ?? 0),
+                'cantidad_despachada' => $cantidadDespachada,
+                'personal_despacho' => $detalle->personal_despacho,
+                'paleta' => $detalle->paleta,
+            ];
+        }, 3);
+
+        if ($request->expectsJson()) {
+            return response()->json($resultado);
         }
 
-        if ($producto->stock < $diferencia) {
-            return back()->with('error', 
-                '⚠️ Stock insuficiente. Disponible: ' . $producto->stock . 
-                ' | Faltante: ' . ($diferencia - $producto->stock)
-            );
+        return back()->with('success', 'Detalle actualizado correctamente');
+
+    } catch (\Illuminate\Validation\ValidationException $e) {
+        if ($request->expectsJson()) {
+            return response()->json([
+                'success' => false,
+                'message' => collect($e->errors())->flatten()->first(),
+                'errors' => $e->errors(),
+            ], 422);
         }
-
-        $producto->stock -= $diferencia;
-        $producto->save();
+        throw $e;
     }
-
-    // 🔥 SI DISMINUYE → DEVOLVER STOCK
-    if ($diferencia < 0) {
-        $producto->stock += abs($diferencia);
-        $producto->save();
-    }
-    // 🔥 ACTUALIZAR DETALLE
-    $updateData = [
-        'cantidad_solicitada' => $cantidadSolicitada,
-        'cantidad_despachada' => $cantidadDespachada,
-        // Distingue un cero confirmado de un despacho aún pendiente.
-        'despacho_confirmado' => $request->exists('cantidad_despachada'),
-        'precio_unitario' => $precio,
-        'estado_item' => $estado,
-        'subtotal' => $subtotal,
-    ];
-    // Solo tocar estos campos si vienen en el request
-// (evita que el guardado rápido de cantidad/precio borre datos ya guardados)
-foreach (['paleta', 'lote', 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
-    if ($request->has($campo)) {
-        $updateData[$campo] = $request->input($campo);
-    }
-}
-
-// 🔥 LÍMITE DE ÍTEMS POR PALETA (máx. 10)
-if (array_key_exists('paleta', $updateData)) {
-    $nuevaPaleta = strtoupper(trim((string) $updateData['paleta']));
-    $paletaActual = strtoupper(trim((string) $detail->paleta));
-
-    if ($nuevaPaleta !== '' && $nuevaPaleta !== $paletaActual) {
-        $countActual = $detail->order->details()
-            ->where('id', '!=', $detail->id)
-            ->whereRaw('UPPER(paleta) = ?', [$nuevaPaleta])
-            ->count();
-
-        if ($countActual >= 10) {
-            return back()->with(
-                'error',
-                "⚠️ La paleta {$nuevaPaleta} ya tiene {$countActual} ítems (máximo 10). No se pueden agregar más productos a esta paleta."
-            );
-        }
-    }
-
-    $updateData['paleta'] = $nuevaPaleta;
-}
-
-
-$detail->update($updateData);
-
-    // 👤 Guardar personal que retiró/despachó el producto
-if ($request->has('personal_despacho')) {
-    $personal = trim((string) $request->input('personal_despacho'));
-
-    if ($personal !== '') {
-        $detail->personal_despacho = $personal;
-        $detail->save();
-    }
-}
-
-    // 🔄 ACTUALIZAR ORDEN
-    $order = $detail->order;
-    $estadoAnterior = $order->estado;
-
-    // 🔥 TOTALES CORRECTOS
-    $order->subtotal = $order->details()->sum('subtotal');
-    $order->igv = round($order->subtotal * 0.18, 2);
-    $order->total = $order->subtotal + $order->igv;
-
-    $items = $order->details;
-
-    // 🔥 ESTADO DINÁMICO REAL (CORREGIDO)
-    if ($order->tipo_orden != 'ENCOMIENDA') {
-
-        $totalSolicitado = $items->sum('cantidad_solicitada');
-        $totalDespachado = $items->sum('cantidad_despachada');
-
-        if ($totalDespachado <= 0) {
-            $order->estado = 'INCOMPLETO';
-        } elseif ($totalDespachado >= $totalSolicitado) {
-            $order->estado = 'COMPLETO';
-        } else {
-            $order->estado = 'PARCIAL';
-        }
-        if ($order->estado === 'COMPLETO' && $estadoAnterior !== 'COMPLETO') {
-            $order->fecha_cierre = now();
-        } elseif ($order->estado !== 'COMPLETO' && $estadoAnterior === 'COMPLETO') {
-            $order->fecha_cierre = null;
-        }
-    }
-
-    $order->save();
-
-    // 🔥 RESPUESTA
-    if ($request->expectsJson()) {
-        return response()->json([
-            'success' => true,
-            'estado' => $estado
-        ]);
-    }
-
-    return back()->with('success', 'Detalle actualizado correctamente');
 }
 
     public function destroyDetail(OrderDetail $detail)
