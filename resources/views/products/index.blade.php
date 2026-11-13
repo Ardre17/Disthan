@@ -196,6 +196,39 @@
 .pv-modal-warn{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}
 .pv-modal-warn img{height:38px;width:auto}
 
+/* ---------- Análisis de rotación ---------- */
+.pv-head-actions{display:flex;gap:8px;align-items:center;justify-content:flex-end;flex-wrap:wrap}
+.pv-btn-analysis{background:#fff;color:#1558d6;border:1px solid #cfe0ff;padding:12px 15px;border-radius:12px;font-weight:700;text-decoration:none;white-space:nowrap;display:inline-flex;gap:8px;align-items:center;cursor:pointer;font-family:inherit;transition:background .15s}
+.pv-btn-analysis:hover{background:#eef4ff}
+.pv-rotation-modal{display:none;position:fixed;inset:0;background:rgba(15,23,42,.65);z-index:10000;align-items:center;justify-content:center;padding:16px}
+.pv-rotation-box{width:min(1080px,100%);max-height:92vh;overflow:hidden;background:#fff;border-radius:18px;box-shadow:0 20px 60px rgba(0,0,0,.3);display:flex;flex-direction:column}
+.pv-rotation-head{display:flex;justify-content:space-between;align-items:flex-start;gap:14px;padding:18px 20px;border-bottom:1px solid var(--line)}
+.pv-rotation-head h2{font-size:19px;margin:0;font-weight:800;color:var(--ink)}
+.pv-rotation-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.pv-rotation-close{border:0;background:#f1f4f9;color:#475569;width:34px;height:34px;border-radius:9px;font-size:21px;cursor:pointer;flex-shrink:0}
+.pv-rotation-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:14px 20px;background:#fafbfd;border-bottom:1px solid var(--line)}
+.pv-rotation-controls label{font-size:12px;font-weight:700;color:#475569}
+.pv-rotation-controls select,.pv-rotation-controls input{height:38px;border:1px solid var(--line);border-radius:9px;padding:0 11px;background:#fff;font:inherit;color:var(--ink)}
+.pv-rotation-controls input{flex:1;min-width:180px}
+.pv-rotation-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;padding:14px 20px}
+.pv-rotation-kpi{border:1px solid var(--line);border-radius:12px;padding:12px;min-width:0}
+.pv-rotation-kpi b{display:block;font-size:24px;line-height:1.1}
+.pv-rotation-kpi span{display:block;font-size:11px;color:var(--muted);margin-top:4px}
+.pv-rotation-kpi.high{background:#effaf2;border-color:#d4f0dc;color:#15803d}
+.pv-rotation-kpi.mid{background:#fff8e8;border-color:#f8e7b8;color:#a16207}
+.pv-rotation-kpi.low{background:#fff1f1;border-color:#f6d5d5;color:#c0312b}
+.pv-rotation-kpi.none{background:#f5f7fa;color:#64748b}
+.pv-rotation-table-wrap{overflow:auto;padding:0 20px 18px;min-height:180px}
+.pv-rotation-table{width:100%;min-width:650px;border-collapse:collapse}
+.pv-rotation-table th{position:sticky;top:0;background:#f8fafc;color:#64748b;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.4px;padding:11px;border-bottom:1px solid var(--line);z-index:1}
+.pv-rotation-table td{padding:11px;border-bottom:1px solid #eef1f6;font-size:12px}
+.pv-rotation-table tr:hover td{background:#fafcff}
+.pv-rotation-badge{display:inline-block;padding:4px 9px;border-radius:7px;font-size:10px;font-weight:800;text-transform:uppercase;white-space:nowrap}
+.pv-rotation-badge.high{background:#d9f7e4;color:#15803d}.pv-rotation-badge.mid{background:#fff3cf;color:#a16207}.pv-rotation-badge.low{background:#ffe0e0;color:#c0312b}.pv-rotation-badge.none{background:#eef1f6;color:#64748b}
+.pv-rotation-empty{text-align:center;color:var(--muted);padding:34px 12px}
+.pv-rotation-foot{padding:0 20px 16px;color:var(--muted);font-size:11px}
+@media(max-width:860px){.pv-head-actions{grid-column:1/-1;justify-content:stretch}.pv-head-actions>*{flex:1;justify-content:center}.pv-rotation-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.pv-rotation-head{padding:15px}.pv-rotation-controls{padding:12px 15px}.pv-rotation-table-wrap{padding:0 15px 15px}}
+
 /* ---------- Tablet ---------- */
 @media (max-width:1180px){
     .pv-head{grid-template-columns:1fr auto}
@@ -297,9 +330,14 @@
             </div>
         </div>
 
-        <a href="{{ route('products.create') }}" class="pv-btn-new">
-            <svg class="pv-i"><use href="#i-plus"/></svg> Nuevo Producto
-        </a>
+        <div class="pv-head-actions">
+            <button type="button" class="pv-btn-analysis" onclick="abrirAnalisisRotacion()">
+                <svg class="pv-i"><use href="#i-trend"/></svg> Análisis de rotación
+            </button>
+            <a href="{{ route('products.create') }}" class="pv-btn-new">
+                <svg class="pv-i"><use href="#i-plus"/></svg> Nuevo Producto
+            </a>
+        </div>
     </div>
 
     {{-- ===== Pestañas de categorías ===== --}}
@@ -569,6 +607,51 @@
         @endif
     </div>
 
+    {{-- ===== Modal análisis de rotación por frecuencia de salidas ===== --}}
+    <div id="modalAnalisisRotacion" class="pv-rotation-modal" aria-hidden="true">
+        <div class="pv-rotation-box" role="dialog" aria-modal="true" aria-labelledby="pvRotationTitle">
+            <div class="pv-rotation-head">
+                <div>
+                    <h2 id="pvRotationTitle">Análisis de rotación de productos</h2>
+                    <p>La clasificación se basa en la cantidad de pedidos distintos con despacho real, no en las unidades despachadas.</p>
+                </div>
+                <button type="button" class="pv-rotation-close" onclick="cerrarAnalisisRotacion()" aria-label="Cerrar">×</button>
+            </div>
+            <div class="pv-rotation-controls">
+                <label for="pvRotationPeriod">Periodo</label>
+                <select id="pvRotationPeriod">
+                    <option value="30">Últimos 30 días</option>
+                    <option value="60">Últimos 60 días</option>
+                    <option value="90" selected>Últimos 90 días</option>
+                    <option value="180">Últimos 180 días</option>
+                </select>
+                <input type="search" id="pvRotationSearch" placeholder="Buscar producto o SKU..." autocomplete="off">
+                <label for="pvRotationFilter">Clasificación</label>
+                <select id="pvRotationFilter">
+                    <option value="TODOS">Todas</option>
+                    <option value="ALTA">Alta</option>
+                    <option value="MEDIA">Media</option>
+                    <option value="BAJA">Baja</option>
+                    <option value="SIN_SALIDAS">Sin salidas</option>
+                </select>
+            </div>
+            <div class="pv-rotation-summary">
+                <div class="pv-rotation-kpi high"><b id="pvRotHigh">0</b><span>Alta rotación</span></div>
+                <div class="pv-rotation-kpi mid"><b id="pvRotMid">0</b><span>Media rotación</span></div>
+                <div class="pv-rotation-kpi low"><b id="pvRotLow">0</b><span>Baja rotación</span></div>
+                <div class="pv-rotation-kpi none"><b id="pvRotNone">0</b><span>Sin salidas</span></div>
+            </div>
+            <div class="pv-rotation-table-wrap">
+                <table class="pv-rotation-table">
+                    <thead><tr><th>Producto</th><th>SKU</th><th>Pedidos con salida</th><th>Unidades despachadas</th><th>Frecuencia / 30 días</th><th>Clasificación</th></tr></thead>
+                    <tbody id="pvRotationBody"></tbody>
+                </table>
+                <div class="pv-rotation-empty" id="pvRotationEmpty" hidden>No hay productos que coincidan con los filtros.</div>
+            </div>
+            <div class="pv-rotation-foot">Criterio: alta = 8 o más pedidos con salida por cada 30 días; media = de 3 a menos de 8; baja = más de 0 y menos de 3. Los productos sin despachos se muestran por separado. La fecha de salida se aproxima con fecha de preparación y, si no existe, fecha de entrega o fecha del pedido.</div>
+        </div>
+    </div>
+
     {{-- ===== Modal detalle de producto (compartido, se llena vía JS) ===== --}}
     <div id="modalDetalle" class="pv-modal">
         <div class="pv-modal-box">
@@ -715,6 +798,79 @@ document.getElementById('modalDetalle').addEventListener('click', function(e){
 document.addEventListener('keydown', function(e){
     if(e.key === 'Escape') cerrarDetalle();
 });
+
+/* =========================================================
+   Análisis de rotación: frecuencia de pedidos con despacho
+========================================================= */
+var datosRotacion = @json($rotacionAnalisis ?? []);
+var productosRotacion = @json($products->map(function($p){ return ['id' => (string) $p->id, 'nombre' => $p->nombre, 'sku' => $p->sku]; })->values());
+
+function clasificarRotacion(salidas, dias){
+    if(!salidas) return {codigo:'SIN_SALIDAS', texto:'Sin salidas', clase:'none', frecuencia:0};
+    var frecuencia = salidas * 30 / dias;
+    if(frecuencia >= 8) return {codigo:'ALTA', texto:'Alta', clase:'high', frecuencia:frecuencia};
+    if(frecuencia >= 3) return {codigo:'MEDIA', texto:'Media', clase:'mid', frecuencia:frecuencia};
+    return {codigo:'BAJA', texto:'Baja', clase:'low', frecuencia:frecuencia};
+}
+
+function escaparHtmlRotacion(valor){
+    return String(valor == null ? '' : valor).replace(/[&<>"']/g, function(c){
+        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c];
+    });
+}
+
+function renderAnalisisRotacion(){
+    var dias = parseInt(document.getElementById('pvRotationPeriod').value, 10) || 90;
+    var filtro = document.getElementById('pvRotationFilter').value;
+    var termino = (document.getElementById('pvRotationSearch').value || '').trim().toLowerCase();
+    var conteos = {ALTA:0, MEDIA:0, BAJA:0, SIN_SALIDAS:0};
+    var lista = productosRotacion.map(function(p){
+        var dato = (datosRotacion[p.id] && datosRotacion[p.id][dias]) ? datosRotacion[p.id][dias] : {salidas:0, unidades:0};
+        var clase = clasificarRotacion(Number(dato.salidas || 0), dias);
+        conteos[clase.codigo]++;
+        return {producto:p, salidas:Number(dato.salidas || 0), unidades:Number(dato.unidades || 0), clase:clase};
+    });
+    document.getElementById('pvRotHigh').textContent = conteos.ALTA;
+    document.getElementById('pvRotMid').textContent = conteos.MEDIA;
+    document.getElementById('pvRotLow').textContent = conteos.BAJA;
+    document.getElementById('pvRotNone').textContent = conteos.SIN_SALIDAS;
+
+    lista = lista.filter(function(x){
+        var texto = (x.producto.nombre + ' ' + (x.producto.sku || '')).toLowerCase();
+        return (filtro === 'TODOS' || filtro === x.clase.codigo) && (!termino || texto.indexOf(termino) !== -1);
+    }).sort(function(a,b){ return b.salidas - a.salidas || a.producto.nombre.localeCompare(b.producto.nombre, 'es'); });
+
+    var tbody = document.getElementById('pvRotationBody');
+    tbody.innerHTML = lista.map(function(x){
+        return '<tr>' +
+            '<td><strong>' + escaparHtmlRotacion(x.producto.nombre) + '</strong></td>' +
+            '<td class="pv-mono">' + escaparHtmlRotacion(x.producto.sku || '—') + '</td>' +
+            '<td><strong>' + x.salidas.toLocaleString('es-PE') + '</strong></td>' +
+            '<td class="pv-mono">' + x.unidades.toLocaleString('es-PE', {maximumFractionDigits:2}) + '</td>' +
+            '<td>' + x.clase.frecuencia.toLocaleString('es-PE', {minimumFractionDigits:1, maximumFractionDigits:1}) + '</td>' +
+            '<td><span class="pv-rotation-badge ' + x.clase.clase + '">' + x.clase.texto + '</span></td>' +
+            '</tr>';
+    }).join('');
+    document.getElementById('pvRotationEmpty').hidden = lista.length > 0;
+}
+
+function abrirAnalisisRotacion(){
+    var modal = document.getElementById('modalAnalisisRotacion');
+    modal.style.display = 'flex';
+    modal.setAttribute('aria-hidden', 'false');
+    renderAnalisisRotacion();
+}
+function cerrarAnalisisRotacion(){
+    var modal = document.getElementById('modalAnalisisRotacion');
+    modal.style.display = 'none';
+    modal.setAttribute('aria-hidden', 'true');
+}
+
+document.getElementById('pvRotationPeriod').addEventListener('change', renderAnalisisRotacion);
+document.getElementById('pvRotationFilter').addEventListener('change', renderAnalisisRotacion);
+document.getElementById('pvRotationSearch').addEventListener('input', renderAnalisisRotacion);
+document.getElementById('modalAnalisisRotacion').addEventListener('click', function(e){ if(e.target === this) cerrarAnalisisRotacion(); });
+document.addEventListener('keydown', function(e){ if(e.key === 'Escape') cerrarAnalisisRotacion(); });
 
 /* =========================================================
    Listado: pestañas, búsqueda, orden, paginación y menú ⋮

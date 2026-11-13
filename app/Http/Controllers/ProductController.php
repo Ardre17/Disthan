@@ -6,6 +6,7 @@ use App\Models\Product;
 use App\Models\Category;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 
 class ProductController extends Controller
 {
@@ -41,11 +42,43 @@ $categories = Category::where('activo', true)
     ->orderBy('nombre')
     ->get();
 
+    // Análisis de rotación por frecuencia de pedidos con despacho real.
+    // Se cuentan pedidos distintos por producto, no unidades despachadas.
+    $rotacionAnalisis = [];
+    $fechaAnalisis = now();
+    $periodosRotacion = [30, 60, 90, 180];
+
+    foreach ($periodosRotacion as $dias) {
+        $desde = $fechaAnalisis->copy()->subDays($dias)->startOfDay();
+
+        $salidas = DB::table('order_details')
+            ->join('orders', 'orders.id', '=', 'order_details.order_id')
+            ->select('order_details.product_id')
+            ->selectRaw('COUNT(DISTINCT order_details.order_id) AS salidas')
+            ->selectRaw('COALESCE(SUM(order_details.cantidad_despachada), 0) AS unidades')
+            ->whereNotNull('order_details.product_id')
+            ->where('order_details.cantidad_despachada', '>', 0)
+            ->whereRaw('COALESCE(order_details.fecha_preparacion, orders.fecha_entrega, orders.fecha_pedido) >= ?', [$desde])
+            ->whereRaw('COALESCE(order_details.fecha_preparacion, orders.fecha_entrega, orders.fecha_pedido) <= ?', [$fechaAnalisis])
+            ->groupBy('order_details.product_id')
+            ->get();
+
+        foreach ($salidas as $fila) {
+            $id = (string) $fila->product_id;
+            $rotacionAnalisis[$id][$dias] = [
+                'salidas' => (int) $fila->salidas,
+                'unidades' => (float) $fila->unidades,
+            ];
+        }
+    }
+
+
     return view(
     'products.index',
     compact(
         'products',
-        'categories'
+        'categories',
+        'rotacionAnalisis'
     ));
 }
 
