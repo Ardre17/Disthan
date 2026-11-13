@@ -227,6 +227,39 @@
 .pv-rotation-badge.high{background:#d9f7e4;color:#15803d}.pv-rotation-badge.mid{background:#fff3cf;color:#a16207}.pv-rotation-badge.low{background:#ffe0e0;color:#c0312b}.pv-rotation-badge.none{background:#eef1f6;color:#64748b}
 .pv-rotation-empty{text-align:center;color:var(--muted);padding:34px 12px}
 .pv-rotation-foot{padding:0 20px 16px;color:var(--muted);font-size:11px}
+
+.pv-rotation-actions{display:flex;gap:8px;margin-left:auto}
+.pv-rotation-btn{border:1px solid #cbd5e1;background:#fff;color:#1f4f9a;border-radius:9px;padding:9px 12px;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.pv-rotation-btn.primary{background:#1f6fff;color:#fff;border-color:#1f6fff}
+.pv-rotation-table th[data-sort]{cursor:pointer;user-select:none}
+.pv-rotation-table th[data-sort]:hover{background:#edf3ff;color:#1558d6}
+.pv-rotation-table th .sort-ind{font-size:10px;margin-left:4px;color:#1f6fff}
+.pv-rotation-mp{border:1px solid #cfe0ff;background:#eff6ff;color:#1558d6;border-radius:7px;padding:6px 9px;font-size:11px;font-weight:700;cursor:pointer;white-space:nowrap}
+.pv-mp-modal{display:none;position:fixed;inset:0;z-index:10002;background:rgba(15,23,42,.65);align-items:center;justify-content:center;padding:15px}
+.pv-mp-box{width:min(850px,100%);max-height:88vh;overflow:auto;background:#fff;border-radius:15px;box-shadow:0 18px 55px rgba(0,0,0,.28)}
+.pv-mp-head{position:sticky;top:0;background:#1558d6;color:#fff;padding:15px 18px;display:flex;justify-content:space-between;align-items:flex-start;z-index:2}
+.pv-mp-head h3{margin:0;font-size:16px}.pv-mp-head p{margin:4px 0 0;font-size:11px;color:#dbeafe}
+.pv-mp-head button{border:0;background:transparent;color:#fff;font-size:23px;cursor:pointer}
+.pv-mp-content{padding:16px;overflow:auto}
+.pv-mp-table{width:100%;border-collapse:collapse;min-width:650px}
+.pv-mp-table th,.pv-mp-table td{padding:10px;border-bottom:1px solid #e8edf4;text-align:left;font-size:12px}
+.pv-mp-table th{background:#f8fafc;color:#64748b;text-transform:uppercase;font-size:10px}
+.pv-mp-stock-low{color:#b45309;font-weight:800}.pv-mp-stock-zero{color:#dc2626;font-weight:800}.pv-mp-stock-ok{color:#15803d;font-weight:800}
+.pv-mp-empty{padding:28px;text-align:center;color:#64748b}
+@media print{
+ body *{visibility:hidden!important}
+ #modalAnalisisRotacion,#modalAnalisisRotacion *{visibility:visible!important}
+ #modalAnalisisRotacion{display:block!important;position:absolute!important;inset:0!important;background:#fff!important;padding:0!important;overflow:visible!important}
+ .pv-rotation-box{width:100%!important;max-height:none!important;overflow:visible!important;box-shadow:none!important;border-radius:0!important}
+ .pv-rotation-head{padding:8px 0!important}.pv-rotation-controls,.pv-rotation-actions,.pv-rotation-close{display:none!important}
+ .pv-rotation-summary{padding:8px 0!important;grid-template-columns:repeat(4,1fr)!important}
+ .pv-rotation-table-wrap{overflow:visible!important;padding:0!important}
+ .pv-rotation-table{min-width:0!important;width:100%!important}
+ .pv-rotation-table th{position:static!important}.pv-rotation-table th,.pv-rotation-table td{padding:6px!important;font-size:9px!important}
+ .pv-rotation-mp{display:none!important}.pv-rotation-foot{padding:8px 0!important}
+ @page{size:landscape;margin:12mm}
+}
+
 @media(max-width:860px){.pv-head-actions{grid-column:1/-1;justify-content:stretch}.pv-head-actions>*{flex:1;justify-content:center}.pv-rotation-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.pv-rotation-head{padding:15px}.pv-rotation-controls{padding:12px 15px}.pv-rotation-table-wrap{padding:0 15px 15px}}
 
 /* ---------- Tablet ---------- */
@@ -626,7 +659,7 @@
                     <option value="180">Últimos 180 días</option>
                 </select>
                 <input type="search" id="pvRotationSearch" placeholder="Buscar producto o SKU..." autocomplete="off">
-                <label for="pvRotationFilter">Clasificación</label>
+                <label for="pvRotationFilter">Rotación</label>
                 <select id="pvRotationFilter">
                     <option value="TODOS">Todas</option>
                     <option value="ALTA">Alta</option>
@@ -634,6 +667,17 @@
                     <option value="BAJA">Baja</option>
                     <option value="SIN_SALIDAS">Sin salidas</option>
                 </select>
+                <label for="pvRotationStockFilter">Stock</label>
+                <select id="pvRotationStockFilter">
+                    <option value="TODOS">Todos</option>
+                    <option value="SIN_STOCK">Sin stock</option>
+                    <option value="BAJO">Bajo</option>
+                    <option value="MEDIO">Medio</option>
+                    <option value="ALTO">Alto</option>
+                </select>
+                <div class="pv-rotation-actions">
+                    <button type="button" class="pv-rotation-btn primary" onclick="imprimirAnalisisRotacion()">Imprimir / PDF</button>
+                </div>
             </div>
             <div class="pv-rotation-summary">
                 <div class="pv-rotation-kpi high"><b id="pvRotHigh">0</b><span>Alta rotación</span></div>
@@ -643,12 +687,22 @@
             </div>
             <div class="pv-rotation-table-wrap">
                 <table class="pv-rotation-table">
-                    <thead><tr><th>Producto</th><th>SKU</th><th>Pedidos con salida</th><th>Unidades despachadas</th><th>Frecuencia / 30 días</th><th>Clasificación</th></tr></thead>
+                    <thead><tr><th data-sort="nombre">Producto <span class="sort-ind">↕</span></th><th data-sort="sku">SKU <span class="sort-ind">↕</span></th><th data-sort="stock">Stock actual <span class="sort-ind">↕</span></th><th data-sort="salidas">Pedidos <span class="sort-ind">↕</span></th><th data-sort="unidades">Unidades despachadas <span class="sort-ind">↕</span></th><th data-sort="frecuencia">Frecuencia / 30 días <span class="sort-ind">↕</span></th><th>Rotación</th><th>Materia prima</th></tr></thead>
                     <tbody id="pvRotationBody"></tbody>
                 </table>
                 <div class="pv-rotation-empty" id="pvRotationEmpty" hidden>No hay productos que coincidan con los filtros.</div>
             </div>
             <div class="pv-rotation-foot">Criterio: alta = 8 o más pedidos con salida por cada 30 días; media = de 3 a menos de 8; baja = más de 0 y menos de 3. Los productos sin despachos se muestran por separado. La fecha de salida se aproxima con fecha de preparación y, si no existe, fecha de entrega o fecha del pedido.</div>
+        </div>
+    </div>
+
+    <div id="modalMateriasPrimasProducto" class="pv-mp-modal" aria-hidden="true">
+        <div class="pv-mp-box" role="dialog" aria-modal="true" aria-labelledby="pvMpTitle">
+            <div class="pv-mp-head">
+                <div><h3 id="pvMpTitle">Materias primas relacionadas</h3><p id="pvMpSubtitle">Historial de órdenes de producción</p></div>
+                <button type="button" onclick="cerrarMateriasPrimas()" aria-label="Cerrar">×</button>
+            </div>
+            <div class="pv-mp-content" id="pvMpContent"></div>
         </div>
     </div>
 
@@ -803,7 +857,13 @@ document.addEventListener('keydown', function(e){
    Análisis de rotación: frecuencia de pedidos con despacho
 ========================================================= */
 var datosRotacion = @json($rotacionAnalisis ?? []);
-var productosRotacion = @json($products->map(function($p){ return ['id' => (string) $p->id, 'nombre' => $p->nombre, 'sku' => $p->sku]; })->values());
+var materiasPrimasPorProducto = @json($materiasPrimasPorProducto ?? []);
+var productosRotacion = @json($products->map(function($p){ return [
+    'id' => (string) $p->id, 'nombre' => $p->nombre, 'sku' => $p->sku,
+    'stock' => (float) ($p->stock ?? 0), 'stock_minimo' => (float) ($p->stock_minimo ?? 0)
+]; })->values());
+var rotacionOrden = {campo:'salidas', direccion:'desc'};
+var rotacionListaVisible = [];
 
 function clasificarRotacion(salidas, dias){
     if(!salidas) return {codigo:'SIN_SALIDAS', texto:'Sin salidas', clase:'none', frecuencia:0};
@@ -812,46 +872,110 @@ function clasificarRotacion(salidas, dias){
     if(frecuencia >= 3) return {codigo:'MEDIA', texto:'Media', clase:'mid', frecuencia:frecuencia};
     return {codigo:'BAJA', texto:'Baja', clase:'low', frecuencia:frecuencia};
 }
-
+function clasificarStockProducto(stock, minimo){
+    if(stock <= 0) return 'SIN_STOCK';
+    if(stock <= minimo) return 'BAJO';
+    if(stock <= minimo * 2) return 'MEDIO';
+    return 'ALTO';
+}
 function escaparHtmlRotacion(valor){
     return String(valor == null ? '' : valor).replace(/[&<>"']/g, function(c){
         return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[c];
     });
 }
-
+function ordenarRotacion(lista){
+    var campo = rotacionOrden.campo, dir = rotacionOrden.direccion === 'asc' ? 1 : -1;
+    return lista.sort(function(a,b){
+        var x, y;
+        if(campo === 'nombre' || campo === 'sku'){
+            x = String(a.producto[campo] || '').toLocaleLowerCase('es');
+            y = String(b.producto[campo] || '').toLocaleLowerCase('es');
+            return x.localeCompare(y, 'es') * dir;
+        }
+        x = Number(campo === 'stock' ? a.producto.stock : campo === 'salidas' ? a.salidas : campo === 'unidades' ? a.unidades : a.clase.frecuencia);
+        y = Number(campo === 'stock' ? b.producto.stock : campo === 'salidas' ? b.salidas : campo === 'unidades' ? b.unidades : b.clase.frecuencia);
+        return (x-y) * dir;
+    });
+}
 function renderAnalisisRotacion(){
     var dias = parseInt(document.getElementById('pvRotationPeriod').value, 10) || 90;
     var filtro = document.getElementById('pvRotationFilter').value;
+    var filtroStock = document.getElementById('pvRotationStockFilter').value;
     var termino = (document.getElementById('pvRotationSearch').value || '').trim().toLowerCase();
     var conteos = {ALTA:0, MEDIA:0, BAJA:0, SIN_SALIDAS:0};
     var lista = productosRotacion.map(function(p){
         var dato = (datosRotacion[p.id] && datosRotacion[p.id][dias]) ? datosRotacion[p.id][dias] : {salidas:0, unidades:0};
         var clase = clasificarRotacion(Number(dato.salidas || 0), dias);
         conteos[clase.codigo]++;
-        return {producto:p, salidas:Number(dato.salidas || 0), unidades:Number(dato.unidades || 0), clase:clase};
+        return {producto:p, salidas:Number(dato.salidas || 0), unidades:Number(dato.unidades || 0), clase:clase, stockNivel:clasificarStockProducto(p.stock,p.stock_minimo)};
     });
     document.getElementById('pvRotHigh').textContent = conteos.ALTA;
     document.getElementById('pvRotMid').textContent = conteos.MEDIA;
     document.getElementById('pvRotLow').textContent = conteos.BAJA;
     document.getElementById('pvRotNone').textContent = conteos.SIN_SALIDAS;
-
     lista = lista.filter(function(x){
         var texto = (x.producto.nombre + ' ' + (x.producto.sku || '')).toLowerCase();
-        return (filtro === 'TODOS' || filtro === x.clase.codigo) && (!termino || texto.indexOf(termino) !== -1);
-    }).sort(function(a,b){ return b.salidas - a.salidas || a.producto.nombre.localeCompare(b.producto.nombre, 'es'); });
-
+        return (filtro === 'TODOS' || filtro === x.clase.codigo) &&
+            (filtroStock === 'TODOS' || filtroStock === x.stockNivel) &&
+            (!termino || texto.indexOf(termino) !== -1);
+    });
+    lista = ordenarRotacion(lista);
+    rotacionListaVisible = lista;
     var tbody = document.getElementById('pvRotationBody');
     tbody.innerHTML = lista.map(function(x){
         return '<tr>' +
             '<td><strong>' + escaparHtmlRotacion(x.producto.nombre) + '</strong></td>' +
             '<td class="pv-mono">' + escaparHtmlRotacion(x.producto.sku || '—') + '</td>' +
+            '<td class="pv-mono">' + x.producto.stock.toLocaleString('es-PE',{maximumFractionDigits:2}) + '</td>' +
             '<td><strong>' + x.salidas.toLocaleString('es-PE') + '</strong></td>' +
             '<td class="pv-mono">' + x.unidades.toLocaleString('es-PE', {maximumFractionDigits:2}) + '</td>' +
             '<td>' + x.clase.frecuencia.toLocaleString('es-PE', {minimumFractionDigits:1, maximumFractionDigits:1}) + '</td>' +
             '<td><span class="pv-rotation-badge ' + x.clase.clase + '">' + x.clase.texto + '</span></td>' +
+            '<td><button type="button" class="pv-rotation-mp" data-product-id="' + escaparHtmlRotacion(x.producto.id) + '">Consultar MP</button></td>' +
             '</tr>';
     }).join('');
     document.getElementById('pvRotationEmpty').hidden = lista.length > 0;
+    document.querySelectorAll('.pv-rotation-table th[data-sort]').forEach(function(th){
+        var active = th.dataset.sort === rotacionOrden.campo;
+        var ind = th.querySelector('.sort-ind');
+        if(ind) ind.textContent = active ? (rotacionOrden.direccion === 'asc' ? '↑' : '↓') : '↕';
+    });
+}
+function consultarMateriasPrimas(productoId){
+    var producto = productosRotacion.find(function(p){ return String(p.id) === String(productoId); });
+    var lista = materiasPrimasPorProducto[String(productoId)] || [];
+    document.getElementById('pvMpTitle').textContent = 'Materias primas relacionadas';
+    document.getElementById('pvMpSubtitle').textContent = producto ? producto.nombre + ' · SKU ' + (producto.sku || '—') : 'Historial de órdenes de producción';
+    var box = document.getElementById('pvMpContent');
+    if(!lista.length){
+        box.innerHTML = '<div class="pv-mp-empty">No se encontraron materias primas registradas en órdenes de producción para este producto.</div>';
+    } else {
+        box.innerHTML = '<table class="pv-mp-table"><thead><tr><th>Código</th><th>Materia prima</th><th>Categoría</th><th>Proveedor</th><th>Stock actual</th><th>Stock mínimo</th><th>Unidad</th><th>Órdenes</th><th>Consumido histórico</th><th>Estado</th></tr></thead><tbody>' + lista.map(function(mp){
+            var cls = Number(mp.stock) <= 0 ? 'pv-mp-stock-zero' : (Number(mp.stock) <= Number(mp.minimum_stock) ? 'pv-mp-stock-low' : 'pv-mp-stock-ok');
+            var estado = Number(mp.stock) <= 0 ? 'Sin stock' : (Number(mp.stock) <= Number(mp.minimum_stock) ? 'Stock bajo' : 'Disponible');
+            return '<tr><td class="pv-mono">'+escaparHtmlRotacion(mp.code || '—')+'</td><td><strong>'+escaparHtmlRotacion(mp.name || '—')+'</strong></td><td>'+escaparHtmlRotacion(mp.category || '—')+'</td><td>'+escaparHtmlRotacion(mp.supplier || '—')+'</td><td class="'+cls+'">'+Number(mp.stock || 0).toLocaleString('es-PE')+'</td><td>'+Number(mp.minimum_stock || 0).toLocaleString('es-PE')+'</td><td>'+escaparHtmlRotacion(mp.unit || '—')+'</td><td>'+Number(mp.ordenes || 0)+'</td><td>'+Number(mp.consumido_historico || 0).toLocaleString('es-PE',{maximumFractionDigits:2})+'</td><td class="'+cls+'">'+estado+'</td></tr>';
+        }).join('') + '</tbody></table><p class="pv-rotation-foot">Datos obtenidos de órdenes de producción históricas. No representan una fórmula fija de consumo del producto.</p>';
+    }
+    var modal = document.getElementById('modalMateriasPrimasProducto');
+    modal.style.display = 'flex'; modal.setAttribute('aria-hidden','false');
+}
+function cerrarMateriasPrimas(){
+    var modal = document.getElementById('modalMateriasPrimasProducto');
+    modal.style.display = 'none'; modal.setAttribute('aria-hidden','true');
+}
+function imprimirAnalisisRotacion(){
+    var periodo = document.getElementById('pvRotationPeriod');
+    var filtro = document.getElementById('pvRotationFilter');
+    var stock = document.getElementById('pvRotationStockFilter');
+    var busqueda = document.getElementById('pvRotationSearch').value || '';
+    var titulos = {30:'Últimos 30 días',60:'Últimos 60 días',90:'Últimos 90 días',180:'Últimos 180 días'};
+    var filas = rotacionListaVisible.map(function(x){
+        return '<tr><td>'+escaparHtmlRotacion(x.producto.nombre)+'</td><td>'+escaparHtmlRotacion(x.producto.sku||'—')+'</td><td>'+x.producto.stock+'</td><td>'+x.salidas+'</td><td>'+x.unidades.toLocaleString('es-PE')+'</td><td>'+x.clase.frecuencia.toFixed(1)+'</td><td>'+x.clase.texto+'</td></tr>';
+    }).join('');
+    var html = '<!doctype html><html><head><meta charset="utf-8"><title>Reporte de rotación DISTAN ERP</title><style>body{font-family:Arial,sans-serif;color:#172033;padding:22px}h1{font-size:20px;margin:0 0 5px}.meta{font-size:11px;color:#526078;margin-bottom:16px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d9e0ea;padding:7px;text-align:left;font-size:10px}th{background:#edf2f8;text-transform:uppercase}footer{margin-top:14px;font-size:10px;color:#64748b}@page{size:landscape;margin:12mm}</style></head><body><h1>DISTAN ERP · Reporte de análisis de rotación</h1><div class="meta">Periodo: '+titulos[periodo.value]+' · Rotación: '+filtro.options[filtro.selectedIndex].text+' · Stock: '+stock.options[stock.selectedIndex].text+' · Búsqueda: '+escaparHtmlRotacion(busqueda||'Todas')+' · Generado: '+new Date().toLocaleString('es-PE')+'</div><table><thead><tr><th>Producto</th><th>SKU</th><th>Stock actual</th><th>Pedidos con salida</th><th>Unidades despachadas</th><th>Frecuencia / 30 días</th><th>Clasificación</th></tr></thead><tbody>'+filas+'</tbody></table><footer>La frecuencia se calcula según pedidos distintos con despacho real. La consulta de materias primas se basa en órdenes de producción históricas y no constituye una fórmula fija.</footer><script>window.onload=function(){window.print();};<\/script></body></html>';
+    var w = window.open('', '_blank');
+    if(!w){ alert('El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes para este sitio.'); return; }
+    w.document.open(); w.document.write(html); w.document.close();
 }
 
 function abrirAnalisisRotacion(){
@@ -869,6 +993,20 @@ function cerrarAnalisisRotacion(){
 document.getElementById('pvRotationPeriod').addEventListener('change', renderAnalisisRotacion);
 document.getElementById('pvRotationFilter').addEventListener('change', renderAnalisisRotacion);
 document.getElementById('pvRotationSearch').addEventListener('input', renderAnalisisRotacion);
+document.getElementById('pvRotationStockFilter').addEventListener('change', renderAnalisisRotacion);
+document.querySelectorAll('.pv-rotation-table th[data-sort]').forEach(function(th){
+    th.addEventListener('click', function(){
+        var campo = th.dataset.sort;
+        if(rotacionOrden.campo === campo) rotacionOrden.direccion = rotacionOrden.direccion === 'asc' ? 'desc' : 'asc';
+        else { rotacionOrden.campo = campo; rotacionOrden.direccion = (campo === 'nombre' || campo === 'sku') ? 'asc' : 'desc'; }
+        renderAnalisisRotacion();
+    });
+});
+document.getElementById('pvRotationBody').addEventListener('click', function(e){
+    var btn = e.target.closest('.pv-rotation-mp');
+    if(btn) consultarMateriasPrimas(btn.dataset.productId);
+});
+document.getElementById('modalMateriasPrimasProducto').addEventListener('click', function(e){ if(e.target === this) cerrarMateriasPrimas(); });
 document.getElementById('modalAnalisisRotacion').addEventListener('click', function(e){ if(e.target === this) cerrarAnalisisRotacion(); });
 document.addEventListener('keydown', function(e){ if(e.key === 'Escape') cerrarAnalisisRotacion(); });
 

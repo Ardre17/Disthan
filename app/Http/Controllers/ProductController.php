@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ProductionOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,50 @@ $categories = Category::where('activo', true)
     ->orderBy('nombre')
     ->get();
 
+    // Materias primas registradas históricamente en órdenes de producción por producto.
+    // No se interpreta como receta/BOM: cada orden registra una materia prima.
+    $materiasPrimasPorProducto = [];
+    $productIds = $products->pluck('id')->all();
+
+    if (!empty($productIds)) {
+        $ordenesProduccion = ProductionOrder::with('rawMaterial')
+            ->whereIn('product_id', $productIds)
+            ->whereNotNull('raw_material_id')
+            ->get(['id', 'product_id', 'raw_material_id', 'produced_quantity', 'consumed_quantity', 'status', 'fecha_produccion']);
+
+        foreach ($ordenesProduccion as $orden) {
+            $mp = $orden->rawMaterial;
+            if (!$mp) continue;
+
+            $productoId = (string) $orden->product_id;
+            $mpId = (string) $mp->id;
+
+            if (!isset($materiasPrimasPorProducto[$productoId][$mpId])) {
+                $materiasPrimasPorProducto[$productoId][$mpId] = [
+                    'id' => $mp->id,
+                    'code' => $mp->code,
+                    'name' => $mp->name,
+                    'category' => $mp->category,
+                    'supplier' => $mp->supplier,
+                    'unit' => $mp->unit,
+                    'stock' => (float) ($mp->stock ?? 0),
+                    'minimum_stock' => (float) ($mp->minimum_stock ?? 0),
+                    'active' => (bool) ($mp->active ?? false),
+                    'status' => $mp->status,
+                    'ordenes' => 0,
+                    'consumido_historico' => 0,
+                ];
+            }
+
+            $materiasPrimasPorProducto[$productoId][$mpId]['ordenes']++;
+            $materiasPrimasPorProducto[$productoId][$mpId]['consumido_historico'] += (float) ($orden->consumed_quantity ?? 0);
+        }
+
+        foreach ($materiasPrimasPorProducto as $id => $items) {
+            $materiasPrimasPorProducto[$id] = array_values($items);
+        }
+    }
+
     // Análisis de rotación por frecuencia de pedidos con despacho real.
     // Se cuentan pedidos distintos por producto, no unidades despachadas.
     $rotacionAnalisis = [];
@@ -78,7 +123,8 @@ $categories = Category::where('activo', true)
     compact(
         'products',
         'categories',
-        'rotacionAnalisis'
+        'rotacionAnalisis',
+        'materiasPrimasPorProducto'
     ));
 }
 
