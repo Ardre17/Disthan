@@ -54,7 +54,7 @@ Route::prefix('catalogo-comercial')
     });
 
 // Añadir DENTRO del grupo existente protegido por auth. Si ya hay rutas mobile.products, conservar solo una copia.
-Route::prefix('mobile')->name('mobile.')->group(function () {
+Route::prefix('mobile')->name('mobile.')->middleware('auth')->group(function () {
     Route::get('/', [MobileOrderController::class, 'home'])->name('home');
     Route::get('/products', [MobileProductController::class, 'index'])->name('products.index');
     Route::get('/products/{product}/edit', [MobileProductController::class, 'edit'])->name('products.edit');
@@ -284,7 +284,7 @@ Route::post('/exportacion/{order}/pallet', [ExportController::class, 'storePalle
 Route::put('/exportacion/pallets/{pallet}/capacidad', [ExportController::class, 'actualizarCapacidadPallet'])
     ->name('exportacion.pallet.capacidad');
 
-Route::put('/order-details/{item}/lote', [OrderController::class, 'updateLote'])->name('orderDetails.updateLote');
+Route::put('/order-details/{item}/lote', [OrderController::class, 'updateLote'])->middleware('auth')->name('orderDetails.updateLote');
 
 Route::get('orders/{order}/carta-calidad', [OrderController::class, 'cartaCalidad'])
      ->name('orders.cartaCalidad');
@@ -663,20 +663,6 @@ Route::prefix('preparation')
             ->name('finish');
     });
 
-
-        // DISTAN MÓVIL: catálogo de productos
-    Route::prefix('mobile')->name('mobile.')->group(function () {
-
-        Route::get('/products', [MobileProductController::class, 'index'])
-            ->name('products.index');
-
-        Route::get('/products/{product}/edit', [MobileProductController::class, 'edit'])
-            ->name('products.edit');
-
-        Route::put('/products/{product}', [MobileProductController::class, 'update'])
-            ->name('products.update');
-
-    });
 });
 
 require __DIR__.'/auth.php';

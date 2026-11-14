@@ -1,12 +1,211 @@
-<!doctype html><html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="theme-color" content="#123d72"><title>Detalle del pedido | DISTAN</title><style>
-:root{--blue:#123d72;--blue2:#1769aa;--bg:#f2f6fb;--ink:#18324d;--muted:#6d7f92;--line:#e2eaf3}*{box-sizing:border-box}body{margin:0;background:var(--bg);font:15px/1.4 system-ui,sans-serif;color:var(--ink)}.top{background:linear-gradient(135deg,#123d72,#1769aa);color:#fff;padding:18px 16px 24px;border-radius:0 0 23px 23px}.back{color:white;text-decoration:none;font-weight:700}.top h1{font-size:24px;margin:17px 0 4px}.sub{opacity:.85;font-size:13px}.wrap{max-width:760px;margin:auto;padding:14px}.panel{background:#fff;border:1px solid var(--line);border-radius:16px;padding:15px;margin-bottom:12px}.label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;font-weight:800}.value{font-weight:750;margin:3px 0 12px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.badge{display:inline-block;background:#eaf2fb;color:#1b5b91;border-radius:20px;padding:5px 9px;font-size:11px;font-weight:800}.product{border-top:1px solid var(--line);padding:13px 0}.product:first-child{border-top:0}.product h3{font-size:15px;margin:0 0 5px}.product p{font-size:12px;color:var(--muted);margin:4px 0}.numbers{display:flex;gap:7px;flex-wrap:wrap;margin-top:8px}.num{background:#f1f6fb;border-radius:9px;padding:7px 9px;font-size:12px}.sectiontitle{font-size:17px;margin:0 0 12px}.empty{color:var(--muted);font-size:13px}.btn{display:block;text-align:center;text-decoration:none;border-radius:12px;padding:13px;background:var(--blue);color:white;font-weight:800;margin-top:10px}.warn{font-size:12px;color:var(--muted);line-height:1.5}
-</style></head><body>
-<nav style="display:flex;gap:7px;padding:10px 12px;max-width:760px;margin:auto"><a href="{{ route('mobile.home') }}" style="flex:1;text-align:center;padding:10px 5px;border-radius:10px;background:#fff;border:1px solid #dbe3ed;color:#123d72;text-decoration:none;font-weight:800;font-size:13px">⌂ Inicio</a><a href="{{ route('mobile.products.index') }}" style="flex:1;text-align:center;padding:10px 5px;border-radius:10px;background:#fff;border:1px solid #dbe3ed;color:#123d72;text-decoration:none;font-weight:800;font-size:13px">▤ Productos</a><a href="{{ route('mobile.orders.index') }}" style="flex:1;text-align:center;padding:10px 5px;border-radius:10px;background:#123d72;color:#fff;text-decoration:none;font-weight:800;font-size:13px">▦ Pedidos</a></nav><header class="top"><a class="back" href="{{ route('mobile.orders.index') }}">‹ Volver a pedidos</a><h1>{{ $order->numero_orden ?: 'Pedido #'.$order->id }}</h1><div class="sub">{{ $order->client->razon_social ?? 'Cliente no disponible' }}</div></header><main class="wrap">
-@if(session('success'))<section class="panel" style="background:#e7f8ef;color:#116443">✓ {{ session('success') }}</section>@endif
-@if($errors->any())<section class="panel" style="background:#fff0f0;color:#a52828">@foreach($errors->all() as $error)<div>{{ $error }}</div>@endforeach</section>@endif
-<section class="panel"><div class="grid"><div><div class="label">Tipo</div><div class="value">{{ str_replace('_',' ', $order->tipo_orden ?? '—') }}</div></div><div><div class="label">Estado</div><div class="value"><span class="badge">{{ str_replace('_',' ', $order->estado ?? 'SIN ESTADO') }}</span></div></div><div><div class="label">Fecha de pedido</div><div class="value">{{ $order->fecha_pedido ? \Carbon\Carbon::parse($order->fecha_pedido)->format('d/m/Y') : '—' }}</div></div><div><div class="label">Fecha de entrega</div><div class="value">{{ $order->fecha_entrega ? \Carbon\Carbon::parse($order->fecha_entrega)->format('d/m/Y') : '—' }}</div></div></div>@if($order->order_interna)<div class="label">Referencia interna</div><div class="value">{{ $order->order_interna }}</div>@endif @if($order->observaciones)<div class="label">Observaciones</div><div>{{ $order->observaciones }}</div>@endif</section>
-<section class="panel"><h2 class="sectiontitle">Armado del pedido · {{ $order->details->count() }} productos</h2><p class="warn">Registra solo la cantidad que acabas de armar. Se acumula como avance y no modifica el despacho ni descuenta stock.</p>@forelse($order->details as $detail)@php($armado=(float)($prepared[$detail->id] ?? 0))@php($solicitado=(float)($detail->cantidad_solicitada ?? 0))<div class="product"><h3>{{ $detail->product->nombre ?? 'Producto eliminado/no disponible' }}</h3><p>Código: {{ $detail->product->sku ?? $detail->product->barcode ?? '—' }}</p><div class="numbers"><span class="num">Solicitado: <b>{{ $solicitado }}</b></span><span class="num">Armado: <b>{{ $armado }}</b></span><span class="num">Falta armar: <b>{{ max(0,$solicitado-$armado) }}</b></span></div><div style="height:7px;background:#e8eef5;border-radius:8px;margin:10px 0;overflow:hidden"><div style="height:7px;width:{{ $solicitado > 0 ? min(100,($armado/$solicitado)*100) : 0 }}%;background:#16845b;border-radius:8px"></div></div>@if($detail->lote || $detail->fecha_vencimiento)<p>Lote: {{ $detail->lote ?: '—' }} · Vence: {{ $detail->fecha_vencimiento ? \Carbon\Carbon::parse($detail->fecha_vencimiento)->format('d/m/Y') : '—' }}</p>@endif @if($armado < $solicitado)<form method="POST" action="{{ route('mobile.orders.prepare', [$order,$detail]) }}" style="display:flex;gap:8px;margin-top:10px;align-items:end">@csrf<label style="flex:1;font-size:12px;color:#6d7f92;font-weight:700">Cantidad armada ahora<input type="number" name="cantidad_armada" min="0.001" max="{{ max(0,$solicitado-$armado) }}" step="0.001" required inputmode="decimal" placeholder="Ej. 10" style="display:block;width:100%;margin-top:5px;border:1px solid #dbe3ed;border-radius:10px;padding:12px;font-size:16px"></label><button class="btn" style="border:0;cursor:pointer">Guardar</button></form>@else<div class="badge" style="background:#e7f8ef;color:#116443;margin-top:9px">Armado completo</div>@endif</div>@empty<div class="empty">Este pedido todavía no tiene productos registrados.</div>@endforelse</section>
-@if(strtoupper(trim($order->tipo_orden ?? ''))==='ENCOMIENDA')<section class="panel"><h2 class="sectiontitle">Bultos</h2>@forelse($order->bultos as $bulto)<div class="product"><h3>{{ $bulto->nombre ?? 'Bulto' }}</h3><p>Peso total: {{ $bulto->peso_total ?? '—' }}</p><p>Productos incluidos: {{ $bulto->detalles->count() }}</p></div>@empty<div class="empty">No hay bultos registrados.</div>@endforelse</section>@endif
-@if(strtoupper(trim($order->tipo_orden ?? ''))==='EXPORTACION')<section class="panel"><h2 class="sectiontitle">Paletas</h2>@forelse($order->pallets as $pallet)<div class="product"><h3>{{ $pallet->nombre ?? ('Paleta #'.$pallet->id) }}</h3><p>Detalles registrados: {{ $pallet->detalles->count() }}</p></div>@empty<div class="empty">No hay paletas registradas.</div>@endforelse</section>@endif
-<section class="panel"><h2 class="sectiontitle">Registro móvil</h2><p class="warn">Los avances guardados quedan asociados a cada producto del pedido. El despacho final y el descuento de stock siguen bajo el proceso normal de DISTAN.</p></section>
-</main></body></html>
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="theme-color" content="#123d72">
+    <title>Armado del pedido | DISTAN</title>
+    <style>
+        :root{--blue:#1f6bff;--navy:#123d72;--ink:#172b4d;--muted:#718096;--line:#e5ebf3;--bg:#f3f6fb;--green:#168653;--green-bg:#e8f7ef;--amber:#b77909;--amber-bg:#fff5df;--red:#c93636;--red-bg:#fff0f0;--white:#fff}
+        *{box-sizing:border-box}html,body{margin:0;max-width:100%;overflow-x:hidden;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,-apple-system,"Segoe UI",sans-serif}
+        button,input{font:inherit}.nav{max-width:1180px;margin:auto;padding:10px 16px;display:flex;gap:8px}.nav a{flex:1;text-align:center;text-decoration:none;background:#fff;border:1px solid var(--line);border-radius:10px;padding:10px 6px;color:var(--navy);font-weight:750;font-size:12px}.nav a.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+        .hero{background:linear-gradient(125deg,#123d72,#1769aa);color:#fff;padding:18px max(16px,calc((100% - 1148px)/2)) 25px}.back{color:#dcecff;text-decoration:none;font-weight:700;font-size:13px}.hero h1{font-size:25px;line-height:1.15;margin:15px 0 5px}.hero-sub{color:#d9e9fb;font-size:13px}.wrap{max-width:1180px;margin:0 auto;padding:16px}.panel{background:#fff;border:1px solid var(--line);border-radius:15px;padding:16px;margin-bottom:14px;box-shadow:0 2px 8px #18324d08}.section-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:0 0 13px}.section-head h2{font-size:16px;margin:0}.muted{color:var(--muted)}.small{font-size:12px}.meta-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.label{display:block;font-size:10px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:800}.value{font-weight:750;margin-top:4px}.badge{display:inline-flex;align-items:center;gap:5px;border-radius:99px;padding:5px 9px;font-size:11px;font-weight:800;background:#eaf1fb;color:#245b91}.badge.green{background:var(--green-bg);color:var(--green)}.badge.amber{background:var(--amber-bg);color:var(--amber)}.badge.red{background:var(--red-bg);color:var(--red)}
+        .kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}.kpi{border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff}.kpi strong{display:block;font-size:23px;line-height:1.1}.kpi span{display:block;color:var(--muted);font-size:11px;margin-top:5px}.overall{margin-top:14px}.progress{height:9px;background:#e9eef5;border-radius:99px;overflow:hidden}.progress>i{display:block;height:100%;background:var(--blue);border-radius:99px}.progress-label{display:flex;justify-content:space-between;font-size:12px;font-weight:750;margin-bottom:6px}
+        .scan-row{display:flex;gap:9px}.scan-input{flex:1;min-width:0;border:1.5px solid #8db4ff;border-radius:10px;padding:12px 13px;background:#fff;font-size:15px;outline:none}.scan-input:focus{border-color:var(--blue);box-shadow:0 0 0 3px #1f6bff1c}.btn{border:0;border-radius:10px;padding:11px 14px;background:var(--blue);color:#fff;font-weight:800;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:7px}.btn.secondary{background:#edf3ff;color:#245b91;border:1px solid #d9e6ff}.btn.ghost{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn:disabled{opacity:.5;cursor:not-allowed}.hint{font-size:11px;color:var(--muted);margin-top:7px}.search{width:100%;margin-top:10px;border:1px solid var(--line);border-radius:9px;padding:10px 12px}
+        .product-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.product{border:1px solid var(--line);border-radius:13px;background:#fff;padding:14px;min-width:0;scroll-margin-top:10px}.product.complete{border-color:#bce5ce;background:linear-gradient(0deg,#f5fcf8,#fff 55%)}.product.partial{border-color:#f0d48f}.product.pending{border-color:#efc1c1}.product.selected{outline:2px solid var(--blue);outline-offset:1px}.product-top{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}.product h3{font-size:14px;margin:0 0 4px;line-height:1.3}.code{font:11px ui-monospace,monospace;color:var(--muted)}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin:12px 0}.stat{background:#f4f7fb;border-radius:9px;padding:8px;text-align:center}.stat b{display:block;font-size:17px}.stat span{font-size:10px;color:var(--muted)}.stat.done b{color:var(--green)}.stat.left b{color:var(--amber)}.product .progress{margin:8px 0 12px}.data-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}.data-cell{font-size:11px;min-width:0}.data-cell b{display:block;font-size:12px;overflow-wrap:anywhere;margin-top:2px}.actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.actions .btn{flex:1}.entry{display:flex;gap:8px;align-items:end;margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}.entry label{flex:1;font-size:11px;color:var(--muted);font-weight:750}.entry input{display:block;width:100%;margin-top:5px;border:1px solid #d7e0ec;border-radius:9px;padding:11px;font-size:16px;font-weight:750;color:var(--ink)}.responsible{font-size:11px;color:var(--muted);margin-top:8px}.warning{border-radius:9px;padding:9px 10px;font-size:11px;line-height:1.4;margin-top:10px}.warning.amber{background:var(--amber-bg);color:#805809}.warning.red{background:var(--red-bg);color:#9e2929}.warning.green{background:var(--green-bg);color:#17663f}.history{margin-top:10px;border-top:1px dashed var(--line);padding-top:9px}.history summary{font-size:11px;font-weight:800;color:#315d8b;cursor:pointer}.history-list{margin-top:7px;display:grid;gap:6px}.history-row{display:flex;justify-content:space-between;gap:8px;font-size:11px;background:#f7f9fc;padding:7px 9px;border-radius:8px}.empty{padding:24px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:10px}.flash{padding:12px 14px;border-radius:11px;margin-bottom:12px;font-weight:650}.flash.ok{background:var(--green-bg);color:var(--green)}.flash.error{background:var(--red-bg);color:var(--red)}
+        .modal{display:none;position:fixed;inset:0;z-index:1000;background:#0b1d35b8;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.dialog{background:#fff;border-radius:16px;padding:16px;width:min(100%,440px);max-height:90vh;overflow:auto}.dialog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.dialog-head h3{margin:0;font-size:16px}.close{border:0;background:#edf2f8;border-radius:9px;width:34px;height:34px;font-size:19px;cursor:pointer}.dialog label{display:block;font-size:12px;font-weight:750;margin:10px 0 5px}.dialog input{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px}.camera-view{width:100%;min-height:240px;border-radius:12px;overflow:hidden;background:#101827}.toast{position:fixed;left:50%;bottom:18px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#172b4d;color:#fff;padding:11px 15px;border-radius:99px;font-size:12px;z-index:1200;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
+        @media(max-width:760px){.wrap{padding:11px}.hero{padding:16px 16px 22px}.meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.product-list{grid-template-columns:1fr}.panel{padding:13px}.hero h1{font-size:22px}.scan-row{flex-wrap:wrap}.scan-row .scan-input{flex-basis:100%}.scan-row .btn{flex:1}.nav{padding:8px}.nav a{font-size:11px}.entry{align-items:stretch}.entry .btn{min-width:104px}}
+        @media(min-width:761px) and (max-width:980px){.product-list{grid-template-columns:1fr}.meta-grid{grid-template-columns:repeat(2,1fr)}}
+    </style>
+</head>
+<body>
+<nav class="nav">
+    <a href="{{ route('mobile.home') }}">⌂ Inicio</a>
+    <a href="{{ route('mobile.products.index') }}">▤ Productos</a>
+    <a class="active" href="{{ route('mobile.orders.index') }}">▦ Pedidos</a>
+</nav>
+<header class="hero">
+    <a class="back" href="{{ route('mobile.orders.index') }}">‹ Volver a pedidos</a>
+    <h1>{{ $order->numero_orden ?: 'Pedido #'.$order->id }}</h1>
+    <div class="hero-sub">{{ $order->client->razon_social ?? 'Cliente no disponible' }} · Armado de pedido</div>
+</header>
+<main class="wrap">
+    @if(session('success'))<div class="flash ok">✓ {{ session('success') }}</div>@endif
+    @if($errors->any())<div class="flash error">@foreach($errors->all() as $error)<div>{{ $error }}</div>@endforeach</div>@endif
+
+    @php
+        $totalProductos = $order->details->count();
+        $totalSolicitado = (float) $order->details->sum('cantidad_solicitada');
+        $totalArmado = 0; $completos = 0; $parciales = 0; $pendientes = 0;
+        foreach ($order->details as $d) {
+            $a = (float) ($prepared[$d->id] ?? 0); $s = (float) ($d->cantidad_solicitada ?? 0); $totalArmado += $a;
+            if ($s > 0 && $a >= $s) $completos++; elseif ($a > 0) $parciales++; else $pendientes++;
+        }
+        $porcentaje = $totalSolicitado > 0 ? min(100, ($totalArmado / $totalSolicitado) * 100) : 0;
+    @endphp
+
+    <section class="panel">
+        <div class="section-head"><h2>Información del pedido</h2><span class="badge">{{ str_replace('_',' ', $order->estado ?? 'SIN ESTADO') }}</span></div>
+        <div class="meta-grid">
+            <div><span class="label">Tipo de pedido</span><div class="value">{{ str_replace('_',' ', $order->tipo_orden ?? '—') }}</div></div>
+            <div><span class="label">Fecha de pedido</span><div class="value">{{ $order->fecha_pedido ? \Carbon\Carbon::parse($order->fecha_pedido)->format('d/m/Y') : '—' }}</div></div>
+            <div><span class="label">Fecha de entrega</span><div class="value">{{ $order->fecha_entrega ? \Carbon\Carbon::parse($order->fecha_entrega)->format('d/m/Y') : '—' }}</div></div>
+            <div><span class="label">Referencia interna</span><div class="value">{{ $order->order_interna ?: '—' }}</div></div>
+        </div>
+        @if($order->observaciones)<div class="warning amber"><b>Observaciones:</b> {{ $order->observaciones }}</div>@endif
+    </section>
+
+    <section class="panel">
+        <div class="section-head"><h2>Resumen de armado</h2><span class="badge {{ $porcentaje >= 100 ? 'green' : ($porcentaje > 0 ? 'amber' : 'red') }}">{{ number_format($porcentaje,1) }} %</span></div>
+        <div class="kpis">
+            <div class="kpi"><strong>{{ $totalProductos }}</strong><span>Productos en pedido</span></div>
+            <div class="kpi"><strong>{{ $completos }}</strong><span>Armado completo</span></div>
+            <div class="kpi"><strong>{{ $parciales }}</strong><span>Armado parcial</span></div>
+            <div class="kpi"><strong>{{ $pendientes }}</strong><span>Pendientes de iniciar</span></div>
+        </div>
+        <div class="overall"><div class="progress-label"><span>Unidades armadas</span><span>{{ rtrim(rtrim(number_format($totalArmado,3,'.',''), '0'), '.') }} / {{ rtrim(rtrim(number_format($totalSolicitado,3,'.',''), '0'), '.') }}</span></div><div class="progress"><i style="width:{{ $porcentaje }}%"></i></div></div>
+    </section>
+
+    <section class="panel" id="panelEscaner">
+        <div class="section-head"><h2>Buscar producto</h2><span class="badge">Escáner / manual</span></div>
+        <div class="scan-row">
+            <input id="scannerInput" class="scan-input" type="text" autocomplete="off" placeholder="Escanea SKU, código de barras o código de caja…">
+            <button type="button" class="btn" id="btnBuscar">Buscar</button>
+            <button type="button" class="btn secondary" id="btnCamara">▣ Cámara</button>
+        </div>
+        <div class="hint">El lector USB/Bluetooth funciona como teclado: escanea el código y presiona Enter. También puedes buscar por nombre.</div>
+        <input id="filtroProducto" class="search" type="search" placeholder="Filtrar productos por nombre o código…">
+        <div id="scanFeedback" class="hint" aria-live="polite"></div>
+    </section>
+
+    <section class="panel">
+        <div class="section-head"><h2>Productos del pedido</h2><span class="small muted">{{ $totalProductos }} registros</span></div>
+        <div class="product-list" id="productList">
+            @forelse($order->details as $detail)
+                @php
+                    $armado = (float) ($prepared[$detail->id] ?? 0);
+                    $solicitado = (float) ($detail->cantidad_solicitada ?? 0);
+                    $faltante = max(0, $solicitado - $armado);
+                    $stockActual = (float) ($detail->product?->stock ?? 0);
+                    $stockRestanteParaArmar = max(0, $stockActual - $armado);
+                    $sinStock = $faltante > 0 && $stockRestanteParaArmar <= 0;
+                    $stockInsuficiente = $faltante > 0 && $stockRestanteParaArmar > 0 && $stockRestanteParaArmar < $faltante;
+                    $maximoArmable = min($faltante, $stockRestanteParaArmar);
+                    $pct = $solicitado > 0 ? min(100, ($armado / $solicitado) * 100) : 0;
+                    $estadoArmado = $solicitado > 0 && $armado >= $solicitado ? 'complete' : ($armado > 0 ? 'partial' : 'pending');
+                    $meta = $preparationMeta[$detail->id] ?? null;
+                    $lote = $detail->lote ?: ($detail->product->lote ?? '');
+                    $vence = $detail->fecha_vencimiento ?: ($detail->product->fecha_vencimiento ?? null);
+                    $produccion = $detail->product->fecha_produccion ?? null;
+                    $ultimoUsuario = $meta ? ($userNames[$meta->updated_by] ?? 'Usuario no disponible') : 'Sin registros';
+                @endphp
+                <article class="product {{ $estadoArmado }}" id="detail-{{ $detail->id }}"
+                    data-detail-id="{{ $detail->id }}"
+                    data-name="{{ mb_strtolower($detail->product->nombre ?? '') }}"
+                    data-sku="{{ $detail->product->sku ?? '' }}"
+                    data-barcode="{{ $detail->product->barcode ?? '' }}"
+                    data-box-barcode="{{ $detail->product->box_barcode ?? '' }}">
+                    <div class="product-top">
+                        <div><h3>{{ $detail->product->nombre ?? 'Producto no disponible' }}</h3><div class="code">SKU: {{ $detail->product->sku ?? '—' }} · ID detalle: {{ $detail->id }}</div></div>
+                        @if($estadoArmado==='complete')<span class="badge green">Completo</span>@elseif($estadoArmado==='partial')<span class="badge amber">Parcial</span>@else<span class="badge red">Pendiente</span>@endif
+                    </div>
+                    <div class="stats">
+                        <div class="stat"><b>{{ rtrim(rtrim(number_format($solicitado,3,'.',''), '0'), '.') }}</b><span>Solicitado</span></div>
+                        <div class="stat done"><b>{{ rtrim(rtrim(number_format($armado,3,'.',''), '0'), '.') }}</b><span>Armado</span></div>
+                        <div class="stat left"><b>{{ rtrim(rtrim(number_format($faltante,3,'.',''), '0'), '.') }}</b><span>Falta</span></div>
+                    </div>
+                    <div class="progress"><i style="width:{{ $pct }}%;background:{{ $pct>=100 ? 'var(--green)' : ($pct>0 ? '#d69a25' : '#d04b4b') }}"></i></div>
+                    <div class="data-grid">
+                        <div class="data-cell"><span class="label">Stock actual</span><b>{{ rtrim(rtrim(number_format($stockActual,3,'.',''), '0'), '.') }}</b></div>
+                        <div class="data-cell"><span class="label">Lote</span><b>{{ $lote ?: '—' }}</b></div>
+                        <div class="data-cell"><span class="label">Fecha de producción</span><b>{{ $produccion ? \Carbon\Carbon::parse($produccion)->format('d/m/Y') : '—' }}</b></div>
+                        <div class="data-cell"><span class="label">Fecha de vencimiento</span><b>{{ $vence ? \Carbon\Carbon::parse($vence)->format('d/m/Y') : '—' }}</b></div>
+                        <div class="data-cell"><span class="label">Último responsable</span><b>{{ $ultimoUsuario }}</b></div>
+                    </div>
+                    @if($faltante > 0)
+                        @if($sinStock)
+                            <div class="warning red">⛔ No queda stock disponible para continuar el armado. Consulta con el encargado si existe producto disponible o si corresponde producir.</div>
+                        @elseif($stockInsuficiente)
+                            <div class="warning amber">⚠ Stock insuficiente: faltan {{ rtrim(rtrim(number_format($faltante,3,'.',''), '0'), '.') }} unidades por armar, pero el stock disponible para continuar es {{ rtrim(rtrim(number_format($stockRestanteParaArmar,3,'.',''), '0'), '.') }}. Puedes registrar un avance parcial hasta el stock disponible.</div>
+                        @elseif($armado > 0)
+                            <div class="warning amber">Armado parcial: faltan {{ rtrim(rtrim(number_format($faltante,3,'.',''), '0'), '.') }} unidades. Puedes continuar registrando el avance.</div>
+                        @else
+                            <div class="warning red">Pendiente de armado. Aún no se han registrado unidades.</div>
+                        @endif
+                        @if(!$sinStock)
+                            <form class="entry" method="POST" action="{{ route('mobile.orders.prepare', [$order,$detail]) }}">
+                                @csrf
+                                <label>Cantidad armada ahora<input type="number" name="cantidad_armada" min="0.001" max="{{ $maximoArmable }}" step="0.001" required inputmode="decimal" placeholder="Máximo {{ $maximoArmable }}"></label>
+                                <button class="btn" type="submit">Guardar avance</button>
+                            </form>
+                        @endif
+                    @else
+                        <div class="warning green">✓ Cantidad solicitada completamente armada.</div>
+                    @endif
+                    <div class="actions"><button class="btn ghost" type="button" onclick="abrirLote({{ $detail->id }}, @js($lote), @js($vence ? \Carbon\Carbon::parse($vence)->format('Y-m-d') : ''))">Editar lote / vencimiento</button></div>
+                    @php($logs = $preparationLogs[$detail->id] ?? collect())
+                    @if($logs->isNotEmpty())
+                        <details class="history"><summary>Historial de armado ({{ $logs->count() }} registros)</summary>
+                            <div class="history-list">
+                                @foreach($logs as $log)
+                                    <div class="history-row"><span><b>+{{ rtrim(rtrim(number_format((float)$log->quantity,3,'.',''), '0'), '.') }}</b> unidades · {{ $log->user_name ?: 'Usuario no disponible' }}</span><span>{{ \Carbon\Carbon::parse($log->created_at)->format('d/m/Y H:i') }}</span></div>
+                                @endforeach
+                            </div>
+                        </details>
+                    @elseif($meta)
+                        <div class="responsible">Acumulado existente antes de activar el historial · actualizado {{ $meta->updated_at ? \Carbon\Carbon::parse($meta->updated_at)->format('d/m/Y H:i') : '—' }}</div>
+                    @endif
+                </article>
+            @empty
+                <div class="empty">Este pedido todavía no tiene productos registrados.</div>
+            @endforelse
+        </div>
+    </section>
+
+    @if(strtoupper(trim($order->tipo_orden ?? ''))==='ENCOMIENDA')
+        <section class="panel"><div class="section-head"><h2>Bultos</h2><span class="badge">Encomienda</span></div>
+            @forelse($order->bultos as $bulto)<div class="product"><h3>{{ $bulto->nombre ?? 'Bulto' }}</h3><div class="small muted">Peso total: {{ $bulto->peso_total ?? '—' }} · Productos incluidos: {{ $bulto->detalles->count() }}</div></div>@empty<div class="empty">No hay bultos registrados.</div>@endforelse
+        </section>
+    @endif
+    @if(strtoupper(trim($order->tipo_orden ?? ''))==='EXPORTACION')
+        <section class="panel"><div class="section-head"><h2>Paletas</h2><span class="badge">Exportación</span></div>
+            @forelse($order->pallets as $pallet)<div class="product"><h3>{{ $pallet->nombre ?? ('Paleta #'.$pallet->id) }}</h3><div class="small muted">Detalles registrados: {{ $pallet->detalles->count() }}</div></div>@empty<div class="empty">No hay paletas registradas.</div>@endforelse
+        </section>
+    @endif
+    <div class="small muted" style="text-align:center;padding:5px 0 18px">El armado se registra por separado. No modifica cantidades despachadas ni descuenta stock.</div>
+</main>
+
+<div class="modal" id="modalLote"><div class="dialog"><div class="dialog-head"><h3>Editar lote y vencimiento</h3><button class="close" type="button" onclick="cerrarModal('modalLote')">×</button></div>
+    <form method="POST" id="formLote">@csrf @method('PUT')
+        <label for="loteInput">Número de lote</label><input id="loteInput" name="lote" maxlength="100" placeholder="Ej. L-2026-045">
+        <label for="venceInput">Fecha de vencimiento</label><input id="venceInput" type="date" name="fecha_vencimiento">
+        <p class="hint">La fecha de producción se muestra desde la ficha del producto. Esta acción actualiza el lote y vencimiento del detalle del pedido.</p>
+        <button class="btn" style="width:100%;margin-top:12px" type="submit">Guardar cambios</button>
+    </form>
+</div></div>
+<div class="modal" id="modalCamara"><div class="dialog"><div class="dialog-head"><h3>Escáner de cámara</h3><button class="close" type="button" onclick="cerrarCamara()">×</button></div><div id="cameraReader" class="camera-view"></div><div class="hint">Centra el código de barras dentro del recuadro. Requiere permiso de cámara y conexión HTTPS.</div></div></div>
+<div id="toast" class="toast"></div>
+<script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+<script>
+    const cards = [...document.querySelectorAll('.product[data-detail-id]')];
+    const scannerInput = document.getElementById('scannerInput');
+    const feedback = document.getElementById('scanFeedback');
+    let cameraScanner = null;
+    function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(t._timer);t._timer=setTimeout(()=>t.classList.remove('show'),2600)}
+    function findCard(code){const v=String(code||'').trim().toLowerCase();return cards.find(c=>[c.dataset.sku,c.dataset.barcode,c.dataset.boxBarcode].some(x=>String(x||'').trim().toLowerCase()===v))}
+    function focusCard(card){if(!card)return false;cards.forEach(c=>c.classList.remove('selected'));card.classList.add('selected');card.scrollIntoView({behavior:'smooth',block:'center'});const qty=card.querySelector('input[name="cantidad_armada"]');if(qty){setTimeout(()=>{qty.focus();qty.select()},450)}else{toast('Este producto ya tiene el armado completo.')}return true}
+    function buscarCodigo(){const code=scannerInput.value.trim();if(!code)return;const card=findCard(code);if(card){feedback.textContent='Producto encontrado: '+card.querySelector('h3').textContent;focusCard(card);scannerInput.value='';}else{feedback.textContent='No se encontró un producto con el código '+code;toast('Código no encontrado en este pedido.')}}
+    document.getElementById('btnBuscar').addEventListener('click',buscarCodigo);
+    scannerInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();buscarCodigo()}});
+    document.getElementById('filtroProducto').addEventListener('input',function(){const q=this.value.trim().toLowerCase();cards.forEach(c=>{c.style.display=(!q||c.dataset.name.includes(q)||[c.dataset.sku,c.dataset.barcode,c.dataset.boxBarcode].some(x=>String(x||'').toLowerCase().includes(q)))?'':'none'})});
+    function abrirLote(id,lote,vence){document.getElementById('formLote').action='/order-details/'+id+'/lote';document.getElementById('loteInput').value=lote||'';document.getElementById('venceInput').value=vence||'';document.getElementById('modalLote').classList.add('show')}
+    function cerrarModal(id){document.getElementById(id).classList.remove('show')}
+    async function abrirCamara(){if(typeof Html5Qrcode==='undefined'){toast('No se pudo cargar el módulo de cámara.');return}document.getElementById('modalCamara').classList.add('show');try{cameraScanner=new Html5Qrcode('cameraReader');await cameraScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:260,height:130}},decoded=>{const card=findCard(decoded);if(card){focusCard(card);feedback.textContent='Código leído: '+decoded;cerrarCamara();toast('Producto identificado');}else{feedback.textContent='Código leído, pero no pertenece a este pedido: '+decoded;}},()=>{});}catch(e){toast('No se pudo iniciar la cámara. Verifica permisos y HTTPS.');cerrarCamara();}}
+    async function cerrarCamara(){if(cameraScanner){try{await cameraScanner.stop();await cameraScanner.clear()}catch(e){}cameraScanner=null}cerrarModal('modalCamara')}
+    document.getElementById('btnCamara').addEventListener('click',abrirCamara);
+    document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m){if(m.id==='modalCamara')cerrarCamara();else m.classList.remove('show')}}));
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){cerrarModal('modalLote');cerrarCamara()}});
+    document.querySelectorAll('.entry').forEach(form=>form.addEventListener('submit',e=>{const btn=form.querySelector('button');btn.disabled=true;btn.textContent='Guardando…'}));
+</script>
+</body>
+</html>

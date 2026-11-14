@@ -54,12 +54,6 @@
 @media(max-width:560px){.raw-content{padding:15px 12px}.raw-top{padding:0 13px}.raw-heading{align-items:flex-start}.raw-actions{width:100%}.raw-actions .raw-btn{flex:1}.raw-kpis{gap:7px}.raw-kpi{padding:10px;gap:8px}.raw-kpi-icon{width:34px;height:34px;font-size:16px}.raw-kpi-value{font-size:21px}.raw-filters{width:100%}.raw-filter{flex:1}.raw-sort{width:100%;justify-content:space-between}.raw-select{flex:1}}
 </style>
 
-<div class="raw-page">
-    <div class="raw-top">
-        <strong>DISTAN ERP <span style="color:#8fa8c8;margin:0 8px">|</span> Materia Prima</strong>
-        <span>Producción&nbsp; › &nbsp;Inventario</span>
-    </div>
-
     <div class="raw-content">
         <div class="raw-heading">
             <div>
