@@ -158,10 +158,12 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
 .op-table tbody tr:first-child td:first-child{ border-top-left-radius:0; }
 .op-table tbody tr td:first-child{ box-shadow:inset 4px 0 0 var(--lc,transparent); }
 .op-table tbody tr:hover{ background:#f9fbfe; }
-.op-table tbody tr.op-sin-stock{ background:#fff0f0; }
-.op-table tbody tr.op-sin-stock td{ border-bottom-color:#fecaca; }
-.op-table tbody tr.op-sin-stock .op-pname{ color:#b91c1c; }
+.op-table tbody tr.op-sin-stock{ background:#fff4cc; }
+.op-table tbody tr.op-sin-stock td{ border-bottom-color:#f3d477; }
+.op-table tbody tr.op-sin-stock .op-pname{ color:#854d0e; }
 .op-stock-badge{ display:inline-flex; align-items:center; gap:4px; margin-top:5px; padding:3px 8px; border-radius:999px; background:#fee2e2; color:#b91c1c; font-size:10px; font-weight:800; letter-spacing:.03em; }
+.op-stock-warning{ display:none; margin-top:6px; color:#854d0e; font-size:11px; line-height:1.35; font-weight:700; max-width:290px; }
+.op-sin-stock .op-stock-warning{ display:block; }
 .op-stock-badge.has-stock{ background:#dcfce7; color:#166534; }
 .op-icon-btn:disabled{ opacity:.35; cursor:not-allowed; }
 .op-table tr.op-flash{ animation:opFlash 1.5s ease; }
@@ -189,6 +191,20 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
 .op-toast.show{ display:flex; animation:toastIn .2s; }
 @keyframes toastIn{ from{ opacity:0; transform:translateY(-10px); } to{ opacity:1; transform:translateY(0); } }
 .op-toast.tok{ border-left:4px solid var(--op-green); } .op-toast.twk{ border-left:4px solid var(--op-amber); } .op-toast.ter{ border-left:4px solid var(--op-red); }
+
+/* Advertencia central de stock insuficiente */
+#modalStockAdvertencia{ display:none; position:fixed; inset:0; z-index:10060; align-items:center; justify-content:center; padding:18px; background:rgba(15,23,42,.72); }
+#modalStockAdvertencia.open{ display:flex; }
+.op-stock-alert-box{ width:100%; max-width:490px; padding:26px 24px 22px; border-radius:18px; background:#fff; border:2px solid #eab308; box-shadow:0 24px 70px rgba(0,0,0,.38); text-align:center; animation:popup .22s; }
+.op-stock-alert-icon{ width:62px; height:62px; display:flex; align-items:center; justify-content:center; margin:0 auto 12px; border-radius:50%; background:#fef3c7; color:#a16207; }
+.op-stock-alert-icon .ic{ width:34px; height:34px; }
+.op-stock-alert-title{ margin:0 0 8px; color:#92400e; font-size:22px; font-weight:900; }
+.op-stock-alert-product{ margin:0 0 12px; color:#14213d; font-size:15px; font-weight:800; }
+.op-stock-alert-text{ margin:0 0 12px; color:#334155; font-size:14px; line-height:1.5; }
+.op-stock-alert-instruction{ margin:0 0 18px; padding:13px; border-radius:10px; background:#fff7dd; border:1px solid #f3d477; color:#854d0e; font-size:14px; font-weight:800; line-height:1.5; }
+.op-stock-alert-detail{ margin:0 0 18px; color:#64748b; font-size:12px; }
+.op-stock-alert-box .op-btn{ width:100%; padding:13px 18px; font-size:14px; }
+@media(max-width:520px){ .op-stock-alert-box{ padding:22px 17px 18px; } .op-stock-alert-title{ font-size:19px; } }
 
 /* Modales */
 .op-overlay{ display:none; position:fixed; inset:0; background:rgba(15,23,42,.55); z-index:10001; align-items:center; justify-content:center; padding:16px; }
@@ -303,6 +319,19 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
 
 {{-- Toast --}}
 <div class="op-toast" id="toast"></div>
+
+{{-- Advertencia central por stock insuficiente --}}
+<div id="modalStockAdvertencia" role="alertdialog" aria-modal="true" aria-labelledby="stockAlertTitle">
+    <div class="op-stock-alert-box">
+        <div class="op-stock-alert-icon"><svg class="ic"><use href="#i-alert"/></svg></div>
+        <h2 class="op-stock-alert-title" id="stockAlertTitle">¡ATENCIÓN! STOCK INSUFICIENTE</h2>
+        <p class="op-stock-alert-product" id="stockAlertProducto"></p>
+        <p class="op-stock-alert-text" id="stockAlertDetalle"></p>
+        <div class="op-stock-alert-instruction">Consultar con el encargado si existe materia prima disponible para producir más.</div>
+        <p class="op-stock-alert-detail">Puedes despachar la cantidad disponible. El faltante permanecerá pendiente.</p>
+        <button type="button" class="op-btn" id="btnStockAlertEntendido" style="background:#d69e25;color:#fff;">ENTENDIDO, CONTINUAR</button>
+    </div>
+</div>
 
 @php
     $estadoCls     = $order->estado === 'COMPLETO' ? 'ok' : ($order->estado === 'PARCIAL' ? 'warn' : 'bad');
@@ -576,7 +605,7 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
             $cajasDespachadas   = $porCaja > 0 ? intdiv((int) $item->cantidad_despachada, $porCaja) : 0;
             $sueltasDespachadas = $porCaja > 0 ? ((int) $item->cantidad_despachada % $porCaja) : 0;
         @endphp
-        <tr id="item-{{ $item->id }}" class="{{ (float) ($item->product->stock ?? 0) <= 0 && $pend > 0 ? 'op-sin-stock' : '' }}" style="--lc:{{ $lc }};">
+        <tr id="item-{{ $item->id }}" class="{{ (float) ($item->product->stock ?? 0) < (float) $pend && $pend > 0 ? 'op-sin-stock' : '' }}" style="--lc:{{ $lc }};">
             <td data-label="#">{{ $loop->iteration }}</td>
             <td data-label="Estado">
                 <span class="op-st {{ $stCls }}" id="st-{{ $item->id }}" title="{{ $stLbl }}"><svg class="ic"><use href="{{ $stIcon }}"/></svg></span>
@@ -584,6 +613,7 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
             <td class="op-td-prod" data-label="Producto">
                 <div class="op-pname">{{ $item->product->nombre }}</div>
                 <span id="stock-badge-{{ $item->id }}" class="op-stock-badge {{ (float) ($item->product->stock ?? 0) > 0 ? 'has-stock' : '' }}">{{ (float) ($item->product->stock ?? 0) > 0 ? 'STOCK: ' . rtrim(rtrim(number_format((float) $item->product->stock, 2, '.', ''), '0'), '.') : 'SIN STOCK' }}</span>
+                <div id="stock-warning-{{ $item->id }}" class="op-stock-warning">⚠ Stock insuficiente para completar el pedido. Consultar con el encargado.</div>
                 @if($esSuper)
                     <div class="op-psub">Paleta: <strong id="paleta-{{ $item->id }}">{{ $item->paleta ?: '—' }}</strong></div>
                 @elseif($item->paleta)
@@ -643,7 +673,7 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
                         @js($item->lote),
                         @js($item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('Y-m-d') : '')
                     )"><svg class="ic sm"><use href="#i-edit"/></svg></button>
-                    <button type="button" class="op-icon-btn" title="{{ (float) ($item->product->stock ?? 0) <= 0 && $pend > 0 ? 'Producto sin stock' : 'Seleccionar producto' }}" aria-label="Seleccionar producto" {{ (float) ($item->product->stock ?? 0) <= 0 && $pend > 0 ? 'disabled' : '' }} onclick="seleccionarPorId({{ $item->id }})"><svg class="ic sm"><use href="#i-chevron"/></svg></button>
+                    <button type="button" class="op-icon-btn" title="Seleccionar producto" aria-label="Seleccionar producto" onclick="seleccionarPorId({{ $item->id }})"><svg class="ic sm"><use href="#i-chevron"/></svg></button>
                     @if($esSuper)
                         {{-- Supermercados: utiliza etiqueta-barra.blade.php (ruta orders.etiqueta) --}}
                         <a href="{{ route('orders.etiqueta', $item) }}"
@@ -998,8 +1028,8 @@ function mostrarActivo(item){
     const stockCero = stockActual <= 0;
     const cantidadInput = byId('activoCantidad');
     const guardarBtn = byId('btnGuardar');
-    if(cantidadInput) cantidadInput.disabled = stockCero;
-    if(guardarBtn) guardarBtn.disabled = stockCero;
+    if(cantidadInput) cantidadInput.disabled = false;
+    if(guardarBtn) guardarBtn.disabled = false;
 
     byId('activoNombre').textContent    = item.product.nombre;
     byId('activoSku').textContent       = item.product.sku ?? '—';
@@ -1027,15 +1057,35 @@ function mostrarActivo(item){
     byId('activoVacio').style.display = 'none';
     byId('activoBox').style.display = 'block';
 
-    // =====================================
-    // VERIFICAR ADVERTENCIAS NUTRICIONALES
-    // =====================================
+    // Primero se muestra la advertencia de stock; después, si corresponde, la nutricional.
+    const pendiente = Math.max(0, (parseFloat(item.cantidad_solicitada) || 0) - (parseFloat(item.cantidad_despachada) || 0));
+    if(stockActual < pendiente){
+        mostrarModalStockAdvertencia(item, function(){ continuarSeleccionActivo(item); });
+    } else {
+        continuarSeleccionActivo(item);
+    }
+}
+
+function continuarSeleccionActivo(item){
     if(item.product.advertencias && listarAdvertencias(item).length){
         mostrarModalAdvertencias(item);
     } else {
         byId('activoCantidad').focus();
         byId('activoCantidad').select();
     }
+}
+
+function mostrarModalStockAdvertencia(item, alCerrar){
+    const stock = Math.max(0, parseFloat(item.product?.stock) || 0);
+    const pendiente = Math.max(0, (parseFloat(item.cantidad_solicitada) || 0) - (parseFloat(item.cantidad_despachada) || 0));
+    const faltante = Math.max(0, pendiente - stock);
+    byId('stockAlertProducto').textContent = item.product?.nombre || 'Producto';
+    byId('stockAlertDetalle').textContent = 'Pendiente: ' + fmtNum(pendiente) + ' · Stock disponible: ' + fmtNum(stock) + ' · Faltante: ' + fmtNum(faltante);
+    byId('modalStockAdvertencia').classList.add('open');
+    byId('btnStockAlertEntendido').onclick = function(){
+        byId('modalStockAdvertencia').classList.remove('open');
+        if(typeof alCerrar === 'function') alCerrar();
+    };
 }
 
 function ocultarActivo(){
@@ -1085,26 +1135,34 @@ function actualizarCajasUI(item){
 }
 
 function actualizarStockUI(item){
-    const stock = parseFloat(item.product?.stock) || 0;
+    const stock = Math.max(0, parseFloat(item.product?.stock) || 0);
     const pendiente = Math.max(0, (parseFloat(item.cantidad_solicitada) || 0) - (parseFloat(item.cantidad_despachada) || 0));
-    const sinStock = stock <= 0 && pendiente > 0;
+    const stockInsuficiente = pendiente > 0 && stock < pendiente;
+    const faltante = Math.max(0, pendiente - stock);
     const row = byId('item-' + item.id);
-    if(row) row.classList.toggle('op-sin-stock', sinStock);
+    if(row) row.classList.toggle('op-sin-stock', stockInsuficiente);
     const badge = byId('stock-badge-' + item.id);
     if(badge){
         badge.textContent = stock > 0 ? 'STOCK: ' + fmtNum(stock) : 'SIN STOCK';
         badge.classList.toggle('has-stock', stock > 0);
     }
+    const aviso = byId('stock-warning-' + item.id);
+    if(aviso){
+        aviso.style.display = stockInsuficiente ? 'block' : 'none';
+        aviso.textContent = stockInsuficiente
+            ? '⚠ Stock insuficiente. Faltan ' + fmtNum(faltante) + ' unidades. Consultar con el encargado.'
+            : '';
+    }
     const boton = row?.querySelector('button[onclick*="seleccionarPorId"]');
     if(boton){
-        boton.disabled = sinStock;
-        boton.title = sinStock ? 'Producto sin stock' : 'Seleccionar producto';
+        boton.disabled = false;
+        boton.title = stockInsuficiente ? 'Seleccionar producto (stock insuficiente)' : 'Seleccionar producto';
     }
     if(activoActual && activoActual.id === item.id){
         byId('activoStock').textContent = fmtNum(stock);
         byId('activoStock').style.color = stock <= 0 ? '#b91c1c' : 'var(--op-text)';
-        byId('activoCantidad').disabled = stock <= 0;
-        byId('btnGuardar').disabled = stock <= 0;
+        byId('activoCantidad').disabled = false;
+        byId('btnGuardar').disabled = false;
     }
 }
 
@@ -1158,11 +1216,7 @@ function resaltarFila(id){
 function seleccionarItem(item){
     const sol = parseFloat(item.cantidad_solicitada) || 0;
     const desActual = parseFloat(item.cantidad_despachada) || 0;
-    const stockActual = parseFloat(item.product?.stock) || 0;
-    if(stockActual <= 0 && desActual < sol){
-        showToast('⛔ ' + item.product.nombre + ' — SIN STOCK. No es necesario prepararlo.', 'ter');
-        return false;
-    }
+    const stockActual = Math.max(0, parseFloat(item.product?.stock) || 0);
     const des = parseFloat(item.cantidad_despachada) || 0;
     const pct = sol > 0 ? (des / sol) * 100 : 0;
 
@@ -1249,10 +1303,6 @@ function guardarDespacho(){
     const stockDisponible = parseFloat(item.product?.stock) || 0;
     const cantidadActual = parseFloat(item.cantidad_despachada) || 0;
     const cantidad = parseFloat(byId('activoCantidad').value);
-    if(cantidad > cantidadActual && stockDisponible <= 0){
-        showToast('⛔ Producto SIN STOCK. No se puede aumentar el despacho.', 'ter');
-        return;
-    }
     if(isNaN(cantidad) || cantidad < 0){
         showToast('⚠ Cantidad inválida', 'twk');
         return;
