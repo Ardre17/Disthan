@@ -161,6 +161,9 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
 .op-table tbody tr.op-sin-stock{ background:#fff4cc; }
 .op-table tbody tr.op-sin-stock td{ border-bottom-color:#f3d477; }
 .op-table tbody tr.op-sin-stock .op-pname{ color:#854d0e; }
+.op-table tbody tr.op-stock-cero{ background:#fee2e2; }
+.op-table tbody tr.op-stock-cero td{ border-bottom-color:#fca5a5; }
+.op-table tbody tr.op-stock-cero .op-pname{ color:#b91c1c; }
 .op-stock-badge{ display:inline-flex; align-items:center; gap:4px; margin-top:5px; padding:3px 8px; border-radius:999px; background:#fee2e2; color:#b91c1c; font-size:10px; font-weight:800; letter-spacing:.03em; }
 .op-stock-warning{ display:none; margin-top:6px; color:#854d0e; font-size:11px; line-height:1.35; font-weight:700; max-width:290px; }
 .op-sin-stock .op-stock-warning{ display:block; }
@@ -605,7 +608,7 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
             $cajasDespachadas   = $porCaja > 0 ? intdiv((int) $item->cantidad_despachada, $porCaja) : 0;
             $sueltasDespachadas = $porCaja > 0 ? ((int) $item->cantidad_despachada % $porCaja) : 0;
         @endphp
-        <tr id="item-{{ $item->id }}" class="{{ (float) ($item->product->stock ?? 0) < (float) $pend && $pend > 0 ? 'op-sin-stock' : '' }}" style="--lc:{{ $lc }};">
+        <tr id="item-{{ $item->id }}" class="{{ (float) ($item->product->stock ?? 0) <= 0 && $pend > 0 ? 'op-stock-cero' : (((float) ($item->product->stock ?? 0) < (float) $pend && $pend > 0) ? 'op-sin-stock' : '') }}" style="--lc:{{ $lc }};">
             <td data-label="#">{{ $loop->iteration }}</td>
             <td data-label="Estado">
                 <span class="op-st {{ $stCls }}" id="st-{{ $item->id }}" title="{{ $stLbl }}"><svg class="ic"><use href="{{ $stIcon }}"/></svg></span>
@@ -673,7 +676,7 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
                         @js($item->lote),
                         @js($item->fecha_vencimiento ? \Carbon\Carbon::parse($item->fecha_vencimiento)->format('Y-m-d') : '')
                     )"><svg class="ic sm"><use href="#i-edit"/></svg></button>
-                    <button type="button" class="op-icon-btn" title="Seleccionar producto" aria-label="Seleccionar producto" onclick="seleccionarPorId({{ $item->id }})"><svg class="ic sm"><use href="#i-chevron"/></svg></button>
+                    <button type="button" class="op-icon-btn" title="{{ (float) ($item->product->stock ?? 0) <= 0 && $pend > 0 ? 'Producto sin stock: bloqueado' : 'Seleccionar producto' }}" aria-label="Seleccionar producto" {{ (float) ($item->product->stock ?? 0) <= 0 && $pend > 0 ? 'disabled' : '' }} onclick="seleccionarPorId({{ $item->id }})"><svg class="ic sm"><use href="#i-chevron"/></svg></button>
                     @if($esSuper)
                         {{-- Supermercados: utiliza etiqueta-barra.blade.php (ruta orders.etiqueta) --}}
                         <a href="{{ route('orders.etiqueta', $item) }}"
@@ -1028,8 +1031,8 @@ function mostrarActivo(item){
     const stockCero = stockActual <= 0;
     const cantidadInput = byId('activoCantidad');
     const guardarBtn = byId('btnGuardar');
-    if(cantidadInput) cantidadInput.disabled = false;
-    if(guardarBtn) guardarBtn.disabled = false;
+    if(cantidadInput) cantidadInput.disabled = stockCero;
+    if(guardarBtn) guardarBtn.disabled = stockCero;
 
     byId('activoNombre').textContent    = item.product.nombre;
     byId('activoSku').textContent       = item.product.sku ?? '—';
@@ -1059,7 +1062,7 @@ function mostrarActivo(item){
 
     // Primero se muestra la advertencia de stock; después, si corresponde, la nutricional.
     const pendiente = Math.max(0, (parseFloat(item.cantidad_solicitada) || 0) - (parseFloat(item.cantidad_despachada) || 0));
-    if(stockActual < pendiente){
+    if(stockActual > 0 && stockActual < pendiente){
         mostrarModalStockAdvertencia(item, function(){ continuarSeleccionActivo(item); });
     } else {
         continuarSeleccionActivo(item);
@@ -1137,10 +1140,14 @@ function actualizarCajasUI(item){
 function actualizarStockUI(item){
     const stock = Math.max(0, parseFloat(item.product?.stock) || 0);
     const pendiente = Math.max(0, (parseFloat(item.cantidad_solicitada) || 0) - (parseFloat(item.cantidad_despachada) || 0));
-    const stockInsuficiente = pendiente > 0 && stock < pendiente;
+    const sinStock = pendiente > 0 && stock <= 0;
+    const stockInsuficiente = pendiente > 0 && stock > 0 && stock < pendiente;
     const faltante = Math.max(0, pendiente - stock);
     const row = byId('item-' + item.id);
-    if(row) row.classList.toggle('op-sin-stock', stockInsuficiente);
+    if(row){
+        row.classList.toggle('op-stock-cero', sinStock);
+        row.classList.toggle('op-sin-stock', stockInsuficiente);
+    }
     const badge = byId('stock-badge-' + item.id);
     if(badge){
         badge.textContent = stock > 0 ? 'STOCK: ' + fmtNum(stock) : 'SIN STOCK';
@@ -1155,14 +1162,14 @@ function actualizarStockUI(item){
     }
     const boton = row?.querySelector('button[onclick*="seleccionarPorId"]');
     if(boton){
-        boton.disabled = false;
-        boton.title = stockInsuficiente ? 'Seleccionar producto (stock insuficiente)' : 'Seleccionar producto';
+        boton.disabled = sinStock;
+        boton.title = sinStock ? 'Producto sin stock: bloqueado' : (stockInsuficiente ? 'Seleccionar producto (stock insuficiente)' : 'Seleccionar producto');
     }
     if(activoActual && activoActual.id === item.id){
         byId('activoStock').textContent = fmtNum(stock);
         byId('activoStock').style.color = stock <= 0 ? '#b91c1c' : 'var(--op-text)';
-        byId('activoCantidad').disabled = false;
-        byId('btnGuardar').disabled = false;
+        byId('activoCantidad').disabled = sinStock;
+        byId('btnGuardar').disabled = sinStock;
     }
 }
 
@@ -1217,7 +1224,13 @@ function seleccionarItem(item){
     const sol = parseFloat(item.cantidad_solicitada) || 0;
     const desActual = parseFloat(item.cantidad_despachada) || 0;
     const stockActual = Math.max(0, parseFloat(item.product?.stock) || 0);
+    const pendienteActual = Math.max(0, sol - desActual);
     const des = parseFloat(item.cantidad_despachada) || 0;
+
+    if(stockActual <= 0 && pendienteActual > 0){
+        showToast('⛔ ' + item.product.nombre + ' está sin stock. Selección bloqueada.', 'ter');
+        return false;
+    }
     const pct = sol > 0 ? (des / sol) * 100 : 0;
 
     if(pct >= 100){
@@ -1300,9 +1313,13 @@ function guardarDespacho(){
     const item = activoActual;
     const btn = byId('btnGuardar');
 
-    const stockDisponible = parseFloat(item.product?.stock) || 0;
+    const stockDisponible = Math.max(0, parseFloat(item.product?.stock) || 0);
     const cantidadActual = parseFloat(item.cantidad_despachada) || 0;
     const cantidad = parseFloat(byId('activoCantidad').value);
+    if(stockDisponible <= 0 && Math.max(0, (parseFloat(item.cantidad_solicitada) || 0) - cantidadActual) > 0){
+        showToast('⛔ Producto sin stock. Despacho bloqueado.', 'ter');
+        return;
+    }
     if(isNaN(cantidad) || cantidad < 0){
         showToast('⚠ Cantidad inválida', 'twk');
         return;
