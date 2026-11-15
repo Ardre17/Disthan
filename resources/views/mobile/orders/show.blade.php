@@ -96,8 +96,13 @@
                     $meta = $preparationMeta[$detail->id] ?? null;
                     $lote = $detail->lote ?: ($detail->product->lote ?? '');
                     $vence = $detail->fecha_vencimiento ?: ($detail->product->fecha_vencimiento ?? null);
-                    $produccion = $detail->product->fecha_produccion ?? null;
-                    $ultimoUsuario = $meta ? ($userNames[$meta->updated_by] ?? 'Usuario no disponible') : 'Sin registros';
+                    $produccion = $detail->fecha_produccion ?: ($detail->product->fecha_produccion ?? null);
+                    $ultimoUsuario = 'Sin registros';
+                    if ($meta && !empty($meta->updated_by)) {
+                        $ultimoUsuario = is_numeric($meta->updated_by)
+                            ? ($userNames[$meta->updated_by] ?? ('Usuario #' . $meta->updated_by))
+                            : $meta->updated_by;
+                    }
                 @endphp
                 <article class="product {{ $estadoArmado }}" id="detail-{{ $detail->id }}"
                     data-detail-id="{{ $detail->id }}"
