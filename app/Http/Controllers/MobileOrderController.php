@@ -172,10 +172,9 @@ class MobileOrderController extends Controller
                 }
             }
             if (Schema::hasColumn('order_details', 'preparado_por')) {
-                $tipoResponsable = Schema::getColumnType('order_details', 'preparado_por');
-                $update['preparado_por'] = in_array($tipoResponsable, ['integer', 'bigint', 'smallint'], true)
-                    ? auth()->id()
-                    : (auth()->user()->name ?? 'Usuario #' . auth()->id());
+                // En PostgreSQL, preparado_por es BIGINT: guardar siempre el ID del usuario.
+                // No guardar el nombre ni el perfil (por ejemplo, 'Operario').
+                $update['preparado_por'] = auth()->id();
             }
             if (Schema::hasColumn('order_details', 'fecha_preparacion')) {
                 $update['fecha_preparacion'] = $ahora;
