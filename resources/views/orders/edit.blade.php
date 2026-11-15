@@ -2,6 +2,59 @@
 
 @section('content')
 
+{{-- DISTAN: avance de armado sincronizado (independiente del despacho) --}}
+<style>
+.distan-prep-live{margin:12px 0 16px;padding:14px 16px;background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;color:#1e3a8a;display:flex;gap:16px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.distan-prep-live .dpl-title{font-weight:800;font-size:13px}.distan-prep-live .dpl-sub{font-size:11px;color:#475569;margin-top:3px}
+.distan-prep-live .dpl-stats{display:flex;gap:14px;flex-wrap:wrap}.distan-prep-live .dpl-stat{font-size:12px;color:#334155}.distan-prep-live .dpl-stat b{font-size:15px;color:#0f172a;margin-left:4px}
+.distan-prep-live .dpl-progress{height:7px;background:#dbeafe;border-radius:99px;overflow:hidden;flex:1;min-width:120px}.distan-prep-live .dpl-progress i{display:block;height:100%;background:#2563eb;width:0;transition:width .25s}
+.distan-prep-live .dpl-pct{font-weight:800;font-size:13px;min-width:42px;text-align:right}
+.distan-prep-tag{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:2px 7px;border-radius:99px;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;white-space:nowrap}
+.distan-prep-tag.partial{background:#fef3c7;color:#92400e}.distan-prep-tag.done{background:#dcfce7;color:#166534}
+</style>
+<div class="distan-prep-live" id="distanPrepLive" data-progress-url="{{ route('preparation.orders.preparation.progress', $order) }}">
+  <div><div class="dpl-title">Armado del pedido · sincronización en vivo</div><div class="dpl-sub" id="dplUpdated">Consultando avance compartido…</div></div>
+  <div class="dpl-stats"><span class="dpl-stat">Preparado<b id="dplPrepared">—</b></span><span class="dpl-stat">Pendiente<b id="dplPending">—</b></span><span class="dpl-stat">Solicitado<b id="dplRequested">—</b></span></div>
+  <div class="dpl-progress"><i id="dplBar"></i></div><div class="dpl-pct" id="dplPercent">0%</div>
+</div>
+<script>
+(function(){
+  const box=document.getElementById('distanPrepLive'); if(!box) return;
+  const url=box.dataset.progressUrl;
+  const fmt=n=>Number(n||0).toLocaleString('es-PE',{maximumFractionDigits:3});
+  async function refreshPreparation(){
+    try{
+      const response=await fetch(url,{headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest'},cache:'no-store'});
+      if(!response.ok) return;
+      const data=await response.json();
+      document.getElementById('dplPrepared').textContent=fmt(data.prepared);
+      document.getElementById('dplPending').textContent=fmt(data.pending);
+      document.getElementById('dplRequested').textContent=fmt(data.requested);
+      document.getElementById('dplPercent').textContent=(data.percent||0)+'%';
+      document.getElementById('dplBar').style.width=Math.min(100,Math.max(0,Number(data.percent)||0))+'%';
+      document.getElementById('dplUpdated').textContent='Actualizado automáticamente · '+new Date().toLocaleTimeString('es-PE',{hour:'2-digit',minute:'2-digit',second:'2-digit'});
+      (data.details||[]).forEach(item=>{
+        const row=document.querySelector('[data-order-detail="'+item.id+'"]'); if(!row) return;
+        let tag=row.querySelector('.distan-prep-tag');
+        if(!tag){
+          tag=document.createElement('span');tag.className='distan-prep-tag';
+          const target=row.querySelector('.oc-pname,.lc-pname,.p-name')||row.querySelector('td:nth-child(2)')||row;
+          target.appendChild(tag);
+        }
+        const prepared=Number(item.prepared)||0, requested=Number(item.requested)||0;
+        const status=prepared<=0?'Pendiente':(prepared+0.000001>=requested?'Completo':'Parcial');
+        tag.className='distan-prep-tag '+(status==='Completo'?'done':(status==='Parcial'?'partial':''));
+        tag.textContent='Armado: '+fmt(prepared)+' / '+fmt(requested)+' · '+status;
+        tag.title='Pendiente de armado: '+fmt(item.pending);
+      });
+    }catch(e){ console.warn('No se pudo actualizar el avance de armado.',e); }
+  }
+  refreshPreparation();
+  window.setInterval(refreshPreparation,6000);
+})();
+</script>
+
+
 @php
     // Icono de pestaña e imagen animada de carga, siguiendo el estilo de Kardex.
     $erpLogoUrl = null;

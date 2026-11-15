@@ -159,12 +159,7 @@ class MobileOrderController extends Controller
                 ]);
             }
 
-            $stock = (float) (DB::table('products')->where('id', $lockedDetail->product_id)->lockForUpdate()->value('stock') ?? 0);
-            if ($stock <= 0 || $nuevo > $stock + 0.000001) {
-                throw ValidationException::withMessages([
-                    'cantidad_armada' => 'El avance acumulado supera el stock disponible para armado. Stock actual: ' . $stock . '. Consulta con el encargado si existe producto disponible.',
-                ]);
-            }
+            // El armado es un registro operativo: no valida ni descuenta stock.
 
             $ahora = now();
             $completo = $solicitado > 0 && $nuevo >= $solicitado;
