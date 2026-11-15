@@ -644,6 +644,11 @@ Route::prefix('preparation')
         Route::get('/', 'index')
             ->name('index');
 
+        // Avance de preparación para sincronización en vivo en las vistas de pedidos
+        Route::get('/orders/{order}/preparation-progress', 'progress')
+            ->whereNumber('order')
+            ->name('orders.preparation.progress');
+
         // Asistente de preparación
         Route::get('/{order}', 'show')
             ->name('show');
