@@ -2,1077 +2,743 @@
 
 @section('content')
 
+
 <style>
-:root{
-    --erp-bg:#eef1f5;
-    --erp-surface:#ffffff;
-    --erp-border:#dde2ea;
-    --erp-ink:#1c2733;
-    --erp-ink-muted:#5b6b7d;
-    --erp-accent:#0b5ed7;
-    --erp-accent-dark:#0a4eb3;
-    --erp-danger:#c0312b;
-    --erp-danger-bg:#fbe9e8;
-    --erp-warn:#b9690e;
-    --erp-warn-bg:#fdf1e2;
-    --erp-ok:#1c7c4d;
-    --erp-ok-bg:#e8f5ee;
-    --font-ui:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Arial,sans-serif;
-    --font-mono:'Consolas','SFMono-Regular',Menlo,monospace;
-}
-*{box-sizing:border-box;}
-.page{
-    background:var(--erp-bg);
-    font-family:var(--font-ui);
-    color:var(--erp-ink);
-    padding:0;min-height:100vh;font-size:13px;
-}
-
-/* ── Top bar ── */
-.erp-bar{
-    background:#1e3a5f;height:38px;
-    display:flex;align-items:center;justify-content:space-between;
-    padding:0 1.25rem;margin:-20px -20px 0;
-}
-.erp-bar-left{display:flex;align-items:center;gap:10px;}
-.erp-logo{color:#fff;font-size:13px;font-weight:700;letter-spacing:.3px;}
-.erp-sep{width:1px;height:18px;background:#334155;}
-.erp-module{color:#7eb8f7;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;}
-.body{padding:1.1rem;}
-
-/* ── Header ── */
-.page-hdr{
-    display:flex;justify-content:space-between;
-    align-items:flex-start;margin-bottom:1rem;flex-wrap:wrap;gap:8px;
-}
-.page-title{
-    font-size:17px;font-weight:700;color:#0f172a;
-    display:flex;align-items:center;gap:8px;
-}
-.page-title:before{
-    content:"";width:4px;height:20px;
-    background:var(--erp-accent);border-radius:2px;display:inline-block;
-}
-.page-sub{font-size:11px;color:#64748b;margin-top:2px;}
-.btn-new{
-    background:var(--erp-accent);color:#fff;
-    padding:8px 16px;border-radius:3px;
-    font-size:12px;font-weight:600;
-    text-decoration:none;display:inline-flex;align-items:center;gap:5px;
-    transition:background .15s;
-}
-.btn-new:hover{background:var(--erp-accent-dark);color:#fff;}
-.btn-calendar{
-    background:#fff;
-    color:var(--erp-ink);
-    border:1px solid var(--erp-border);
-    padding:8px 16px;
-    border-radius:3px;
-    font-size:12px;
-    font-weight:600;
-    text-decoration:none;
-    display:inline-flex;
-    align-items:center;
-    gap:5px;
-    cursor:pointer;
-    transition:background .15s,border-color .15s;
-}
-
-.btn-calendar:hover{
-    background:#f8fafc;
-    border-color:#c2cbd8;
-}
-
-.btn-calendar:active{
-    transform:scale(.98);
-}
-
-/* ── KPIs ── */
-.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1rem;}
-@media(max-width:700px){.kpis{grid-template-columns:repeat(2,1fr);}}
-.kpi{
-    background:var(--erp-surface);border:1px solid var(--erp-border);
-    border-radius:4px;padding:.75rem 1rem;border-left:4px solid;
-    position:relative;overflow:hidden;
-}
-.kpi-icon{
-    position:absolute;right:10px;top:50%;transform:translateY(-50%);
-    font-size:26px;opacity:.1;
-}
-.kpi-label{font-size:10px;color:var(--erp-ink-muted);text-transform:uppercase;letter-spacing:.06em;font-weight:600;margin-bottom:3px;}
-.kpi-val{font-size:22px;font-weight:800;color:var(--erp-ink);line-height:1;}
-.kpi-sub{font-size:10px;color:#94a3b8;margin-top:1px;}
-
-/* ── Advertencias ── */
-.warn-card{
-    background:#fffbeb;border:1px solid #fde68a;
-    border-left:4px solid #f59e0b;border-radius:4px;
-    padding:1rem;margin-bottom:1rem;
-}
-.warn-title{
-    display:flex;align-items:center;gap:7px;
-    font-size:12px;font-weight:700;color:#b45309;
-    text-transform:uppercase;letter-spacing:.06em;margin-bottom:.75rem;
-}
-.warn-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px;}
-.warn-item{
-    display:flex;align-items:flex-start;gap:8px;
-    background:#fff;border:1px solid #fde68a;
-    border-radius:3px;padding:8px 10px;
-}
-.warn-item-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
-.warn-item-text{font-size:11px;color:#7c4b00;line-height:1.55;}
-.warn-item-text strong{color:#b45309;}
-
-/* ── Info strip ── */
-.info-strip{
-    background:#eff6ff;border:1px solid #bfdbfe;
-    border-left:4px solid var(--erp-accent);
-    border-radius:4px;padding:.75rem 1rem;
-    margin-bottom:1rem;
-    display:flex;align-items:flex-start;gap:10px;
-    font-size:11px;color:#1e40af;line-height:1.6;
-}
-
-/* ── Filter bar ── */
-.filter-bar{
-    background:var(--erp-surface);border:1px solid var(--erp-border);
-    border-radius:4px;padding:.75rem 1rem;
-    margin-bottom:1rem;display:flex;gap:8px;align-items:center;flex-wrap:wrap;
-}
+/* Compatibilidad visual de los modales existentes */
 .finput{
-    padding:7px 10px;border:1px solid var(--erp-border);
-    border-radius:3px;font-size:12px;color:var(--erp-ink);
-    background:#fbfcfe;outline:none;flex:1;min-width:180px;
-    font-family:var(--font-ui);transition:border-color .15s;
+    width:100%;padding:8px 10px;border:1px solid #d5deeb;border-radius:6px;
+    font-size:12px;color:#26364d;background:#fff;outline:none;font-family:inherit;
 }
-.finput:focus{border-color:var(--erp-accent);box-shadow:0 0 0 2px rgba(11,94,215,.1);}
-.fselect{
-    padding:7px 10px;border:1px solid var(--erp-border);
-    border-radius:3px;font-size:12px;color:var(--erp-ink);
-    background:#fbfcfe;outline:none;
-    font-family:var(--font-ui);
-}
-
-/* ── Result bar ── */
-.result-bar{
-    display:flex;justify-content:space-between;align-items:center;
-    margin-bottom:.65rem;font-size:12px;color:var(--erp-ink-muted);
-    flex-wrap:wrap;gap:6px;
-}
-.result-bar strong{color:var(--erp-ink);}
-
-/* ── Cards producción ── */
-.catalog{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(290px,1fr));
-    gap:12px;
-}
-.prod-card{
-    background:var(--erp-surface);border:1px solid var(--erp-border);
-    border-radius:4px;overflow:hidden;
-    display:flex;flex-direction:column;
-    transition:box-shadow .15s,border-color .15s;
-}
-.prod-card:hover{
-    border-color:#c2cbd8;
-    box-shadow:0 2px 10px rgba(20,30,45,.08);
-}
-.prod-card.st-pending   {border-top:3px solid #f59e0b;}
-.prod-card.st-progress  {border-top:3px solid var(--erp-accent);}
-.prod-card.st-done      {border-top:3px solid var(--erp-ok);}
-.prod-card.st-cancelled {border-top:3px solid #94a3b8;}
-
-.prod-card-hdr{
-    padding:.75rem 1rem .5rem;
-    border-bottom:1px solid var(--erp-border);
-    display:flex;justify-content:space-between;align-items:flex-start;gap:8px;
-}
-.prod-num{
-    font-family:var(--font-mono);font-size:13px;
-    font-weight:700;color:var(--erp-ink);
-}
-.status-badge{
-    display:inline-flex;align-items:center;gap:3px;
-    font-size:10px;font-weight:700;padding:3px 8px;
-    border-radius:3px;white-space:nowrap;flex-shrink:0;
-}
-.sb-pending   {background:#fef3c7;color:#b45309;border:1px solid #fde68a;}
-.sb-progress  {background:#dbeafe;color:var(--erp-accent-dark);border:1px solid #bfdbfe;}
-.sb-done      {background:var(--erp-ok-bg);color:var(--erp-ok);border:1px solid #b7dfca;}
-.sb-cancelled {background:#f1f5f9;color:#64748b;border:1px solid #e2e8f0;}
-
-.prod-card-body{padding:.75rem 1rem;flex:1;display:flex;flex-direction:column;gap:0;}
-.info-row{
-    display:flex;justify-content:space-between;align-items:center;
-    font-size:12px;padding:5px 0;
-    border-bottom:1px dashed #ecf0f4;
-    color:var(--erp-ink-muted);
-}
-.info-row:last-of-type{border-bottom:none;}
-.info-val{font-weight:600;color:var(--erp-ink);max-width:60%;text-align:right;}
-
-.mat-tag{
-    display:inline-flex;align-items:center;gap:4px;
-    background:#f4f6f9;border:1px solid var(--erp-border);
-    border-radius:3px;padding:3px 8px;
-    font-size:11px;font-weight:600;color:var(--erp-ink-muted);
-    margin-top:6px;
-}
-
-.prod-card-footer{
-    padding:.65rem 1rem;background:#f9fafb;
-    border-top:1px solid var(--erp-border);
-}
-.btn-open{
-    display:flex;align-items:center;justify-content:center;gap:5px;
-    width:100%;padding:8px;
-    background:var(--erp-ok);color:#fff;
-    border:none;border-radius:3px;
-    font-size:12px;font-weight:600;
-    text-decoration:none;cursor:pointer;
-    transition:background .15s;
-}
-.btn-open:hover{background:#166534;color:#fff;}
-
-/* ── Empty ── */
-.empty-state{
-    background:var(--erp-surface);border:1px dashed var(--erp-border);
-    border-radius:4px;padding:3rem;text-align:center;
-    color:var(--erp-ink-muted);grid-column:1/-1;
-}
-.empty-state h3{color:var(--erp-ink);font-size:15px;margin-bottom:6px;}
-
-/* =========================================================
-   CALENDARIO DE PRODUCCIÓN
-========================================================= */
-
+.finput:focus{border-color:#7eabf5;box-shadow:0 0 0 3px rgba(7,94,232,.08);}
+.flabel{display:block;font-size:11px;font-weight:700;color:#475569;margin-bottom:5px;}
 .calendario-modal{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:rgba(15,23,42,.60);
-    z-index:11000;
-    align-items:center;
-    justify-content:center;
-    padding:20px;
+    display:none;position:fixed;inset:0;background:rgba(15,23,42,.60);
+    z-index:11000;align-items:center;justify-content:center;padding:20px;
 }
-
 .calendario-box{
-    background:#fff;
-    width:min(950px,96vw);
-    max-height:92vh;
-    border-radius:8px;
-    box-shadow:0 20px 50px rgba(0,0,0,.25);
-    overflow:hidden;
-    display:flex;
-    flex-direction:column;
+    background:#fff;width:min(950px,96vw);max-height:92vh;border-radius:8px;
+    box-shadow:0 20px 50px rgba(0,0,0,.25);overflow:hidden;display:flex;flex-direction:column;
 }
-
 .calendario-header{
-    padding:15px 18px;
-    border-bottom:1px solid #e2e8f0;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
+    padding:15px 18px;border-bottom:1px solid #e2e8f0;display:flex;
+    justify-content:space-between;align-items:center;gap:10px;
 }
-
-.calendario-titulo{
-    font-size:16px;
-    font-weight:800;
-    color:#0f172a;
-}
-
-.calendario-subtitulo{
-    font-size:11px;
-    color:#94a3b8;
-    margin-top:2px;
-}
-
+.calendario-titulo{font-size:16px;font-weight:800;color:#0f172a;}
+.calendario-subtitulo{font-size:11px;color:#94a3b8;margin-top:2px;}
 .calendario-close{
-    border:0;
-    background:#f1f5f9;
-    width:32px;
-    height:32px;
-    border-radius:5px;
-    font-size:18px;
-    cursor:pointer;
+    border:0;background:#f1f5f9;width:32px;height:32px;border-radius:5px;
+    font-size:18px;cursor:pointer;
 }
-
-.calendario-body{
-    padding:18px;
-    overflow:auto;
-}
-
-.calendario-navegacion{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:15px;
-}
-
-.calendario-mes{
-    font-size:17px;
-    font-weight:800;
-    color:#0f172a;
-    text-transform:capitalize;
-}
-
+.calendario-body{padding:18px;overflow:auto;}
+.calendario-navegacion{display:flex;align-items:center;justify-content:space-between;margin-bottom:15px;}
+.calendario-mes{font-size:17px;font-weight:800;color:#0f172a;text-transform:capitalize;}
 .calendario-nav-btn{
-    border:1px solid #cbd5e1;
-    background:#fff;
-    color:#334155;
-    width:36px;
-    height:34px;
-    border-radius:5px;
-    cursor:pointer;
-    font-size:16px;
+    border:1px solid #cbd5e1;background:#fff;color:#334155;width:36px;height:34px;
+    border-radius:5px;cursor:pointer;font-size:16px;
 }
-
-.calendario-nav-btn:hover{
-    background:#f8fafc;
-}
-
-.calendario-grid{
-    display:grid;
-    grid-template-columns:repeat(7,1fr);
-    gap:5px;
-}
-
-.calendario-dia-semana{
-    text-align:center;
-    font-size:10px;
-    font-weight:800;
-    color:#64748b;
-    padding:6px 2px;
-    text-transform:uppercase;
-}
-
+.calendario-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+.calendario-dia-semana{text-align:center;font-size:10px;font-weight:800;color:#64748b;padding:6px 2px;text-transform:uppercase;}
 .calendario-dia{
-    min-height:78px;
-    border:1px solid #e2e8f0;
-    background:#fff;
-    border-radius:5px;
-    padding:7px;
-    cursor:pointer;
-    position:relative;
-    transition:.15s;
+    min-height:65px;border:1px solid #e2e8f0;background:#fff;border-radius:5px;
+    padding:7px;cursor:pointer;position:relative;
 }
-
-.calendario-dia:hover{
-    border-color:#93c5fd;
-    background:#f8fbff;
-}
-
-.calendario-dia.vacio{
-    background:#f8fafc;
-    cursor:default;
-}
-
-.calendario-dia-numero{
-    font-size:12px;
-    font-weight:800;
-    color:#334155;
-}
-
-.calendario-dia.hoy{
-    border-color:#0b5ed7;
-    box-shadow:inset 0 0 0 1px #0b5ed7;
-}
-
-.calendario-dia.hoy .calendario-dia-numero{
-    color:#0b5ed7;
-}
-
-.calendario-producciones{
-    margin-top:7px;
-    display:flex;
-    flex-direction:column;
-    gap:3px;
-}
-
+.calendario-dia.vacio{background:#f8fafc;cursor:default;}
+.calendario-dia-numero{font-size:12px;font-weight:800;color:#334155;}
+.calendario-dia.hoy{border-color:#0b5ed7;box-shadow:inset 0 0 0 1px #0b5ed7;}
+.calendario-dia.hoy .calendario-dia-numero{color:#0b5ed7;}
+.calendario-producciones{margin-top:7px;display:flex;flex-direction:column;gap:3px;}
 .calendario-produccion-indicador{
-    display:flex;
-    align-items:center;
-    gap:4px;
-    background:#e8f5ee;
-    color:#166534;
-    border-radius:3px;
-    padding:3px 5px;
-    font-size:9px;
-    font-weight:700;
-    overflow:hidden;
-    white-space:nowrap;
+    display:flex;align-items:center;gap:4px;background:#e8f5ee;color:#166534;
+    border-radius:3px;padding:3px 5px;font-size:9px;font-weight:700;overflow:hidden;white-space:nowrap;
 }
-
-.calendario-produccion-indicador .punto{
-    width:5px;
-    height:5px;
-    border-radius:50%;
-    background:#1c7c4d;
-    flex-shrink:0;
-}
-
-.calendario-mas{
-    font-size:9px;
-    color:#64748b;
-    font-weight:700;
-    margin-top:2px;
-}
-
-.producciones-dia{
-    margin-top:18px;
-    border-top:1px solid #e2e8f0;
-    padding-top:15px;
-}
-
-.producciones-dia-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:10px;
-    margin-bottom:10px;
-}
-
-.producciones-dia-titulo{
-    font-size:14px;
-    font-weight:800;
-    color:#0f172a;
-}
-
-.producciones-dia-resumen{
-    display:flex;
-    gap:6px;
-    flex-wrap:wrap;
-}
-
-.resumen-chip{
-    background:#f1f5f9;
-    border:1px solid #e2e8f0;
-    border-radius:4px;
-    padding:5px 8px;
-    font-size:10px;
-    color:#475569;
-    font-weight:700;
-}
-
-.produccion-dia-card{
-    border:1px solid #e2e8f0;
-    border-radius:5px;
-    padding:10px;
-    margin-bottom:7px;
-    background:#fff;
-}
-
-.produccion-dia-top{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    gap:8px;
-}
-
-.produccion-dia-op{
-    font-family:var(--font-mono);
-    font-size:12px;
-    font-weight:800;
-    color:#0f172a;
-}
-
-.produccion-dia-hora{
-    font-size:10px;
-    color:#64748b;
-}
-
-.produccion-dia-producto{
-    font-size:12px;
-    font-weight:700;
-    color:#334155;
-    margin-top:6px;
-}
-
-.produccion-dia-detalles{
-    display:grid;
-    grid-template-columns:repeat(3,1fr);
-    gap:7px;
-    margin-top:8px;
-}
-
-.produccion-dia-detalle{
-    background:#f8fafc;
-    border:1px solid #eef2f7;
-    border-radius:4px;
-    padding:6px;
-}
-
-.produccion-dia-detalle-label{
-    font-size:9px;
-    color:#94a3b8;
-    text-transform:uppercase;
-    font-weight:700;
-}
-
-.produccion-dia-detalle-value{
-    font-size:11px;
-    color:#334155;
-    font-weight:700;
-    margin-top:2px;
-}
-
-.btn-ver-produccion{
-    margin-top:8px;
-    border:1px solid #cbd5e1;
-    background:#fff;
-    color:#475569;
-    border-radius:4px;
-    padding:5px 9px;
-    font-size:10px;
-    font-weight:700;
-    cursor:pointer;
-}
-
-.btn-ver-produccion:hover{
-    background:#f8fafc;
-}
-
-.calendario-sin-producciones{
-    padding:25px 10px;
-    text-align:center;
-    color:#94a3b8;
-    font-size:12px;
-    border:1px dashed #dbe2ea;
-    border-radius:5px;
-}
-
+.calendario-produccion-indicador .punto{width:5px;height:5px;border-radius:50%;background:#1c7c4d;flex-shrink:0;}
+.calendario-mas{font-size:9px;color:#64748b;font-weight:700;margin-top:2px;}
+.producciones-dia{margin-top:18px;border-top:1px solid #e2e8f0;padding-top:15px;}
+.producciones-dia-header{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px;}
+.producciones-dia-titulo{font-size:14px;font-weight:800;color:#0f172a;}
+.producciones-dia-resumen{display:flex;gap:6px;flex-wrap:wrap;}
+.resumen-chip{background:#f1f5f9;border:1px solid #e2e8f0;border-radius:4px;padding:5px 8px;font-size:10px;color:#475569;font-weight:700;}
+.produccion-dia-card{border:1px solid #e2e8f0;border-radius:5px;padding:10px;margin-bottom:7px;background:#fff;}
+.produccion-dia-top{display:flex;justify-content:space-between;align-items:center;gap:8px;}
+.produccion-dia-op{font-family:monospace;font-size:12px;font-weight:800;color:#0f172a;}
+.produccion-dia-hora{font-size:10px;color:#64748b;}
+.produccion-dia-producto{font-size:12px;font-weight:700;color:#334155;margin-top:6px;}
+.produccion-dia-detalles{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:8px;}
+.produccion-dia-detalle{background:#f8fafc;border:1px solid #eef2f7;border-radius:4px;padding:6px;}
+.produccion-dia-detalle-label{font-size:9px;color:#94a3b8;text-transform:uppercase;font-weight:700;}
+.produccion-dia-detalle-value{font-size:11px;color:#334155;font-weight:700;margin-top:2px;}
+.btn-ver-produccion{margin-top:8px;border:1px solid #cbd5e1;background:#fff;color:#475569;border-radius:4px;padding:5px 9px;font-size:10px;font-weight:700;cursor:pointer;}
+.calendario-sin-producciones{padding:25px 10px;text-align:center;color:#94a3b8;font-size:12px;border:1px dashed #dbe2ea;border-radius:5px;}
 @media(max-width:700px){
-
-    .calendario-modal{
-        padding:8px;
-    }
-
-    .calendario-box{
-        width:100%;
-        max-height:96vh;
-    }
-
-    .calendario-body{
-        padding:10px;
-    }
-
-    .calendario-dia{
-        min-height:65px;
-        padding:5px;
-    }
-
-    .calendario-dia-numero{
-        font-size:11px;
-    }
-
-    .calendario-produccion-indicador{
-        font-size:8px;
-        padding:2px 3px;
-    }
-
-    .produccion-dia-detalles{
-        grid-template-columns:1fr;
-    }
+    .calendario-modal{padding:8px;}
+    .calendario-box{width:100%;max-height:96vh;}
+    .calendario-body{padding:10px;}
+    .calendario-dia{min-height:55px;padding:5px;}
+    .produccion-dia-detalles{grid-template-columns:1fr;}
 }
 </style>
 
-<div class="page">
+<style>
+/* =========================================================
+   DISTAN ERP · CONTROL DE PRODUCCIÓN
+   Vista de tabla + calendario lateral
+========================================================= */
+.prod-dashboard{
+    --pd-blue:#075ee8;
+    --pd-blue-dark:#064fc4;
+    --pd-ink:#172338;
+    --pd-muted:#64748b;
+    --pd-line:#dce4ef;
+    --pd-bg:#f3f6fb;
+    color:var(--pd-ink);
+    font-family:var(--font-ui, "Segoe UI", Arial, sans-serif);
+    padding:12px;
+    background:var(--pd-bg);
+    min-height:calc(100vh - 80px);
+}
+.prod-dashboard *{box-sizing:border-box;}
+.pd-actions{
+    display:flex;justify-content:flex-end;align-items:center;
+    gap:9px;margin-bottom:13px;flex-wrap:wrap;
+}
+.pd-btn{
+    display:inline-flex;align-items:center;justify-content:center;gap:7px;
+    min-height:37px;padding:8px 14px;border-radius:7px;
+    border:1px solid #cbd7e7;background:#fff;color:#24334a;
+    font-size:12px;font-weight:700;text-decoration:none;cursor:pointer;
+    transition:.15s ease;
+}
+.pd-btn:hover{background:#f8fbff;border-color:#9eb5d5;color:#172338;}
+.pd-btn-primary{background:var(--pd-blue);border-color:var(--pd-blue);color:#fff;}
+.pd-btn-primary:hover{background:var(--pd-blue-dark);border-color:var(--pd-blue-dark);color:#fff;}
+.pd-kpis{
+    display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
+    gap:10px;margin-bottom:14px;
+}
+.pd-kpi{
+    min-height:83px;background:#fff;border:1px solid var(--pd-line);
+    border-left:4px solid var(--pd-blue);border-radius:9px;
+    padding:13px 15px;display:flex;align-items:center;gap:12px;
+    box-shadow:0 2px 7px rgba(15,35,65,.045);position:relative;overflow:hidden;
+}
+.pd-kpi:nth-child(2){border-left-color:#f59e0b;}
+.pd-kpi:nth-child(3){border-left-color:#7955e8;}
+.pd-kpi:nth-child(4){border-left-color:#16a765;}
+.pd-kpi-icon{
+    width:43px;height:43px;flex:0 0 43px;border-radius:12px;
+    display:flex;align-items:center;justify-content:center;
+    background:#edf4ff;color:#1261df;font-size:21px;
+}
+.pd-kpi:nth-child(2) .pd-kpi-icon{background:#fff5e8;color:#e99013;}
+.pd-kpi:nth-child(3) .pd-kpi-icon{background:#f2efff;color:#7955e8;}
+.pd-kpi:nth-child(4) .pd-kpi-icon{background:#eaf9f1;color:#16a765;}
+.pd-kpi-label{font-size:11px;color:#52627a;font-weight:600;margin-bottom:3px;}
+.pd-kpi-value{font-size:23px;line-height:1.1;font-weight:800;letter-spacing:-.5px;color:#142238;}
+.pd-kpi-sub{font-size:10px;color:#94a3b8;margin-top:3px;}
+.pd-workspace{
+    display:grid;grid-template-columns:minmax(0,1fr) 330px;
+    gap:13px;align-items:start;
+}
+.pd-main{min-width:0;}
+.pd-panel{
+    background:#fff;border:1px solid var(--pd-line);border-radius:10px;
+    box-shadow:0 2px 8px rgba(15,35,65,.045);overflow:hidden;
+}
+.pd-filter-panel{padding:10px;margin-bottom:12px;}
+.pd-tabs{display:flex;gap:0;overflow-x:auto;margin-bottom:10px;}
+.pd-tab{
+    white-space:nowrap;border:1px solid #d5deeb;background:#fff;color:#26364d;
+    padding:9px 14px;font-size:11px;font-weight:700;cursor:pointer;
+    display:inline-flex;align-items:center;gap:7px;
+}
+.pd-tab:first-child{border-radius:7px 0 0 7px;}
+.pd-tab:last-child{border-radius:0 7px 7px 0;}
+.pd-tab+.pd-tab{border-left:0;}
+.pd-tab.active{background:var(--pd-blue);border-color:var(--pd-blue);color:#fff;}
+.pd-filter-row{display:flex;gap:10px;align-items:center;}
+.pd-search-wrap{position:relative;flex:1;min-width:150px;}
+.pd-search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#718198;}
+.pd-search{
+    width:100%;height:39px;border:1px solid #d4deeb;border-radius:7px;
+    padding:8px 12px 8px 35px;font-size:12px;color:#26364d;background:#fbfcfe;outline:none;
+}
+.pd-search:focus,.pd-select:focus{border-color:#7eabf5;box-shadow:0 0 0 3px rgba(7,94,232,.08);}
+.pd-period{display:flex;align-items:center;gap:8px;white-space:nowrap;font-size:11px;color:#52627a;font-weight:600;}
+.pd-select{
+    height:39px;min-width:145px;border:1px solid #d4deeb;border-radius:7px;
+    padding:7px 10px;background:#fbfcfe;color:#26364d;font-size:11px;outline:none;
+}
+.pd-table-head{
+    padding:12px 14px;border-bottom:1px solid #e5ebf3;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+}
+.pd-table-title{font-size:15px;font-weight:800;display:flex;align-items:center;gap:9px;}
+.pd-table-title-icon{color:var(--pd-blue);font-size:19px;}
+.pd-table-meta{font-size:11px;color:#64748b;display:flex;align-items:center;gap:9px;}
+.pd-sort-btn{
+    width:31px;height:31px;border:1px solid #d5deeb;border-radius:7px;
+    background:#fff;color:#475569;cursor:pointer;font-size:15px;
+}
+.pd-table-scroll{overflow-x:auto;}
+.pd-table{width:100%;border-collapse:collapse;min-width:790px;font-size:11px;}
+.pd-table thead th{
+    background:#f5f7fb;color:#35445a;text-align:left;padding:11px 10px;
+    font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.02em;
+    border-bottom:1px solid #e1e7f0;white-space:nowrap;
+}
+.pd-table tbody tr{border-bottom:1px solid #e8edf4;transition:background .12s;}
+.pd-table tbody tr:hover{background:#f8fbff;}
+.pd-table tbody tr:last-child{border-bottom:0;}
+.pd-table td{padding:10px 9px;vertical-align:middle;}
+.pd-product{display:flex;align-items:center;gap:9px;min-width:190px;}
+.pd-product-icon{
+    width:34px;height:38px;border-radius:6px;background:#f3f6fa;
+    display:flex;align-items:center;justify-content:center;font-size:19px;flex:0 0 34px;
+}
+.pd-product-name{font-size:11px;font-weight:800;color:#18263b;line-height:1.35;}
+.pd-product-sku{font-size:10px;color:#77869a;margin-top:3px;}
+.pd-quantity{font-size:12px;font-weight:800;color:#18263b;white-space:nowrap;}
+.pd-progress-row{display:flex;align-items:center;gap:7px;margin-top:5px;}
+.pd-progress{height:7px;width:88px;background:#e1e7f0;border-radius:99px;overflow:hidden;}
+.pd-progress span{height:100%;display:block;background:var(--pd-blue);border-radius:99px;}
+.pd-progress-pct{font-size:9px;color:#64748b;min-width:24px;}
+.pd-center{text-align:center;white-space:nowrap;font-weight:700;color:#34445b;}
+.pd-date{white-space:nowrap;color:#475569;font-size:10px;}
+.pd-status{
+    display:inline-flex;align-items:center;gap:5px;padding:6px 9px;
+    border-radius:99px;font-size:10px;font-weight:700;white-space:nowrap;
+}
+.pd-status-progress{background:#e7f1ff;color:#0758cf;}
+.pd-status-active{background:#e3f8ed;color:#13834b;}
+.pd-status-pending{background:#fff4df;color:#a76505;}
+.pd-status-idle{background:#eef2f7;color:#526174;}
+.pd-row-actions{display:flex;align-items:center;gap:5px;white-space:nowrap;}
+.pd-history{
+    border:1px solid #cbd7e7;background:#fff;border-radius:6px;
+    padding:6px 8px;font-size:10px;font-weight:700;color:#27374e;cursor:pointer;
+}
+.pd-history:hover{background:#f2f7ff;border-color:#9cb9e8;}
+.pd-more{
+    width:27px;height:27px;border:1px solid #cbd7e7;background:#fff;
+    border-radius:6px;color:#475569;cursor:pointer;
+}
+.pd-empty{padding:35px 15px;text-align:center;color:#748399;font-size:12px;}
+.pd-calendar{padding:13px;}
+.pd-calendar-title{
+    display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;
+    padding-bottom:11px;border-bottom:1px solid #e4eaf2;
+}
+.pd-calendar-title span{color:var(--pd-blue);font-size:17px;}
+.pd-cal-nav{display:flex;align-items:center;justify-content:space-between;margin:10px 2px;}
+.pd-cal-nav button{
+    width:27px;height:27px;border:0;background:transparent;color:#334155;
+    font-size:20px;cursor:pointer;border-radius:5px;
+}
+.pd-cal-nav button:hover{background:#f1f5f9;}
+.pd-cal-month{text-transform:capitalize;font-size:12px;font-weight:800;}
+.pd-cal-grid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:2px;}
+.pd-cal-weekday{text-align:center;padding:6px 0;font-size:9px;font-weight:800;color:#64748b;background:#f5f7fb;}
+.pd-cal-day{
+    min-height:36px;border:0;border-radius:5px;background:#fff;position:relative;
+    font-size:10px;font-weight:700;color:#29384d;cursor:pointer;
+}
+.pd-cal-day:hover{background:#edf4ff;}
+.pd-cal-day.muted{color:#aab4c2;font-weight:500;}
+.pd-cal-day.selected{background:var(--pd-blue);color:#fff;}
+.pd-cal-dot{
+    width:5px;height:5px;border-radius:50%;background:#16a34a;
+    position:absolute;bottom:4px;left:50%;transform:translateX(-50%);
+}
+.pd-cal-dot.planned{background:#1670ee;}
+.pd-cal-day.selected .pd-cal-dot{background:#fff;}
+.pd-cal-legend{display:flex;gap:14px;align-items:center;margin:10px 2px 13px;font-size:9px;color:#526174;}
+.pd-legend-item{display:flex;align-items:center;gap:5px;}
+.pd-legend-dot{width:7px;height:7px;border-radius:50%;background:#16a34a;}
+.pd-legend-dot.planned{background:#1670ee;}
+.pd-day-detail{border:1px solid #dce6f4;border-radius:8px;overflow:hidden;}
+.pd-day-detail-head{
+    background:#eaf2ff;padding:9px 10px;display:flex;align-items:center;
+    justify-content:space-between;gap:7px;
+}
+.pd-day-detail-date{font-size:13px;font-weight:900;color:#173b78;}
+.pd-day-detail-count{font-size:10px;color:#52627a;}
+.pd-day-order{padding:9px 10px;border-top:1px solid #e8edf4;display:flex;gap:8px;align-items:flex-start;}
+.pd-day-check{
+    width:17px;height:17px;flex:0 0 17px;border-radius:50%;
+    background:#e0f6e9;color:#159451;display:flex;align-items:center;justify-content:center;
+    font-size:10px;margin-top:1px;
+}
+.pd-day-op{font-size:11px;font-weight:800;color:#1c2b40;}
+.pd-day-product{font-size:10px;color:#66758a;margin-top:2px;line-height:1.35;}
+.pd-day-empty{padding:15px 10px;text-align:center;color:#8a97a9;font-size:10px;}
+.pd-calendar-footer{
+    display:flex;align-items:center;justify-content:space-between;
+    width:100%;padding:12px 1px 0;border:0;background:transparent;
+    color:var(--pd-blue);font-size:11px;font-weight:800;cursor:pointer;
+}
+.pd-calendar-footer:hover{color:var(--pd-blue-dark);}
+.pd-hidden-data{display:none;}
+@media(max-width:1100px){
+    .pd-workspace{grid-template-columns:minmax(0,1fr) 300px;}
+}
+@media(max-width:900px){
+    .pd-workspace{grid-template-columns:1fr;}
+    .pd-calendar{max-width:none;}
+}
+@media(max-width:650px){
+    .prod-dashboard{padding:8px;}
+    .pd-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;}
+    .pd-kpi{padding:10px;min-height:72px;gap:8px;}
+    .pd-kpi-icon{width:34px;height:34px;flex-basis:34px;font-size:17px;}
+    .pd-kpi-value{font-size:19px;}
+    .pd-filter-row{align-items:stretch;flex-direction:column;}
+    .pd-period{justify-content:space-between;}
+    .pd-select{flex:1;}
+    .pd-tabs{padding-bottom:2px;}
+    .pd-tab{padding:8px 10px;font-size:10px;}
+    .pd-actions{justify-content:stretch;}
+    .pd-actions .pd-btn{flex:1;}
+    .pd-table-title{font-size:13px;}
+}
+</style>
 
-<div class="erp-bar">
-    <div class="erp-bar-left">
-        <div class="erp-logo">DISTAN ERP</div>
-        <div class="erp-sep"></div>
-        <div class="erp-module">Órdenes de Producción</div>
-    </div>
-    <span style="font-size:11px;color:#5a8abf;">Producción › Órdenes</span>
-</div>
-
-<div class="body">
-
-{{-- ── Header ── --}}
-<div class="page-hdr">
-    <div>
-        <div class="page-title">Órdenes de producción</div>
-        <div class="page-sub">Gestión y seguimiento de lotes de producción</div>
-    </div>
-
-    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-
-        <button
-            type="button"
-            class="btn-calendar"
-            onclick="abrirCalendarioProduccion()"
-        >
-            📅 Calendario
-        </button>
-
-        <a href="{{ route('production-orders.create') }}" class="btn-new">
-            ➕ Nueva producción
-        </a>
-
-    </div>
-</div>
-
-{{-- ── KPIs ── --}}
 @php
-    $total      = $orders->count();
-    $pendientes = $orders->filter(fn($o) => strtoupper($o->status) === 'PENDIENTE')->count();
-    $enProceso  = $orders->filter(fn($o) => in_array(strtoupper($o->status), ['EN_PROCESO','EN PROCESO','PROCESO']))->count();
-    $completadas= $orders->filter(fn($o) => in_array(strtoupper($o->status), ['COMPLETADO','COMPLETADA','DONE','COMPLETO']))->count();
+    $totalOrdenes = $orders->count();
+
+    $normalizarEstado = function ($estado) {
+        return strtoupper(str_replace([' ', '-'], '_', trim((string) $estado)));
+    };
+
+    $pendientes = $orders->filter(fn($o) => $normalizarEstado($o->status) === 'PENDIENTE')->count();
+
+    $enProceso = $orders->filter(function ($o) use ($normalizarEstado) {
+        return in_array($normalizarEstado($o->status), ['EN_PROCESO', 'PROCESO']);
+    })->count();
+
+    $unidadesProducidas = $productosProduccion->sum('total_producido');
 @endphp
 
-<div class="kpis">
-    <div class="kpi" style="border-left-color:var(--erp-accent);">
-        <div class="kpi-icon">🏭</div>
-        <div class="kpi-label">Total órdenes</div>
-        <div class="kpi-val">{{ $total }}</div>
-        <div class="kpi-sub">registradas en sistema</div>
-    </div>
-    <div class="kpi" style="border-left-color:#f59e0b;">
-        <div class="kpi-icon">⏳</div>
-        <div class="kpi-label">Pendientes</div>
-        <div class="kpi-val" style="color:var(--erp-warn);">{{ $pendientes }}</div>
-        <div class="kpi-sub">por iniciar</div>
-    </div>
-    <div class="kpi" style="border-left-color:var(--erp-accent);">
-        <div class="kpi-icon">⚙️</div>
-        <div class="kpi-label">En proceso</div>
-        <div class="kpi-val" style="color:var(--erp-accent);">{{ $enProceso }}</div>
-        <div class="kpi-sub">en ejecución</div>
-    </div>
-    <div class="kpi" style="border-left-color:var(--erp-ok);background:var(--erp-ok-bg);">
-        <div class="kpi-icon">✅</div>
-        <div class="kpi-label">Completadas</div>
-        <div class="kpi-val" style="color:var(--erp-ok);">{{ $completadas }}</div>
-        <div class="kpi-sub">finalizadas</div>
-    </div>
-</div>
+<div class="prod-dashboard">
 
-{{-- ── Panel advertencias ── --}}
-<div class="warn-card">
-    <div class="warn-title">⚠️ Advertencias operativas — leer antes de operar</div>
-    <div class="warn-grid">
-        <div class="warn-item">
-            <div class="warn-item-icon">🚫</div>
-            <div class="warn-item-text">
-                <strong>No se puede eliminar</strong><br>
-                Las órdenes de producción no pueden eliminarse una vez creadas. Si se cometió un error, comunícate con el encargado del sistema para una corrección.
+    {{-- Acciones superiores: sin menú ni encabezado duplicado --}}
+    <div class="pd-actions">
+        <button type="button" class="pd-btn" onclick="abrirCalendarioProduccion()">
+            <span>▦</span> Calendario
+        </button>
+        <a href="{{ route('production-orders.create') }}" class="pd-btn pd-btn-primary">
+            <span style="font-size:17px;line-height:12px;">＋</span> Nueva producción
+        </a>
+    </div>
+
+    {{-- Indicadores --}}
+    <div class="pd-kpis">
+        <div class="pd-kpi">
+            <div class="pd-kpi-icon">▤</div>
+            <div>
+                <div class="pd-kpi-label">Órdenes registradas</div>
+                <div class="pd-kpi-value">{{ number_format($totalOrdenes) }}</div>
+                <div class="pd-kpi-sub">En el sistema</div>
             </div>
         </div>
-        <div class="warn-item">
-            <div class="warn-item-icon">🎯</div>
-            <div class="warn-item-text">
-                <strong>Verificar materia prima</strong><br>
-                Antes de iniciar, confirma que la materia prima seleccionada es la correcta en tipo, lote y cantidad. Un error afecta todo el lote de producción.
+        <div class="pd-kpi">
+            <div class="pd-kpi-icon">⌛</div>
+            <div>
+                <div class="pd-kpi-label">Pendientes</div>
+                <div class="pd-kpi-value">{{ str_pad($pendientes, 2, '0', STR_PAD_LEFT) }}</div>
+                <div class="pd-kpi-sub">Por iniciar</div>
             </div>
         </div>
-        <div class="warn-item">
-            <div class="warn-item-icon">⌨️</div>
-            <div class="warn-item-text">
-                <strong>Cuidado al digitar</strong><br>
-                Revisa dos veces las cantidades antes de guardar. Los datos registrados impactan directamente el kardex de materia prima y el stock del producto.
+        <div class="pd-kpi">
+            <div class="pd-kpi-icon">⚙</div>
+            <div>
+                <div class="pd-kpi-label">En proceso</div>
+                <div class="pd-kpi-value">{{ str_pad($enProceso, 2, '0', STR_PAD_LEFT) }}</div>
+                <div class="pd-kpi-sub">En ejecución</div>
             </div>
         </div>
-        <div class="warn-item">
-            <div class="warn-item-icon">📋</div>
-            <div class="warn-item-text">
-                <strong>Actualizar el kardex</strong><br>
-                Toda salida de materia prima debe quedar registrada. El inventario del sistema debe reflejar siempre el stock físico real del almacén.
+        <div class="pd-kpi">
+            <div class="pd-kpi-icon">▣</div>
+            <div>
+                <div class="pd-kpi-label">Unidades producidas</div>
+                <div class="pd-kpi-value">{{ number_format($unidadesProducidas, 0) }}</div>
+                <div class="pd-kpi-sub">Acumulado histórico</div>
             </div>
         </div>
     </div>
-</div>
 
-{{-- ── Info strip ── --}}
-<div class="info-strip">
-    <span style="font-size:18px;flex-shrink:0;">ℹ️</span>
-    <div>
-        <strong>¿Cómo funciona una orden de producción?</strong>
-        Crea la orden → selecciona el producto a fabricar y la materia prima a consumir → registra las cantidades → el sistema descuenta el stock de materia prima automáticamente al completar la orden. Si necesitas corregir una orden cerrada, contacta al encargado.
+    <div class="pd-workspace">
+        <main class="pd-main">
+
+            {{-- Filtros y ordenamiento --}}
+            <section class="pd-panel pd-filter-panel">
+                <div class="pd-tabs">
+                    <button type="button" class="pd-tab active" data-filter="all" onclick="cambiarFiltroProduccion('all', this)">☷ Todos</button>
+                    <button type="button" class="pd-tab" data-filter="most" onclick="cambiarFiltroProduccion('most', this)">↗ Más producidos</button>
+                    <button type="button" class="pd-tab" data-filter="least" onclick="cambiarFiltroProduccion('least', this)">↘ Menos producidos</button>
+                    <button type="button" class="pd-tab" data-filter="pending" onclick="cambiarFiltroProduccion('pending', this)">◷ Pendientes de producción</button>
+                </div>
+
+                <div class="pd-filter-row">
+                    <div class="pd-search-wrap">
+                        <span class="pd-search-icon">⌕</span>
+                        <input
+                            type="search"
+                            id="filtroTexto"
+                            class="pd-search"
+                            placeholder="Buscar producto o SKU..."
+                            oninput="filtrarOrdenes()"
+                        >
+                    </div>
+
+                    <label class="pd-period">
+                        Período:
+                        <select id="filtroPeriodo" class="pd-select" onchange="filtrarOrdenes()">
+                            <option value="30">▦ Últimos 30 días</option>
+                            <option value="7">Últimos 7 días</option>
+                            <option value="90">Últimos 3 meses</option>
+                            <option value="365">Últimos 12 meses</option>
+                            <option value="all">Todo el historial</option>
+                        </select>
+                    </label>
+                </div>
+            </section>
+
+            {{-- Tabla principal --}}
+            <section class="pd-panel">
+                <div class="pd-table-head">
+                    <div class="pd-table-title">
+                        <span class="pd-table-title-icon">▥</span>
+                        Rendimiento por producto
+                    </div>
+                    <div class="pd-table-meta">
+                        <span><strong id="countVisible">{{ $productosProduccion->count() }}</strong> productos</span>
+                        <button type="button" class="pd-sort-btn" title="Cambiar orden" onclick="alternarOrdenTabla()">↕</button>
+                    </div>
+                </div>
+
+                <div class="pd-table-scroll">
+                    <table class="pd-table">
+                        <thead>
+                            <tr>
+                                <th>Producto / SKU</th>
+                                <th>Producción acumulada</th>
+                                <th style="text-align:center;">Órdenes</th>
+                                <th>Última producción</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="catalogGrid">
+                        @forelse($productosProduccion as $grupo)
+                            @php
+                                $producto = $grupo->producto;
+                                $ultima = $grupo->ultima;
+
+                                $textoBusqueda = strtolower(
+                                    ($producto->nombre ?? '') . ' ' .
+                                    ($producto->sku ?? '') . ' ' .
+                                    ($producto->barcode ?? '')
+                                );
+
+                                $tienePendiente = $grupo->ordenes->contains(function ($orden) {
+                                    return strtoupper($orden->status) === 'PENDIENTE';
+                                });
+
+                                $tieneProceso = $grupo->en_produccion > 0;
+                                $tieneCompletado = $grupo->finalizadas > 0;
+
+                                if ($tieneProceso) {
+                                    $statusKey = 'progress';
+                                    $statusLabel = '⚙ En producción';
+                                    $statusClass = 'pd-status-progress';
+                                } elseif ($tienePendiente && !$tieneCompletado) {
+                                    $statusKey = 'pending';
+                                    $statusLabel = '◷ Pendiente';
+                                    $statusClass = 'pd-status-pending';
+                                } elseif ($tieneCompletado || $grupo->cantidad_ordenes > 0) {
+                                    $statusKey = 'active';
+                                    $statusLabel = '✓ Activa';
+                                    $statusClass = 'pd-status-active';
+                                } else {
+                                    $statusKey = 'idle';
+                                    $statusLabel = '◷ Sin producción reciente';
+                                    $statusClass = 'pd-status-idle';
+                                }
+
+                                $totalProducto = (float) $grupo->total_producido;
+                                $maxProduccion = max(1, (float) $productosProduccion->max('total_producido'));
+                                $porcentaje = min(100, ($totalProducto / $maxProduccion) * 100);
+                            @endphp
+
+                            <tr
+                                class="pd-product-row"
+                                data-q="{{ $textoBusqueda }}"
+                                data-status="{{ $statusKey }}"
+                                data-total="{{ $totalProducto }}"
+                                data-name="{{ $producto->nombre ?? 'Producto' }}"
+                                data-product-id="{{ $grupo->product_id }}"
+                            >
+                                <td>
+                                    <div class="pd-product">
+                                        <div class="pd-product-icon">📦</div>
+                                        <div>
+                                            <div class="pd-product-name">{{ $producto->nombre ?? 'Producto' }}</div>
+                                            <div class="pd-product-sku">SKU: {{ $producto->sku ?? '—' }}</div>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="pd-quantity" data-alltime="{{ $totalProducto }}">
+                                        {{ number_format($totalProducto, 2) }} un.
+                                    </div>
+                                    <div class="pd-progress-row">
+                                        <div class="pd-progress"><span style="width:{{ $porcentaje }}%;"></span></div>
+                                        <span class="pd-progress-pct">{{ number_format($porcentaje, 0) }}%</span>
+                                    </div>
+                                </td>
+                                <td class="pd-center">{{ $grupo->cantidad_ordenes }}</td>
+                                <td class="pd-date">
+                                    @if($ultima && $ultima->fecha_produccion)
+                                        ▦ {{ $ultima->fecha_produccion->format('d/m/Y') }}
+                                    @else
+                                        —
+                                    @endif
+                                </td>
+                                <td><span class="pd-status {{ $statusClass }}">{{ $statusLabel }}</span></td>
+                                <td>
+                                    <div class="pd-row-actions">
+                                        <button type="button" class="pd-history" onclick="mostrarProducciones({{ $grupo->product_id }})">Ver historial</button>
+                                        <button type="button" class="pd-more" title="Ver historial" onclick="mostrarProducciones({{ $grupo->product_id }})">⋮</button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <tr class="pd-hidden-data">
+                                <td colspan="6">
+                                    <div id="producciones-{{ $grupo->product_id }}">
+                                        @foreach($grupo->ordenes as $orden)
+                                            <div
+                                                class="produccion-data"
+                                                data-id="{{ $orden->id }}"
+                                                data-number="{{ $orden->number }}"
+                                                data-quantity="{{ number_format($orden->produced_quantity, 2, '.', '') }}"
+                                                data-status="{{ $orden->status }}"
+                                                data-date="{{ $orden->fecha_produccion ? $orden->fecha_produccion->format('d/m/Y H:i') : '—' }}"
+                                                data-date-iso="{{ $orden->fecha_produccion ? $orden->fecha_produccion->format('Y-m-d') : '' }}"
+                                                data-material="{{ $orden->rawMaterial->name ?? '—' }}"
+                                            ></div>
+                                        @endforeach
+                                    </div>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="pd-empty">
+                                    <div style="font-size:28px;margin-bottom:7px;">🏭</div>
+                                    No existen órdenes de producción.
+                                    <div style="margin-top:10px;">
+                                        <a href="{{ route('production-orders.create') }}" class="pd-btn pd-btn-primary">＋ Nueva producción</a>
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforelse
+                        </tbody>
+                    </table>
+                </div>
+                <div id="pdNoResults" class="pd-empty" style="display:none;">No se encontraron productos con los filtros seleccionados.</div>
+            </section>
+        </main>
+
+        {{-- Calendario compacto siempre visible --}}
+        <aside class="pd-panel pd-calendar">
+            <div class="pd-calendar-title"><span>▦</span> Calendario de producción</div>
+
+            <div class="pd-cal-nav">
+                <button type="button" onclick="cambiarMesPanel(-1)" aria-label="Mes anterior">‹</button>
+                <div id="pdCalMonth" class="pd-cal-month"></div>
+                <button type="button" onclick="cambiarMesPanel(1)" aria-label="Mes siguiente">›</button>
+            </div>
+
+            <div id="pdCalGrid" class="pd-cal-grid"></div>
+
+            <div class="pd-cal-legend">
+                <span class="pd-legend-item"><i class="pd-legend-dot"></i> Realizada</span>
+                
+            </div>
+
+            <div class="pd-day-detail">
+                <div class="pd-day-detail-head">
+                    <div class="pd-day-detail-date" id="pdDayTitle">HOY</div>
+                    <div class="pd-day-detail-count" id="pdDayCount">0 órdenes</div>
+                </div>
+                <div id="pdDayOrders">
+                    <div class="pd-day-empty">Selecciona un día para consultar la producción.</div>
+                </div>
+            </div>
+
+            <button type="button" class="pd-calendar-footer" onclick="abrirCalendarioProduccion()">
+                <span>▦ Ver calendario completo</span><span>›</span>
+            </button>
+        </aside>
     </div>
 </div>
 
-{{-- ── Filtros ── --}}
-<div class="filter-bar">
-    🔍
-    <input
-        type="text"
-        class="finput"
-        id="filtroTexto"
-        placeholder="Buscar por número, producto o materia prima..."
-        oninput="filtrarOrdenes()">
-    <select class="fselect" id="filtroEstado" onchange="filtrarOrdenes()">
-        <option value="">Todos los estados</option>
-        <option value="pendiente">⏳ Pendiente</option>
-        <option value="proceso">⚙️ En proceso</option>
-        <option value="completo">✅ Completado</option>
-    </select>
-</div>
+<script>
+/* =========================================================
+   FILTROS Y ORDENAMIENTO DE PRODUCTOS
+========================================================= */
+let filtroProduccionActual = 'all';
+let ordenTablaDescendente = true;
 
-<div class="result-bar">
-    <div>Mostrando <strong id="countVisible">{{ $orders->count() }}</strong> órdenes</div>
-    <div style="font-size:11px;color:#94a3b8;">Más recientes primero</div>
-</div>
+function cambiarFiltroProduccion(tipo, boton) {
+    filtroProduccionActual = tipo;
+    document.querySelectorAll('.pd-tab').forEach(el => el.classList.remove('active'));
+    if (boton) boton.classList.add('active');
+    filtrarOrdenes();
+}
 
-{{-- ── Cards ── --}}
-<div class="catalog" id="catalogGrid">
-@forelse($productosProduccion as $grupo)
+function alternarOrdenTabla() {
+    ordenTablaDescendente = !ordenTablaDescendente;
+    const tbody = document.getElementById('catalogGrid');
+    const filas = Array.from(tbody.querySelectorAll('tr.pd-product-row'));
+    filas.sort((a, b) => {
+        const diferencia = Number(a.dataset.total || 0) - Number(b.dataset.total || 0);
+        return ordenTablaDescendente ? -diferencia : diferencia;
+    });
+    filas.forEach(fila => {
+        const datos = tbody.querySelector('#producciones-' + fila.dataset.productId)?.closest('tr');
+        tbody.appendChild(fila);
+        if (datos) tbody.appendChild(datos);
+    });
+    filtrarOrdenes();
+}
 
-    @php
+function fechaLimitePeriodo(dias) {
+    const fecha = new Date();
+    fecha.setHours(0, 0, 0, 0);
+    fecha.setDate(fecha.getDate() - dias);
+    return fecha;
+}
 
-        $producto = $grupo->producto;
+function filtrarOrdenes() {
+    const texto = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
+    const periodo = document.getElementById('filtroPeriodo')?.value || '30';
+    const limite = periodo === 'all' ? null : fechaLimitePeriodo(Number(periodo));
+    const filas = Array.from(document.querySelectorAll('#catalogGrid tr.pd-product-row'));
+    let visibles = 0;
 
-        $ultima = $grupo->ultima;
+    filas.forEach(fila => {
+        const textoCoincide = !texto || (fila.dataset.q || '').includes(texto);
+        const estado = fila.dataset.status || '';
+        let estadoCoincide = true;
 
-        /*
-         * Para el buscador
-         */
-        $textoBusqueda = strtolower(
-            ($producto->nombre ?? '') . ' ' .
-            ($producto->sku ?? '') . ' ' .
-            ($producto->barcode ?? '')
-        );
-
-        /*
-         * Estados disponibles del grupo
-         */
-        $tienePendiente = $grupo->ordenes->contains(function ($orden) {
-            return strtoupper($orden->status) === 'PENDIENTE';
-        });
-
-        $tieneProceso = $grupo->en_produccion > 0;
-
-        $tieneCompletado = $grupo->finalizadas > 0;
-
-        /*
-         * Estado principal del producto
-         */
-        if ($tieneProceso) {
-
-            $statusKey = 'progress';
-
-        } elseif ($tieneCompletado) {
-
-            $statusKey = 'done';
-
-        } else {
-
-            $statusKey = 'pending';
+        if (filtroProduccionActual === 'pending') {
+            estadoCoincide = estado === 'pending' || estado === 'idle';
         }
 
-        $cardClass = [
-            'pending'  => 'st-pending',
-            'progress' => 'st-progress',
-            'done'     => 'st-done',
-        ][$statusKey];
-
-        $badgeClass = [
-            'pending'  => 'sb-pending',
-            'progress' => 'sb-progress',
-            'done'     => 'sb-done',
-        ][$statusKey];
-
-        $badgeLabel = [
-            'pending'  => '⏳ Pendiente',
-            'progress' => '⚙️ En producción',
-            'done'     => '✅ Producción realizada',
-        ][$statusKey];
-
-    @endphp
-
-
-    <div
-        class="prod-card {{ $cardClass }}"
-        data-q="{{ $textoBusqueda }}"
-        data-status="{{ $statusKey }}"
-    >
-
-        {{-- CABECERA --}}
-
-        <div class="prod-card-hdr">
-
-            <div>
-
-                <div style="
-                    font-size:14px;
-                    font-weight:800;
-                    color:var(--erp-ink);
-                ">
-                    {{ $producto->nombre ?? 'Producto' }}
-                </div>
-
-                @if($producto?->sku)
-
-                    <div style="
-                        margin-top:2px;
-                        font-size:10px;
-                        color:#94a3b8;
-                        font-family:var(--font-mono);
-                    ">
-                        SKU: {{ $producto->sku }}
-                    </div>
-
-                @endif
-
-            </div>
-
-            <span class="status-badge {{ $badgeClass }}">
-                {{ $badgeLabel }}
-            </span>
-
-        </div>
-
-
-        {{-- CUERPO --}}
-
-        <div class="prod-card-body">
-
-
-            {{-- PRODUCCIÓN TOTAL --}}
-
-            <div style="
-                background:#f8fafc;
-                border:1px solid #e2e8f0;
-                border-radius:4px;
-                padding:12px;
-                margin-bottom:8px;
-                text-align:center;
-            ">
-
-                <div style="
-                    font-size:10px;
-                    color:var(--erp-ink-muted);
-                    text-transform:uppercase;
-                    letter-spacing:.05em;
-                    font-weight:700;
-                ">
-                    Producción acumulada
-                </div>
-
-                <div style="
-                    font-size:24px;
-                    line-height:1.2;
-                    font-weight:900;
-                    color:var(--erp-ink);
-                    font-family:var(--font-mono);
-                    margin-top:3px;
-                ">
-                    {{ number_format($grupo->total_producido, 2) }}
-                </div>
-
-                <div style="
-                    font-size:10px;
-                    color:#94a3b8;
-                ">
-                    unidades
-                </div>
-
-            </div>
-
-
-            {{-- INFORMACIÓN --}}
-
-            <div class="info-row">
-
-                <span>Órdenes de producción</span>
-
-                <span class="info-val">
-                    {{ $grupo->cantidad_ordenes }}
-                </span>
-
-            </div>
-
-
-            <div class="info-row">
-
-                <span>Finalizadas</span>
-
-                <span class="info-val" style="color:var(--erp-ok);">
-
-                    {{ $grupo->finalizadas }}
-
-                </span>
-
-            </div>
-
-
-            @if($grupo->en_produccion > 0)
-
-                <div class="info-row">
-
-                    <span>En producción</span>
-
-                    <span class="info-val" style="color:var(--erp-accent);">
-
-                        {{ $grupo->en_produccion }}
-
-                    </span>
-
-                </div>
-
-            @endif
-
-
-            {{-- ÚLTIMA PRODUCCIÓN --}}
-
-            @if($ultima)
-
-                <div style="
-                    margin-top:8px;
-                    padding:8px;
-                    background:#f9fafb;
-                    border:1px dashed #dbe2ea;
-                    border-radius:3px;
-                    font-size:10px;
-                    color:#64748b;
-                ">
-
-                    <div style="
-                        font-weight:700;
-                        color:#475569;
-                        margin-bottom:3px;
-                    ">
-                        Última producción
-                    </div>
-
-                    <div style="
-                        display:flex;
-                        justify-content:space-between;
-                        gap:8px;
-                    ">
-
-                        <span style="
-                            font-family:var(--font-mono);
-                            font-weight:700;
-                        ">
-                            {{ $ultima->number }}
-                        </span>
-
-                        <span style="font-weight:700;">
-
-                            {{ number_format($ultima->produced_quantity, 2) }}
-                            unidades
-
-                        </span>
-
-                    </div>
-
-                </div>
-
-            @endif
-
-
-            {{-- MATERIAS PRIMAS --}}
-
-            @if($grupo->raw_materials->count())
-
-                <div style="
-                    margin-top:8px;
-                    display:flex;
-                    gap:5px;
-                    flex-wrap:wrap;
-                ">
-
-                    @foreach($grupo->raw_materials as $material)
-
-                        <span class="mat-tag">
-
-                            🧪 {{ $material->name }}
-
-                            @if($material->unit)
-                                · {{ $material->unit }}
-                            @endif
-
-                        </span>
-
-                    @endforeach
-
-                </div>
-
-            @endif
-
-        </div>
-
-
-        {{-- FOOTER --}}
-
-        <div class="prod-card-footer">
-
-            <button
-                type="button"
-                class="btn-open"
-                onclick="mostrarProducciones({{ $grupo->product_id }})"
-            >
-                📂 Ver producciones
-            </button>
-
-        </div>
-
-    </div>
-
-
-    {{-- =====================================================
-         DATOS OCULTOS DE LAS PRODUCCIONES
-    ====================================================== --}}
-
-    <div
-        id="producciones-{{ $grupo->product_id }}"
-        style="display:none;"
-    >
-
-        @foreach($grupo->ordenes as $orden)
-
-            <div
-                class="produccion-data"
-                data-id="{{ $orden->id }}"
-                data-number="{{ $orden->number }}"
-                data-quantity="{{ number_format($orden->produced_quantity, 2) }}"
-                data-status="{{ $orden->status }}"
-                data-date="{{ $orden->fecha_produccion
-                    ? $orden->fecha_produccion->format('d/m/Y H:i')
-                    : '—'
-                }}"
-                data-material="{{ $orden->rawMaterial->name ?? '—' }}"
-            ></div>
-
-        @endforeach
-
-    </div>
-
-
-@empty
-
-    <div class="empty-state">
-
-        <div style="font-size:36px;margin-bottom:8px;">
-            🏭
-        </div>
-
-        <h3>
-            No existen órdenes de producción
-        </h3>
-
-        <p style="font-size:12px;margin:.5rem 0 1rem;">
-            Comienza creando tu primera orden de producción.
-        </p>
-
-        <a
-            href="{{ route('production-orders.create') }}"
-            class="btn-new"
-        >
-            ➕ Nueva producción
-        </a>
-
-    </div>
-
-@endforelse
-</div>
-
-</div>
-</div>
+        const datos = document.getElementById('producciones-' + fila.dataset.productId);
+        let cantidadPeriodo = 0;
+        if (datos) {
+            datos.querySelectorAll('.produccion-data').forEach(item => {
+                if ((item.dataset.status || '').toUpperCase() !== 'FINALIZADA') return;
+                const fecha = item.dataset.dateIso ? new Date(item.dataset.dateIso + 'T00:00:00') : null;
+                if (!fecha || (limite && fecha < limite)) return;
+                cantidadPeriodo += Number(item.dataset.quantity || 0);
+            });
+        }
+
+        const cantidadMostrar = periodo === 'all'
+            ? Number(fila.dataset.total || 0)
+            : cantidadPeriodo;
+
+        const cantidadCoincide = filtroProduccionActual !== 'pending' ||
+            estadoCoincide;
+
+        const mostrar = textoCoincide && estadoCoincide && cantidadCoincide;
+        fila.style.display = mostrar ? '' : 'none';
+
+        const datosFila = datos?.closest('tr');
+        if (datosFila) datosFila.style.display = mostrar ? 'none' : 'none';
+
+        const celdaCantidad = fila.querySelector('.pd-quantity');
+        if (celdaCantidad) {
+            celdaCantidad.textContent = Number(cantidadMostrar).toLocaleString('es-PE', {
+                minimumFractionDigits: 0, maximumFractionDigits: 2
+            }) + ' un.';
+            celdaCantidad.dataset.periodTotal = cantidadMostrar;
+        }
+
+        if (mostrar) visibles++;
+    });
+
+    if (filtroProduccionActual === 'most' || filtroProduccionActual === 'least') {
+        filas.sort((a, b) => {
+            const av = Number(a.querySelector('.pd-quantity')?.dataset.periodTotal || 0);
+            const bv = Number(b.querySelector('.pd-quantity')?.dataset.periodTotal || 0);
+            return filtroProduccionActual === 'most' ? bv - av : av - bv;
+        });
+        const tbody = document.getElementById('catalogGrid');
+        filas.forEach(fila => {
+            const datosFila = document.getElementById('producciones-' + fila.dataset.productId)?.closest('tr');
+            tbody.appendChild(fila);
+            if (datosFila) tbody.appendChild(datosFila);
+        });
+    }
+
+    const contador = document.getElementById('countVisible');
+    if (contador) contador.textContent = visibles;
+    const sinResultados = document.getElementById('pdNoResults');
+    if (sinResultados) sinResultados.style.display = visibles ? 'none' : 'block';
+}
+
+/* =========================================================
+   HISTORIAL DE PRODUCCIÓN
+========================================================= */
+function mostrarProducciones(productId) {
+    const contenedor = document.getElementById('producciones-' + productId);
+    if (!contenedor) return;
+
+    const datos = contenedor.querySelectorAll('.produccion-data');
+    const tabla = document.getElementById('tablaProducciones');
+    const filaProducto = document.querySelector('.pd-product-row[data-product-id="' + productId + '"]');
+    const nombreProducto = filaProducto?.dataset.name || 'Producto';
+
+    document.getElementById('modalProductoNombre').textContent = nombreProducto;
+    tabla.innerHTML = '';
+
+    datos.forEach(dato => {
+        const estado = (dato.dataset.status || '').toUpperCase();
+        let color = '#64748b', fondo = '#f1f5f9', texto = estado || '—';
+
+        if (estado === 'FINALIZADA') {
+            color = '#166534'; fondo = '#dcfce7'; texto = '✓ Finalizada';
+        } else if (estado === 'EN_PRODUCCION' || estado === 'EN PROCESO' || estado === 'PROCESO') {
+            color = '#1d4ed8'; fondo = '#dbeafe'; texto = '⚙ En producción';
+        } else if (estado === 'PENDIENTE') {
+            color = '#a16207'; fondo = '#fef3c7'; texto = '◷ Pendiente';
+        }
+
+        const fila = document.createElement('tr');
+        fila.style.borderBottom = '1px solid #f1f5f9';
+        fila.innerHTML = `
+            <td style="padding:9px;font-family:monospace;font-weight:700;">${dato.dataset.number || '—'}</td>
+            <td style="padding:9px;text-align:center;font-family:monospace;font-weight:700;">${dato.dataset.quantity || '0'}</td>
+            <td style="padding:9px;">${dato.dataset.material || '—'}</td>
+            <td style="padding:9px;text-align:center;color:#64748b;">${dato.dataset.date || '—'}</td>
+            <td style="padding:9px;text-align:center;">
+                <span style="display:inline-block;padding:4px 8px;border-radius:4px;background:${fondo};color:${color};font-size:10px;font-weight:700;">${texto}</span>
+            </td>
+            <td style="padding:9px;text-align:center;white-space:nowrap;">
+                <button type="button" onclick="verProduccion(${Number(dato.dataset.id)})" style="border:1px solid #cbd5e1;background:#fff;color:#475569;border-radius:5px;padding:5px 8px;cursor:pointer;font-size:11px;">Ver</button>
+                <button type="button" onclick="editarProduccion(${Number(dato.dataset.id)})" style="border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:5px;padding:5px 8px;cursor:pointer;font-size:11px;">Editar</button>
+            </td>`;
+        tabla.appendChild(fila);
+    });
+
+    document.getElementById('modalProducciones').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+</script>
 
 @php
     $produccionesCalendario = $orders
@@ -2428,4 +2094,218 @@ document
         }
     );
 </script>
+
+<script>
+/* =========================================================
+   CALENDARIO LATERAL COMPACTO
+========================================================= */
+let pdPanelDate = new Date();
+let pdPanelSelected = new Date();
+
+function pdDateKey(date) {
+    const y = date.getFullYear();
+    const m = String(date.getMonth() + 1).padStart(2, '0');
+    const d = String(date.getDate()).padStart(2, '0');
+    return `${y}-${m}-${d}`;
+}
+function pdEscapeHtml(value) {
+    return String(value ?? '').replace(/[&<>"']/g, char => ({
+        '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#039;'
+    }[char]));
+}
+function renderPanelCalendario() {
+    const grid = document.getElementById('pdCalGrid');
+    const title = document.getElementById('pdCalMonth');
+    if (!grid || !title) return;
+
+    const year = pdPanelDate.getFullYear();
+    const month = pdPanelDate.getMonth();
+    title.textContent = new Intl.DateTimeFormat('es-PE', {month:'long', year:'numeric'}).format(pdPanelDate);
+
+    const weekdays = ['Lun','Mar','Mié','Jue','Vie','Sáb','Dom'];
+    grid.innerHTML = weekdays.map(day => `<div class="pd-cal-weekday">${day}</div>`).join('');
+
+    const firstDay = new Date(year, month, 1);
+    const offset = (firstDay.getDay() + 6) % 7;
+    const days = new Date(year, month + 1, 0).getDate();
+
+    for (let i = 0; i < offset; i++) {
+        const blank = document.createElement('div');
+        grid.appendChild(blank);
+    }
+
+    for (let day = 1; day <= days; day++) {
+        const date = new Date(year, month, day);
+        const key = pdDateKey(date);
+        const items = (produccionesCalendario || []).filter(item => item.fecha === key);
+        const cell = document.createElement('button');
+        cell.type = 'button';
+        cell.className = 'pd-cal-day' + (pdDateKey(pdPanelSelected) === key ? ' selected' : '');
+        cell.textContent = day;
+
+        if (items.length) {
+            const dot = document.createElement('i');
+            dot.className = 'pd-cal-dot';
+            cell.appendChild(dot);
+        }
+
+        cell.addEventListener('click', () => {
+            pdPanelSelected = date;
+            renderPanelCalendario();
+            mostrarDiaPanel(key);
+        });
+        grid.appendChild(cell);
+    }
+
+    mostrarDiaPanel(pdDateKey(pdPanelSelected));
+}
+function cambiarMesPanel(delta) {
+    pdPanelDate = new Date(pdPanelDate.getFullYear(), pdPanelDate.getMonth() + delta, 1);
+    renderPanelCalendario();
+}
+function mostrarDiaPanel(key) {
+    const items = (produccionesCalendario || []).filter(item => item.fecha === key)
+        .sort((a,b) => (a.hora || '').localeCompare(b.hora || ''));
+
+    const date = new Date(key + 'T00:00:00');
+    const title = document.getElementById('pdDayTitle');
+    const count = document.getElementById('pdDayCount');
+    const list = document.getElementById('pdDayOrders');
+    if (!title || !count || !list) return;
+
+    title.textContent = new Intl.DateTimeFormat('es-PE', {day:'2-digit', month:'short'}).format(date).toUpperCase();
+    count.textContent = `${items.length} ${items.length === 1 ? 'orden' : 'órdenes'}`;
+
+    if (!items.length) {
+        list.innerHTML = '<div class="pd-day-empty">No hay producciones finalizadas en este día.</div>';
+        return;
+    }
+
+    list.innerHTML = items.slice(0, 4).map(item => `
+        <div class="pd-day-order">
+            <div class="pd-day-check">✓</div>
+            <div>
+                <div class="pd-day-op">${pdEscapeHtml(item.number)}</div>
+                <div class="pd-day-product">${pdEscapeHtml(item.product)} · ${Number(item.quantity || 0).toLocaleString('es-PE')} un.</div>
+            </div>
+        </div>
+    `).join('');
+}
+document.addEventListener('DOMContentLoaded', () => {
+    pdPanelDate = new Date();
+    pdPanelSelected = new Date();
+    renderPanelCalendario();
+    filtrarOrdenes();
+});
+</script>
+
+
+<script>
+/* Sobrescritura final para asegurar que la tabla moderna use los filtros nuevos. */
+function filtrarOrdenes() {
+    const texto = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
+    const periodo = document.getElementById('filtroPeriodo')?.value || '30';
+    const limite = periodo === 'all' ? null : fechaLimitePeriodo(Number(periodo));
+    const filas = Array.from(document.querySelectorAll('#catalogGrid tr.pd-product-row'));
+    let visibles = 0;
+
+    filas.forEach(fila => {
+        const textoCoincide = !texto || (fila.dataset.q || '').includes(texto);
+        const estado = fila.dataset.status || '';
+        let estadoCoincide = true;
+        if (filtroProduccionActual === 'pending') {
+            estadoCoincide = estado === 'pending' || estado === 'idle';
+        }
+
+        const datos = document.getElementById('producciones-' + fila.dataset.productId);
+        let cantidadPeriodo = 0;
+        if (datos) {
+            datos.querySelectorAll('.produccion-data').forEach(item => {
+                if ((item.dataset.status || '').toUpperCase() !== 'FINALIZADA') return;
+                const fecha = item.dataset.dateIso ? new Date(item.dataset.dateIso + 'T00:00:00') : null;
+                if (!fecha || (limite && fecha < limite)) return;
+                cantidadPeriodo += Number(item.dataset.quantity || 0);
+            });
+        }
+
+        const cantidadMostrar = periodo === 'all' ? Number(fila.dataset.total || 0) : cantidadPeriodo;
+        const mostrar = textoCoincide && estadoCoincide;
+        fila.style.display = mostrar ? '' : 'none';
+
+        const celdaCantidad = fila.querySelector('.pd-quantity');
+        if (celdaCantidad) {
+            celdaCantidad.textContent = Number(cantidadMostrar).toLocaleString('es-PE', {
+                minimumFractionDigits:0, maximumFractionDigits:2
+            }) + ' un.';
+            celdaCantidad.dataset.periodTotal = cantidadMostrar;
+        }
+        if (mostrar) visibles++;
+    });
+
+    if (filtroProduccionActual === 'most' || filtroProduccionActual === 'least') {
+        filas.sort((a,b) => {
+            const av = Number(a.querySelector('.pd-quantity')?.dataset.periodTotal || 0);
+            const bv = Number(b.querySelector('.pd-quantity')?.dataset.periodTotal || 0);
+            return filtroProduccionActual === 'most' ? bv-av : av-bv;
+        });
+        const tbody = document.getElementById('catalogGrid');
+        filas.forEach(fila => {
+            const hidden = document.getElementById('producciones-' + fila.dataset.productId)?.closest('tr');
+            tbody.appendChild(fila);
+            if (hidden) tbody.appendChild(hidden);
+        });
+    }
+
+    const contador = document.getElementById('countVisible');
+    if (contador) contador.textContent = visibles;
+    const sinResultados = document.getElementById('pdNoResults');
+    if (sinResultados) sinResultados.style.display = visibles ? 'none' : 'block';
+}
+</script>
+
+
+<script>
+function mostrarProducciones(productId) {
+    const contenedor = document.getElementById('producciones-' + productId);
+    if (!contenedor) return;
+
+    const tabla = document.getElementById('tablaProducciones');
+    const filaProducto = document.querySelector('.pd-product-row[data-product-id="' + productId + '"]');
+    document.getElementById('modalProductoNombre').textContent = filaProducto?.dataset.name || 'Producto';
+    tabla.innerHTML = '';
+
+    contenedor.querySelectorAll('.produccion-data').forEach(dato => {
+        const estado = (dato.dataset.status || '').toUpperCase();
+        let color = '#64748b', fondo = '#f1f5f9', texto = estado || '—';
+
+        if (estado === 'FINALIZADA') {
+            color = '#166534'; fondo = '#dcfce7'; texto = '✓ Finalizada';
+        } else if (['EN_PRODUCCION','EN PROCESO','PROCESO'].includes(estado)) {
+            color = '#1d4ed8'; fondo = '#dbeafe'; texto = '⚙ En producción';
+        } else if (estado === 'PENDIENTE') {
+            color = '#a16207'; fondo = '#fef3c7'; texto = '◷ Pendiente';
+        }
+
+        const fila = document.createElement('tr');
+        fila.style.borderBottom = '1px solid #f1f5f9';
+        fila.innerHTML = `
+            <td style="padding:9px;font-family:monospace;font-weight:700;">${dato.dataset.number || '—'}</td>
+            <td style="padding:9px;text-align:center;font-family:monospace;font-weight:700;">${dato.dataset.quantity || '0'}</td>
+            <td style="padding:9px;">${dato.dataset.material || '—'}</td>
+            <td style="padding:9px;text-align:center;color:#64748b;">${dato.dataset.date || '—'}</td>
+            <td style="padding:9px;text-align:center;">
+                <span style="display:inline-block;padding:4px 8px;border-radius:4px;background:${fondo};color:${color};font-size:10px;font-weight:700;">${texto}</span>
+            </td>
+            <td style="padding:9px;text-align:center;white-space:nowrap;">
+                <button type="button" onclick="verProduccion(${Number(dato.dataset.id)})" style="border:1px solid #cbd5e1;background:#fff;color:#475569;border-radius:5px;padding:5px 8px;cursor:pointer;font-size:11px;">Ver</button>
+                <button type="button" onclick="editarProduccion(${Number(dato.dataset.id)})" style="border:1px solid #bfdbfe;background:#eff6ff;color:#1d4ed8;border-radius:5px;padding:5px 8px;cursor:pointer;font-size:11px;">Editar</button>
+            </td>`;
+        tabla.appendChild(fila);
+    });
+
+    document.getElementById('modalProducciones').style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+</script>
+
 @endsection
