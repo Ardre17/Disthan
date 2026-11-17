@@ -1,57 +1,18 @@
 @extends('layouts.app')
 @section('content')
 <style>
-.pc{padding:18px;background:#f3f6fb;min-height:calc(100vh - 70px);color:#172338}
-.pc-top{display:flex;justify-content:flex-end;gap:8px;margin-bottom:14px;flex-wrap:wrap}
-.pc-btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 13px;border-radius:7px;border:1px solid #d5deeb;background:#fff;color:#26364d;text-decoration:none;font-size:12px;font-weight:700;cursor:pointer}
-.pc-primary{background:#075ee8;border-color:#075ee8;color:white}
-.pc-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px}
-.pc-kpi,.pc-panel{background:#fff;border:1px solid #dce4ef;border-radius:9px;padding:14px;box-shadow:0 2px 7px #0f23410a}
-.pc-kpi small{display:block;color:#64748b;font-size:11px}.pc-kpi strong{display:block;font-size:23px;margin-top:4px}
-.pc-panel{padding:0;overflow:hidden}.pc-panel h3{font-size:14px;margin:0;padding:13px 15px;border-bottom:1px solid #e5ebf3}
-.pc-table{width:100%;border-collapse:collapse;min-width:760px}.pc-table th,.pc-table td{text-align:left;padding:11px 12px;border-bottom:1px solid #edf1f6;font-size:11px}.pc-table th{background:#f7f9fc;color:#52627a;text-transform:uppercase;font-size:10px}
-.pc-badge{padding:5px 8px;border-radius:20px;background:#e7f1ff;color:#0758cf;font-size:10px;font-weight:700}
-.pc-muted{color:#64748b}
-@media(max-width:700px){.pc{padding:9px}.pc-kpis{grid-template-columns:1fr 1fr}.pc-top>*{flex:1}.pc-table-wrap{overflow:auto}}
+.pc{--navy:#14243b;--blue:#2563eb;--cyan:#0ea5e9;--green:#15803d;--muted:#64748b;color:#172338;background:#f4f7fb;min-height:calc(100vh - 65px);padding:22px;font-family:inherit}.pc-wrap{max-width:1420px;margin:auto}.pc-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}.pc-eyebrow{font-size:10px;font-weight:800;letter-spacing:.13em;color:#64809f;text-transform:uppercase}.pc-title{font-size:25px;font-weight:800;letter-spacing:-.04em;margin:4px 0;color:#14243b}.pc-sub{font-size:12px;color:#718096}.pc-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 5px 18px #102b4c08;margin-bottom:14px}.pc-card h3{font-size:14px;font-weight:800;margin:0 0 12px;color:#1e3048}.pc-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(290px,.8fr);gap:16px}.pc-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:15px}.pc-kpi{background:#fff;border:1px solid #e2e8f0;border-radius:13px;padding:16px}.pc-kpi small{font-size:10px;color:#718096;font-weight:700}.pc-kpi strong{display:block;font-size:25px;color:#14243b;margin-top:5px}.pc-muted{color:#718096}.pc-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;border-radius:9px;border:1px solid #dbe3ed;background:#fff;color:#26364d;text-decoration:none;font-size:11px;font-weight:800;cursor:pointer}.pc-primary{background:#2563eb;color:#fff;border-color:#2563eb}.pc-green{background:#15803d;color:#fff;border-color:#15803d}.pc-amber{background:#fff7e6;color:#a16207;border-color:#f5d69b}.pc-table{width:100%;border-collapse:collapse;min-width:720px}.pc-table th,.pc-table td{text-align:left;padding:12px;border-bottom:1px solid #edf1f6;font-size:11px}.pc-table th{color:#718096;background:#f8fafc;font-size:9px;letter-spacing:.08em;text-transform:uppercase}.pc-badge{display:inline-flex;padding:5px 9px;border-radius:30px;background:#eaf2ff;color:#1d4ed8;font-size:9px;font-weight:800}.pc-field{width:100%;border:1px solid #dbe3ed;border-radius:9px;padding:10px 12px;background:#fff;font-size:12px;color:#172338}.pc-label{display:block;font-size:10px;font-weight:800;color:#52627a;margin:0 0 6px}.pc-formrow{margin-bottom:13px}.pc-clock{background:linear-gradient(135deg,#14243b,#203d62);color:#fff;text-align:center;padding:22px;border-radius:13px}.pc-clock strong{font:800 38px ui-monospace,monospace;display:block;margin:8px 0}.pc-metric{background:#f8fafc;border:1px solid #e8eef5;border-radius:11px;padding:13px}.pc-metric small{display:block;color:#718096;font-size:9px;font-weight:800;text-transform:uppercase}.pc-metric strong{display:block;font-size:24px;margin-top:5px}.pc-worker{display:inline-flex;padding:6px 10px;background:#edf4ff;color:#1d4ed8;border-radius:30px;font-size:10px;font-weight:800;margin:2px}.pc-alert{padding:11px 13px;border-radius:9px;background:#ecfdf3;color:#166534;font-size:11px;margin-bottom:12px}.pc-error{padding:11px 13px;border-radius:9px;background:#fff1f2;color:#be123c;font-size:11px;margin-bottom:12px}.pc-actions{display:flex;gap:8px;flex-wrap:wrap}.pc-progress{height:9px;background:#e8eef5;border-radius:20px;overflow:hidden}.pc-progress span{display:block;height:100%;background:#16a34a;border-radius:20px}
+@media(max-width:850px){.pc{padding:12px}.pc-grid{grid-template-columns:1fr}.pc-kpis{grid-template-columns:1fr 1fr}.pc-title{font-size:21px}.pc-clock strong{font-size:31px}}@media(max-width:480px){.pc-kpis{grid-template-columns:1fr 1fr}.pc-card{padding:13px}}
 </style>
-<div class="pc">
-    <div class="pc-top">
-        <a class="pc-btn" href="{{ route('production-center.standards') }}">⏱ Tiempos estándar</a>
-        <a class="pc-btn pc-primary" href="{{ route('production-center.create') }}">＋ Nueva orden</a>
-    </div>
-    @php
-        $open = $orders->where('status','EN_PRODUCCION');
-        $finished = $orders->where('status','FINALIZADA');
-        $units = $finished->sum('produced_quantity');
-    @endphp
-    <div class="pc-kpis">
-        <div class="pc-kpi"><small>Órdenes abiertas</small><strong>{{ $open->count() }}</strong></div>
-        <div class="pc-kpi"><small>Órdenes finalizadas</small><strong>{{ $finished->count() }}</strong></div>
-        <div class="pc-kpi"><small>Unidades fabricadas</small><strong>{{ number_format($units,0) }}</strong></div>
-    </div>
-    <section class="pc-panel">
-        <h3>Órdenes de producción</h3>
-        <div class="pc-table-wrap">
-            <table class="pc-table">
-                <thead><tr><th>Orden</th><th>Producto</th><th>Objetivo</th><th>Real fabricado</th><th>Jornadas</th><th>Tiempo efectivo</th><th>Estado</th><th></th></tr></thead>
-                <tbody>
-                @forelse($orders as $order)
-                    <tr>
-                        <td><strong>{{ $order->number }}</strong></td>
-                        <td>{{ $order->product->nombre ?? '—' }}</td>
-                        <td>{{ number_format((float)($order->target_quantity ?? $order->produced_quantity),2) }}</td>
-                        <td>{{ number_format((float)$order->produced_quantity,2) }}</td>
-                        <td>{{ $order->shifts->count() }}</td>
-                        <td>{{ gmdate('H:i:s', (int)$order->actual_duration_seconds) }}</td>
-                        <td><span class="pc-badge">{{ $order->status }}</span></td>
-                        <td><a class="pc-btn" href="{{ route('production-center.show',$order) }}">Abrir</a></td>
-                    </tr>
-                @empty
-                    <tr><td colspan="8" class="pc-muted">Todavía no hay órdenes registradas en el nuevo centro.</td></tr>
-                @endforelse
-                </tbody>
-            </table>
-        </div>
-    </section>
-</div>
+<div class="pc"><div class="pc-wrap">
+ <header class="pc-head"><div><div class="pc-eyebrow">DISTAN ERP · Operaciones</div><h1 class="pc-title">Centro de producción</h1><div class="pc-sub">Seguimiento de órdenes, jornadas y rendimiento de fabricación</div></div><div class="pc-actions"><a class="pc-btn" href="{{ route('production-center.standards') }}">◷ Tiempos estándar</a><a class="pc-btn pc-primary" href="{{ route('production-center.create') }}">＋ Nueva orden</a></div></header>
+ @php $open=$orders->where('status','EN_PRODUCCION');$finished=$orders->where('status','FINALIZADA');$units=$finished->sum('produced_quantity'); @endphp
+ <div class="pc-kpis"><div class="pc-kpi"><small>ÓRDENES EN CURSO</small><strong>{{ $open->count() }}</strong></div><div class="pc-kpi"><small>ÓRDENES FINALIZADAS</small><strong>{{ $finished->count() }}</strong></div><div class="pc-kpi"><small>UNIDADES FABRICADAS</small><strong>{{ number_format($units,0) }}</strong></div></div>
+ @if(session('success'))<div class="pc-alert">{{ session('success') }}</div>@endif
+ <section class="pc-card" style="padding:0;overflow:hidden"><div style="padding:17px 18px;border-bottom:1px solid #edf1f6"><h3 style="margin:0">Órdenes de producción</h3><div class="pc-sub">Consulta el avance real y teórico de cada orden</div></div><div style="overflow:auto"><table class="pc-table"><thead><tr><th>Orden</th><th>Producto</th><th>Objetivo</th><th>Fabricado</th><th>Jornadas</th><th>Estado</th><th></th></tr></thead><tbody>
+ @forelse($orders as $order) @php $done=(float)$order->shifts->where('status','FINALIZADA')->sum('produced_quantity');$active=$order->shifts->firstWhere('status','EN_CURSO');$actual=$done+(float)($active->current_produced_quantity??0); @endphp
+ <tr><td><strong>{{ $order->number }}</strong><div class="pc-muted">{{ $order->created_at?->format('d/m/Y') }}</div></td><td><strong>{{ $order->product->nombre??'Producto' }}</strong><div class="pc-muted">{{ $order->product->sku??'' }}</div></td><td>{{ number_format((float)$order->target_quantity,0) }}</td><td><strong>{{ number_format($actual,0) }}</strong></td><td>{{ $order->shifts->count() }}</td><td><span class="pc-badge" style="{{ $order->status==='FINALIZADA'?'background:#eaf8ef;color:#15803d':'' }}">{{ str_replace('_',' ',$order->status) }}</span></td><td><a class="pc-btn" href="{{ route('production-center.show',$order) }}">Ver detalle →</a></td></tr>
+ @empty<tr><td colspan="7" class="pc-muted" style="text-align:center;padding:35px">Todavía no hay órdenes. Crea la primera para comenzar el seguimiento.</td></tr>@endforelse
+ </tbody></table></div></section>
+</div></div>
 @endsection

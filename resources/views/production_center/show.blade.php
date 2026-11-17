@@ -1,129 +1,34 @@
 @extends('layouts.app')
 @section('content')
-@php
-    $order = $production_order;
-    $planned = (int)($order->planned_duration_seconds ?? 0);
-    $actual = (int)($order->actual_duration_seconds ?? 0);
-    $activePause = $activeShift?->pauses?->firstWhere('resumed_at', null);
-    $elapsedNow = 0;
-    if ($activeShift) {
-        $elapsedNow = $activeShift->started_at->diffInSeconds(now());
-        $elapsedNow -= $activeShift->pauses->sum(fn($p) => $p->resumed_at ? $p->paused_at->diffInSeconds($p->resumed_at) : $p->paused_at->diffInSeconds(now()));
-        $elapsedNow = max(0, $elapsedNow);
-    }
-@endphp
 <style>
-.pc{padding:18px;background:#f3f6fb;min-height:calc(100vh - 70px);color:#172338}.pc-grid{display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:13px;align-items:start}.pc-card{background:#fff;border:1px solid #dce4ef;border-radius:10px;padding:16px;margin-bottom:12px}.pc-row{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #edf1f6;font-size:12px}.pc-row:last-child{border:0}.pc-muted{color:#64748b}.pc-btn{display:inline-flex;align-items:center;justify-content:center;padding:9px 12px;border-radius:7px;border:1px solid #d5deeb;background:#fff;color:#26364d;text-decoration:none;font-size:11px;font-weight:700;cursor:pointer}.pc-primary{background:#075ee8;color:#fff;border-color:#075ee8}.pc-green{background:#16834b;color:#fff;border-color:#16834b}.pc-orange{background:#fff7e6;color:#a16207;border-color:#f5d69b}.pc-red{background:#fff1f2;color:#be123c;border-color:#fecdd3}.pc-clock{text-align:center;background:#101e33;color:#fff;border-radius:10px;padding:20px}.pc-clock strong{font:800 36px Consolas,monospace;display:block;margin:8px 0}.pc-clock small{color:#b9c6d8}.pc-workers{display:flex;flex-wrap:wrap;gap:6px}.pc-worker{background:#eef4ff;color:#1d4ed8;padding:6px 9px;border-radius:20px;font-size:10px;font-weight:700}.pc-table{width:100%;border-collapse:collapse}.pc-table th,.pc-table td{text-align:left;padding:9px;border-bottom:1px solid #edf1f6;font-size:11px}.pc-table th{color:#64748b;background:#f7f9fc}.pc-field{border:1px solid #d5deeb;border-radius:7px;padding:9px;width:100%;margin:5px 0 10px}.pc-actions{display:flex;gap:7px;flex-wrap:wrap}.pc-form label{font-size:11px;font-weight:700;color:#52627a}
-@media(max-width:850px){.pc-grid{grid-template-columns:1fr}.pc{padding:9px}.pc-clock strong{font-size:30px}}
+.pc{--navy:#14243b;--blue:#2563eb;--cyan:#0ea5e9;--green:#15803d;--muted:#64748b;color:#172338;background:#f4f7fb;min-height:calc(100vh - 65px);padding:22px;font-family:inherit}.pc-wrap{max-width:1420px;margin:auto}.pc-head{display:flex;justify-content:space-between;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:20px}.pc-eyebrow{font-size:10px;font-weight:800;letter-spacing:.13em;color:#64809f;text-transform:uppercase}.pc-title{font-size:25px;font-weight:800;letter-spacing:-.04em;margin:4px 0;color:#14243b}.pc-sub{font-size:12px;color:#718096}.pc-card{background:#fff;border:1px solid #e2e8f0;border-radius:14px;padding:18px;box-shadow:0 5px 18px #102b4c08;margin-bottom:14px}.pc-card h3{font-size:14px;font-weight:800;margin:0 0 12px;color:#1e3048}.pc-grid{display:grid;grid-template-columns:minmax(0,1.6fr) minmax(290px,.8fr);gap:16px}.pc-kpis{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:15px}.pc-kpi{background:#fff;border:1px solid #e2e8f0;border-radius:13px;padding:16px}.pc-kpi small{font-size:10px;color:#718096;font-weight:700}.pc-kpi strong{display:block;font-size:25px;color:#14243b;margin-top:5px}.pc-muted{color:#718096}.pc-btn{display:inline-flex;align-items:center;justify-content:center;gap:7px;padding:10px 14px;border-radius:9px;border:1px solid #dbe3ed;background:#fff;color:#26364d;text-decoration:none;font-size:11px;font-weight:800;cursor:pointer}.pc-primary{background:#2563eb;color:#fff;border-color:#2563eb}.pc-green{background:#15803d;color:#fff;border-color:#15803d}.pc-amber{background:#fff7e6;color:#a16207;border-color:#f5d69b}.pc-table{width:100%;border-collapse:collapse;min-width:720px}.pc-table th,.pc-table td{text-align:left;padding:12px;border-bottom:1px solid #edf1f6;font-size:11px}.pc-table th{color:#718096;background:#f8fafc;font-size:9px;letter-spacing:.08em;text-transform:uppercase}.pc-badge{display:inline-flex;padding:5px 9px;border-radius:30px;background:#eaf2ff;color:#1d4ed8;font-size:9px;font-weight:800}.pc-field{width:100%;border:1px solid #dbe3ed;border-radius:9px;padding:10px 12px;background:#fff;font-size:12px;color:#172338}.pc-label{display:block;font-size:10px;font-weight:800;color:#52627a;margin:0 0 6px}.pc-formrow{margin-bottom:13px}.pc-clock{background:linear-gradient(135deg,#14243b,#203d62);color:#fff;text-align:center;padding:22px;border-radius:13px}.pc-clock strong{font:800 38px ui-monospace,monospace;display:block;margin:8px 0}.pc-metric{background:#f8fafc;border:1px solid #e8eef5;border-radius:11px;padding:13px}.pc-metric small{display:block;color:#718096;font-size:9px;font-weight:800;text-transform:uppercase}.pc-metric strong{display:block;font-size:24px;margin-top:5px}.pc-worker{display:inline-flex;padding:6px 10px;background:#edf4ff;color:#1d4ed8;border-radius:30px;font-size:10px;font-weight:800;margin:2px}.pc-alert{padding:11px 13px;border-radius:9px;background:#ecfdf3;color:#166534;font-size:11px;margin-bottom:12px}.pc-error{padding:11px 13px;border-radius:9px;background:#fff1f2;color:#be123c;font-size:11px;margin-bottom:12px}.pc-actions{display:flex;gap:8px;flex-wrap:wrap}.pc-progress{height:9px;background:#e8eef5;border-radius:20px;overflow:hidden}.pc-progress span{display:block;height:100%;background:#16a34a;border-radius:20px}
+@media(max-width:850px){.pc{padding:12px}.pc-grid{grid-template-columns:1fr}.pc-kpis{grid-template-columns:1fr 1fr}.pc-title{font-size:21px}.pc-clock strong{font-size:31px}}@media(max-width:480px){.pc-kpis{grid-template-columns:1fr 1fr}.pc-card{padding:13px}}
 </style>
-<div class="pc">
-    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:13px">
-        <div><div style="font-size:11px;color:#64748b">CENTRO DE PRODUCCIÓN / ORDEN</div><h2 style="font-size:20px;margin:3px 0">{{ $order->number }} · {{ $order->product->nombre ?? 'Producto' }}</h2></div>
-        <span class="pc-worker">{{ $order->status }}</span>
-    </div>
-    @if(session('success'))<div style="background:#e8f7ee;color:#166534;padding:10px;border-radius:7px;margin-bottom:12px">{{ session('success') }}</div>@endif
-    @if($errors->any())<div style="background:#fff1f2;color:#be123c;padding:10px;border-radius:7px;margin-bottom:12px">@foreach($errors->all() as $error)<div>{{ $error }}</div>@endforeach</div>@endif
-
-    <div class="pc-grid">
-        <main>
-            <section class="pc-card">
-                <h3 style="font-size:14px;margin:0 0 8px">Resumen de la orden</h3>
-                <div class="pc-row"><span class="pc-muted">Cantidad objetivo</span><strong>{{ number_format((float)$order->target_quantity,2) }}</strong></div>
-                <div class="pc-row"><span class="pc-muted">Cantidad real acumulada</span><strong style="color:#16834b">{{ number_format((float)$completedQuantity,2) }}</strong></div>
-                <div class="pc-row"><span class="pc-muted">Pendiente frente al objetivo</span><strong>{{ number_format(max(0,(float)$order->target_quantity-$completedQuantity),2) }}</strong></div>
-                <div class="pc-row"><span class="pc-muted">Estándar por unidad</span><strong>{{ number_format((float)$order->standard_time_seconds,3) }} segundos</strong></div>
-                <div class="pc-row"><span class="pc-muted">Tiempo proyectado</span><strong>{{ gmdate('H:i:s',$planned) }}</strong></div>
-                <div class="pc-row"><span class="pc-muted">Tiempo efectivo acumulado</span><strong>{{ gmdate('H:i:s',$actual) }}</strong></div>
-                <div class="pc-row"><span class="pc-muted">Materia prima prevista para descontar al cierre</span><strong>{{ number_format((float)$order->consumed_quantity,2) }} · {{ $order->rawMaterial->unit ?? '' }}</strong></div>
-            </section>
-
-            <section class="pc-card">
-                <h3 style="font-size:14px;margin:0 0 12px">Jornadas registradas</h3>
-                <div style="overflow:auto">
-                <table class="pc-table">
-                    <thead><tr><th>Jornada</th><th>Fecha</th><th>Personal</th><th>Unidades</th><th>Tiempo efectivo</th><th>Estado</th></tr></thead>
-                    <tbody>
-                    @forelse($order->shifts as $shift)
-                        <tr>
-                            <td>#{{ $shift->shift_number }}</td>
-                            <td>{{ $shift->started_at->format('d/m/Y H:i') }}</td>
-                            <td>{{ $shift->workers->pluck('name')->join(', ') }}</td>
-                            <td>{{ number_format((float)$shift->produced_quantity,2) }}</td>
-                            <td>{{ gmdate('H:i:s',(int)$shift->actual_duration_seconds) }}</td>
-                            <td>{{ $shift->status }}</td>
-                        </tr>
-                    @empty
-                        <tr><td colspan="6" class="pc-muted">Sin jornadas registradas.</td></tr>
-                    @endforelse
-                    </tbody>
-                </table>
-                </div>
-            </section>
-
-            @if($order->status !== 'FINALIZADA' && !$activeShift)
-            <section class="pc-card">
-                <h3 style="font-size:14px;margin:0 0 5px">Iniciar siguiente jornada</h3>
-                <p class="pc-muted" style="font-size:11px">Registra al personal que participará en esta nueva jornada.</p>
-                <form method="POST" action="{{ route('production-center.shifts.start',$order) }}" class="pc-form">
-                    @csrf
-                    <div id="newWorkers"><input class="pc-field" name="workers[]" required placeholder="Nombre del operario"></div>
-                    <button type="button" class="pc-btn" onclick="addNewWorker()">＋ Añadir persona</button>
-                    <button class="pc-btn pc-primary" type="submit">▶ Iniciar jornada</button>
-                </form>
-            </section>
-            @endif
-        </main>
-
-        <aside>
-            @if($activeShift)
-                <section class="pc-card">
-                    <h3 style="font-size:14px;margin:0 0 12px">Jornada #{{ $activeShift->shift_number }}</h3>
-                    <div class="pc-clock">
-                        <small>{{ $activePause ? 'JORNADA PAUSADA' : 'TIEMPO EFECTIVO DE ESTA JORNADA' }}</small>
-                        <strong id="pcClock" data-elapsed="{{ $elapsedNow }}">{{ gmdate('H:i:s',$elapsedNow) }}</strong>
-                        <small>Inicio: {{ $activeShift->started_at->format('d/m/Y H:i:s') }}</small>
-                    </div>
-                    <div style="margin:13px 0 7px;font-size:11px;font-weight:700">Personal participante</div>
-                    <div class="pc-workers">@foreach($activeShift->workers as $worker)<span class="pc-worker">{{ $worker->name }}</span>@endforeach</div>
-                    <div class="pc-actions" style="margin-top:14px">
-                        @if($activePause)
-                            <form method="POST" action="{{ route('production-center.shifts.resume',$activeShift) }}">@csrf<button class="pc-btn pc-green">▶ Reanudar</button></form>
-                        @else
-                            <form method="POST" action="{{ route('production-center.shifts.pause',$activeShift) }}">@csrf<button class="pc-btn pc-orange">Ⅱ Pausar</button></form>
-                        @endif
-                    </div>
-                    <form method="POST" action="{{ route('production-center.shifts.close',$activeShift) }}" style="margin-top:16px">
-                        @csrf
-                        <label>Cantidad fabricada durante esta jornada</label>
-                        <input class="pc-field" type="number" min="0" step="0.01" name="produced_quantity" required placeholder="Unidades fabricadas hoy">
-                        <label>Observación de la jornada (opcional)</label>
-                        <input class="pc-field" name="notes" placeholder="Incidencias, cambios de turno...">
-                        <button class="pc-btn pc-primary" style="width:100%" type="submit" onclick="return confirm('¿Cerrar esta jornada? La orden seguirá abierta.')">■ Cerrar jornada</button>
-                    </form>
-                </section>
-            @elseif($order->status === 'FINALIZADA')
-                <section class="pc-card"><h3 style="margin:0 0 8px">Orden finalizada</h3><strong style="font-size:27px;color:#16834b">{{ number_format((float)$order->produced_quantity,2) }}</strong><div class="pc-muted" style="font-size:11px">Unidades reales ingresadas al inventario.</div></section>
-            @else
-                <section class="pc-card">
-                    <h3 style="font-size:14px;margin:0 0 8px">Finalizar orden</h3>
-                    <p class="pc-muted" style="font-size:11px">La cantidad real será la suma de las cantidades registradas al cerrar cada jornada.</p>
-                    <div style="font-size:24px;font-weight:800;color:#16834b">{{ number_format((float)$completedQuantity,2) }} unidades</div>
-                    <form method="POST" action="{{ route('production-center.finish',$order) }}" style="margin-top:12px">
-                        @csrf
-                        <button class="pc-btn pc-green" style="width:100%" type="submit" onclick="return confirm('¿Finalizar la orden e ingresar al inventario la cantidad real acumulada?')">✓ Finalizar orden e ingresar inventario</button>
-                    </form>
-                </section>
-            @endif
-            <a class="pc-btn" style="width:100%" href="{{ route('production-center.index') }}">← Volver al centro de producción</a>
-        </aside>
-    </div>
-</div>
+<div class="pc" data-order-metrics="{{ route('production-center.metrics',$production_order) }}"><div class="pc-wrap">
+<header class="pc-head"><div><div class="pc-eyebrow">Centro de producción / Orden {{ $production_order->number }}</div><h1 class="pc-title">{{ $production_order->product->nombre??'Producción' }}</h1><div class="pc-sub">{{ $production_order->number }} · {{ $production_order->status==='FINALIZADA'?'Producción finalizada':'Seguimiento de fabricación por jornadas' }}</div></div><div class="pc-actions"><a class="pc-btn" href="{{ route('production-center.index') }}">← Centro</a>@if($production_order->status==='FINALIZADA')<a class="pc-btn pc-primary" target="_blank" href="{{ route('production-center.print',$production_order) }}">▣ Imprimir producción</a>@endif</div></header>
+@if(session('success'))<div class="pc-alert">{{ session('success') }}</div>@endif @if($errors->any())<div class="pc-error">@foreach($errors->all() as $error)<div>{{ $error }}</div>@endforeach</div>@endif
+<div class="pc-kpis"><div class="pc-kpi"><small>CANTIDAD PLANIFICADA</small><strong>{{ number_format((float)$production_order->target_quantity,0) }}</strong></div><div class="pc-kpi"><small>PRODUCCIÓN REAL REGISTRADA</small><strong id="pcActual" style="color:#15803d">{{ number_format($currentActual,0) }}</strong></div><div class="pc-kpi"><small>PRODUCCIÓN TEÓRICA POR TIEMPO</small><strong id="pcTheoretical" style="color:#2563eb">{{ number_format($theoreticalQuantity,0) }}</strong></div></div>
+<div class="pc-grid"><main>
+<section class="pc-card"><h3>Resumen y análisis de la orden</h3><div class="pc-grid" style="grid-template-columns:1fr 1fr;gap:10px"><div class="pc-metric"><small>Tiempo estándar por unidad</small><strong>{{ number_format((float)$production_order->standard_time_seconds,3) }} s</strong></div><div class="pc-metric"><small>Tiempo planificado</small><strong>{{ gmdate('H:i:s',(int)$production_order->planned_duration_seconds) }}</strong></div><div class="pc-metric"><small>Tiempo efectivo acumulado</small><strong id="pcElapsed">{{ gmdate('H:i:s',$elapsedNow) }}</strong></div><div class="pc-metric"><small>Diferencia real vs. teórica</small><strong id="pcDifference">{{ number_format($currentActual-$theoreticalQuantity,0) }}</strong></div></div><div style="margin-top:15px"><div style="display:flex;justify-content:space-between;font-size:10px;font-weight:800;margin-bottom:6px"><span>Avance real frente al objetivo</span><span id="pcPercent">{{ number_format(min(100,$production_order->target_quantity>0?($currentActual/$production_order->target_quantity)*100:0),1) }}%</span></div><div class="pc-progress"><span id="pcProgressBar" style="width:{{ min(100,$production_order->target_quantity>0?($currentActual/$production_order->target_quantity)*100:0) }}%"></span></div></div><p class="pc-sub" style="margin:12px 0 0">La producción teórica se calcula con el tiempo efectivo acumulado (descontando pausas) dividido entre el estándar guardado en esta orden. La producción real depende de los registros del equipo.</p></section>
+<section class="pc-card" style="padding:0;overflow:hidden"><div style="padding:17px 18px"><h3 style="margin:0">Historial de jornadas</h3></div><div style="overflow:auto"><table class="pc-table"><thead><tr><th>Jornada</th><th>Inicio / cierre</th><th>Participantes</th><th>Unidades reales</th><th>Tiempo efectivo</th><th>Estado</th></tr></thead><tbody>@foreach($production_order->shifts as $shift)<tr><td><strong>#{{ $shift->shift_number }}</strong></td><td>{{ $shift->started_at->format('d/m/Y H:i') }}<br><span class="pc-muted">{{ $shift->ended_at?->format('d/m/Y H:i')??'En curso' }}</span></td><td>@foreach($shift->workers as $worker)<span class="pc-worker">{{ $worker->name }}</span>@endforeach</td><td>{{ number_format((float)($shift->status==='EN_CURSO'?$shift->current_produced_quantity:$shift->produced_quantity),0) }}</td><td>{{ gmdate('H:i:s',(int)$shift->actual_duration_seconds) }}</td><td><span class="pc-badge">{{ $shift->status }}</span></td></tr>@endforeach</tbody></table></div></section>
+@if($production_order->status!=='FINALIZADA' && !$activeShift)<section class="pc-card"><h3>Iniciar siguiente jornada</h3><p class="pc-sub">Puedes registrar un equipo distinto para cada jornada.</p><form method="POST" action="{{ route('production-center.shifts.start',$production_order) }}">@csrf<div id="newWorkers"><input class="pc-field" name="workers[]" required placeholder="Nombre del operario" style="margin-bottom:8px"></div><button type="button" class="pc-btn" onclick="addNewWorker()">＋ Añadir persona</button><button class="pc-btn pc-primary">▶ Iniciar jornada</button></form></section>@endif
+</main><aside>
+@if($activeShift)
+<section class="pc-card"><div style="display:flex;justify-content:space-between;align-items:center"><h3>Jornada #{{ $activeShift->shift_number }}</h3><span class="pc-badge">{{ $activePause?'PAUSADA':'EN CURSO' }}</span></div><div class="pc-clock"><small>TIEMPO EFECTIVO DE ESTA JORNADA</small><strong id="pcClock" data-elapsed="{{ $activeElapsed }}">{{ gmdate('H:i:s',$activeElapsed) }}</strong><small>Inicio {{ $activeShift->started_at->format('d/m/Y H:i:s') }}</small></div><div style="margin:14px 0 7px;font-size:10px;font-weight:800">PERSONAL PARTICIPANTE</div><div>@foreach($activeShift->workers as $worker)<span class="pc-worker">{{ $worker->name }}</span>@endforeach</div>
+<div class="pc-actions" style="margin-top:14px">@if($activePause)<form method="POST" action="{{ route('production-center.shifts.resume',$activeShift) }}">@csrf<button class="pc-btn pc-green">▶ Reanudar</button></form>@else<form method="POST" action="{{ route('production-center.shifts.pause',$activeShift) }}">@csrf<button class="pc-btn pc-amber">Ⅱ Pausar</button></form>@endif</div>
+<div class="pc-metric" style="margin-top:14px"><small>PRODUCCIÓN TEÓRICA HASTA AHORA</small><strong id="pcLiveTheoretical">{{ number_format($theoreticalQuantity,0) }} unidades</strong><small>Estimación automática según tiempo efectivo y estándar.</small></div>
+<form id="progressForm" style="margin-top:14px" method="POST" action="{{ route('production-center.shifts.progress',$activeShift) }}">@csrf<label class="pc-label">Cantidad real fabricada hasta este momento</label><input id="pcCurrentQuantity" class="pc-field" type="number" min="0" step="0.01" name="current_produced_quantity" value="{{ number_format((float)$activeShift->current_produced_quantity,2,'.','') }}" required><small class="pc-sub">Actualiza este dato durante la jornada. Gerencia verá el último valor guardado.</small><button type="submit" class="pc-btn pc-primary" style="width:100%;margin-top:8px">Guardar avance real</button><div id="progressSaved" class="pc-sub" style="margin-top:5px"></div></form>
+<form method="POST" action="{{ route('production-center.shifts.close',$activeShift) }}" style="margin-top:17px">@csrf<label class="pc-label">Cantidad final fabricada en esta jornada</label><input class="pc-field" type="number" min="0" step="0.01" name="produced_quantity" value="{{ number_format((float)$activeShift->current_produced_quantity,2,'.','') }}" required><label class="pc-label" style="margin-top:10px">Observaciones de la jornada</label><input class="pc-field" name="notes" placeholder="Incidencias o comentarios"><button class="pc-btn pc-primary" style="width:100%;margin-top:10px" onclick="return confirm('¿Cerrar esta jornada? La orden seguirá abierta.')">■ Cerrar jornada</button></form></section>
+@elseif($production_order->status==='FINALIZADA')
+<section class="pc-card"><h3>Producción finalizada</h3><div class="pc-metric"><small>UNIDADES INGRESADAS AL INVENTARIO</small><strong style="color:#15803d">{{ number_format((float)$production_order->produced_quantity,0) }}</strong></div><a class="pc-btn pc-primary" style="width:100%;margin-top:12px" target="_blank" href="{{ route('production-center.print',$production_order) }}">▣ Ver / imprimir informe</a></section>
+@else
+<section class="pc-card"><h3>Finalizar orden</h3><p class="pc-sub">La orden se cerrará cuando no existan jornadas abiertas. Se ingresará al inventario la suma de unidades reales registradas en las jornadas.</p><div class="pc-metric"><small>UNIDADES REALES ACUMULADAS</small><strong style="color:#15803d">{{ number_format($completedQuantity,0) }}</strong></div><form method="POST" action="{{ route('production-center.finish',$production_order) }}" style="margin-top:12px">@csrf<button class="pc-btn pc-green" style="width:100%" onclick="return confirm('¿Finalizar la orden y actualizar el inventario?')">✓ Finalizar orden</button></form></section>
+@endif
+<section class="pc-card"><h3>Datos de referencia</h3><div class="pc-sub">Materia prima: <strong>{{ $production_order->rawMaterial->name??'—' }}</strong></div><div class="pc-sub" style="margin-top:7px">Consumo previsto: <strong>{{ number_format((float)$production_order->consumed_quantity,2) }} {{ $production_order->rawMaterial->unit??'' }}</strong></div><div class="pc-sub" style="margin-top:7px">Creada por: <strong>{{ $production_order->user->name??'—' }}</strong></div></section>
+</aside></div></div></div>
 <script>
-const clock=document.getElementById('pcClock');
-if(clock && !@json((bool)$activePause)){
- let elapsed=Number(clock.dataset.elapsed||0),last=Date.now();
- setInterval(()=>{const now=Date.now();elapsed+=(now-last)/1000;last=now;let n=Math.floor(elapsed),h=Math.floor(n/3600),m=Math.floor((n%3600)/60),s=n%60;clock.textContent=[h,m,s].map(v=>String(v).padStart(2,'0')).join(':');},1000);
-}
-function addNewWorker(){const input=document.createElement('input');input.className='pc-field';input.name='workers[]';input.required=true;input.placeholder='Nombre del operario';document.getElementById('newWorkers').appendChild(input);}
+const metricsUrl=document.querySelector('[data-order-metrics]')?.dataset.orderMetrics;const clock=document.getElementById('pcClock');let elapsed=Number(clock?.dataset.elapsed||0),last=Date.now();const isPaused=@json((bool)$activePause);if(clock&&!isPaused){setInterval(()=>{let now=Date.now();elapsed+=(now-last)/1000;last=now;clock.textContent=fmt(elapsed)},1000)}function fmt(v){let n=Math.floor(v),h=Math.floor(n/3600),m=Math.floor(n%3600/60),s=n%60;return [h,m,s].map(x=>String(x).padStart(2,'0')).join(':')}function addNewWorker(){let x=document.createElement('input');x.className='pc-field';x.name='workers[]';x.required=true;x.placeholder='Nombre del operario';x.style.marginBottom='8px';document.getElementById('newWorkers').appendChild(x)}
+async function refreshMetrics(){if(!metricsUrl)return;try{let r=await fetch(metricsUrl,{headers:{'Accept':'application/json'}});if(!r.ok)return;let d=await r.json();let t=Number(d.theoretical),a=Number(d.actual),diff=a-t;let e=document.getElementById('pcTheoretical');if(e)e.textContent=Math.round(t).toLocaleString('es-PE');e=document.getElementById('pcLiveTheoretical');if(e)e.textContent=Math.round(t).toLocaleString('es-PE')+' unidades';e=document.getElementById('pcActual');if(e)e.textContent=Math.round(a).toLocaleString('es-PE');e=document.getElementById('pcDifference');if(e)e.textContent=(diff>=0?'+':'')+Math.round(diff).toLocaleString('es-PE');e=document.getElementById('pcElapsed');if(e)e.textContent=fmt(d.seconds);let pct=Math.min(100,Number(@json((float)$production_order->target_quantity))>0?a/Number(@json((float)$production_order->target_quantity))*100:0);e=document.getElementById('pcPercent');if(e)e.textContent=pct.toFixed(1)+'%';e=document.getElementById('pcProgressBar');if(e)e.style.width=pct+'%'}catch(e){console.warn('No se pudo actualizar el seguimiento',e)}}if(metricsUrl)setInterval(refreshMetrics,15000);
+const pf=document.getElementById('progressForm');if(pf)pf.addEventListener('submit',async ev=>{ev.preventDefault();let b=pf.querySelector('button'),msg=document.getElementById('progressSaved');b.disabled=true;try{let r=await fetch(pf.action,{method:'POST',body:new FormData(pf),headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest'}});if(!r.ok)throw new Error('No se pudo guardar');msg.textContent='Avance guardado correctamente.';msg.style.color='#15803d';refreshMetrics()}catch(e){msg.textContent='No se pudo guardar. Intenta nuevamente.';msg.style.color='#be123c'}finally{b.disabled=false}});
 </script>
 @endsection

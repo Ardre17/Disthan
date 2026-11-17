@@ -8,7 +8,7 @@ class ProductionOrderShift extends Model
 {
     protected $fillable = [
         'production_order_id', 'shift_number', 'status', 'started_at',
-        'ended_at', 'produced_quantity', 'actual_duration_seconds',
+        'ended_at', 'produced_quantity', 'current_produced_quantity', 'actual_duration_seconds',
         'notes', 'started_by', 'closed_by',
     ];
 
@@ -16,6 +16,7 @@ class ProductionOrderShift extends Model
         'started_at' => 'datetime',
         'ended_at' => 'datetime',
         'produced_quantity' => 'decimal:2',
+        'current_produced_quantity' => 'decimal:2',
         'actual_duration_seconds' => 'integer',
     ];
 

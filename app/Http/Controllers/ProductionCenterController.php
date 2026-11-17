@@ -104,11 +104,25 @@ class ProductionCenterController extends Controller
         ]);
 
         $activeShift = $production_order->shifts->firstWhere('status', 'EN_CURSO');
-        $completedQuantity = (float) $production_order->shifts
-            ->where('status', 'FINALIZADA')->sum('produced_quantity');
-
+        $completedShifts = $production_order->shifts->where('status', 'FINALIZADA');
+        $completedQuantity = (float) $completedShifts->sum('produced_quantity');
+        $completedSeconds = (int) $completedShifts->sum('actual_duration_seconds');
+        $activePause = $activeShift ? $activeShift->pauses->firstWhere('resumed_at', null) : null;
+        $activeElapsed = 0;
+        if ($activeShift) {
+            $activeElapsed = max(0, $activeShift->started_at->diffInSeconds(now()));
+            foreach ($activeShift->pauses as $pause) {
+                $activeElapsed -= $pause->paused_at->diffInSeconds($pause->resumed_at ?? now());
+            }
+            $activeElapsed = max(0, (int) $activeElapsed);
+        }
+        $elapsedNow = $completedSeconds + $activeElapsed;
+        $theoreticalQuantity = (float) $production_order->standard_time_seconds > 0
+            ? $elapsedNow / (float) $production_order->standard_time_seconds : 0;
+        $currentActual = $completedQuantity + (float) ($activeShift->current_produced_quantity ?? 0);
         return view('production_center.show', compact(
-            'production_order', 'activeShift', 'completedQuantity'
+            'production_order', 'activeShift', 'completedQuantity', 'completedSeconds',
+            'activePause', 'activeElapsed', 'elapsedNow', 'theoreticalQuantity', 'currentActual'
         ));
     }
 
@@ -217,6 +231,7 @@ class ProductionCenterController extends Controller
                 'status' => 'FINALIZADA',
                 'ended_at' => $end,
                 'produced_quantity' => $data['produced_quantity'],
+                'current_produced_quantity' => $data['produced_quantity'],
                 'actual_duration_seconds' => $effective,
                 'notes' => $data['notes'] ?? $shift->notes,
                 'closed_by' => auth()->id(),
@@ -231,6 +246,53 @@ class ProductionCenterController extends Controller
         });
 
         return back()->with('success', 'Jornada cerrada y sus resultados guardados. La orden sigue abierta.');
+    }
+
+    public function updateShiftProgress(Request $request, ProductionOrderShift $shift)
+    {
+        $data = $request->validate(['current_produced_quantity' => ['required', 'numeric', 'min:0']]);
+        if ($shift->status !== 'EN_CURSO') {
+            throw ValidationException::withMessages(['progress' => 'La jornada ya no está abierta.']);
+        }
+        $shift->update(['current_produced_quantity' => $data['current_produced_quantity']]);
+        return response()->json(['ok' => true, 'current' => (float) $shift->fresh()->current_produced_quantity]);
+    }
+
+    public function liveMetrics(ProductionOrder $production_order)
+    {
+        $production_order->load('shifts.pauses');
+        $finished = $production_order->shifts->where('status', 'FINALIZADA');
+        $seconds = (int) $finished->sum('actual_duration_seconds');
+        $real = (float) $finished->sum('produced_quantity');
+        $active = $production_order->shifts->firstWhere('status', 'EN_CURSO');
+        if ($active) {
+            $seconds += max(0, (int) $active->started_at->diffInSeconds(now()));
+            foreach ($active->pauses as $pause) {
+                $seconds -= $pause->paused_at->diffInSeconds($pause->resumed_at ?? now());
+            }
+            $seconds = max(0, $seconds);
+            $real += (float) $active->current_produced_quantity;
+        }
+        $standard = (float) $production_order->standard_time_seconds;
+        return response()->json([
+            'theoretical' => $standard > 0 ? round($seconds / $standard, 2) : 0,
+            'actual' => round($real, 2),
+            'seconds' => $seconds,
+            'active' => (bool) $active,
+            'paused' => $active ? $active->pauses->contains(fn ($pause) => $pause->resumed_at === null) : false,
+        ]);
+    }
+
+    public function printOrder(ProductionOrder $production_order)
+    {
+        $production_order->load(['product', 'rawMaterial', 'user', 'shifts.workers', 'shifts.pauses']);
+        abort_unless($production_order->status === 'FINALIZADA', 404);
+        $actualSeconds = (int) $production_order->shifts->where('status', 'FINALIZADA')->sum('actual_duration_seconds');
+        $actualQuantity = (float) $production_order->shifts->where('status', 'FINALIZADA')->sum('produced_quantity');
+        $standard = (float) $production_order->standard_time_seconds;
+        $theoretical = $standard > 0 ? $actualSeconds / $standard : 0;
+        $actualPerUnit = $actualQuantity > 0 ? $actualSeconds / $actualQuantity : 0;
+        return view('production_center.print', compact('production_order', 'actualSeconds', 'actualQuantity', 'standard', 'theoretical', 'actualPerUnit'));
     }
 
     public function finishOrder(ProductionOrder $production_order)
