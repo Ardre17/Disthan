@@ -247,8 +247,23 @@ html, body { max-width:100%; overflow-x:hidden; -webkit-text-size-adjust:100%; }
 .camara-hdr-pulse{ width:8px; height:8px; border-radius:50%; background:#22c55e; animation:pulse 1.4s infinite; }
 @keyframes pulse{ 0%,100%{ opacity:1; transform:scale(1); } 50%{ opacity:.3; transform:scale(.8); } }
 .btn-camara-cerrar{ background:transparent; border:none; color:#94a3b8; font-size:20px; cursor:pointer; }
-#camaraVisor{ position:relative; background:#000; min-height:300px; overflow:hidden; }
-#camaraVisor video{ width:100%!important; height:auto!important; display:block; }
+#camaraVisor{
+    position:relative;
+    background:#000;
+    width:100%;
+    height:min(65vh, 420px);
+    min-height:300px;
+    overflow:hidden;
+}
+#camaraVisor video{
+    width:100%!important;
+    height:100%!important;
+    min-height:300px!important;
+    object-fit:cover!important;
+    display:block!important;
+    background:#000;
+}
+#camaraVisor canvas{ display:none!important; }
 .scan-frame{ position:absolute; z-index:3; inset:50% auto auto 50%; width:260px; height:150px; transform:translate(-50%,-50%); pointer-events:none; border:2px solid #3b82f6; border-radius:10px; box-shadow:0 0 0 9999px rgba(0,0,0,.28); }
 .scan-line{ position:absolute; left:8px; right:8px; top:50%; height:2px; background:#22c55e; box-shadow:0 0 8px #22c55e; animation:scanAnim 1.8s ease-in-out infinite; }
 @keyframes scanAnim{ 0%,100%{ transform:translateY(-55px); } 50%{ transform:translateY(55px); } }
