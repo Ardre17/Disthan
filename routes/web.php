@@ -48,12 +48,15 @@ Route::prefix('centro-produccion')->name('production-center.')->controller(Produ
     Route::get('/', 'index')->name('index');
     Route::get('/crear', 'create')->name('create');
     Route::post('/', 'store')->name('store');
+    Route::get('/{production_order}/imprimir', 'printOrder')->name('print');
+    Route::get('/{production_order}/metricas', 'liveMetrics')->name('metrics');
     Route::get('/{production_order}', 'show')->name('show');
 
     Route::post('/{production_order}/jornadas', 'startShift')->name('shifts.start');
     Route::post('/jornadas/{shift}/pausar', 'pauseShift')->name('shifts.pause');
     Route::post('/jornadas/{shift}/reanudar', 'resumeShift')->name('shifts.resume');
     Route::post('/jornadas/{shift}/cerrar', 'closeShift')->name('shifts.close');
+    Route::post('/jornadas/{shift}/avance', 'updateShiftProgress')->name('shifts.progress');
 
     Route::post('/{production_order}/finalizar', 'finishOrder')->name('finish');
 
