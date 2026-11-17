@@ -211,7 +211,7 @@ class ProductionCenterController extends Controller
             $paused = $shift->pauses->sum(function ($pause) {
                 return $pause->paused_at->diffInSeconds($pause->resumed_at);
             });
-            $effective = max(0, $elapsed - $paused);
+            $effective = max(0, (int) round($elapsed - $paused));
 
             $shift->update([
                 'status' => 'FINALIZADA',
