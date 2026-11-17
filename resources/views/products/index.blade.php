@@ -62,6 +62,9 @@
             'id' => (string) $p->id,
             'nombre' => $p->nombre,
             'sku' => $p->sku,
+            'fecha_vencimiento' => $p->fecha_vencimiento
+                ? \Carbon\Carbon::parse($p->fecha_vencimiento)->format('d/m/Y')
+                : '—',
             'stock' => (float) ($p->stock ?? 0),
             'stock_minimo' => (float) ($p->stock_minimo ?? 0),
         ];
@@ -699,7 +702,7 @@
             </div>
             <div class="pv-rotation-table-wrap">
                 <table class="pv-rotation-table">
-                    <thead><tr><th data-sort="nombre">Producto <span class="sort-ind">↕</span></th><th data-sort="sku">SKU <span class="sort-ind">↕</span></th><th data-sort="stock">Stock actual <span class="sort-ind">↕</span></th><th data-sort="salidas">Pedidos <span class="sort-ind">↕</span></th><th data-sort="unidades">Unidades despachadas <span class="sort-ind">↕</span></th><th data-sort="frecuencia">Frecuencia / 30 días <span class="sort-ind">↕</span></th><th>Rotación</th><th>Materia prima</th></tr></thead>
+                    <thead><tr><th data-sort="nombre">Producto <span class="sort-ind">↕</span></th><th data-sort="sku">SKU <span class="sort-ind">↕</span></th><th>Fecha de vencimiento</th><th data-sort="stock">Stock actual <span class="sort-ind">↕</span></th><th data-sort="salidas">Pedidos <span class="sort-ind">↕</span></th><th data-sort="unidades">Unidades despachadas <span class="sort-ind">↕</span></th><th data-sort="frecuencia">Frecuencia / 30 días <span class="sort-ind">↕</span></th><th>Rotación</th><th>Materia prima</th></tr></thead>
                     <tbody id="pvRotationBody"></tbody>
                 </table>
                 <div class="pv-rotation-empty" id="pvRotationEmpty" hidden>No hay productos que coincidan con los filtros.</div>
@@ -935,6 +938,7 @@ function renderAnalisisRotacion(){
         return '<tr>' +
             '<td><strong>' + escaparHtmlRotacion(x.producto.nombre) + '</strong></td>' +
             '<td class="pv-mono">' + escaparHtmlRotacion(x.producto.sku || '—') + '</td>' +
+            '<td class="pv-mono">' + escaparHtmlRotacion(x.producto.fecha_vencimiento || '—') + '</td>' +
             '<td class="pv-mono">' + x.producto.stock.toLocaleString('es-PE',{maximumFractionDigits:2}) + '</td>' +
             '<td><strong>' + x.salidas.toLocaleString('es-PE') + '</strong></td>' +
             '<td class="pv-mono">' + x.unidades.toLocaleString('es-PE', {maximumFractionDigits:2}) + '</td>' +
@@ -979,9 +983,9 @@ function imprimirAnalisisRotacion(){
     var busqueda = document.getElementById('pvRotationSearch').value || '';
     var titulos = {30:'Últimos 30 días',60:'Últimos 60 días',90:'Últimos 90 días',180:'Últimos 180 días'};
     var filas = rotacionListaVisible.map(function(x){
-        return '<tr><td>'+escaparHtmlRotacion(x.producto.nombre)+'</td><td>'+escaparHtmlRotacion(x.producto.sku||'—')+'</td><td>'+x.producto.stock+'</td><td>'+x.salidas+'</td><td>'+x.unidades.toLocaleString('es-PE')+'</td><td>'+x.clase.frecuencia.toFixed(1)+'</td><td>'+x.clase.texto+'</td></tr>';
+        return '<tr><td>'+escaparHtmlRotacion(x.producto.nombre)+'</td><td>'+escaparHtmlRotacion(x.producto.sku||'—')+'</td><td>'+escaparHtmlRotacion(x.producto.fecha_vencimiento||'—')+'</td><td>'+x.producto.stock+'</td><td>'+x.salidas+'</td><td>'+x.unidades.toLocaleString('es-PE')+'</td><td>'+x.clase.frecuencia.toFixed(1)+'</td><td>'+x.clase.texto+'</td></tr>';
     }).join('');
-    var html = '<!doctype html><html><head><meta charset="utf-8"><title>Reporte de rotación DISTAN ERP</title><style>body{font-family:Arial,sans-serif;color:#172033;padding:22px}h1{font-size:20px;margin:0 0 5px}.meta{font-size:11px;color:#526078;margin-bottom:16px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d9e0ea;padding:7px;text-align:left;font-size:10px}th{background:#edf2f8;text-transform:uppercase}footer{margin-top:14px;font-size:10px;color:#64748b}@page{size:landscape;margin:12mm}</style></head><body><h1>DISTAN ERP · Reporte de análisis de rotación</h1><div class="meta">Periodo: '+titulos[periodo.value]+' · Rotación: '+filtro.options[filtro.selectedIndex].text+' · Stock: '+stock.options[stock.selectedIndex].text+' · Búsqueda: '+escaparHtmlRotacion(busqueda||'Todas')+' · Generado: '+new Date().toLocaleString('es-PE')+'</div><table><thead><tr><th>Producto</th><th>SKU</th><th>Stock actual</th><th>Pedidos con salida</th><th>Unidades despachadas</th><th>Frecuencia / 30 días</th><th>Clasificación</th></tr></thead><tbody>'+filas+'</tbody></table><footer>La frecuencia se calcula según pedidos distintos con despacho real. La consulta de materias primas se basa en órdenes de producción históricas y no constituye una fórmula fija.</footer><script>window.onload=function(){window.print();};<\/script></body></html>';
+    var html = '<!doctype html><html><head><meta charset="utf-8"><title>Reporte de rotación DISTAN ERP</title><style>body{font-family:Arial,sans-serif;color:#172033;padding:22px}h1{font-size:20px;margin:0 0 5px}.meta{font-size:11px;color:#526078;margin-bottom:16px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #d9e0ea;padding:7px;text-align:left;font-size:10px}th{background:#edf2f8;text-transform:uppercase}footer{margin-top:14px;font-size:10px;color:#64748b}@page{size:landscape;margin:12mm}</style></head><body><h1>DISTAN ERP · Reporte de análisis de rotación</h1><div class="meta">Periodo: '+titulos[periodo.value]+' · Rotación: '+filtro.options[filtro.selectedIndex].text+' · Stock: '+stock.options[stock.selectedIndex].text+' · Búsqueda: '+escaparHtmlRotacion(busqueda||'Todas')+' · Generado: '+new Date().toLocaleString('es-PE')+'</div><table><thead><tr><th>Producto</th><th>SKU</th><th>Fecha de vencimiento</th><th>Stock actual</th><th>Pedidos con salida</th><th>Unidades despachadas</th><th>Frecuencia / 30 días</th><th>Clasificación</th></tr></thead><tbody>'+filas+'</tbody></table><footer>La frecuencia se calcula según pedidos distintos con despacho real. La consulta de materias primas se basa en órdenes de producción históricas y no constituye una fórmula fija.</footer><script>window.onload=function(){window.print();};<\/script></body></html>';
     var w = window.open('', '_blank');
     if(!w){ alert('El navegador bloqueó la ventana de impresión. Permite las ventanas emergentes para este sitio.'); return; }
     w.document.open(); w.document.write(html); w.document.close();
