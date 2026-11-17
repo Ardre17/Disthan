@@ -42,6 +42,24 @@ use App\Http\Controllers\SupplyOrderController;
 use App\Http\Controllers\MobileProductController;
 use App\Http\Controllers\MobileOrderController;
 use App\Http\Controllers\CatalogoComercialController;
+use App\Http\Controllers\ProductionCenterController;
+
+Route::prefix('centro-produccion')->name('production-center.')->controller(ProductionCenterController::class)->group(function () {
+    Route::get('/', 'index')->name('index');
+    Route::get('/crear', 'create')->name('create');
+    Route::post('/', 'store')->name('store');
+    Route::get('/{production_order}', 'show')->name('show');
+
+    Route::post('/{production_order}/jornadas', 'startShift')->name('shifts.start');
+    Route::post('/jornadas/{shift}/pausar', 'pauseShift')->name('shifts.pause');
+    Route::post('/jornadas/{shift}/reanudar', 'resumeShift')->name('shifts.resume');
+    Route::post('/jornadas/{shift}/cerrar', 'closeShift')->name('shifts.close');
+
+    Route::post('/{production_order}/finalizar', 'finishOrder')->name('finish');
+
+    Route::get('/configuracion/tiempos', 'standards')->name('standards');
+    Route::post('/configuracion/tiempos', 'saveStandard')->name('standards.save');
+});
 
 Route::prefix('catalogo-comercial')
     ->name('catalogo.publico.')
