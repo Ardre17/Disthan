@@ -83,9 +83,9 @@ $menu = [
     ],
 
     'produccion' => [
-        'label' => 'Producción(Antiguo)', 'icon' => 'grid','roles' => ['admin'], 'color' => '#2f6fd0', 'group' => true,
+        'label' => 'Producción', 'icon' => 'grid','roles' => ['admin'], 'color' => '#2f6fd0', 'group' => true,
         'items' => [
-            ['label' => 'Producción', 'icon' => 'factory', 'route' => 'production-orders.index',
+            ['label' => 'Producción(Antiguo)', 'icon' => 'factory', 'route' => 'production-orders.index',
              'roles' => ['admin','gerencia'], 'routes' => ['production-orders.*'], 'paths' => ['production', 'produccion']],
 
              [
