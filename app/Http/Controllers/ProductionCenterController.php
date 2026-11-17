@@ -322,13 +322,24 @@ class ProductionCenterController extends Controller
                 throw ValidationException::withMessages(['order' => 'No se encontró el producto o la materia prima de esta orden.']);
             }
 
-            if ((float) $material->stock < (float) $order->consumed_quantity) {
-                throw ValidationException::withMessages(['inventory' => 'No hay suficiente materia prima para finalizar esta orden.']);
+            // consumed_quantity representa el consumo previsto para completar
+            // toda la cantidad planificada. Ajustamos el descuento a lo realmente fabricado.
+            $plannedQuantity = (float) $order->target_quantity;
+            if ($plannedQuantity <= 0) {
+                throw ValidationException::withMessages(['inventory' => 'La cantidad planificada de la orden no es válida.']);
             }
 
-            // Mantiene el comportamiento de inventario actual: el consumo de MP
-            // se descuenta al finalizar y el producto terminado aumenta con la suma real.
-            $material->stock = (float) $material->stock - (float) $order->consumed_quantity;
+            $actualMaterialConsumption = ((float) $order->consumed_quantity / $plannedQuantity) * $actualProduced;
+            $actualMaterialConsumption = round($actualMaterialConsumption, 2);
+
+            if ((float) $material->stock < $actualMaterialConsumption) {
+                throw ValidationException::withMessages([
+                    'inventory' => 'No hay suficiente materia prima. Se necesitan ' . number_format($actualMaterialConsumption, 2) . ' unidades para la producción real registrada.',
+                ]);
+            }
+
+            // Descuenta solo la materia prima proporcional a las unidades realmente fabricadas.
+            $material->stock = (float) $material->stock - $actualMaterialConsumption;
             if ($material->stock <= 0) {
                 $material->status = 'AGOTADO';
             } elseif ($material->stock <= $material->minimum_stock) {
@@ -351,7 +362,7 @@ class ProductionCenterController extends Controller
         });
 
         return redirect()->route('production-center.show', $production_order)
-            ->with('success', 'Orden finalizada. El inventario se actualizó con la cantidad realmente fabricada.');
+            ->with('success', 'Orden finalizada. Se descontó materia prima proporcional a la cantidad realmente fabricada y se actualizó el inventario de producto terminado.');
     }
 
     public function standards()
