@@ -1024,12 +1024,17 @@ public function historial(Request $request)
     ));
 }
 
-    public function operario(Order $order)
+
+public function operario(Order $order)
 {
-    $order->load('details.product');
+    $order->load([
+        'client',
+        'details.product'
+    ]);
 
     return view('orders.operario', compact('order'));
 }
+
    public function pdf(Order $order)
 {
     $order->load(['client','details.product']);
