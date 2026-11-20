@@ -678,6 +678,9 @@ Route::prefix('preparation')
         Route::post('/detail/{detail}/confirm-information', 'confirmInformation')
             ->name('confirmInformation');
 
+        Route::post('/detail/{detail}/migrate-confirmed-information', 'migrateConfirmedInformation')
+            ->name('migrateConfirmedInformation');
+
         Route::post('/detail/{detail}/save', 'save')
             ->name('save');
 

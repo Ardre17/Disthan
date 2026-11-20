@@ -80,6 +80,7 @@ class OrderPreparationController extends Controller
                 'confirmed_lote' => $d->informacion_confirmada_lote,
                 'confirmed_produccion' => $d->informacion_confirmada_produccion,
                 'confirmed_vencimiento' => $d->informacion_confirmada_vencimiento,
+                'migrated_at' => $d->informacion_migrada_at ?? null,
                 'confirmed_user' => $d->informacion_confirmada_por ? DB::table('users')->where('id', $d->informacion_confirmada_por)->value('name') : null,
                 'prepared_by' => $d->preparado_por,
                 'prepared_user' => $d->preparado_por ? DB::table('users')->where('id', $d->preparado_por)->value('name') : null,
@@ -126,6 +127,45 @@ class OrderPreparationController extends Controller
                 'lote' => $lote,
                 'fecha_produccion' => $produccion,
                 'fecha_vencimiento' => $vencimiento,
+            ];
+        }, 3);
+
+        return response()->json($result);
+    }
+
+    /** Copia al detalle del pedido los datos que fueron confirmados previamente. */
+    public function migrateConfirmedInformation(OrderDetail $detail)
+    {
+        $result = DB::transaction(function () use ($detail) {
+            $locked = OrderDetail::query()->whereKey($detail->id)->lockForUpdate()->firstOrFail();
+
+            if (!$locked->informacion_confirmada_at) {
+                throw ValidationException::withMessages([
+                    'confirmacion' => 'Primero debes confirmar el lote y las fechas del producto.',
+                ]);
+            }
+
+            if ($locked->informacion_migrada_at) {
+                return ['success' => true, 'already_migrated' => true];
+            }
+
+            // El snapshot confirmado es la fuente; no se consulta ni modifica products.
+            $migratedAt = now();
+            $locked->forceFill([
+                'lote' => $locked->informacion_confirmada_lote,
+                'fecha_produccion' => $locked->informacion_confirmada_produccion,
+                'fecha_vencimiento' => $locked->informacion_confirmada_vencimiento,
+                'informacion_migrada_at' => $migratedAt,
+                'informacion_migrada_por' => Auth::id(),
+            ])->save();
+
+            return [
+                'success' => true,
+                'already_migrated' => false,
+                'lote' => $locked->lote,
+                'fecha_produccion' => $locked->fecha_produccion,
+                'fecha_vencimiento' => $locked->fecha_vencimiento,
+                'migrated_at' => $migratedAt->toIso8601String(),
             ];
         }, 3);
 

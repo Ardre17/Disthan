@@ -820,6 +820,8 @@ public function etiqueta(OrderDetail $item)
             'informacion_confirmada_lote' => null,
             'informacion_confirmada_produccion' => null,
             'informacion_confirmada_vencimiento' => null,
+            'informacion_migrada_at' => null,
+            'informacion_migrada_por' => null,
         ];
     }
     $item->update($validated);
@@ -1537,6 +1539,8 @@ public function updateDetail(Request $request, OrderDetail $detail)
                     'informacion_confirmada_lote' => null,
                     'informacion_confirmada_produccion' => null,
                     'informacion_confirmada_vencimiento' => null,
+            'informacion_migrada_at' => null,
+            'informacion_migrada_por' => null,
                 ];
             }
 

@@ -30,7 +30,7 @@
         .mobile-octimg{width:34px;height:34px;object-fit:contain;display:block}
         .mobile-oct{width:34px;height:34px;background:#111;color:#fff;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:5.5px;font-weight:900;line-height:1.1;text-align:center;padding:2px}
         .mobile-oct span{display:block}
-.distan-confirm-box{margin:10px 0;padding:10px;border:1px solid #dbe5f0;border-radius:10px;background:#f8fbff;font-size:11px}.dcb-ok{color:#166534;font-weight:800}.dcb-wait{color:#92400e;font-weight:750}
+.distan-confirm-box{display:block;width:100%;margin:10px 0 12px;padding:12px 14px;border:1px solid #dbe5f0;border-radius:10px;background:#f8fbff;font-size:12px;line-height:1.55}.dcb-ok{color:#166534;font-weight:800}.dcb-wait{color:#92400e;font-weight:750}.dcb-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.dcb-actions .btn{flex:0 0 auto}
 </style>
 </head>
 <body>
@@ -192,22 +192,27 @@
                         <div class="stat left"><b>{{ rtrim(rtrim(number_format($faltante,3,'.',''), '0'), '.') }}</b><span>Falta</span></div>
                     </div>
                     <div class="progress"><i style="width:{{ $pct }}%;background:{{ $pct>=100 ? 'var(--green)' : ($pct>0 ? '#d69a25' : '#d04b4b') }}"></i></div>
-                    <div class="data-grid">
-                        <div class="data-cell"><span class="label">Stock actual</span><b>{{ rtrim(rtrim(number_format($stockActual,3,'.',''), '0'), '.') }}</b></div>
-                        <div class="data-cell"><span class="label">Lote</span><b>{{ $lote ?: '—' }}</b></div>
-                        <div class="data-cell"><span class="label">Fecha de producción</span><b>{{ $produccion ? \Carbon\Carbon::parse($produccion)->format('d/m/Y') : '—' }}</b></div>
-                        <div class="data-cell"><span class="label">Fecha de vencimiento</span><b>{{ $vence ? \Carbon\Carbon::parse($vence)->format('d/m/Y') : '—' }}</b></div>
-                        <div class="data-cell"><span class="label">Último responsable</span><b>{{ $ultimoUsuario }}</b></div>
-                    </div>
-                    <div class="distan-confirm-box" data-confirm-url="{{ route('preparation.confirmInformation', $detail) }}" data-csrf="{{ csrf_token() }}" data-requested="{{ $solicitado }}" data-prepared="{{ $armado }}">
+                    <div class="distan-confirm-box" data-confirm-url="{{ route('preparation.confirmInformation', $detail) }}" data-migrate-url="{{ route('preparation.migrateConfirmedInformation', $detail) }}" data-csrf="{{ csrf_token() }}" data-requested="{{ $solicitado }}" data-prepared="{{ $armado }}">
                         @if($detail->informacion_confirmada_at)
-                            <span class="dcb-ok">✓ Información verificada</span> · {{ \Carbon\Carbon::parse($detail->informacion_confirmada_at)->format('d/m/Y H:i') }} · Armado por: {{ $ultimoUsuario }}
+                            <div><span class="dcb-ok">✓ Información verificada</span> · {{ \Carbon\Carbon::parse($detail->informacion_confirmada_at)->format('d/m/Y H:i') }} · Armado por: {{ $ultimoUsuario }}</div>
+                            @if($detail->informacion_migrada_at)
+                                <div class="dcb-ok" style="margin-top:6px">✓ Datos migrados a los campos del pedido</div>
+                            @else
+                                <div class="dcb-actions"><button type="button" class="btn migrate-information">Migrar confirmación</button><span class="hint">Copiar lote, producción y vencimiento a los campos del pedido.</span></div>
+                            @endif
                         @elseif($estadoArmado==='complete')
                             <button type="button" class="btn confirm-information">Confirmar lote y fechas</button>
                             <div class="hint">Verifica el lote, la fecha de producción y el vencimiento.</div>
                         @else
                             <span class="dcb-wait">Pendiente: disponible al completar el 100 % del armado.</span>
                         @endif
+                    </div>
+                    <div class="data-grid">
+                        <div class="data-cell"><span class="label">Stock actual</span><b>{{ rtrim(rtrim(number_format($stockActual,3,'.',''), '0'), '.') }}</b></div>
+                        <div class="data-cell"><span class="label">Lote</span><b>{{ $lote ?: '—' }}</b></div>
+                        <div class="data-cell"><span class="label">Fecha de producción</span><b>{{ $produccion ? \Carbon\Carbon::parse($produccion)->format('d/m/Y') : '—' }}</b></div>
+                        <div class="data-cell"><span class="label">Fecha de vencimiento</span><b>{{ $vence ? \Carbon\Carbon::parse($vence)->format('d/m/Y') : '—' }}</b></div>
+                        <div class="data-cell"><span class="label">Último responsable</span><b>{{ $ultimoUsuario }}</b></div>
                     </div>
                     @if($faltante > 0)
                         @if($sinStock)
@@ -354,9 +359,15 @@
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){cerrarModal('modalLote');cerrarAlerta('modalProduccion');cerrarAlerta('modalOctogonos');cerrarCamara()}});
     document.querySelectorAll('.distan-confirm-box .confirm-information').forEach(btn=>btn.addEventListener('click',async()=>{
         const box=btn.closest('.distan-confirm-box');btn.disabled=true;btn.textContent='Confirmando…';
-        try{const res=await fetch(box.dataset.confirmUrl,{method:'POST',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-TOKEN':box.dataset.csrf}});const data=await res.json();if(!res.ok)throw new Error(data.message||Object.values(data.errors||{}).flat().join(' '));box.innerHTML='<span class="badge green">✓ Información verificada</span> · '+new Date(data.confirmed_at).toLocaleString('es-PE');toast('Información del producto confirmada.');}
+        try{const res=await fetch(box.dataset.confirmUrl,{method:'POST',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-TOKEN':box.dataset.csrf}});const data=await res.json();if(!res.ok)throw new Error(data.message||Object.values(data.errors||{}).flat().join(' '));box.innerHTML='<div><span class="dcb-ok">✓ Información verificada</span> · '+new Date(data.confirmed_at).toLocaleString('es-PE')+'</div><div class="dcb-actions"><button type="button" class="btn migrate-information">Migrar confirmación</button><span class="hint">Copiar lote, producción y vencimiento a los campos del pedido.</span></div>';toast('Información del producto confirmada.');}
         catch(err){toast(err.message||'No se pudo confirmar.');btn.disabled=false;btn.textContent='Confirmar lote y fechas';}
     }));
+    document.addEventListener('click',async e=>{
+        const btn=e.target.closest('.distan-confirm-box .migrate-information');if(!btn)return;
+        const box=btn.closest('.distan-confirm-box');btn.disabled=true;btn.textContent='Migrando…';
+        try{const res=await fetch(box.dataset.migrateUrl,{method:'POST',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-TOKEN':box.dataset.csrf}});const data=await res.json();if(!res.ok)throw new Error(data.message||Object.values(data.errors||{}).flat().join(' '));toast('Lote y fechas migrados al pedido.');window.location.reload();}
+        catch(err){toast(err.message||'No se pudo migrar la información.');btn.disabled=false;btn.textContent='Migrar confirmación';}
+    });
     document.querySelectorAll('.entry').forEach(form=>form.addEventListener('submit',e=>{const btn=form.querySelector('button');btn.disabled=true;btn.textContent='Guardando…'}));
 </script>
 </body>

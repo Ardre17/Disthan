@@ -12,7 +12,10 @@
 .distan-prep-tag{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:2px 7px;border-radius:99px;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;white-space:nowrap}
 .distan-prep-tag.partial{background:#fef3c7;color:#92400e}.distan-prep-tag.done{background:#dcfce7;color:#166534}
 
-.distan-confirm-box{margin:8px 0;padding:8px 10px;border:1px solid #dbe5f0;border-radius:9px;background:#f8fbff;font-size:11px;color:#334155;}
+.distan-confirm-box{display:block;width:100%;box-sizing:border-box;grid-column:1 / -1;margin:10px 0;padding:12px 14px;border:1px solid #dbe5f0;border-radius:10px;background:#f8fbff;font-size:12px;color:#334155;line-height:1.55;}
+.distan-confirm-box .dcb-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}
+.distan-confirm-box .dcb-migrate{border:0;border-radius:7px;padding:8px 13px;background:#1d4ed8;color:#fff;font-weight:750;cursor:pointer;font-size:11px}
+.distan-confirm-box .dcb-migrate:disabled{opacity:.55;cursor:wait}
 .distan-confirm-box .dcb-btn{border:0;border-radius:7px;padding:7px 11px;background:#15803d;color:#fff;font-weight:750;cursor:pointer;font-size:11px;}
 .distan-confirm-box .dcb-btn:disabled{opacity:.55;cursor:wait;}
 .distan-confirm-box .dcb-ok{color:#166534;font-weight:750;}
@@ -57,7 +60,10 @@
         if(confirmBox){
           const isComplete=requested>0 && prepared+0.000001>=requested;
           if(item.confirmed_at){
-            confirmBox.innerHTML='<span class="dcb-ok">✓ Información verificada</span>'+(item.confirmed_user?' · '+String(item.confirmed_user).replace(/[<>]/g,''):'')+' · '+new Date(item.confirmed_at).toLocaleString('es-PE')+(item.prepared_user?' · Armado por: '+String(item.prepared_user).replace(/[<>]/g,''):'');
+            const migrated=!!item.migrated_at;
+            confirmBox.innerHTML='<div><span class="dcb-ok">✓ Información verificada</span>'+(item.confirmed_user?' · '+String(item.confirmed_user).replace(/[<>]/g,''):'')+' · '+new Date(item.confirmed_at).toLocaleString('es-PE')+(item.prepared_user?' · Armado por: '+String(item.prepared_user).replace(/[<>]/g,''):'')+'</div>'+(migrated?'<div class="dcb-ok" style="margin-top:6px">✓ Datos migrados a los campos del pedido</div>':'<div class="dcb-actions"><button type="button" class="dcb-migrate">Migrar confirmación</button><span>Copiará lote, producción y vencimiento al detalle del pedido.</span></div>');
+            const migrateBtn=confirmBox.querySelector('.dcb-migrate');
+            if(migrateBtn){migrateBtn.onclick=async()=>{migrateBtn.disabled=true;migrateBtn.textContent='Migrando…';try{const res=await fetch(confirmBox.dataset.migrateUrl,{method:'POST',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-TOKEN':confirmBox.dataset.csrf}});const body=await res.json();if(!res.ok)throw new Error(body.message||Object.values(body.errors||{}).flat().join(' '));window.location.reload();}catch(err){alert(err.message||'No se pudo migrar la información.');migrateBtn.disabled=false;migrateBtn.textContent='Migrar confirmación';}};}
           }else if(isComplete){
             confirmBox.innerHTML='<button type="button" class="dcb-btn">Confirmar lote y fechas</button><div style="margin-top:4px">Revisa lote, producción y vencimiento antes de confirmar.</div>';
             const btn=confirmBox.querySelector('button');
@@ -1097,7 +1103,6 @@ hr.dv{border-top-color:#e8eef6;}
                         <div class="lc-prod">
                             <div class="lc-thumb">@if($lcThumb)<img src="{{ $lcThumb }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">@else 📦 @endif</div>
                             <div class="lc-pname">{{ $item->product->nombre }}</div>
-                    <div class="distan-confirm-box" data-confirm-url="{{ route('preparation.confirmInformation', $item) }}" data-csrf="{{ csrf_token() }}" data-requested="{{ $item->cantidad_solicitada }}" data-prepared="{{ $item->cantidad_preparada ?? 0 }}"></div>
 
                         </div>
                     </td>
@@ -1212,6 +1217,11 @@ hr.dv{border-top-color:#e8eef6;}
                                 <button type="submit" class="lc-ic del" title="Eliminar"><svg class="lc-i"><use href="#lc-trash"/></svg></button>
                             </form>
                         </div>
+                    </td>
+                </tr>
+                <tr class="lc-confirm-row" data-order-detail="{{ $item->id }}">
+                    <td colspan="14" style="padding:0 12px 10px;border-bottom:1px solid #e2e8f0;">
+                        <div class="distan-confirm-box" data-confirm-url="{{ route('preparation.confirmInformation', $item) }}" data-migrate-url="{{ route('preparation.migrateConfirmedInformation', $item) }}" data-csrf="{{ csrf_token() }}" data-requested="{{ $item->cantidad_solicitada }}" data-prepared="{{ $item->cantidad_preparada ?? 0 }}"></div>
                     </td>
                 </tr>
             @endforeach

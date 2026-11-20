@@ -39,6 +39,8 @@ class OrderDetail extends Model
     'informacion_confirmada_lote',
     'informacion_confirmada_produccion',
     'informacion_confirmada_vencimiento',
+    'informacion_migrada_at',
+    'informacion_migrada_por',
     'nivel',
     'ubicacion'
 ];
