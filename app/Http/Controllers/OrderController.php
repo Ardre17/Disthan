@@ -806,6 +806,22 @@ public function etiqueta(OrderDetail $item)
 
     // Guardar únicamente en el detalle de esta orden.
     // No se modifica la ficha maestra de products.
+    $changed = false;
+    foreach (['lote', 'fecha_produccion', 'fecha_vencimiento'] as $field) {
+        if (array_key_exists($field, $validated) && (string) ($validated[$field] ?? '') !== (string) ($item->{$field} ?? '')) {
+            $changed = true;
+            break;
+        }
+    }
+    if ($changed) {
+        $validated += [
+            'informacion_confirmada_at' => null,
+            'informacion_confirmada_por' => null,
+            'informacion_confirmada_lote' => null,
+            'informacion_confirmada_produccion' => null,
+            'informacion_confirmada_vencimiento' => null,
+        ];
+    }
     $item->update($validated);
 
     return back()->with(
@@ -1414,6 +1430,7 @@ public function updateDetail(Request $request, OrderDetail $detail)
         'paleta' => ['nullable', 'string', 'max:100'],
         'lote' => ['sometimes', 'nullable', 'string', 'max:100'],
         'fecha_vencimiento' => ['sometimes', 'nullable', 'date'],
+        'fecha_produccion' => ['sometimes', 'nullable', 'date'],
         'nivel' => ['sometimes', 'nullable', 'string', 'max:100'],
         'ubicacion' => ['sometimes', 'nullable', 'string', 'max:255'],
     ]);
@@ -1480,7 +1497,7 @@ public function updateDetail(Request $request, OrderDetail $detail)
                 'subtotal' => round($cantidadDespachada * $precio, 2),
             ];
 
-            foreach (['paleta', 'lote', 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
+            foreach (['paleta', 'lote', 'fecha_produccion', 'fecha_vencimiento', 'nivel', 'ubicacion'] as $campo) {
                 if ($request->has($campo)) {
                     $updateData[$campo] = $request->input($campo);
                 }
@@ -1504,6 +1521,23 @@ public function updateDetail(Request $request, OrderDetail $detail)
                 }
 
                 $updateData['paleta'] = $nuevaPaleta;
+            }
+
+            $metadataChanged = false;
+            foreach (['lote', 'fecha_produccion', 'fecha_vencimiento', 'cantidad_solicitada'] as $campo) {
+                if (array_key_exists($campo, $updateData) && (string) ($updateData[$campo] ?? '') !== (string) ($detalle->{$campo} ?? '')) {
+                    $metadataChanged = true;
+                    break;
+                }
+            }
+            if ($metadataChanged) {
+                $updateData += [
+                    'informacion_confirmada_at' => null,
+                    'informacion_confirmada_por' => null,
+                    'informacion_confirmada_lote' => null,
+                    'informacion_confirmada_produccion' => null,
+                    'informacion_confirmada_vencimiento' => null,
+                ];
             }
 
             $detalle->update($updateData);

@@ -11,6 +11,13 @@
 .distan-prep-live .dpl-pct{font-weight:800;font-size:13px;min-width:42px;text-align:right}
 .distan-prep-tag{display:inline-flex;align-items:center;gap:4px;margin-top:4px;padding:2px 7px;border-radius:99px;background:#dbeafe;color:#1d4ed8;font-size:10px;font-weight:700;white-space:nowrap}
 .distan-prep-tag.partial{background:#fef3c7;color:#92400e}.distan-prep-tag.done{background:#dcfce7;color:#166534}
+
+.distan-confirm-box{margin:8px 0;padding:8px 10px;border:1px solid #dbe5f0;border-radius:9px;background:#f8fbff;font-size:11px;color:#334155;}
+.distan-confirm-box .dcb-btn{border:0;border-radius:7px;padding:7px 11px;background:#15803d;color:#fff;font-weight:750;cursor:pointer;font-size:11px;}
+.distan-confirm-box .dcb-btn:disabled{opacity:.55;cursor:wait;}
+.distan-confirm-box .dcb-ok{color:#166534;font-weight:750;}
+.distan-confirm-box .dcb-wait{color:#92400e;font-weight:700;}
+
 </style>
 <div class="distan-prep-live" id="distanPrepLive" data-progress-url="{{ route('preparation.orders.preparation.progress', $order) }}">
   <div><div class="dpl-title">Armado del pedido · sincronización en vivo</div><div class="dpl-sub" id="dplUpdated">Consultando avance compartido…</div></div>
@@ -46,6 +53,27 @@
         tag.className='distan-prep-tag '+(status==='Completo'?'done':(status==='Parcial'?'partial':''));
         tag.textContent='Armado: '+fmt(prepared)+' / '+fmt(requested)+' · '+status;
         tag.title='Pendiente de armado: '+fmt(item.pending);
+        const confirmBox=document.querySelector('.distan-confirm-box[data-confirm-url*="/detail/'+item.id+'/confirm-information"]') || row.querySelector('.distan-confirm-box');
+        if(confirmBox){
+          const isComplete=requested>0 && prepared+0.000001>=requested;
+          if(item.confirmed_at){
+            confirmBox.innerHTML='<span class="dcb-ok">✓ Información verificada</span>'+(item.confirmed_user?' · '+String(item.confirmed_user).replace(/[<>]/g,''):'')+' · '+new Date(item.confirmed_at).toLocaleString('es-PE')+(item.prepared_user?' · Armado por: '+String(item.prepared_user).replace(/[<>]/g,''):'');
+          }else if(isComplete){
+            confirmBox.innerHTML='<button type="button" class="dcb-btn">Confirmar lote y fechas</button><div style="margin-top:4px">Revisa lote, producción y vencimiento antes de confirmar.</div>';
+            const btn=confirmBox.querySelector('button');
+            btn.onclick=async()=>{
+              btn.disabled=true;btn.textContent='Confirmando…';
+              try{
+                const res=await fetch(confirmBox.dataset.confirmUrl,{method:'POST',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-TOKEN':confirmBox.dataset.csrf}});
+                const body=await res.json();
+                if(!res.ok) throw new Error(body.message||Object.values(body.errors||{}).flat().join(' '));
+                refreshPreparation();
+              }catch(err){alert(err.message||'No se pudo confirmar la información.');btn.disabled=false;btn.textContent='Confirmar lote y fechas';}
+            };
+          }else{
+            confirmBox.innerHTML='<span class="dcb-wait">Pendiente: confirma cuando el armado llegue al 100 %.</span>';
+          }
+        }
       });
     }catch(e){ console.warn('No se pudo actualizar el avance de armado.',e); }
   }
@@ -1069,6 +1097,8 @@ hr.dv{border-top-color:#e8eef6;}
                         <div class="lc-prod">
                             <div class="lc-thumb">@if($lcThumb)<img src="{{ $lcThumb }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">@else 📦 @endif</div>
                             <div class="lc-pname">{{ $item->product->nombre }}</div>
+                    <div class="distan-confirm-box" data-confirm-url="{{ route('preparation.confirmInformation', $item) }}" data-csrf="{{ csrf_token() }}" data-requested="{{ $item->cantidad_solicitada }}" data-prepared="{{ $item->cantidad_preparada ?? 0 }}"></div>
+
                         </div>
                     </td>
 

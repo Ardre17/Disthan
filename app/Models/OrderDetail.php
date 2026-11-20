@@ -13,7 +13,6 @@ class OrderDetail extends Model
 
     'cantidad_solicitada',
     'cantidad_despachada',
-    'despacho_confirmado',
 
     // PREPARACIÓN
     'cantidad_preparada',
@@ -32,9 +31,14 @@ class OrderDetail extends Model
     'estado_item',
 
     'paleta',
-    'lote',
     'fecha_produccion',
     'fecha_vencimiento',
+    'lote',
+    'informacion_confirmada_at',
+    'informacion_confirmada_por',
+    'informacion_confirmada_lote',
+    'informacion_confirmada_produccion',
+    'informacion_confirmada_vencimiento',
     'nivel',
     'ubicacion'
 ];

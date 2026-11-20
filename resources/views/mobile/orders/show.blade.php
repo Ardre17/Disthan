@@ -22,7 +22,16 @@
         .modal{display:none;position:fixed;inset:0;z-index:1000;background:#0b1d35b8;align-items:center;justify-content:center;padding:16px}.modal.show{display:flex}.dialog{background:#fff;border-radius:16px;padding:16px;width:min(100%,440px);max-height:90vh;overflow:auto}.dialog-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}.dialog-head h3{margin:0;font-size:16px}.close{border:0;background:#edf2f8;border-radius:9px;width:34px;height:34px;font-size:19px;cursor:pointer}.dialog label{display:block;font-size:12px;font-weight:750;margin:10px 0 5px}.dialog input{width:100%;border:1px solid var(--line);border-radius:9px;padding:11px}.camera-view{width:100%;min-height:240px;border-radius:12px;overflow:hidden;background:#101827}.toast{position:fixed;left:50%;bottom:18px;transform:translate(-50%,20px);opacity:0;pointer-events:none;background:#172b4d;color:#fff;padding:11px 15px;border-radius:99px;font-size:12px;z-index:1200;transition:.2s}.toast.show{opacity:1;transform:translate(-50%,0)}
         @media(max-width:760px){.wrap{padding:11px}.hero{padding:16px 16px 22px}.meta-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.product-list{grid-template-columns:1fr}.panel{padding:13px}.hero h1{font-size:22px}.scan-row{flex-wrap:wrap}.scan-row .scan-input{flex-basis:100%}.scan-row .btn{flex:1}.nav{padding:8px}.nav a{font-size:11px}.entry{align-items:stretch}.entry .btn{min-width:104px}}
         @media(min-width:761px) and (max-width:980px){.product-list{grid-template-columns:1fr}.meta-grid{grid-template-columns:repeat(2,1fr)}}
-    </style>
+    
+        .product-title-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;min-width:0}
+        .product-title-row h3{margin:0}
+        .mobile-octs{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+        .mobile-octw{display:inline-flex;width:34px;height:34px;align-items:center;justify-content:center;flex:0 0 34px}
+        .mobile-octimg{width:34px;height:34px;object-fit:contain;display:block}
+        .mobile-oct{width:34px;height:34px;background:#111;color:#fff;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:5.5px;font-weight:900;line-height:1.1;text-align:center;padding:2px}
+        .mobile-oct span{display:block}
+.distan-confirm-box{margin:10px 0;padding:10px;border:1px solid #dbe5f0;border-radius:10px;background:#f8fbff;font-size:11px}.dcb-ok{color:#166534;font-weight:800}.dcb-wait{color:#92400e;font-weight:750}
+</style>
 </head>
 <body>
 <nav class="nav">
@@ -109,6 +118,42 @@
                             ? ($userNames[$meta->updated_by] ?? ('Usuario #' . $meta->updated_by))
                             : $meta->updated_by;
                     }
+                    // Octógonos del producto: usa la misma fuente y normalización que edit_local.
+                    $octRaw = $detail->product?->octogonos ?? [];
+                    $octValues = [];
+                    if (is_string($octRaw)) {
+                        $decoded = json_decode($octRaw, true);
+                        $octValues = is_array($decoded) ? $decoded : preg_split('/[,;]+/', $octRaw);
+                    } elseif (is_array($octRaw)) {
+                        $octValues = $octRaw;
+                    }
+                    foreach ([
+                        'azucar' => 'alto_azucar',
+                        'sodio' => 'alto_sodio',
+                        'grasas saturadas' => 'alto_grasas_saturadas',
+                        'grasas trans' => 'alto_grasas_trans',
+                    ] as $octName => $octColumn) {
+                        if (!empty($detail->product->{$octColumn})) $octValues[] = $octName;
+                    }
+                    $octKeys = [];
+                    foreach ($octValues as $octValue) {
+                        if (!is_string($octValue) && !is_numeric($octValue)) continue;
+                        $octNorm = mb_strtolower(trim((string) $octValue));
+                        $octNorm = strtr($octNorm, ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u']);
+                        if ($octNorm === '') continue;
+                        if (str_contains($octNorm, 'azuc')) $octKeys['azucar'] = ['ALTO EN', 'AZÚCAR'];
+                        elseif (str_contains($octNorm, 'sod')) $octKeys['sodio'] = ['ALTO EN', 'SODIO'];
+                        elseif (str_contains($octNorm, 'satur')) $octKeys['grasas_saturadas'] = ['ALTO EN', 'GRAS.SAT.'];
+                        elseif (str_contains($octNorm, 'trans')) $octKeys['grasas_trans'] = ['ALTO EN', 'GRAS.TRANS'];
+                        elseif (str_contains($octNorm, 'grasa')) $octKeys['grasas'] = ['ALTO EN', 'GRASAS'];
+                    }
+                    $octImages = [
+                        'azucar' => 'https://pbs.twimg.com/media/F-6D6zQWEAMPN7d.png',
+                        'sodio' => 'https://blogs.ucontinental.edu.pe/wp-content/uploads/2019/06/Octogono-sodio.png',
+                        'grasas_saturadas' => 'https://dolcezzaperu.pe/wp-content/uploads/2023/06/MicrosoftTeams-image-2.png',
+                        'grasas_trans' => 'https://dolcezzaperu.pe/wp-content/uploads/2023/06/MicrosoftTeams-image-2.png',
+                        'grasas' => 'https://dolcezzaperu.pe/wp-content/uploads/2023/06/MicrosoftTeams-image-2.png',
+                    ];
                 @endphp
                 <article class="product {{ $estadoArmado }}" id="detail-{{ $detail->id }}"
                     data-detail-id="{{ $detail->id }}"
@@ -120,7 +165,25 @@
                     data-pending="{{ $faltante }}"
                     data-warnings="{{ $detail->product->advertencias ?? '' }}">
                     <div class="product-top">
-                        <div><h3>{{ $detail->product->nombre ?? 'Producto no disponible' }}</h3><div class="code">SKU: {{ $detail->product->sku ?? '—' }} · ID detalle: {{ $detail->id }}</div></div>
+                        <div style="min-width:0;flex:1">
+                            <div class="product-title-row">
+                                <h3>{{ $detail->product->nombre ?? 'Producto no disponible' }}</h3>
+                                @if(!empty($octKeys))
+                                    <div class="mobile-octs" aria-label="Advertencias nutricionales">
+                                        @foreach($octKeys as $octKey => $octLabel)
+                                            <span class="mobile-octw" title="{{ implode(' ', $octLabel) }}">
+                                                @if(!empty($octImages[$octKey]))
+                                                    <img class="mobile-octimg" src="{{ $octImages[$octKey] }}" alt="{{ implode(' ', $octLabel) }}" loading="lazy"
+                                                         onerror="this.style.display='none';this.nextElementSibling.style.display='inline-flex';">
+                                                @endif
+                                                <span class="mobile-oct" @if(!empty($octImages[$octKey])) style="display:none" @endif><span>{{ $octLabel[0] }}</span><span>{{ $octLabel[1] }}</span></span>
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="code">SKU: {{ $detail->product->sku ?? '—' }} · ID detalle: {{ $detail->id }}</div>
+                        </div>
                         @if($estadoArmado==='complete')<span class="badge green">Completo</span>@elseif($estadoArmado==='partial')<span class="badge amber">Parcial</span>@else<span class="badge red">Pendiente</span>@endif
                     </div>
                     <div class="stats">
@@ -135,6 +198,16 @@
                         <div class="data-cell"><span class="label">Fecha de producción</span><b>{{ $produccion ? \Carbon\Carbon::parse($produccion)->format('d/m/Y') : '—' }}</b></div>
                         <div class="data-cell"><span class="label">Fecha de vencimiento</span><b>{{ $vence ? \Carbon\Carbon::parse($vence)->format('d/m/Y') : '—' }}</b></div>
                         <div class="data-cell"><span class="label">Último responsable</span><b>{{ $ultimoUsuario }}</b></div>
+                    </div>
+                    <div class="distan-confirm-box" data-confirm-url="{{ route('preparation.confirmInformation', $detail) }}" data-csrf="{{ csrf_token() }}" data-requested="{{ $solicitado }}" data-prepared="{{ $armado }}">
+                        @if($detail->informacion_confirmada_at)
+                            <span class="dcb-ok">✓ Información verificada</span> · {{ \Carbon\Carbon::parse($detail->informacion_confirmada_at)->format('d/m/Y H:i') }} · Armado por: {{ $ultimoUsuario }}
+                        @elseif($estadoArmado==='complete')
+                            <button type="button" class="btn confirm-information">Confirmar lote y fechas</button>
+                            <div class="hint">Verifica el lote, la fecha de producción y el vencimiento.</div>
+                        @else
+                            <span class="dcb-wait">Pendiente: disponible al completar el 100 % del armado.</span>
+                        @endif
                     </div>
                     @if($faltante > 0)
                         @if($sinStock)
@@ -156,7 +229,7 @@
                     @else
                         <div class="warning green">✓ Cantidad solicitada completamente armada.</div>
                     @endif
-                    <div class="actions"><button class="btn ghost" type="button" onclick="abrirLote({{ $detail->id }}, @js($lote), @js($vence ? \Carbon\Carbon::parse($vence)->format('Y-m-d') : ''))">Editar lote / vencimiento</button></div>
+                    <div class="actions"><button class="btn ghost" type="button" onclick="abrirLote({{ $detail->id }}, @js($lote), @js($vence ? \Carbon\Carbon::parse($vence)->format('Y-m-d') : ''), @js($produccion ? \Carbon\Carbon::parse($produccion)->format('Y-m-d') : ''))">Editar lote / vencimiento</button></div>
                     @php($logs = $preparationLogs[$detail->id] ?? collect())
                     @if($logs->isNotEmpty())
                         <details class="history"><summary>Historial de armado ({{ $logs->count() }} registros)</summary>
@@ -192,6 +265,7 @@
 <div class="modal" id="modalLote"><div class="dialog"><div class="dialog-head"><h3>Editar lote y vencimiento</h3><button class="close" type="button" onclick="cerrarModal('modalLote')">×</button></div>
     <form method="POST" id="formLote">@csrf @method('PUT')
         <label for="loteInput">Número de lote</label><input id="loteInput" name="lote" maxlength="100" placeholder="Ej. L-2026-045">
+        <label for="produccionInput">Fecha de producción</label><input id="produccionInput" type="date" name="fecha_produccion">
         <label for="venceInput">Fecha de vencimiento</label><input id="venceInput" type="date" name="fecha_vencimiento">
         <p class="hint">La fecha de producción se muestra desde la ficha del producto. Esta acción actualiza el lote y vencimiento del detalle del pedido.</p>
         <button class="btn" style="width:100%;margin-top:12px" type="submit">Guardar cambios</button>
@@ -271,13 +345,18 @@
     cards.forEach(card=>card.addEventListener('click',e=>{if(e.target.closest('button,a,input,form,summary'))return;focusCard(card)}));
     scannerInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();buscarCodigo()}});
     document.getElementById('filtroProducto').addEventListener('input',function(){const q=this.value.trim().toLowerCase();cards.forEach(c=>{c.style.display=(!q||c.dataset.name.includes(q)||[c.dataset.sku,c.dataset.barcode,c.dataset.boxBarcode].some(x=>String(x||'').toLowerCase().includes(q)))?'':'none'})});
-    function abrirLote(id,lote,vence){document.getElementById('formLote').action='/order-details/'+id+'/lote';document.getElementById('loteInput').value=lote||'';document.getElementById('venceInput').value=vence||'';document.getElementById('modalLote').classList.add('show')}
+    function abrirLote(id,lote,vence,produccion){document.getElementById('formLote').action='/order-details/'+id+'/lote';document.getElementById('loteInput').value=lote||'';document.getElementById('venceInput').value=vence||'';document.getElementById('produccionInput').value=produccion||'';document.getElementById('modalLote').classList.add('show')}
     function cerrarModal(id){document.getElementById(id).classList.remove('show')}
     async function abrirCamara(){if(typeof Html5Qrcode==='undefined'){toast('No se pudo cargar el módulo de cámara.');return}document.getElementById('modalCamara').classList.add('show');try{cameraScanner=new Html5Qrcode('cameraReader');await cameraScanner.start({facingMode:'environment'},{fps:10,qrbox:{width:260,height:130}},decoded=>{const card=findCard(decoded);if(card){focusCard(card);feedback.textContent='Código leído: '+decoded;cerrarCamara();toast('Producto identificado');}else{feedback.textContent='Código leído, pero no pertenece a este pedido: '+decoded;}},()=>{});}catch(e){toast('No se pudo iniciar la cámara. Verifica permisos y HTTPS.');cerrarCamara();}}
     async function cerrarCamara(){if(cameraScanner){try{await cameraScanner.stop();await cameraScanner.clear()}catch(e){}cameraScanner=null}cerrarModal('modalCamara')}
     document.getElementById('btnCamara').addEventListener('click',abrirCamara);
     document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m){if(m.id==='modalCamara')cerrarCamara();else m.classList.remove('show')}}));
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){cerrarModal('modalLote');cerrarAlerta('modalProduccion');cerrarAlerta('modalOctogonos');cerrarCamara()}});
+    document.querySelectorAll('.distan-confirm-box .confirm-information').forEach(btn=>btn.addEventListener('click',async()=>{
+        const box=btn.closest('.distan-confirm-box');btn.disabled=true;btn.textContent='Confirmando…';
+        try{const res=await fetch(box.dataset.confirmUrl,{method:'POST',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-TOKEN':box.dataset.csrf}});const data=await res.json();if(!res.ok)throw new Error(data.message||Object.values(data.errors||{}).flat().join(' '));box.innerHTML='<span class="badge green">✓ Información verificada</span> · '+new Date(data.confirmed_at).toLocaleString('es-PE');toast('Información del producto confirmada.');}
+        catch(err){toast(err.message||'No se pudo confirmar.');btn.disabled=false;btn.textContent='Confirmar lote y fechas';}
+    }));
     document.querySelectorAll('.entry').forEach(form=>form.addEventListener('submit',e=>{const btn=form.querySelector('button');btn.disabled=true;btn.textContent='Guardando…'}));
 </script>
 </body>

@@ -75,8 +75,61 @@ class OrderPreparationController extends Controller
                 'requested' => (float) $d->cantidad_solicitada,
                 'prepared' => (float) ($d->cantidad_preparada ?? 0),
                 'pending' => max(0, (float) $d->cantidad_solicitada - (float) ($d->cantidad_preparada ?? 0)),
+                'confirmed_at' => $d->informacion_confirmada_at,
+                'confirmed_by' => $d->informacion_confirmada_por,
+                'confirmed_lote' => $d->informacion_confirmada_lote,
+                'confirmed_produccion' => $d->informacion_confirmada_produccion,
+                'confirmed_vencimiento' => $d->informacion_confirmada_vencimiento,
+                'confirmed_user' => $d->informacion_confirmada_por ? DB::table('users')->where('id', $d->informacion_confirmada_por)->value('name') : null,
+                'prepared_by' => $d->preparado_por,
+                'prepared_user' => $d->preparado_por ? DB::table('users')->where('id', $d->preparado_por)->value('name') : null,
+                'prepared_at' => $d->fecha_preparacion,
             ])->values(),
         ]);
+    }
+
+    /** Confirma que lote y fechas del detalle fueron revisados tras completar el armado. */
+    public function confirmInformation(OrderDetail $detail)
+    {
+        $result = DB::transaction(function () use ($detail) {
+            $locked = OrderDetail::query()->with('product')->whereKey($detail->id)->lockForUpdate()->firstOrFail();
+            $requested = (float) ($locked->cantidad_solicitada ?? 0);
+            $prepared = (float) ($locked->cantidad_preparada ?? 0);
+
+            if ($requested <= 0 || $prepared + 0.000001 < $requested) {
+                throw ValidationException::withMessages([
+                    'confirmacion' => 'No se puede confirmar: el producto todavía no tiene el 100 % del armado registrado.',
+                ]);
+            }
+
+            $lote = $locked->lote ?: ($locked->product?->lote ?? null);
+            $produccion = $locked->fecha_produccion ?: ($locked->product?->fecha_produccion ?? null);
+            $vencimiento = $locked->fecha_vencimiento ?: ($locked->product?->fecha_vencimiento ?? null);
+            $now = now();
+
+            $locked->forceFill([
+                'informacion_confirmada_at' => $now,
+                'informacion_confirmada_por' => Auth::id(),
+                'informacion_confirmada_lote' => $lote,
+                'informacion_confirmada_produccion' => $produccion,
+                'informacion_confirmada_vencimiento' => $vencimiento,
+            ])->save();
+
+            return [
+                'success' => true,
+                'confirmed_at' => $now->toIso8601String(),
+                'confirmed_by' => Auth::id(),
+                'confirmed_user' => Auth::user()?->name,
+                'prepared_by' => $locked->preparado_por,
+                'prepared_user' => $locked->preparado_por ? DB::table('users')->where('id', $locked->preparado_por)->value('name') : null,
+                'prepared_at' => $locked->fecha_preparacion,
+                'lote' => $lote,
+                'fecha_produccion' => $produccion,
+                'fecha_vencimiento' => $vencimiento,
+            ];
+        }, 3);
+
+        return response()->json($result);
     }
 
     /** Guarda el total preparado indicado por el asistente de escritorio. */

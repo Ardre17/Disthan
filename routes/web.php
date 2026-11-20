@@ -675,6 +675,9 @@ Route::prefix('preparation')
             ->name('show');
 
         // Acciones del asistente
+        Route::post('/detail/{detail}/confirm-information', 'confirmInformation')
+            ->name('confirmInformation');
+
         Route::post('/detail/{detail}/save', 'save')
             ->name('save');
 
