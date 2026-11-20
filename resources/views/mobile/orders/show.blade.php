@@ -195,10 +195,10 @@
                     <div class="distan-confirm-box" data-confirm-url="{{ route('preparation.confirmInformation', $detail) }}" data-migrate-url="{{ route('preparation.migrateConfirmedInformation', $detail) }}" data-csrf="{{ csrf_token() }}" data-requested="{{ $solicitado }}" data-prepared="{{ $armado }}">
                         @if($detail->informacion_confirmada_at)
                             <div><span class="dcb-ok">✓ Información verificada</span> · {{ \Carbon\Carbon::parse($detail->informacion_confirmada_at)->format('d/m/Y H:i') }} · Armado por: {{ $ultimoUsuario }}</div>
-                            @if($detail->informacion_migrada_at)
+                            @if($detail->informacion_migrada_at && (float)($detail->cantidad_despachada ?? 0) + 0.000001 >= (float)($detail->cantidad_preparada ?? 0))
                                 <div class="dcb-ok" style="margin-top:6px">✓ Datos migrados a los campos del pedido</div>
                             @else
-                                <div class="dcb-actions"><button type="button" class="btn migrate-information">Migrar confirmación</button><span class="hint">Copiar lote, producción y vencimiento a los campos del pedido.</span></div>
+                                <div class="dcb-actions"><button type="button" class="btn migrate-information">Migrar confirmación</button><span class="hint">Copiar lote y fechas, registrar la cantidad preparada como despachada y actualizar el stock.</span></div>
                             @endif
                         @elseif($estadoArmado==='complete')
                             <button type="button" class="btn confirm-information">Confirmar lote y fechas</button>
@@ -359,7 +359,7 @@
     document.addEventListener('keydown',e=>{if(e.key==='Escape'){cerrarModal('modalLote');cerrarAlerta('modalProduccion');cerrarAlerta('modalOctogonos');cerrarCamara()}});
     document.querySelectorAll('.distan-confirm-box .confirm-information').forEach(btn=>btn.addEventListener('click',async()=>{
         const box=btn.closest('.distan-confirm-box');btn.disabled=true;btn.textContent='Confirmando…';
-        try{const res=await fetch(box.dataset.confirmUrl,{method:'POST',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-TOKEN':box.dataset.csrf}});const data=await res.json();if(!res.ok)throw new Error(data.message||Object.values(data.errors||{}).flat().join(' '));box.innerHTML='<div><span class="dcb-ok">✓ Información verificada</span> · '+new Date(data.confirmed_at).toLocaleString('es-PE')+'</div><div class="dcb-actions"><button type="button" class="btn migrate-information">Migrar confirmación</button><span class="hint">Copiar lote, producción y vencimiento a los campos del pedido.</span></div>';toast('Información del producto confirmada.');}
+        try{const res=await fetch(box.dataset.confirmUrl,{method:'POST',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-TOKEN':box.dataset.csrf}});const data=await res.json();if(!res.ok)throw new Error(data.message||Object.values(data.errors||{}).flat().join(' '));box.innerHTML='<div><span class="dcb-ok">✓ Información verificada</span> · '+new Date(data.confirmed_at).toLocaleString('es-PE')+'</div><div class="dcb-actions"><button type="button" class="btn migrate-information">Migrar confirmación</button><span class="hint">Copiar lote y fechas, registrar la cantidad preparada como despachada y actualizar el stock.</span></div>';toast('Información del producto confirmada.');}
         catch(err){toast(err.message||'No se pudo confirmar.');btn.disabled=false;btn.textContent='Confirmar lote y fechas';}
     }));
     document.addEventListener('click',async e=>{

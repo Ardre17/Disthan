@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\OrderDetail;
+use App\Models\Product;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -74,6 +75,7 @@ class OrderPreparationController extends Controller
                 'id' => $d->id,
                 'requested' => (float) $d->cantidad_solicitada,
                 'prepared' => (float) ($d->cantidad_preparada ?? 0),
+                'dispatched' => (float) ($d->cantidad_despachada ?? 0),
                 'pending' => max(0, (float) $d->cantidad_solicitada - (float) ($d->cantidad_preparada ?? 0)),
                 'confirmed_at' => $d->informacion_confirmada_at,
                 'confirmed_by' => $d->informacion_confirmada_por,
@@ -114,6 +116,7 @@ class OrderPreparationController extends Controller
                 'informacion_confirmada_lote' => $lote,
                 'informacion_confirmada_produccion' => $produccion,
                 'informacion_confirmada_vencimiento' => $vencimiento,
+                'informacion_confirmada_preparado_por' => $locked->preparado_por,
             ])->save();
 
             return [
@@ -133,7 +136,10 @@ class OrderPreparationController extends Controller
         return response()->json($result);
     }
 
-    /** Copia al detalle del pedido los datos que fueron confirmados previamente. */
+    /**
+     * Migra la información confirmada y registra el despacho de la cantidad realmente preparada.
+     * Replica las reglas de stock, subtotal y estado utilizadas por updateDetail().
+     */
     public function migrateConfirmedInformation(OrderDetail $detail)
     {
         $result = DB::transaction(function () use ($detail) {
@@ -145,23 +151,95 @@ class OrderPreparationController extends Controller
                 ]);
             }
 
-            if ($locked->informacion_migrada_at) {
-                return ['success' => true, 'already_migrated' => true];
+            $requested = (float) ($locked->cantidad_solicitada ?? 0);
+            $prepared = (float) ($locked->cantidad_preparada ?? 0);
+            $dispatchedBefore = (float) ($locked->cantidad_despachada ?? 0);
+
+            if ($requested <= 0 || $prepared <= 0 || $prepared > $requested + 0.000001) {
+                throw ValidationException::withMessages([
+                    'cantidad_preparada' => 'La cantidad preparada debe ser mayor que cero y no puede superar la cantidad solicitada.',
+                ]);
             }
 
-            // El snapshot confirmado es la fuente; no se consulta ni modifica products.
+            if ($prepared + 0.000001 < $requested) {
+                throw ValidationException::withMessages([
+                    'cantidad_preparada' => 'El producto debe estar armado al 100 % antes de migrar la confirmación.',
+                ]);
+            }
+
+            $product = Product::query()->whereKey($locked->product_id)->lockForUpdate()->firstOrFail();
+            $delta = $prepared - $dispatchedBefore;
+            $stock = (float) ($product->stock ?? 0);
+
+            if ($delta > 0 && $stock < $delta) {
+                throw ValidationException::withMessages([
+                    'cantidad_despachada' => 'Stock insuficiente. Disponible: ' . $stock . ' | Requerido adicional: ' . $delta,
+                ]);
+            }
+
+            // Aplicar únicamente la diferencia para evitar descontar dos veces si se reintenta.
+            if ($delta > 0) {
+                $product->stock = $stock - $delta;
+                $product->save();
+            } elseif ($delta < 0) {
+                $product->stock = $stock + abs($delta);
+                $product->save();
+            }
+
+            $estadoItem = $prepared <= 0
+                ? 'INCOMPLETO'
+                : ($prepared + 0.000001 < $requested ? 'PARCIAL' : 'COMPLETO');
             $migratedAt = now();
+
             $locked->forceFill([
                 'lote' => $locked->informacion_confirmada_lote,
                 'fecha_produccion' => $locked->informacion_confirmada_produccion,
                 'fecha_vencimiento' => $locked->informacion_confirmada_vencimiento,
+                'cantidad_despachada' => $prepared,
+                'despacho_confirmado' => true,
+                'subtotal' => round($prepared * (float) ($locked->precio_unitario ?? 0), 2),
+                'estado_item' => $estadoItem,
+                // El operario que armó se conserva desde el registro de preparación.
+                'preparado_por' => $locked->informacion_confirmada_preparado_por ?? $locked->preparado_por,
                 'informacion_migrada_at' => $migratedAt,
                 'informacion_migrada_por' => Auth::id(),
             ])->save();
 
+            $order = Order::query()->whereKey($locked->order_id)->lockForUpdate()->firstOrFail();
+            $items = $order->details()->get();
+            $order->subtotal = (float) $items->sum('subtotal');
+            $order->igv = round($order->subtotal * 0.18, 2);
+            $order->total = $order->subtotal + $order->igv;
+
+            if ($order->tipo_orden != 'ENCOMIENDA') {
+                $totalRequested = (float) $items->sum('cantidad_solicitada');
+                $totalDispatched = (float) $items->sum('cantidad_despachada');
+                $previousStatus = $order->estado;
+
+                if ($totalDispatched <= 0) {
+                    $order->estado = 'INCOMPLETO';
+                } elseif ($totalDispatched + 0.000001 >= $totalRequested) {
+                    $order->estado = 'COMPLETO';
+                } else {
+                    $order->estado = 'PARCIAL';
+                }
+
+                if ($order->estado === 'COMPLETO' && $previousStatus !== 'COMPLETO') {
+                    $order->fecha_cierre = now();
+                } elseif ($order->estado !== 'COMPLETO' && $previousStatus === 'COMPLETO') {
+                    $order->fecha_cierre = null;
+                }
+            }
+
+            $order->save();
+
             return [
                 'success' => true,
-                'already_migrated' => false,
+                'cantidad_despachada' => $prepared,
+                'subtotal' => round($prepared * (float) ($locked->precio_unitario ?? 0), 2),
+                'estado_item' => $estadoItem,
+                'stock' => (float) $product->fresh()->stock,
+                'preparado_por' => $locked->preparado_por,
                 'lote' => $locked->lote,
                 'fecha_produccion' => $locked->fecha_produccion,
                 'fecha_vencimiento' => $locked->fecha_vencimiento,
