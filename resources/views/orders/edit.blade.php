@@ -1054,7 +1054,9 @@ hr.dv{border:none;border-top:1px solid #f1f5f9;}
 .oc-detail > td{background:#f8fafc;padding:14px 16px !important;border-bottom:1px solid var(--oc-line);}
 .oc-panel{display:grid;grid-template-columns:270px 1fr;gap:18px;align-items:start;}
 @media(max-width:980px){.oc-panel{grid-template-columns:1fr;}}
-.oc-form{display:grid;grid-template-columns:1fr 150px 150px 130px;gap:12px;align-items:end;}
+.oc-form{display:grid;grid-column:1 / -1;width:100%;min-width:0;grid-template-columns:1fr 150px 150px 130px;gap:12px;align-items:end;}
+.oc-panel > .oc-form{grid-column:1 / -1;}
+.oc-form .fields-box{width:100%;min-width:0;}
 @media(max-width:1100px){.oc-form{grid-template-columns:1fr 1fr;}.oc-form .fields-box{grid-column:1/-1;}}
 .oc-form .fields-box{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;background:transparent;padding:0;}
 @media(max-width:700px){.oc-form .fields-box{grid-template-columns:1fr 1fr;}}
