@@ -67,6 +67,29 @@
           target.appendChild(preparer);
         }
         preparer.textContent=item.prepared_user?'Armado por: '+item.prepared_user:'Armado por: Pendiente de registro';
+
+        // La columna «Armó» utiliza el mismo usuario que registró la preparación.
+        const armadorCell=row.querySelector('.oc-armador-cell');
+        if(armadorCell){
+          armadorCell.textContent='';
+          if(item.prepared_user){
+            const persona=document.createElement('span');
+            persona.className='oc-persona';
+            const icon=document.createElement('span');
+            icon.className='oc-persona-icon';
+            icon.textContent='👤';
+            const name=document.createElement('span');
+            name.textContent=item.prepared_user;
+            persona.append(icon,name);
+            armadorCell.appendChild(persona);
+          }else{
+            const pending=document.createElement('span');
+            pending.className='oc-dash';
+            pending.textContent='Sin registrar';
+            armadorCell.appendChild(pending);
+          }
+        }
+
         const confirmBox=document.querySelector('.distan-confirm-box[data-confirm-url*="/detail/'+item.id+'/confirm-information"]') || row.querySelector('.distan-confirm-box');
         if(confirmBox){
           const isComplete=requested>0 && prepared+0.000001>=requested;
@@ -92,6 +115,24 @@
           }
         }
       });
+
+      // Actualizar el panel superior con los operarios de todos los productos.
+      const armadores=[...new Set((data.details||[])
+        .map(item=>(item.prepared_user||'').trim())
+        .filter(Boolean))];
+      const nombres=document.getElementById('ocArmadoresNombres');
+      const detalle=document.getElementById('ocArmadoresDetalle');
+      if(nombres && detalle){
+        nombres.classList.toggle('muted',armadores.length===0);
+        nombres.textContent=armadores.length===0
+          ? 'Aún no registrado'
+          : (armadores.length===1 ? armadores[0] : armadores.length+' personas');
+        detalle.textContent=armadores.length===0
+          ? 'Se mostrará cuando se registre el armado de algún producto.'
+          : (armadores.length===1
+              ? 'Responsable registrado en la preparación de los productos.'
+              : armadores.join(' · '));
+      }
     }catch(e){ console.warn('No se pudo actualizar el avance de armado.',e); }
   }
   refreshPreparation();
@@ -1793,20 +1834,37 @@ html, body {
 </div>
 
 {{-- ─────────────── ARMADO DE LA ORDEN ─────────────── --}}
+@php
+    // El personal que armó se obtiene del registro de preparación por producto,
+    // no del despacho. Se eliminan nombres repetidos.
+    $armadoresPreparacion = $order->details
+        ->pluck('prepared_by_name')
+        ->filter(fn ($nombre) => trim((string) $nombre) !== '')
+        ->unique()
+        ->values();
+@endphp
 <div class="oc-armado-card" id="ocArmadoresResumen">
     <div class="oc-armado-icon">👤</div>
     <div class="oc-armado-body">
         <div class="oc-armado-label">Personal que armó la orden</div>
-        @if($armadoresOrden->count() === 0)
-            <div class="oc-armado-name muted">Aún no registrado</div>
-            <div class="oc-armado-help">Se mostrará cuando se registre un despacho.</div>
-        @elseif($armadoresOrden->count() === 1)
-            <div class="oc-armado-name">{{ $armadorPrincipal }}</div>
-            <div class="oc-armado-help">Responsable registrado en los productos despachados.</div>
-        @else
-            <div class="oc-armado-name">{{ $armadoresOrden->count() }} personas</div>
-            <div class="oc-armado-help">{{ $armadoresOrden->implode(' · ') }}</div>
-        @endif
+        <div class="oc-armado-name {{ $armadoresPreparacion->isEmpty() ? 'muted' : '' }}" id="ocArmadoresNombres">
+            @if($armadoresPreparacion->isEmpty())
+                Aún no registrado
+            @elseif($armadoresPreparacion->count() === 1)
+                {{ $armadoresPreparacion->first() }}
+            @else
+                {{ $armadoresPreparacion->count() }} personas
+            @endif
+        </div>
+        <div class="oc-armado-help" id="ocArmadoresDetalle">
+            @if($armadoresPreparacion->isEmpty())
+                Se mostrará cuando se registre el armado de algún producto.
+            @elseif($armadoresPreparacion->count() > 1)
+                {{ $armadoresPreparacion->implode(' · ') }}
+            @else
+                Responsable registrado en la preparación de los productos.
+            @endif
+        </div>
     </div>
     <div class="oc-armado-status">
         <span>{{ $completados }} / {{ $totalItems }} productos completos</span>
@@ -2020,10 +2078,10 @@ html, body {
                         </td>
 
                         <td class="oc-armador-cell">
-                            @if(trim((string)($detail->personal_despacho ?? '')) !== '')
+                            @if(trim((string)($detail->prepared_by_name ?? '')) !== '')
                                 <span class="oc-persona">
                                     <span class="oc-persona-icon">👤</span>
-                                    <span>{{ $detail->personal_despacho }}</span>
+                                    <span>{{ $detail->prepared_by_name }}</span>
                                 </span>
                             @else
                                 <span class="oc-dash">Sin registrar</span>
