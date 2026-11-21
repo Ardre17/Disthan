@@ -1366,6 +1366,26 @@ public function edit(Order $order)
         'bultos.detalles.product'
     ]);
 
+    // Resolver el usuario que armó cada detalle sin alterar los registros.
+    $preparerIds = $order->details
+        ->pluck('preparado_por')
+        ->filter()
+        ->unique()
+        ->values();
+
+    $preparerNames = $preparerIds->isNotEmpty()
+        ? \Illuminate\Support\Facades\DB::table('users')
+            ->whereIn('id', $preparerIds)
+            ->pluck('name', 'id')
+        : collect();
+
+    foreach ($order->details as $detail) {
+        $detail->setAttribute(
+            'prepared_by_name',
+            $preparerNames->get($detail->preparado_por)
+        );
+    }
+
     // Recalcular subtotales despachados. La pérdida solo aplica
     // cuando el despacho fue confirmado explícitamente (incluido un cero).
     foreach ($order->details as $detail) {

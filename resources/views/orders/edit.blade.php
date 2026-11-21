@@ -56,6 +56,17 @@
         tag.className='distan-prep-tag '+(status==='Completo'?'done':(status==='Parcial'?'partial':''));
         tag.textContent='Armado: '+fmt(prepared)+' / '+fmt(requested)+' · '+status;
         tag.title='Pendiente de armado: '+fmt(item.pending);
+
+        // Mostrar en vivo el nombre del usuario que registró el armado.
+        let preparer=row.querySelector('.distan-prepared-by');
+        if(!preparer){
+          preparer=document.createElement('div');
+          preparer.className='distan-prepared-by';
+          preparer.style.cssText='margin-top:4px;font-size:11px;color:#475569;font-weight:600;';
+          const target=row.querySelector('.oc-pname,.lc-pname,.p-name')||row.querySelector('td:nth-child(2)')||row;
+          target.appendChild(preparer);
+        }
+        preparer.textContent=item.prepared_user?'Armado por: '+item.prepared_user:'Armado por: Pendiente de registro';
         const confirmBox=document.querySelector('.distan-confirm-box[data-confirm-url*="/detail/'+item.id+'/confirm-information"]') || row.querySelector('.distan-confirm-box');
         if(confirmBox){
           const isComplete=requested>0 && prepared+0.000001>=requested;
@@ -1933,6 +1944,9 @@ html, body {
                                 <div class="oc-thumb">@if($ocImg)<img src="{{ $ocImg }}" alt="" loading="lazy" onerror="this.replaceWith(document.createTextNode('📦'))">@else 📦 @endif</div>
                                 <div>
                                     <div class="oc-pname">{{ $detail->product->nombre }}</div>
+                                    <div class="distan-prepared-by" style="margin-top:4px;font-size:11px;color:#475569;font-weight:600;">
+                                        Armado por: {{ $detail->prepared_by_name ?: 'Pendiente de registro' }}
+                                    </div>
                                     @if($ocPerdidaConfirmada)
                                         <span class="oc-loss-badge" data-loss-badge>PÉRDIDA TOTAL</span>
                                     @endif
