@@ -56,6 +56,24 @@
         tag.className='distan-prep-tag '+(status==='Completo'?'done':(status==='Parcial'?'partial':''));
         tag.textContent='Armado: '+fmt(prepared)+' / '+fmt(requested)+' · '+status;
         tag.title='Pendiente de armado: '+fmt(item.pending);
+
+        // Mostrar el usuario que registró la preparación en la columna «Armó».
+        const armCell=row.querySelector('td[data-armador-cell], .lc-armador-cell');
+        if(armCell){
+          armCell.textContent='';
+          if(item.prepared_user){
+            const label=document.createElement('span');
+            label.className='lc-arm';
+            label.textContent='👤 '+item.prepared_user;
+            armCell.appendChild(label);
+            row.dataset.armo=item.prepared_user.toLowerCase();
+            row.dataset.armoTxt=item.prepared_user;
+          }else{
+            armCell.textContent='Sin registrar';
+            row.dataset.armo='';
+            row.dataset.armoTxt='';
+          }
+        }
         const confirmBox=document.querySelector('.distan-confirm-box[data-confirm-url*="/detail/'+item.id+'/confirm-information"]') || row.querySelector('.distan-confirm-box');
         if(confirmBox){
           const isComplete=requested>0 && prepared+0.000001>=requested;
@@ -720,7 +738,7 @@ hr.dv{border-top-color:#e8eef6;}
 
     // ── Personal que armó la orden (lee el nombre de cada línea; ajusta aquí si tu campo se llama distinto) ──
     $lcArmo = function ($i) {
-        $n = $i->personal_despacho ?? $i->armado_por ?? $i->armo ?? null;
+        $n = $i->prepared_by_name ?? $i->personal_despacho ?? $i->armado_por ?? $i->armo ?? null;
         if (!is_string($n) || $n === '' || is_numeric($n)) {
             $u = $i->usuario ?? $i->user ?? $i->operario ?? null;
             $n = is_object($u) ? ($u->name ?? $u->nombre ?? null) : (is_string($u) ? $u : null);
@@ -734,6 +752,21 @@ hr.dv{border-top-color:#e8eef6;}
     }
     ksort($lcPersonas);
     $lcPersonasN = count($lcPersonas);
+
+    // Monto de pérdida por producto y acumulado de la orden.
+    $lcMontoPerdidaOrden = 0;
+    foreach ($order->details as $detallePerdida) {
+        $stockActualPerdida = $detallePerdida->product->stock ?? null;
+        $sinStockPerdida = $stockActualPerdida !== null && (float) $stockActualPerdida <= 0;
+        $perdidaConfirmada = (bool) ($detallePerdida->despacho_confirmado ?? false);
+        if ($perdidaConfirmada || ($sinStockPerdida && (float) $detallePerdida->cantidad_solicitada > (float) $detallePerdida->cantidad_despachada)) {
+            $lcMontoPerdidaOrden += max(
+                (float) $detallePerdida->cantidad_solicitada - (float) $detallePerdida->cantidad_despachada,
+                0
+            ) * (float) $detallePerdida->precio_unitario;
+        }
+    }
+    $lcMontoPerdidaOrden = round($lcMontoPerdidaOrden, 2);
 
     // ── Tiempo de armado: del primer al último despacho registrado (o campos propios si existen) ──
     $lcConDesp = $order->details->filter(fn($i) => $i->cantidad_despachada > 0 && ($i->updated_at ?? null));
@@ -1020,6 +1053,7 @@ hr.dv{border-top-color:#e8eef6;}
                     <th>Últ. despacho</th>
                     <th>Armó</th>
                     <th class="r">Subtotal</th>
+                    <th class="r">Monto de pérdida</th>
                     <th>Acciones</th>
                 </tr>
             </thead>
@@ -1053,6 +1087,11 @@ hr.dv{border-top-color:#e8eef6;}
                 $lcArmoN  = $lcArmo($item);
                 $lcUltD   = $lcDesp > 0 ? ($item->updated_at ?? null) : null;
                 $lcSubt   = $item->subtotal ?? ($item->cantidad_despachada * $item->precio_unitario);
+                $lcStockRaw = $item->product->stock ?? null;
+                $lcStockCero = $lcStockRaw !== null && (float) $lcStockRaw <= 0;
+                $lcPerdidaItem = ((bool) ($item->despacho_confirmado ?? false) || ($lcStockCero && $lcPend > 0))
+                    ? round($lcPend * (float) $item->precio_unitario, 2)
+                    : 0;
 
                 $lcOcts = [];
                 // Compatibilidad con los dos formatos usados en las vistas: octogonos y advertencias.
@@ -1095,6 +1134,7 @@ hr.dv{border-top-color:#e8eef6;}
                     data-armo="{{ $lcArmoN ? mb_strtolower($lcArmoN) : '' }}"
                     data-armo-txt="{{ $lcArmoN ?? '' }}"
                     data-sub="{{ number_format((float) $lcSubt, 2, '.', '') }}"
+                    data-perdida="{{ number_format((float) $lcPerdidaItem, 2, '.', '') }}"
                     data-search="{{ mb_strtolower($item->product->nombre.' '.($item->product->sku ?? '').' '.($loteItem ?? '').' '.($lcArmoN ?? '')) }}">
 
                     <td class="lc-num idx">{{ $loop->iteration }}</td>
@@ -1159,7 +1199,7 @@ hr.dv{border-top-color:#e8eef6;}
 
                     <td class="lc-num" style="font-size:11.5px;white-space:nowrap;">{{ $lcUltD ? \Carbon\Carbon::parse($lcUltD)->format('d/m H:i') : '—' }}</td>
 
-                    <td>
+                    <td data-armador-cell>
                         @if($lcArmoN)
                             <span class="lc-arm"><svg class="lc-i"><use href="#lc-user"/></svg>{{ $lcArmoN }}</span>
                         @else
@@ -1179,6 +1219,10 @@ hr.dv{border-top-color:#e8eef6;}
                                disabled
                                title="Precio unitario"
                                oninput="syncHidden({{ $item->id }})">
+                    </td>
+
+                    <td class="r lc-num" data-loss-cell style="font-weight:800;white-space:nowrap;color:{{ $lcPerdidaItem > 0 ? '#dc2626' : '#94a3b8' }};background:{{ $lcPerdidaItem > 0 ? '#fff1f2' : 'transparent' }};">
+                        S/ {{ number_format($lcPerdidaItem, 2) }}
                     </td>
 
                     <td>
@@ -1262,6 +1306,7 @@ hr.dv{border-top-color:#e8eef6;}
                 <table class="summary-table">
                     <tr><td>Subtotal</td><td>S/ {{ number_format($order->subtotal,2) }}</td></tr>
                     <tr><td>IGV (18%)</td><td>S/ {{ number_format($order->igv,2) }}</td></tr>
+                    <tr><td style="color:#b91c1c;font-weight:700;">Monto de pérdida</td><td style="color:#b91c1c;font-weight:800;">S/ {{ number_format($lcMontoPerdidaOrden,2) }}</td></tr>
                     <tr class="total-row"><td>TOTAL</td><td>S/ {{ number_format($order->total,2) }}</td></tr>
                 </table>
 
@@ -1684,7 +1729,7 @@ function lcLimpiar() {
 
 /* ── Exportar CSV (valores actuales de la tabla) ── */
 function lcExportCSV() {
-    var head = ['SKU', 'Producto', 'Solicitado', 'Despachado', 'Pendiente', 'Lote', 'Vencimiento', 'Armó', 'Subtotal'];
+    var head = ['SKU', 'Producto', 'Solicitado', 'Despachado', 'Pendiente', 'Lote', 'Vencimiento', 'Armó', 'Subtotal', 'Monto de pérdida'];
     var esc = function (v) { return '"' + String(v == null ? '' : v).replace(/"/g, '""') + '"'; };
     var rows = [];
     document.querySelectorAll('#lcTabla tr.lc-row').forEach(function (tr) {
@@ -1692,7 +1737,7 @@ function lcExportCSV() {
         var sol = parseFloat((document.getElementById('sol-' + id) || {}).value) || 0;
         var des = parseFloat((document.getElementById('des-' + id) || {}).value) || 0;
         rows.push([tr.dataset.sku, tr.dataset.nombre, sol, des, Math.max(sol - des, 0), tr.dataset.lote, tr.dataset.venc,
-                   tr.dataset.armoTxt, tr.dataset.sub]);
+                   tr.dataset.armoTxt, tr.dataset.sub, tr.dataset.perdida]);
     });
     var csv = [head].concat(rows).map(function (r) { return r.map(esc).join(','); }).join('\r\n');
     var blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
