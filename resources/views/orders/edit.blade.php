@@ -1362,10 +1362,30 @@ html, body {
     $ocSumSol  = (float) $order->details->sum('cantidad_solicitada');
     $ocSumDesp = (float) $order->details->sum('cantidad_despachada');
     $ocSumPend = max($ocSumSol - $ocSumDesp, 0);
+    // Color por paleta: mismo nombre = mismo color (tono calculado del número de paleta).
+    $ocPalHue = function ($nombre) {
+        $nombre = mb_strtoupper(trim((string) $nombre));
+        if ($nombre === '') return 0;
+        $digits = preg_replace('/\D/', '', $nombre);
+        if ($digits !== '') {
+            $n = (int) $digits;
+        } else {
+            $h = 0;
+            foreach (mb_str_split($nombre) as $ch) { $h = (($h * 31) + mb_ord($ch)) & 0xFFFFFFFF; }
+            $n = $h % 1000;
+        }
+        return (int) round(fmod($n * 137.508, 360));
+    };
+
+    // Pérdida = pendiente × precio unitario, cuando el despacho está confirmado
+    // o cuando el producto no tiene stock (stock 0) y aún queda pendiente.
     $ocMontoPerdida = (float) $order->details->sum(function ($d) {
-        if (!(bool) ($d->despacho_confirmado ?? false)) return 0;
         $despachado = (float) $d->cantidad_despachada;
         $pendiente = max((float) $d->cantidad_solicitada - $despachado, 0);
+        $confirmado = (bool) ($d->despacho_confirmado ?? false);
+        $stockRaw = $d->product->stock ?? null;
+        $sinStock = $stockRaw !== null && (float) $stockRaw <= 0 && $pendiente > 0;
+        if (!$confirmado && !$sinStock) return 0;
         return round($pendiente * (float) $d->precio_unitario, 2);
     });
     $ocAvance  = $ocSumSol > 0 ? round(($ocSumDesp / $ocSumSol) * 100, 1) : 0;
@@ -1455,6 +1475,80 @@ html, body {
 })();
 </script>
 
+
+
+{{-- ══════════ MEJORAS VISUALES (aditivas): formulario uniforme · stock cero · colores de paleta ══════════ --}}
+<style>
+/* ── 1) Panel de edición: info a la izquierda, formulario a la derecha, sin espacios vacíos ── */
+.oc-tbl .oc-detail > td{padding:16px 18px !important;}
+.oc-panel{grid-template-columns:300px minmax(0,1fr);gap:14px 18px;align-items:stretch;}
+.oc-panel > .info-strip.oc-info-grid{grid-column:1;grid-row:1;align-self:stretch;margin-bottom:0;grid-auto-rows:1fr;background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:10px;}
+.oc-panel > .info-strip.oc-info-grid .oc-info-card,
+.oc-panel > .info-strip.oc-info-grid .oc-info-progress{background:#f8fafc;}
+.oc-panel > .oc-form{grid-column:2;grid-row:1;grid-template-columns:minmax(0,1fr);align-self:stretch;}
+.oc-panel > .distan-confirm-box{grid-column:1 / -1;grid-row:2;margin:0;}
+.oc-panel .oc-form .fields-box.oc-fields-grid{
+    grid-template-columns:repeat(3,minmax(0,1fr)) !important;
+    gap:12px 14px;align-items:end;align-content:center;height:100%;
+    background:#fff;border:1px solid #e2e8f0;border-radius:10px;padding:14px 16px;
+}
+.oc-panel .oc-fields-grid .finput{height:38px;padding:0 10px;font-size:13px;border-radius:8px;}
+.oc-panel .oc-fields-grid .paleta-input{font-size:14px;font-weight:800;letter-spacing:2px;text-align:left;border-width:1px;border-color:#e2e8f0;}
+.oc-panel .oc-fields-grid .paleta-input.oc-pal-on{border:2px solid hsl(var(--pal-h),65%,48%);background:hsl(var(--pal-h),90%,96%);color:hsl(var(--pal-h),70%,30%);}
+.oc-panel .oc-fields-grid .paleta-input.oc-pal-on:focus{box-shadow:0 0 0 3px hsla(var(--pal-h),65%,48%,.2);}
+.oc-panel .oc-fields-grid .flabel{margin-bottom:4px;}
+.oc-panel .oc-form-subtotal{height:38px;min-height:38px;padding:0 12px;}
+.oc-panel .oc-form-subtotal strong{font-family:var(--oc-mono);font-size:14px;}
+.oc-panel .oc-form-save .btn{height:38px;min-height:38px;font-size:13px;}
+@media(max-width:1100px){
+    .oc-panel{grid-template-columns:minmax(0,1fr);}
+    .oc-panel > .info-strip.oc-info-grid,
+    .oc-panel > .oc-form,
+    .oc-panel > .distan-confirm-box{grid-column:1 / -1;grid-row:auto;}
+    .oc-panel > .info-strip.oc-info-grid{grid-template-columns:repeat(3,minmax(0,1fr)) !important;}
+    .oc-panel > .info-strip.oc-info-grid .oc-info-progress{grid-column:1 / -1;}
+}
+@media(max-width:700px){
+    .oc-panel > .info-strip.oc-info-grid{grid-template-columns:1fr 1fr !important;}
+    .oc-panel .oc-form .fields-box.oc-fields-grid{grid-template-columns:1fr 1fr !important;}
+    .oc-panel .oc-form-save{grid-column:1 / -1;}
+}
+
+/* ── 2) Stock cero: fila en rojo (mientras quede pendiente) ── */
+.oc-tbl tr.oc-row.oc-row-sin-stock > td,
+.oc-tbl tr.oc-row.oc-row-sin-stock:hover > td{
+    background:#fff1f2 !important;
+    border-bottom-color:#fecaca;
+}
+.oc-tbl tr.oc-row.oc-row-sin-stock > td:first-child{box-shadow:inset 4px 0 0 #dc2626;}
+.oc-tbl tr.oc-row.oc-row-sin-stock .oc-pname{color:#991b1b;}
+.oc-row-sin-stock .oc-loss-zero{color:#b91c1c !important;}
+.oc-stock-badge{margin-right:4px;}
+[data-loss-badge] ~ [data-stock-badge]{display:none;}
+.oc-row:not(.oc-row-sin-stock) [data-stock-badge]{display:none;}
+
+/* ── 3) Colores por paleta (mismo nombre = mismo color) ── */
+.oc-pal-card.oc-pal-colored{
+    border:2px solid hsl(var(--pal-h),60%,62%);
+    background:hsl(var(--pal-h),90%,96%);
+    overflow:hidden;
+}
+.oc-pal-card.oc-pal-colored::before{
+    content:'';position:absolute;left:0;right:0;top:0;height:7px;
+    background:hsl(var(--pal-h),65%,48%);
+}
+.oc-pal-card.oc-pal-colored .oc-pal-ic{color:hsl(var(--pal-h),65%,40%);margin-top:4px;}
+.oc-pal-card.oc-pal-colored .oc-pal-n{color:hsl(var(--pal-h),70%,30%);}
+.oc-pal-card.oc-pal-colored .oc-pal-bar{background:hsl(var(--pal-h),40%,88%);}
+.oc-tbl tr.oc-row.oc-row > td.oc-pal-cell{
+    background:hsl(var(--pal-h),90%,94%) !important;
+    box-shadow:inset 0 0 0 1px hsl(var(--pal-h),60%,80%);
+}
+.oc-tbl td.oc-pal-cell .oc-pal{
+    background:hsl(var(--pal-h),65%,45%);
+    color:#fff;
+}
+</style>
 
 {{-- ══════════ CABECERA ══════════ --}}
 <div class="oc-head">
@@ -1579,7 +1673,7 @@ html, body {
                     ])->values()->toJson();
                 @endphp
 
-                <div class="oc-pal-card {{ $llena ? 'paleta-llena' : '' }}"
+                <div class="oc-pal-card oc-pal-colored {{ $llena ? 'paleta-llena' : '' }}" style="--pal-h:{{ $ocPalHue($nombrePaleta) }};"
                     onclick="abrirPaleta({{ json_encode($nombrePaleta) }}, {{ $items->count() }}, {{ $totUds }}, {{ $despUds }}, {{ round($pesoKg,1) }}, {{ $pctP }}, {{ json_encode($fillColor) }}, {{ $itemsJson }})">
                     @if($llena)
                         <span class="paleta-box-full-badge">LLENA</span>
@@ -1796,6 +1890,12 @@ html, body {
                         $ocDespachoConfirmado = (bool) ($detail->despacho_confirmado ?? false);
                         $ocPerdidaConfirmada = $ocDespachoConfirmado && $ocSol > 0 && $ocDesp <= 0;
 
+                        // Stock cero: fila en rojo mientras quede pendiente por despachar
+                        $ocStockRaw  = $detail->product->stock ?? null;
+                        $ocStockCero = $ocStockRaw !== null && (float) $ocStockRaw <= 0;
+                        $ocSinStock  = $ocStockCero && $ocPend > 0;
+                        $ocPalH      = $ocPalHue($detail->paleta);
+
                         $ocVenc = $detail->fecha_vencimiento ?? ($detail->product->fecha_vencimiento ?? null);
                         $ocVencado = $ocVenc && \Carbon\Carbon::parse($ocVenc)->isPast();
 
@@ -1815,10 +1915,11 @@ html, body {
                         $ocUlt  = $ocDesp > 0 ? $detail->updated_at : null;
                     @endphp
 
-                    <tr class="oc-row{{ $ocPerdidaConfirmada ? ' oc-row-perdida' : '' }}"
+                    <tr class="oc-row{{ $ocPerdidaConfirmada ? ' oc-row-perdida' : '' }}{{ $ocSinStock ? ' oc-row-sin-stock' : '' }}"
                         id="producto-{{ $detail->product->barcode }}"
                         data-order-detail="{{ $detail->id }}"
                         data-perdida-confirmada="{{ $ocDespachoConfirmado ? '1' : '0' }}"
+                        data-stock-cero="{{ $ocStockCero ? '1' : '0' }}"
                         data-barcode="{{ $detail->product->barcode }}"
                         data-box-barcode="{{ $detail->product->box_barcode }}"
                         data-estado="{{ $s }}"
@@ -1834,6 +1935,9 @@ html, body {
                                     <div class="oc-pname">{{ $detail->product->nombre }}</div>
                                     @if($ocPerdidaConfirmada)
                                         <span class="oc-loss-badge" data-loss-badge>PÉRDIDA TOTAL</span>
+                                    @endif
+                                    @if($ocStockCero)
+                                        <span class="oc-loss-badge oc-stock-badge" data-stock-badge>SIN STOCK</span>
                                     @endif
                                     @if(!empty($detail->product->marca))<div class="oc-pmarca">Marca: {{ $detail->product->marca }}</div>@endif
                                 </div>
@@ -1890,7 +1994,7 @@ html, body {
                             </div>
                         </td>
 
-                        <td class="c">@if($detail->paleta)<span class="oc-pal">{{ $detail->paleta }}</span>@else<span class="oc-dash">—</span>@endif</td>
+                        <td class="c{{ $detail->paleta ? ' oc-pal-cell' : '' }}" @if($detail->paleta) style="--pal-h:{{ $ocPalH }};" @endif>@if($detail->paleta)<span class="oc-pal">{{ $detail->paleta }}</span>@else<span class="oc-dash">—</span>@endif</td>
                         <td class="oc-num">{{ $ocUbic ?: '—' }}</td>
 
                         <td>
@@ -1915,7 +2019,7 @@ html, body {
                         <td class="oc-num" style="font-weight:700;white-space:nowrap;">S/ {{ number_format($detail->cantidad_despachada * $detail->precio_unitario,2) }}</td>
 
                         @php
-                            $ocPerdidaItem = (bool) ($detail->despacho_confirmado ?? false)
+                            $ocPerdidaItem = ((bool) ($detail->despacho_confirmado ?? false) || $ocSinStock)
                                 ? round(
                                     max((float) $detail->cantidad_solicitada - (float) $detail->cantidad_despachada, 0)
                                     * (float) $detail->precio_unitario,
@@ -1970,7 +2074,7 @@ html, body {
                                 <div class="info-strip oc-info-grid">
                                     <div class="info-item oc-info-card">
                                         <span>📦 Stock</span>
-                                        <span class="info-val">{{ $detail->product->stock }}</span>
+                                        <span class="info-val" @if($ocStockCero) style="color:#dc2626;" @endif>{{ $detail->product->stock }}</span>
                                     </div>
 
                                     <div class="info-item oc-info-card">
@@ -2046,7 +2150,8 @@ html, body {
 
                                         <div>
                                             <label class="flabel">Paleta</label>
-                                            <input type="text" name="paleta" class="finput paleta-input"
+                                            <input type="text" name="paleta" class="finput paleta-input{{ $detail->paleta ? ' oc-pal-on' : '' }}"
+                                                @if($detail->paleta) style="--pal-h:{{ $ocPalH }};" @endif
                                                 value="{{ $detail->paleta }}" placeholder="P01"
                                                 oninput="this.value=this.value.toUpperCase()">
                                         </div>
@@ -4952,6 +5057,42 @@ document.getElementById('modalResumenOrden')?.addEventListener('click', function
         if (!form) return;
         if (['cantidad_solicitada', 'cantidad_despachada', 'precio_unitario'].includes(event.target.name)) {
             actualizarEstadoPerdida(form);
+        }
+    });
+})();
+</script>
+
+<script>
+/* Mejoras aditivas: fila roja por stock cero en vivo + color de paleta en vivo */
+(function () {
+    function palHue(name) {
+        name = String(name || '').trim().toUpperCase();
+        if (!name) return null;
+        var digits = name.replace(/\D/g, ''), n;
+        if (digits !== '') { n = parseInt(digits, 10); }
+        else { var h = 0; for (var i = 0; i < name.length; i++) { h = ((h * 31) + name.charCodeAt(i)) >>> 0; } n = h % 1000; }
+        return Math.round((n * 137.508) % 360);
+    }
+    document.addEventListener('input', function (e) {
+        var t = e.target;
+        var form = t && t.closest ? t.closest('form[data-detail-form]') : null;
+        if (!form) return;
+
+        if (t.name === 'cantidad_solicitada' || t.name === 'cantidad_despachada') {
+            var det = form.closest('.oc-detail');
+            var id = det ? det.dataset.orderDetail : null;
+            var row = id ? document.querySelector('.oc-row[data-order-detail="' + id + '"]') : null;
+            if (row && row.dataset.stockCero === '1') {
+                var sol = parseFloat(form.querySelector('[name="cantidad_solicitada"]').value) || 0;
+                var desp = parseFloat(form.querySelector('[name="cantidad_despachada"]').value) || 0;
+                row.classList.toggle('oc-row-sin-stock', sol > desp);
+            }
+        }
+
+        if (t.name === 'paleta') {
+            var h = palHue(t.value);
+            if (h === null) { t.classList.remove('oc-pal-on'); t.style.removeProperty('--pal-h'); }
+            else { t.style.setProperty('--pal-h', h); t.classList.add('oc-pal-on'); }
         }
     });
 })();
