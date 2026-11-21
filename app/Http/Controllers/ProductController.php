@@ -4,7 +4,6 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
-use App\Models\ProductionOrder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\DB;
@@ -43,50 +42,6 @@ $categories = Category::where('activo', true)
     ->orderBy('nombre')
     ->get();
 
-    // Materias primas registradas históricamente en órdenes de producción por producto.
-    // No se interpreta como receta/BOM: cada orden registra una materia prima.
-    $materiasPrimasPorProducto = [];
-    $productIds = $products->pluck('id')->all();
-
-    if (!empty($productIds)) {
-        $ordenesProduccion = ProductionOrder::with('rawMaterial')
-            ->whereIn('product_id', $productIds)
-            ->whereNotNull('raw_material_id')
-            ->get(['id', 'product_id', 'raw_material_id', 'produced_quantity', 'consumed_quantity', 'status', 'fecha_produccion']);
-
-        foreach ($ordenesProduccion as $orden) {
-            $mp = $orden->rawMaterial;
-            if (!$mp) continue;
-
-            $productoId = (string) $orden->product_id;
-            $mpId = (string) $mp->id;
-
-            if (!isset($materiasPrimasPorProducto[$productoId][$mpId])) {
-                $materiasPrimasPorProducto[$productoId][$mpId] = [
-                    'id' => $mp->id,
-                    'code' => $mp->code,
-                    'name' => $mp->name,
-                    'category' => $mp->category,
-                    'supplier' => $mp->supplier,
-                    'unit' => $mp->unit,
-                    'stock' => (float) ($mp->stock ?? 0),
-                    'minimum_stock' => (float) ($mp->minimum_stock ?? 0),
-                    'active' => (bool) ($mp->active ?? false),
-                    'status' => $mp->status,
-                    'ordenes' => 0,
-                    'consumido_historico' => 0,
-                ];
-            }
-
-            $materiasPrimasPorProducto[$productoId][$mpId]['ordenes']++;
-            $materiasPrimasPorProducto[$productoId][$mpId]['consumido_historico'] += (float) ($orden->consumed_quantity ?? 0);
-        }
-
-        foreach ($materiasPrimasPorProducto as $id => $items) {
-            $materiasPrimasPorProducto[$id] = array_values($items);
-        }
-    }
-
     // Análisis de rotación por frecuencia de pedidos con despacho real.
     // Se cuentan pedidos distintos por producto, no unidades despachadas.
     $rotacionAnalisis = [];
@@ -123,8 +78,7 @@ $categories = Category::where('activo', true)
     compact(
         'products',
         'categories',
-        'rotacionAnalisis',
-        'materiasPrimasPorProducto'
+        'rotacionAnalisis'
     ));
 }
 
@@ -145,6 +99,7 @@ $categories = Category::where('activo', true)
         $request->validate([
             'sku' => 'required|unique:products',
             'nombre' => 'required',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
         $imagePath = null;
@@ -208,18 +163,19 @@ $categories = Category::where('activo', true)
         $request->validate([
             'sku' => 'required',
             'nombre' => 'required',
+            'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'eliminar_imagen' => 'nullable|boolean',
         ]);
 
+        // Mantener la imagen actual si no se selecciona un archivo nuevo.
         $imagePath = $product->imagen;
+        $oldImagePath = $product->imagen;
 
         if ($request->hasFile('imagen')) {
-
-            if ($product->imagen) {
-                Storage::disk('public')->delete($product->imagen);
-            }
-
-            $imagePath = $request->file('imagen')
-                ->store('products', 'public');
+            // Guardar primero la nueva imagen; no borrar la anterior antes de confirmar.
+            $imagePath = $request->file('imagen')->store('products', 'public');
+        } elseif ($request->boolean('eliminar_imagen')) {
+            $imagePath = null;
         }
 
         $product->update([
@@ -251,6 +207,11 @@ $categories = Category::where('activo', true)
             'stock' => $request->stock,
             'stock_minimo' => $request->stock_minimo,
         ]);
+
+        // Eliminar el archivo anterior solo después de guardar correctamente el producto.
+        if ($oldImagePath && $oldImagePath !== $imagePath) {
+            Storage::disk('public')->delete($oldImagePath);
+        }
 
         return redirect()
             ->route('products.index')
