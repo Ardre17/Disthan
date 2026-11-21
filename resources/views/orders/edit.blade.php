@@ -2284,12 +2284,12 @@ html, body {
     <div class="oc-card">
         <h3 class="oc-card-t">Información adicional</h3>
         <div class="oc-info">
-            <div><span>Creado por</span><b>{{ $order->user->name ?? $order->creado_por ?? '—' }}</b></div>
+            <div><span>Creado por</span><b>{{ $order->creator?->name ?? '—' }}</b></div>
             <div><span>Estado</span><b><span class="oc-chip" style="background:{{ $estadoColor }}1a;color:{{ $estadoColor }};padding:2px 10px;">{{ $order->estado }}</span></b></div>
             <div><span>Fecha de creación</span><b class="oc-num">{{ $ocFecha($order->created_at ?? null, 'd/m/Y H:i') }}</b></div>
             <div><span>Prioridad</span><b>{{ $order->prioridad ?? 'Normal' }}</b></div>
             <div><span>Última actualización</span><b class="oc-num">{{ $ocFecha($order->updated_at ?? null, 'd/m/Y H:i') }}</b></div>
-            <div><span>Almacén de salida</span><b>{{ $order->almacen ?? $order->almacen_salida ?? '—' }}</b></div>
+            <div><span>Almacén de salida</span><b>Producto terminado</b></div>
         </div>
     </div>
 

@@ -9,6 +9,7 @@ class Order extends Model
     protected $fillable = [
 
         'numero_orden',
+        'created_by',
 
         'factura_asociada',
 
@@ -36,6 +37,11 @@ class Order extends Model
         'total'
     ];
 
+
+    public function creator()
+    {
+        return $this->belongsTo(\App\Models\User::class, 'created_by');
+    }
 
     public function client()
     {

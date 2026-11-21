@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Order;
 use App\Models\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use App\Models\Product;
 use App\Models\OrderDetail;
 use App\Services\Barcode\Code128Generator;
@@ -518,6 +519,8 @@ public function storeImportPdf(Request $request)
 
             $order = Order::create([
                 'numero_orden' => $numeroOrden,
+
+                'created_by' => Auth::id(),
 
                 'client_id' => $request->client_id,
 
@@ -1071,6 +1074,7 @@ public function pdfEncomienda(Order $order)
 {
     $order->load([
         'client',
+        'creator',
         'details.product',
         'bultos.detalles.product'
     ]);
@@ -1317,6 +1321,8 @@ public function stockPedidos()
     ),
 
     'client_id' => $request->client_id,
+
+    'created_by' => Auth::id(),
 
     'tipo_orden' => $request->tipo_orden,
 

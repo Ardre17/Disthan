@@ -108,15 +108,33 @@ class OrderPreparationController extends Controller
             $lote = $locked->lote ?: ($locked->product?->lote ?? null);
             $produccion = $locked->fecha_produccion ?: ($locked->product?->fecha_produccion ?? null);
             $vencimiento = $locked->fecha_vencimiento ?: ($locked->product?->fecha_vencimiento ?? null);
+
+            // Compatibilidad con armados antiguos: recuperar al último operario
+            // desde la tabla móvil o, como respaldo, desde el último log.
+            $preparedBy = $locked->preparado_por;
+            if (!$preparedBy && Schema::hasTable('mobile_order_preparations')) {
+                $preparedBy = DB::table('mobile_order_preparations')
+                    ->where('order_detail_id', $locked->id)
+                    ->value('updated_by');
+            }
+            if (!$preparedBy && Schema::hasTable('mobile_order_preparation_logs')) {
+                $preparedBy = DB::table('mobile_order_preparation_logs')
+                    ->where('order_detail_id', $locked->id)
+                    ->orderByDesc('created_at')
+                    ->orderByDesc('id')
+                    ->value('user_id');
+            }
+
             $now = now();
 
             $locked->forceFill([
+                'preparado_por' => $preparedBy,
                 'informacion_confirmada_at' => $now,
                 'informacion_confirmada_por' => Auth::id(),
                 'informacion_confirmada_lote' => $lote,
                 'informacion_confirmada_produccion' => $produccion,
                 'informacion_confirmada_vencimiento' => $vencimiento,
-                'informacion_confirmada_preparado_por' => $locked->preparado_por,
+                'informacion_confirmada_preparado_por' => $preparedBy,
             ])->save();
 
             return [
@@ -124,8 +142,8 @@ class OrderPreparationController extends Controller
                 'confirmed_at' => $now->toIso8601String(),
                 'confirmed_by' => Auth::id(),
                 'confirmed_user' => Auth::user()?->name,
-                'prepared_by' => $locked->preparado_por,
-                'prepared_user' => $locked->preparado_por ? DB::table('users')->where('id', $locked->preparado_por)->value('name') : null,
+                'prepared_by' => $preparedBy,
+                'prepared_user' => $preparedBy ? DB::table('users')->where('id', $preparedBy)->value('name') : null,
                 'prepared_at' => $locked->fecha_preparacion,
                 'lote' => $lote,
                 'fecha_produccion' => $produccion,
@@ -191,6 +209,25 @@ class OrderPreparationController extends Controller
                 : ($prepared + 0.000001 < $requested ? 'PARCIAL' : 'COMPLETO');
             $migratedAt = now();
 
+            // Si la confirmación se hizo antes de este ajuste y no guardó
+            // al operario, recuperar el usuario del registro móvil histórico.
+            $preparedByToMigrate = $locked->informacion_confirmada_preparado_por
+                ?? $locked->preparado_por;
+
+            if (!$preparedByToMigrate && Schema::hasTable('mobile_order_preparations')) {
+                $preparedByToMigrate = DB::table('mobile_order_preparations')
+                    ->where('order_detail_id', $locked->id)
+                    ->value('updated_by');
+            }
+
+            if (!$preparedByToMigrate && Schema::hasTable('mobile_order_preparation_logs')) {
+                $preparedByToMigrate = DB::table('mobile_order_preparation_logs')
+                    ->where('order_detail_id', $locked->id)
+                    ->orderByDesc('created_at')
+                    ->orderByDesc('id')
+                    ->value('user_id');
+            }
+
             $locked->forceFill([
                 'lote' => $locked->informacion_confirmada_lote,
                 'fecha_produccion' => $locked->informacion_confirmada_produccion,
@@ -200,7 +237,7 @@ class OrderPreparationController extends Controller
                 'subtotal' => round($prepared * (float) ($locked->precio_unitario ?? 0), 2),
                 'estado_item' => $estadoItem,
                 // El operario que armó se conserva desde el registro de preparación.
-                'preparado_por' => $locked->informacion_confirmada_preparado_por ?? $locked->preparado_por,
+                'preparado_por' => $preparedByToMigrate,
                 'informacion_migrada_at' => $migratedAt,
                 'informacion_migrada_por' => Auth::id(),
             ])->save();
