@@ -113,6 +113,13 @@ textarea{
 
 <h2>✏️ Editar Producto</h2>
 
+<form action="{{ route('products.update',$product) }}"
+      method="POST"
+      enctype="multipart/form-data">
+
+@csrf
+@method('PUT')
+
 <div class="image-panel">
     <div class="image-panel-head">
         <div>
@@ -161,13 +168,6 @@ textarea{
     </div>
     <div class="image-error" id="imageError" role="alert" style="display:none;"></div>
 </div>
-
-<form action="{{ route('products.update',$product) }}"
-      method="POST"
-      enctype="multipart/form-data">
-
-@csrf
-@method('PUT')
 
 <div class="row">
 
