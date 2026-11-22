@@ -248,7 +248,9 @@
                         <div class="warning green">✓ Cantidad solicitada completamente armada.</div>
                     @endif
                     <div class="actions"><button class="btn ghost" type="button" onclick="abrirLote({{ $detail->id }}, @js($lote), @js($vence ? \Carbon\Carbon::parse($vence)->format('Y-m-d') : ''), @js($produccion ? \Carbon\Carbon::parse($produccion)->format('Y-m-d') : ''))">Editar lote / vencimiento</button></div>
-                    @php($logs = $preparationLogs[$detail->id] ?? collect())
+                    @php
+                        $logs = $preparationLogs[$detail->id] ?? collect();
+                    @endphp
                     @if($logs->isNotEmpty())
                         <details class="history"><summary>Historial de armado ({{ $logs->count() }} registros)</summary>
                             <div class="history-list">
@@ -303,7 +305,8 @@
         </div>
     </div>
 </div>
-\n<div class="modal" id="modalLote"><div class="dialog"><div class="dialog-head"><h3>Editar lote y vencimiento</h3><button class="close" type="button" onclick="cerrarModal('modalLote')">×</button></div>
+
+<div class="modal" id="modalLote"><div class="dialog"><div class="dialog-head"><h3>Editar lote y vencimiento</h3><button class="close" type="button" onclick="cerrarModal('modalLote')">×</button></div>
     <form method="POST" id="formLote">@csrf @method('PUT')
         <label for="loteInput">Número de lote</label><input id="loteInput" name="lote" maxlength="100" placeholder="Ej. L-2026-045">
         <label for="produccionInput">Fecha de producción</label><input id="produccionInput" type="date" name="fecha_produccion">
