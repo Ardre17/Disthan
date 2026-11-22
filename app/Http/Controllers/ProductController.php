@@ -164,16 +164,20 @@ $categories = Category::where('activo', true)
             'sku' => 'required',
             'nombre' => 'required',
             'imagen' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+            'imagen_url' => 'nullable|url|max:2048',
             'eliminar_imagen' => 'nullable|boolean',
         ]);
 
-        // Mantener la imagen actual si no se selecciona un archivo nuevo.
+        // Mantener la imagen actual si no se selecciona archivo, URL ni eliminación.
         $imagePath = $product->imagen;
         $oldImagePath = $product->imagen;
 
         if ($request->hasFile('imagen')) {
-            // Guardar primero la nueva imagen; no borrar la anterior antes de confirmar.
+            // El archivo subido tiene prioridad sobre la URL externa.
             $imagePath = $request->file('imagen')->store('products', 'public');
+        } elseif ($request->filled('imagen_url')) {
+            // Se guarda la URL directamente en el campo imagen.
+            $imagePath = trim($request->input('imagen_url'));
         } elseif ($request->boolean('eliminar_imagen')) {
             $imagePath = null;
         }
@@ -209,7 +213,11 @@ $categories = Category::where('activo', true)
         ]);
 
         // Eliminar el archivo anterior solo después de guardar correctamente el producto.
-        if ($oldImagePath && $oldImagePath !== $imagePath) {
+        if (
+            $oldImagePath &&
+            $oldImagePath !== $imagePath &&
+            !\Illuminate\Support\Str::startsWith($oldImagePath, ['http://', 'https://'])
+        ) {
             Storage::disk('public')->delete($oldImagePath);
         }
 
@@ -220,7 +228,10 @@ $categories = Category::where('activo', true)
 
     public function destroy(Product $product)
     {
-        if ($product->imagen) {
+        if (
+            $product->imagen &&
+            !\Illuminate\Support\Str::startsWith($product->imagen, ['http://', 'https://'])
+        ) {
             Storage::disk('public')->delete($product->imagen);
         }
 
