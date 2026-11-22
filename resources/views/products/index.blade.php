@@ -493,12 +493,19 @@
                             $product->nombre.' '.$product->sku.' '.$product->barcode.' '.$product->box_barcode.' '.$product->lote
                         ));
 
+                        // La imagen puede ser una URL externa o una ruta del disco público.
+                        $imagenUrl = $product->imagen
+                            ? (\\Illuminate\\Support\\Str::startsWith($product->imagen, ['http://', 'https://'])
+                                ? $product->imagen
+                                : \\Illuminate\\Support\\Facades\\Storage::disk('public')->url($product->imagen))
+                            : null;
+
                         // Datos para el modal de detalle
                         $mdData = [
                             'sku' => $product->sku,
                             'nombre' => $product->nombre,
                             'categoria' => $product->categoria,
-                            'imagen' => $product->imagen ? asset('storage/'.$product->imagen) : null,
+                            'imagen' => $imagenUrl,
                             'advertencias' => $product->advertencias,
                             'lote' => $product->lote,
                             'stock' => $product->stock,
@@ -543,7 +550,7 @@
                         <td class="c-img" data-label="Imagen">
                             <div class="pv-thumb">
                                 @if($product->imagen)
-                                    <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($product->imagen) }}"
+                                    <img src="{{ $imagenUrl }}"
                                         alt="{{ $product->nombre }}"
                                         loading="lazy"
                                         decoding="async"
