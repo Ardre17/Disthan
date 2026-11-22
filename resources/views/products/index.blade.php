@@ -495,9 +495,9 @@
 
                         // La imagen puede ser una URL externa o una ruta del disco público.
                         $imagenUrl = $product->imagen
-                            ? (\\Illuminate\\Support\\Str::startsWith($product->imagen, ['http://', 'https://'])
+                            ? (\Illuminate\Support\Str::startsWith($product->imagen, ['http://', 'https://'])
                                 ? $product->imagen
-                                : \\Illuminate\\Support\\Facades\\Storage::disk('public')->url($product->imagen))
+                                : \Illuminate\Support\Facades\Storage::disk('public')->url($product->imagen))
                             : null;
 
                         // Datos para el modal de detalle
