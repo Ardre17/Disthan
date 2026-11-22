@@ -105,13 +105,51 @@ textarea{
 .image-error{margin-top:8px;color:#b91c1c;font-size:12px;font-weight:600}
 @media(max-width:600px){.image-upload-layout{grid-template-columns:1fr}.image-preview{width:100%;max-width:220px;margin:auto}.image-panel-head{flex-direction:column}}
 
+
+/* DISTAN ERP - estilo renovado */
+:root{--erp-navy:#123d72;--erp-blue:#2563eb;--erp-ink:#172b4d;--erp-muted:#64748b;--erp-line:#e2e8f0;--erp-bg:#f3f6fb}
+html,body{background:var(--erp-bg)!important}
+.page{max-width:1220px;margin:0 auto;padding:30px 22px 48px}
+.card{max-width:1080px;padding:0;margin:0 auto;overflow:hidden;border:1px solid #e4eaf2;border-radius:20px;background:#fff;box-shadow:0 12px 36px rgba(15,42,75,.08)}
+.card h2{position:relative;margin:0;padding:26px 30px 24px 76px;color:#fff;font-size:23px;font-weight:800;letter-spacing:-.35px;background:linear-gradient(120deg,#123d72,#1769aa 65%,#2585c7)}
+.card h2:before{content:"▦";position:absolute;left:29px;top:50%;transform:translateY(-50%);width:34px;height:34px;display:flex;align-items:center;justify-content:center;border:1px solid #ffffff55;border-radius:10px;background:#ffffff20;font-size:20px}
+.card form{padding:25px 30px 30px}
+.row{column-gap:20px;row-gap:2px}
+.form-group{margin-bottom:17px;min-width:0}
+label{color:#334155;font-size:12px;font-weight:750;letter-spacing:.01em}
+input:not([type=checkbox]):not([type=file]),select,textarea{display:block;width:100%;min-height:43px;padding:10px 12px;color:var(--erp-ink);background:#fff;border:1px solid #cfd9e6;border-radius:9px;font-size:13px;outline:none;transition:border-color .15s,box-shadow .15s}
+input:not([type=checkbox]):not([type=file]):focus,select:focus,textarea:focus{border-color:#5792f5;box-shadow:0 0 0 3px #2563eb18;background:#fcfdff}
+textarea{resize:vertical;min-height:105px}
+.image-panel{margin:0 0 25px;padding:20px;border:1px solid #dce7f4;border-radius:15px;background:linear-gradient(145deg,#f8fbff,#f1f6fc)}
+.image-panel-head h3{font-size:16px;color:var(--erp-ink)}
+.image-panel-head p{font-size:12px;color:var(--erp-muted);line-height:1.5}
+.image-format{background:#e5efff;color:#245b91;border:1px solid #d5e5ff}
+.image-upload-layout{grid-template-columns:210px minmax(0,1fr);gap:22px}
+.image-preview{width:210px;height:210px;border:1px solid #dbe4ef;border-radius:13px;box-shadow:0 3px 12px #18324d0b}
+.image-dropzone{min-height:132px;border-color:#8bb7f7;background:#f0f6ff;border-radius:12px}
+.image-dropzone strong{font-size:14px}
+.image-dropzone:hover,.image-dropzone.dragover{background:#e3efff}
+.image-file-info{font-size:11px;line-height:1.5}
+.external-image-field{padding:13px;background:#fff;border:1px solid #e2e8f0;border-radius:11px}
+.remove-image-option{padding:9px 11px;background:#fff7f7;border:1px solid #fee2e2;border-radius:9px;width:max-content;max-width:100%}
+.remove-image-option input{accent-color:#dc2626}
+.buttons{justify-content:flex-end;align-items:center;gap:10px;padding-top:19px;margin-top:24px;border-top:1px solid #edf1f6}
+.btn-back,.btn-update{min-height:43px;display:inline-flex;align-items:center;justify-content:center;padding:11px 19px;border-radius:9px;font-size:13px;font-weight:800;transition:transform .15s,filter .15s,box-shadow .15s}
+.btn-back{background:#eef2f7;color:#334155;border:1px solid #dce3ec}
+.btn-update{background:linear-gradient(120deg,#2563eb,#1d4ed8);box-shadow:0 4px 10px #2563eb26}
+.btn-back:hover,.btn-update:hover{filter:brightness(.98);transform:translateY(-1px)}
+.form-group>div[style*="display:grid"]{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:12px!important;padding:15px!important;background:#f8fafc!important;border:1px solid var(--erp-line)!important;border-radius:11px!important}
+.form-group>div[style*="display:grid"] label{display:flex;align-items:center;gap:8px;margin:0;padding:9px 10px;background:#fff;border:1px solid #e5eaf1;border-radius:8px;font-size:11px;line-height:1.35}
+.form-group>div[style*="display:grid"] input[type=checkbox]{width:16px;height:16px;flex:0 0 16px;accent-color:var(--erp-blue)}
+@media(max-width:700px){.page{padding:12px 10px 28px}.card{border-radius:14px}.card h2{font-size:19px;padding:21px 18px 21px 62px}.card h2:before{left:17px}.card form{padding:17px 15px 20px}.row{grid-template-columns:1fr;gap:0}.image-panel{padding:14px}.image-upload-layout{grid-template-columns:1fr}.image-preview{width:100%;max-width:230px;height:210px;margin:0 auto}.form-group>div[style*="display:grid"]{grid-template-columns:1fr!important}.buttons{flex-direction:column-reverse;align-items:stretch}.btn-back,.btn-update{width:100%}}
+
 </style>
 
 <div class="page">
 
 <div class="card">
 
-<h2>✏️ Editar Producto</h2>
+<h2>Editar producto</h2>
 
 <form action="{{ route('products.update',$product) }}"
       method="POST"
