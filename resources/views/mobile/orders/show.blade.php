@@ -30,7 +30,7 @@
         .mobile-octimg{width:34px;height:34px;object-fit:contain;display:block}
         .mobile-oct{width:34px;height:34px;background:#111;color:#fff;clip-path:polygon(30% 0,70% 0,100% 30%,100% 70%,70% 100%,30% 100%,0 70%,0 30%);display:inline-flex;flex-direction:column;align-items:center;justify-content:center;font-size:5.5px;font-weight:900;line-height:1.1;text-align:center;padding:2px}
         .mobile-oct span{display:block}
-.distan-confirm-box{display:block;width:100%;margin:10px 0 12px;padding:12px 14px;border:1px solid #dbe5f0;border-radius:10px;background:#f8fbff;font-size:12px;line-height:1.55}.dcb-ok{color:#166534;font-weight:800}.dcb-wait{color:#92400e;font-weight:750}.dcb-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.dcb-actions .btn{flex:0 0 auto}
+.product-heading{display:flex;align-items:center;gap:11px;min-width:0}.product-photo{width:66px;height:66px;flex:0 0 66px;object-fit:contain;border:1px solid var(--line);border-radius:11px;background:#fff;padding:4px}.product-photo-placeholder{width:66px;height:66px;flex:0 0 66px;display:flex;align-items:center;justify-content:center;border:1px dashed #cbd5e1;border-radius:11px;background:#f8fafc;color:#94a3b8;font-size:10px;text-align:center}.products-modal-dialog{width:min(100%,620px);max-height:88vh;display:flex;flex-direction:column}.products-modal-list{overflow:auto;display:grid;gap:8px;margin-top:10px}.products-modal-item{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid var(--line);border-radius:11px;background:#fff}.products-modal-item img{width:48px;height:48px;flex:0 0 48px;object-fit:contain;border:1px solid var(--line);border-radius:8px;background:#fff}.products-modal-item .pm-info{min-width:0;flex:1}.products-modal-item .pm-name{font-weight:800;font-size:12px;line-height:1.3}.products-modal-item .pm-meta{font-size:10px;color:var(--muted);margin-top:4px}.products-modal-item .pm-state{font-size:10px;font-weight:800;white-space:nowrap;padding:5px 7px;border-radius:99px}.pm-state.complete{background:var(--green-bg);color:var(--green)}.pm-state.partial{background:var(--amber-bg);color:var(--amber)}.pm-state.pending{background:var(--red-bg);color:var(--red)}.products-modal-search{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px;margin:8px 0 2px}.distan-confirm-box{display:block;width:100%;margin:10px 0 12px;padding:12px 14px;border:1px solid #dbe5f0;border-radius:10px;background:#f8fbff;font-size:12px;line-height:1.55}.dcb-ok{color:#166534;font-weight:800}.dcb-wait{color:#92400e;font-weight:750}.dcb-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:8px}.dcb-actions .btn{flex:0 0 auto}
 </style>
 </head>
 <body>
@@ -94,7 +94,7 @@
     </section>
 
     <section class="panel">
-        <div class="section-head"><h2>Productos del pedido</h2><span class="small muted">{{ $totalProductos }} registros</span></div>
+        <div class="section-head"><div><h2>Productos del pedido</h2><span class="small muted">{{ $totalProductos }} registros</span></div><button type="button" class="btn secondary" id="btnVerProductos">☷ Ver todos los productos</button></div>
         <div class="product-list" id="productList">
             @forelse($order->details as $detail)
                 @php
@@ -107,6 +107,12 @@
                     $stockInsuficiente = $faltante > 0 && $stockRestanteParaArmar > 0 && $stockRestanteParaArmar < $faltante;
                     $maximoArmable = min($faltante, $stockRestanteParaArmar);
                     $pct = $solicitado > 0 ? min(100, ($armado / $solicitado) * 100) : 0;
+                    $imagenProducto = $detail->product?->imagen ?? null;
+                    $imagenProductoUrl = $imagenProducto
+                        ? (\Illuminate\Support\Str::startsWith($imagenProducto, ['http://', 'https://'])
+                            ? $imagenProducto
+                            : \Illuminate\Support\Facades\Storage::disk('public')->url($imagenProducto))
+                        : null;
                     $estadoArmado = $solicitado > 0 && $armado >= $solicitado ? 'complete' : ($armado > 0 ? 'partial' : 'pending');
                     $meta = $preparationMeta[$detail->id] ?? null;
                     $lote = $detail->lote ?: ($detail->product->lote ?? '');
@@ -165,7 +171,13 @@
                     data-pending="{{ $faltante }}"
                     data-warnings="{{ $detail->product->advertencias ?? '' }}">
                     <div class="product-top">
-                        <div style="min-width:0;flex:1">
+                        <div class="product-heading">
+                            @if($imagenProductoUrl)
+                                <img class="product-photo" src="{{ $imagenProductoUrl }}" alt="{{ $detail->product->nombre ?? 'Producto' }}" loading="lazy" onerror="this.style.display='none'">
+                            @else
+                                <div class="product-photo-placeholder">Sin imagen</div>
+                            @endif
+                            <div style="min-width:0;flex:1">
                             <div class="product-title-row">
                                 <h3>{{ $detail->product->nombre ?? 'Producto no disponible' }}</h3>
                                 @if(!empty($octKeys))
@@ -183,6 +195,7 @@
                                 @endif
                             </div>
                             <div class="code">SKU: {{ $detail->product->sku ?? '—' }} · ID detalle: {{ $detail->id }}</div>
+                            </div>
                         </div>
                         @if($estadoArmado==='complete')<span class="badge green">Completo</span>@elseif($estadoArmado==='partial')<span class="badge amber">Parcial</span>@else<span class="badge red">Pendiente</span>@endif
                     </div>
@@ -267,7 +280,30 @@
     <div class="small muted" style="text-align:center;padding:5px 0 18px">El armado se registra por separado. No modifica cantidades despachadas ni descuenta stock.</div>
 </main>
 
-<div class="modal" id="modalLote"><div class="dialog"><div class="dialog-head"><h3>Editar lote y vencimiento</h3><button class="close" type="button" onclick="cerrarModal('modalLote')">×</button></div>
+<div class="modal" id="modalProductos">
+    <div class="dialog products-modal-dialog">
+        <div class="dialog-head"><div><h3>Productos de esta orden</h3><div class="small muted">Consulta nombres, imágenes y avance sin desplazarte por toda la pantalla.</div></div><button class="close" type="button" onclick="cerrarModal('modalProductos')" aria-label="Cerrar">×</button></div>
+        <input id="buscarProductoModal" class="products-modal-search" type="search" placeholder="Buscar producto por nombre o SKU…">
+        <div class="products-modal-list" id="listaProductosModal">
+            @foreach($order->details as $modalDetail)
+                @php
+                    $modalArmado = (float) ($prepared[$modalDetail->id] ?? 0);
+                    $modalSolicitado = (float) ($modalDetail->cantidad_solicitada ?? 0);
+                    $modalFalta = max(0, $modalSolicitado - $modalArmado);
+                    $modalEstado = $modalSolicitado > 0 && $modalArmado >= $modalSolicitado ? 'complete' : ($modalArmado > 0 ? 'partial' : 'pending');
+                    $modalImagen = $modalDetail->product?->imagen ?? null;
+                    $modalImagenUrl = $modalImagen ? (\Illuminate\Support\Str::startsWith($modalImagen, ['http://','https://']) ? $modalImagen : \Illuminate\Support\Facades\Storage::disk('public')->url($modalImagen)) : null;
+                @endphp
+                <div class="products-modal-item" data-modal-name="{{ mb_strtolower($modalDetail->product->nombre ?? '') }}" data-modal-sku="{{ mb_strtolower($modalDetail->product->sku ?? '') }}">
+                    @if($modalImagenUrl)<img src="{{ $modalImagenUrl }}" alt="" loading="lazy" onerror="this.style.display='none'">@else<div class="product-photo-placeholder" style="width:48px;height:48px;flex-basis:48px">Sin imagen</div>@endif
+                    <div class="pm-info"><div class="pm-name">{{ $modalDetail->product->nombre ?? 'Producto no disponible' }}</div><div class="pm-meta">SKU: {{ $modalDetail->product->sku ?? '—' }} · Solicitado: {{ rtrim(rtrim(number_format($modalSolicitado,3,'.',''), '0'), '.') }} · Armado: {{ rtrim(rtrim(number_format($modalArmado,3,'.',''), '0'), '.') }} · Falta: {{ rtrim(rtrim(number_format($modalFalta,3,'.',''), '0'), '.') }}</div></div>
+                    <span class="pm-state {{ $modalEstado }}">{{ $modalEstado === 'complete' ? 'Completo' : ($modalEstado === 'partial' ? 'Parcial' : 'Pendiente') }}</span>
+                </div>
+            @endforeach
+        </div>
+    </div>
+</div>
+\n<div class="modal" id="modalLote"><div class="dialog"><div class="dialog-head"><h3>Editar lote y vencimiento</h3><button class="close" type="button" onclick="cerrarModal('modalLote')">×</button></div>
     <form method="POST" id="formLote">@csrf @method('PUT')
         <label for="loteInput">Número de lote</label><input id="loteInput" name="lote" maxlength="100" placeholder="Ej. L-2026-045">
         <label for="produccionInput">Fecha de producción</label><input id="produccionInput" type="date" name="fecha_produccion">
@@ -347,6 +383,9 @@
 
     function buscarCodigo(){const code=scannerInput.value.trim();if(!code)return;const card=findCard(code);if(card){feedback.textContent='Producto encontrado: '+card.querySelector('h3').textContent;focusCard(card);scannerInput.value='';}else{feedback.textContent='No se encontró un producto con el código '+code;toast('Código no encontrado en este pedido.')}}
     document.getElementById('btnBuscar').addEventListener('click',buscarCodigo);
+    document.getElementById('btnVerProductos').addEventListener('click',()=>{document.getElementById('modalProductos').classList.add('show');document.getElementById('buscarProductoModal').value='';filtrarListaModal('');});
+    function filtrarListaModal(valor){const q=String(valor||'').trim().toLowerCase();document.querySelectorAll('.products-modal-item').forEach(item=>{item.style.display=(!q||item.dataset.modalName.includes(q)||item.dataset.modalSku.includes(q))?'':'none'});}
+    document.getElementById('buscarProductoModal').addEventListener('input',function(){filtrarListaModal(this.value);});
     cards.forEach(card=>card.addEventListener('click',e=>{if(e.target.closest('button,a,input,form,summary'))return;focusCard(card)}));
     scannerInput.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();buscarCodigo()}});
     document.getElementById('filtroProducto').addEventListener('input',function(){const q=this.value.trim().toLowerCase();cards.forEach(c=>{c.style.display=(!q||c.dataset.name.includes(q)||[c.dataset.sku,c.dataset.barcode,c.dataset.boxBarcode].some(x=>String(x||'').toLowerCase().includes(q)))?'':'none'})});
@@ -356,7 +395,7 @@
     async function cerrarCamara(){if(cameraScanner){try{await cameraScanner.stop();await cameraScanner.clear()}catch(e){}cameraScanner=null}cerrarModal('modalCamara')}
     document.getElementById('btnCamara').addEventListener('click',abrirCamara);
     document.querySelectorAll('.modal').forEach(m=>m.addEventListener('click',e=>{if(e.target===m){if(m.id==='modalCamara')cerrarCamara();else m.classList.remove('show')}}));
-    document.addEventListener('keydown',e=>{if(e.key==='Escape'){cerrarModal('modalLote');cerrarAlerta('modalProduccion');cerrarAlerta('modalOctogonos');cerrarCamara()}});
+    document.addEventListener('keydown',e=>{if(e.key==='Escape'){cerrarModal('modalProductos');cerrarModal('modalLote');cerrarAlerta('modalProduccion');cerrarAlerta('modalOctogonos');cerrarCamara()}});
     document.querySelectorAll('.distan-confirm-box .confirm-information').forEach(btn=>btn.addEventListener('click',async()=>{
         const box=btn.closest('.distan-confirm-box');btn.disabled=true;btn.textContent='Confirmando…';
         try{const res=await fetch(box.dataset.confirmUrl,{method:'POST',headers:{'Accept':'application/json','X-Requested-With':'XMLHttpRequest','X-CSRF-TOKEN':box.dataset.csrf}});const data=await res.json();if(!res.ok)throw new Error(data.message||Object.values(data.errors||{}).flat().join(' '));box.innerHTML='<div><span class="dcb-ok">✓ Información verificada</span> · '+new Date(data.confirmed_at).toLocaleString('es-PE')+'</div><div class="dcb-actions"><button type="button" class="btn migrate-information">Migrar confirmación</button><span class="hint">Copiar lote y fechas, registrar la cantidad preparada como despachada y actualizar el stock.</span></div>';toast('Información del producto confirmada.');}
