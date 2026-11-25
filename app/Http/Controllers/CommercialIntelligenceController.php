@@ -184,4 +184,118 @@ class CommercialIntelligenceController extends Controller
             'resumenClientes', 'clienteDetalle', 'productosCliente'
         ));
     }
+
+    /** Genera un PDF real a partir de los filtros aplicados (no captura la pantalla). */
+    public function exportPdf(Request $request)
+    {
+        abort_unless(in_array(auth()->user()->role ?? '', ['admin', 'gerencia'], true), 403);
+
+        $validated = $request->validate([
+            'desde' => ['nullable', 'date'],
+            'hasta' => ['nullable', 'date', 'after_or_equal:desde'],
+            'tipo_cliente' => ['nullable', 'in:MAYORISTA,MINORISTA,SUPERMERCADOS'],
+            'cliente' => ['nullable', 'integer'],
+            'cliente_detalle' => ['nullable', 'integer'],
+            'producto' => ['nullable', 'string', 'max:160'],
+            'prioridad' => ['nullable', 'in:ALTA,MEDIA,SEGUIMIENTO,ATENDIDO'],
+            'vista' => ['nullable', 'in:matriz,clientes,detalle'],
+        ]);
+
+        $desde = $validated['desde'] ?? null;
+        $hasta = $validated['hasta'] ?? null;
+        $tipoCliente = $validated['tipo_cliente'] ?? '';
+        $vista = $validated['vista'] ?? 'matriz';
+
+        $base = DB::table('orders as o')
+            ->join('clients as c', 'c.id', '=', 'o.client_id')
+            ->join('order_details as od', 'od.order_id', '=', 'o.id')
+            ->join('products as p', 'p.id', '=', 'od.product_id')
+            ->whereIn(DB::raw("UPPER(COALESCE(o.estado, ''))"), ['COMPLETO', 'INCOMPLETO', 'PARCIAL'])
+            ->whereRaw("UPPER(COALESCE(o.tipo_orden, '')) <> 'EXPORTACION'")
+            ->whereRaw("COALESCE(c.razon_social, '') NOT ILIKE '%export%'")
+            ->whereRaw("COALESCE(c.nombre_comercial, '') NOT ILIKE '%export%'")
+            ->when($desde, fn ($q) => $q->whereDate('o.fecha_pedido', '>=', $desde))
+            ->when($hasta, fn ($q) => $q->whereDate('o.fecha_pedido', '<=', $hasta))
+            ->when($tipoCliente, fn ($q) => $q->whereRaw("UPPER(COALESCE(c.tipo_cliente, '')) = ?", [$tipoCliente]));
+
+        $nombreCliente = fn ($query) => $query->selectRaw("COALESCE(NULLIF(c.nombre_comercial, ''), c.razon_social, 'Cliente sin nombre') AS cliente");
+        $tituloSegmento = $tipoCliente ? str_replace('_', ' ', $tipoCliente) : 'Todos los tipos de cliente';
+        $productoBuscado = trim($validated['producto'] ?? '');
+        $titulo = $vista === 'matriz'
+            ? ($productoBuscado !== '' ? 'Producto: '.$productoBuscado : 'Matriz de prioridad por cliente')
+            : ($vista === 'detalle' ? 'Detalle de productos por cliente' : 'Análisis por cliente');
+
+        if ($vista === 'matriz') {
+            if (!empty($validated['cliente'])) {
+                $cliente = (clone $base)->where('c.id', (int) $validated['cliente'])
+                    ->select('c.id')->selectRaw("COALESCE(NULLIF(c.nombre_comercial, ''), c.razon_social, 'Cliente sin nombre') AS nombre")
+                    ->groupBy('c.id', 'c.nombre_comercial', 'c.razon_social')->first();
+                $rows = (clone $base)->where('c.id', (int) $validated['cliente'])
+                    ->when($productoBuscado !== '', fn ($q) => $q->where(function ($w) use ($productoBuscado) { $w->where('p.nombre', 'ILIKE', '%'.$productoBuscado.'%')->orWhere('p.sku', 'ILIKE', '%'.$productoBuscado.'%'); }))
+                    ->select('p.sku', 'p.nombre as producto')
+                    ->selectRaw('COUNT(DISTINCT o.id) AS pedidos')
+                    ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
+                    ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
+                    ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+                    ->groupBy('p.id', 'p.sku', 'p.nombre')->orderByDesc('faltantes')->get();
+                $tipoReporte = 'matriz_detalle';
+            } else {
+                $raw = (clone $base)->when($productoBuscado !== '', fn ($q) => $q->where(function ($w) use ($productoBuscado) { $w->where('p.nombre', 'ILIKE', '%'.$productoBuscado.'%')->orWhere('p.sku', 'ILIKE', '%'.$productoBuscado.'%'); }))
+                    ->select('c.id as client_id', 'p.id as product_id', 'p.sku', 'p.nombre as producto')
+                    ->selectRaw("COALESCE(NULLIF(c.nombre_comercial, ''), c.razon_social, 'Cliente sin nombre') AS cliente")
+                    ->selectRaw('COUNT(DISTINCT o.id) AS pedidos')
+                    ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
+                    ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
+                    ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+                    ->groupBy('c.id', 'c.nombre_comercial', 'c.razon_social', 'p.id', 'p.sku', 'p.nombre')->get();
+                $maximos = $raw->groupBy('client_id')->map(fn ($g) => ['faltantes'=>max(1,(float)$g->max('faltantes')), 'pedidos'=>max(1,(float)$g->max('pedidos'))]);
+                $raw = $raw->map(function ($r) use ($maximos) {
+                    $m = $maximos->get($r->client_id, ['faltantes'=>1,'pedidos'=>1]);
+                    $r->atencion = (float)$r->solicitadas > 0 ? ((float)$r->despachadas/(float)$r->solicitadas)*100 : 0;
+                    $v = (float)$r->faltantes > 0 ? ((float)$r->faltantes/$m['faltantes'])*100 : 0;
+                    $b = max(0,100-$r->atencion); $f = ((float)$r->pedidos/$m['pedidos'])*100;
+                    $r->indice = .40*$v + .35*$b + .25*$f;
+                    $r->prioridad = (float)$r->faltantes <= 0 ? 'ATENDIDO' : ($r->indice >= 70 ? 'ALTA' : ($r->indice >= 45 ? 'MEDIA' : 'SEGUIMIENTO'));
+                    return $r;
+                });
+                if (!empty($validated['prioridad'])) $raw = $raw->where('prioridad', $validated['prioridad']);
+                $rows = $raw->groupBy('client_id')->map(function ($g) {
+                    $first=$g->first(); $sol=(float)$g->sum('solicitadas'); $des=(float)$g->sum('despachadas');
+                    $rank=['ATENDIDO'=>0,'SEGUIMIENTO'=>1,'MEDIA'=>2,'ALTA'=>3];
+                    return (object)['cliente'=>$first->cliente,'productos'=>$g->count(),'pedidos'=>$g->sum('pedidos'),'solicitadas'=>$sol,'despachadas'=>$des,'faltantes'=>$g->sum('faltantes'),'atencion'=>$sol>0?($des/$sol)*100:0,'prioridad'=>$g->pluck('prioridad')->sortByDesc(fn($x)=>$rank[$x]??0)->first(),'indice'=>$g->max('indice')];
+                })->sortByDesc('faltantes')->values();
+                $cliente = null;
+                $tipoReporte = 'matriz';
+            }
+        } elseif ($vista === 'detalle' && !empty($validated['cliente_detalle'])) {
+            $cliente = (clone $base)->where('c.id', (int)$validated['cliente_detalle'])
+                ->select('c.id')->selectRaw("COALESCE(NULLIF(c.nombre_comercial, ''), c.razon_social, 'Cliente sin nombre') AS nombre")
+                ->groupBy('c.id','c.nombre_comercial','c.razon_social')->first();
+            $rows = (clone $base)->where('c.id', (int)$validated['cliente_detalle'])
+                ->select('p.sku','p.nombre as producto')->selectRaw('COUNT(DISTINCT o.id) AS pedidos')
+                ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
+                ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+                ->groupBy('p.id','p.sku','p.nombre')->orderByDesc('solicitadas')->orderBy('p.nombre')->get()
+                ->map(function($r){$r->atencion=(float)$r->solicitadas>0?((float)$r->despachadas/(float)$r->solicitadas)*100:0;return $r;});
+            $tipoReporte = 'cliente_detalle';
+        } else {
+            $cliente = null;
+            $rows = (clone $base)->select('c.id as client_id')
+                ->selectRaw("COALESCE(NULLIF(c.nombre_comercial, ''), c.razon_social, 'Cliente sin nombre') AS cliente")
+                ->selectRaw('COUNT(DISTINCT o.id) AS pedidos')->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
+                ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
+                ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+                ->groupBy('c.id','c.nombre_comercial','c.razon_social')->orderBy('cliente')->get()
+                ->map(function($r){$r->atencion=(float)$r->solicitadas>0?((float)$r->despachadas/(float)$r->solicitadas)*100:0;return $r;});
+            $tipoReporte = 'clientes';
+        }
+
+        $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('commercial-intelligence.pdf', compact(
+            'rows','desde','hasta','titulo','tituloSegmento','tipoReporte','cliente','productoBuscado','tipoCliente'
+        ))->setPaper('a4', 'landscape');
+
+        $file = 'inteligencia-comercial-'.now()->format('Ymd-His').'.pdf';
+        return $pdf->download($file);
+    }
+
 }

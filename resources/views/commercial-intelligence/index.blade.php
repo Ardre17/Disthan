@@ -23,6 +23,9 @@
     ], fn($v) => $v !== null && $v !== '');
     $matrixParams = array_merge($filterParams, ['vista' => 'matriz']);
     $clientParams = array_merge($filterParams, ['vista' => 'clientes']);
+    $pdfParams = array_merge($filterParams, ['vista' => $vista]);
+    if (!empty($validated['cliente'])) $pdfParams['cliente'] = $validated['cliente'];
+    if (!empty($validated['cliente_detalle'])) $pdfParams['cliente_detalle'] = $validated['cliente_detalle'];
     $priorityClass = ['ALTA'=>'p-alta','MEDIA'=>'p-media','SEGUIMIENTO'=>'p-seguimiento','ATENDIDO'=>'p-atendido'];
 @endphp
 
@@ -64,6 +67,7 @@
         @endif
         <button type="submit" class="ci-btn">Aplicar filtros</button>
         <a class="ci-btn light" href="{{ route('commercial-intelligence.index', ['vista'=>$vista]) }}">Limpiar</a>
+        <a class="ci-btn" style="background:#0f766e" href="{{ route('commercial-intelligence.pdf', $pdfParams) }}" target="_blank" rel="noopener">Descargar PDF</a>
     </form>
 
     <nav class="ci-tabs" aria-label="Secciones de Inteligencia Comercial">

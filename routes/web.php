@@ -483,6 +483,8 @@ Route::middleware('auth')->group(function () {
     // Inteligencia Comercial (dashboard y matriz de prioridad, solo lectura).
     Route::get('/inteligencia-comercial', [CommercialIntelligenceController::class, 'index'])
         ->name('commercial-intelligence.index');
+    Route::get('/inteligencia-comercial/pdf', [CommercialIntelligenceController::class, 'exportPdf'])
+        ->name('commercial-intelligence.pdf');
 
     Route::get('/products/proyectado', [ProductController::class, 'proyectado'])
         ->name('products.proyectado');
