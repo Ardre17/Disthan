@@ -135,6 +135,14 @@ $menu = [
         ],
     ],
 
+    'inteligencia_comercial' => [
+        'label' => 'Inteligencia Comercial', 'icon' => 'trend', 'roles' => ['admin','gerencia'], 'color' => '#7c3aed', 'group' => true,
+        'items' => [
+            ['label' => 'Dashboard comercial', 'icon' => 'bars', 'route' => 'commercial-intelligence.index',
+             'roles' => ['admin','gerencia'], 'routes' => ['commercial-intelligence.*'], 'paths' => ['inteligencia-comercial']],
+        ],
+    ],
+
     'reportes' => [
         'label' => 'Reportes', 'icon' => 'bars', 'color' => '#2f6fd0','roles' => ['admin'], 'group' => true,
         'items' => [

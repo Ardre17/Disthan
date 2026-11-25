@@ -43,6 +43,7 @@ use App\Http\Controllers\MobileProductController;
 use App\Http\Controllers\MobileOrderController;
 use App\Http\Controllers\CatalogoComercialController;
 use App\Http\Controllers\ProductionCenterController;
+use App\Http\Controllers\CommercialIntelligenceController;
 
 Route::prefix('centro-produccion')->name('production-center.')->controller(ProductionCenterController::class)->group(function () {
     Route::get('/', 'index')->name('index');
@@ -478,6 +479,10 @@ Route::get('/dashboard', [DashboardController::class, 'index'])
 |--------------------------------------------------------------------------
 */
 Route::middleware('auth')->group(function () {
+
+    // Inteligencia Comercial (dashboard y matriz de prioridad, solo lectura).
+    Route::get('/inteligencia-comercial', [CommercialIntelligenceController::class, 'index'])
+        ->name('commercial-intelligence.index');
 
     Route::get('/products/proyectado', [ProductController::class, 'proyectado'])
         ->name('products.proyectado');
