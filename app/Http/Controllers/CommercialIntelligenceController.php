@@ -101,8 +101,10 @@ class CommercialIntelligenceController extends Controller
             return $row;
         });
 
-        $matrix = $matrix
-            ->when(!empty($validated['cliente']), fn ($rows) => $rows->where('client_id', (int) $validated['cliente']))
+        // Filtros de producto/prioridad se aplican antes de agrupar por cliente.
+        // Si no se elige un cliente, la vista muestra una fila por cliente;
+        // al elegirlo, se presenta el detalle de sus productos.
+        $matrixBaseFiltrada = $matrix
             ->when(!empty($validated['producto']), function ($rows) use ($validated) {
                 $term = mb_strtolower(trim($validated['producto']));
                 return $rows->filter(fn ($r) => str_contains(mb_strtolower((string) $r->producto), $term)
@@ -111,7 +113,31 @@ class CommercialIntelligenceController extends Controller
             ->when(!empty($validated['prioridad']), fn ($rows) => $rows->where('prioridad', $validated['prioridad']))
             ->sortByDesc('indice')->values();
 
-        $conteoPrioridad = $matrix->countBy('prioridad');
+        $matrixClientes = $matrixBaseFiltrada->groupBy('client_id')->map(function ($rows) {
+            $first = $rows->first();
+            $faltantes = (float) $rows->sum('faltantes');
+            $solicitadas = (float) $rows->sum('solicitadas');
+            $despachadas = (float) $rows->sum('despachadas');
+            $prioridades = ['ATENDIDO' => 0, 'SEGUIMIENTO' => 1, 'MEDIA' => 2, 'ALTA' => 3];
+            $prioridad = $rows->pluck('prioridad')->sortByDesc(fn ($p) => $prioridades[$p] ?? 0)->first() ?? 'ATENDIDO';
+            return (object) [
+                'client_id' => $first->client_id,
+                'cliente' => $first->cliente,
+                'productos' => $rows->count(),
+                'solicitadas' => $solicitadas,
+                'despachadas' => $despachadas,
+                'faltantes' => $faltantes,
+                'atencion' => $solicitadas > 0 ? ($despachadas / $solicitadas) * 100 : 0,
+                'prioridad' => $prioridad,
+                'indice' => (float) $rows->max('indice'),
+            ];
+        })->sortByDesc('faltantes')->values();
+
+        $matrix = $matrixBaseFiltrada
+            ->when(!empty($validated['cliente']), fn ($rows) => $rows->where('client_id', (int) $validated['cliente']))
+            ->values();
+
+        $conteoPrioridad = $matrixBaseFiltrada->countBy('prioridad');
         $matrixTotales = [
             'filas' => $matrix->count(),
             'alta' => $conteoPrioridad->get('ALTA', 0),
@@ -154,7 +180,7 @@ class CommercialIntelligenceController extends Controller
 
         return view('commercial-intelligence.index', compact(
             'desde', 'hasta', 'validated', 'tipoCliente', 'vista', 'totales', 'solicitadas', 'despachadas', 'faltantes', 'atencion',
-            'porTipo', 'topProductos', 'matrix', 'clientes', 'productosFiltro', 'matrixTotales',
+            'porTipo', 'topProductos', 'matrix', 'matrixClientes', 'clientes', 'productosFiltro', 'matrixTotales',
             'resumenClientes', 'clienteDetalle', 'productosCliente'
         ));
     }
