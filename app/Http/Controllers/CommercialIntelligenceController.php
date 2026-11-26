@@ -44,6 +44,9 @@ class CommercialIntelligenceController extends Controller
             ->selectRaw('COALESCE(SUM(od.cantidad_solicitada), 0) AS solicitadas')
             ->selectRaw('COALESCE(SUM(od.cantidad_despachada), 0) AS despachadas')
             ->selectRaw('COALESCE(SUM(GREATEST(COALESCE(od.cantidad_solicitada,0) - COALESCE(od.cantidad_despachada,0),0)), 0) AS faltantes')
+            ->selectRaw('COALESCE(SUM(COALESCE(od.cantidad_solicitada,0) * COALESCE(od.precio_unitario,0)), 0) AS venta_solicitada')
+            ->selectRaw('COALESCE(SUM(COALESCE(od.cantidad_despachada,0) * COALESCE(od.precio_unitario,0)), 0) AS venta_despachada')
+            ->selectRaw('COALESCE(SUM(GREATEST(COALESCE(od.cantidad_solicitada,0) - COALESCE(od.cantidad_despachada,0),0) * COALESCE(od.precio_unitario,0)), 0) AS valor_no_despachado')
             ->first();
 
         $solicitadas = (float) ($totales->solicitadas ?? 0);
@@ -56,12 +59,16 @@ class CommercialIntelligenceController extends Controller
             ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
             ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
             ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0) - COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+            ->selectRaw('SUM(COALESCE(od.cantidad_despachada,0) * COALESCE(od.precio_unitario,0)) AS venta_despachada')
+            ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0) * COALESCE(od.precio_unitario,0)) AS valor_no_despachado')
             ->groupBy('tipo')->orderByDesc('faltantes')->get();
 
         $topProductos = (clone $base)->select('p.sku', 'p.nombre')
             ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
             ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
             ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0) - COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+            ->selectRaw('SUM(COALESCE(od.cantidad_despachada,0) * COALESCE(od.precio_unitario,0)) AS venta_despachada')
+            ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0) * COALESCE(od.precio_unitario,0)) AS valor_no_despachado')
             ->groupBy('p.id', 'p.sku', 'p.nombre')->orderByDesc('faltantes')->limit(10)->get();
 
         // Opciones para los filtros, respetando período y tipo de cliente.
@@ -80,6 +87,10 @@ class CommercialIntelligenceController extends Controller
             ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
             ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
             ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0) - COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+            ->selectRaw('SUM(COALESCE(od.cantidad_solicitada,0) * COALESCE(od.precio_unitario,0)) AS venta_solicitada')
+            ->selectRaw('SUM(COALESCE(od.cantidad_despachada,0) * COALESCE(od.precio_unitario,0)) AS venta_despachada')
+            ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0) * COALESCE(od.precio_unitario,0)) AS valor_no_despachado')
+            ->selectRaw('CASE WHEN SUM(COALESCE(od.cantidad_solicitada,0)) > 0 THEN SUM(COALESCE(od.cantidad_solicitada,0) * COALESCE(od.precio_unitario,0)) / SUM(COALESCE(od.cantidad_solicitada,0)) ELSE 0 END AS precio_unitario_promedio')
             ->groupBy('c.id', 'c.nombre_comercial', 'c.razon_social', 'p.id', 'p.sku', 'p.nombre')->get();
 
         $maximos = $matrix->groupBy('client_id')->map(fn ($rows) => [
@@ -127,6 +138,10 @@ class CommercialIntelligenceController extends Controller
                 'solicitadas' => $solicitadas,
                 'despachadas' => $despachadas,
                 'faltantes' => $faltantes,
+                'venta_solicitada' => (float) $rows->sum('venta_solicitada'),
+                'venta_despachada' => (float) $rows->sum('venta_despachada'),
+                'valor_no_despachado' => (float) $rows->sum('valor_no_despachado'),
+                'precio_unitario_promedio' => $solicitadas > 0 ? ((float) $rows->sum('venta_solicitada') / $solicitadas) : 0,
                 'atencion' => $solicitadas > 0 ? ($despachadas / $solicitadas) * 100 : 0,
                 'prioridad' => $prioridad,
                 'indice' => (float) $rows->max('indice'),
@@ -153,6 +168,8 @@ class CommercialIntelligenceController extends Controller
             ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
             ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
             ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0) - COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+            ->selectRaw('SUM(COALESCE(od.cantidad_despachada,0) * COALESCE(od.precio_unitario,0)) AS venta_despachada')
+            ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0) * COALESCE(od.precio_unitario,0)) AS valor_no_despachado')
             ->groupBy('c.id', 'c.nombre_comercial', 'c.razon_social')->orderBy('cliente')->get()
             ->map(function ($r) {
                 $r->atencion = (float) $r->solicitadas > 0 ? ((float) $r->despachadas / (float) $r->solicitadas) * 100 : 0;
@@ -170,6 +187,10 @@ class CommercialIntelligenceController extends Controller
                     ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
                     ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
                     ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0) - COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+                    ->selectRaw('SUM(COALESCE(od.cantidad_solicitada,0) * COALESCE(od.precio_unitario,0)) AS venta_solicitada')
+                    ->selectRaw('SUM(COALESCE(od.cantidad_despachada,0) * COALESCE(od.precio_unitario,0)) AS venta_despachada')
+                    ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0) * COALESCE(od.precio_unitario,0)) AS valor_no_despachado')
+                    ->selectRaw('CASE WHEN SUM(COALESCE(od.cantidad_solicitada,0)) > 0 THEN SUM(COALESCE(od.cantidad_solicitada,0) * COALESCE(od.precio_unitario,0)) / SUM(COALESCE(od.cantidad_solicitada,0)) ELSE 0 END AS precio_unitario_promedio')
                     ->groupBy('p.id', 'p.sku', 'p.nombre')->orderByDesc('solicitadas')->orderBy('p.nombre')->get()
                     ->map(function ($r) {
                         $r->atencion = (float) $r->solicitadas > 0 ? ((float) $r->despachadas / (float) $r->solicitadas) * 100 : 0;
@@ -237,6 +258,10 @@ class CommercialIntelligenceController extends Controller
                     ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
                     ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
                     ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+                    ->selectRaw('SUM(COALESCE(od.cantidad_solicitada,0) * COALESCE(od.precio_unitario,0)) AS venta_solicitada')
+                    ->selectRaw('SUM(COALESCE(od.cantidad_despachada,0) * COALESCE(od.precio_unitario,0)) AS venta_despachada')
+                    ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0) * COALESCE(od.precio_unitario,0)) AS valor_no_despachado')
+                    ->selectRaw('CASE WHEN SUM(COALESCE(od.cantidad_solicitada,0)) > 0 THEN SUM(COALESCE(od.cantidad_solicitada,0) * COALESCE(od.precio_unitario,0)) / SUM(COALESCE(od.cantidad_solicitada,0)) ELSE 0 END AS precio_unitario_promedio')
                     ->groupBy('p.id', 'p.sku', 'p.nombre')->orderByDesc('faltantes')->get();
                 $tipoReporte = 'matriz_detalle';
             } else {
@@ -247,6 +272,9 @@ class CommercialIntelligenceController extends Controller
                     ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
                     ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
                     ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+                    ->selectRaw('SUM(COALESCE(od.cantidad_solicitada,0) * COALESCE(od.precio_unitario,0)) AS venta_solicitada')
+                    ->selectRaw('SUM(COALESCE(od.cantidad_despachada,0) * COALESCE(od.precio_unitario,0)) AS venta_despachada')
+                    ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0) * COALESCE(od.precio_unitario,0)) AS valor_no_despachado')
                     ->groupBy('c.id', 'c.nombre_comercial', 'c.razon_social', 'p.id', 'p.sku', 'p.nombre')->get();
                 $maximos = $raw->groupBy('client_id')->map(fn ($g) => ['faltantes'=>max(1,(float)$g->max('faltantes')), 'pedidos'=>max(1,(float)$g->max('pedidos'))]);
                 $raw = $raw->map(function ($r) use ($maximos) {
@@ -262,7 +290,7 @@ class CommercialIntelligenceController extends Controller
                 $rows = $raw->groupBy('client_id')->map(function ($g) {
                     $first=$g->first(); $sol=(float)$g->sum('solicitadas'); $des=(float)$g->sum('despachadas');
                     $rank=['ATENDIDO'=>0,'SEGUIMIENTO'=>1,'MEDIA'=>2,'ALTA'=>3];
-                    return (object)['cliente'=>$first->cliente,'productos'=>$g->count(),'pedidos'=>$g->sum('pedidos'),'solicitadas'=>$sol,'despachadas'=>$des,'faltantes'=>$g->sum('faltantes'),'atencion'=>$sol>0?($des/$sol)*100:0,'prioridad'=>$g->pluck('prioridad')->sortByDesc(fn($x)=>$rank[$x]??0)->first(),'indice'=>$g->max('indice')];
+                    return (object)['cliente'=>$first->cliente,'productos'=>$g->count(),'pedidos'=>$g->sum('pedidos'),'solicitadas'=>$sol,'despachadas'=>$des,'faltantes'=>$g->sum('faltantes'),'venta_solicitada'=>$g->sum('venta_solicitada'),'venta_despachada'=>$g->sum('venta_despachada'),'valor_no_despachado'=>$g->sum('valor_no_despachado'),'precio_unitario_promedio'=>$sol>0?($g->sum('venta_solicitada')/$sol):0,'atencion'=>$sol>0?($des/$sol)*100:0,'prioridad'=>$g->pluck('prioridad')->sortByDesc(fn($x)=>$rank[$x]??0)->first(),'indice'=>$g->max('indice')];
                 })->sortByDesc('faltantes')->values();
                 $cliente = null;
                 $tipoReporte = 'matriz';
@@ -275,6 +303,10 @@ class CommercialIntelligenceController extends Controller
                 ->select('p.sku','p.nombre as producto')->selectRaw('COUNT(DISTINCT o.id) AS pedidos')
                 ->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
                 ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+                ->selectRaw('SUM(COALESCE(od.cantidad_solicitada,0) * COALESCE(od.precio_unitario,0)) AS venta_solicitada')
+                ->selectRaw('SUM(COALESCE(od.cantidad_despachada,0) * COALESCE(od.precio_unitario,0)) AS venta_despachada')
+                ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0) * COALESCE(od.precio_unitario,0)) AS valor_no_despachado')
+                ->selectRaw('CASE WHEN SUM(COALESCE(od.cantidad_solicitada,0)) > 0 THEN SUM(COALESCE(od.cantidad_solicitada,0) * COALESCE(od.precio_unitario,0)) / SUM(COALESCE(od.cantidad_solicitada,0)) ELSE 0 END AS precio_unitario_promedio')
                 ->groupBy('p.id','p.sku','p.nombre')->orderByDesc('solicitadas')->orderBy('p.nombre')->get()
                 ->map(function($r){$r->atencion=(float)$r->solicitadas>0?((float)$r->despachadas/(float)$r->solicitadas)*100:0;return $r;});
             $tipoReporte = 'cliente_detalle';
@@ -285,6 +317,8 @@ class CommercialIntelligenceController extends Controller
                 ->selectRaw('COUNT(DISTINCT o.id) AS pedidos')->selectRaw('SUM(od.cantidad_solicitada) AS solicitadas')
                 ->selectRaw('SUM(od.cantidad_despachada) AS despachadas')
                 ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0)) AS faltantes')
+                ->selectRaw('SUM(COALESCE(od.cantidad_despachada,0) * COALESCE(od.precio_unitario,0)) AS venta_despachada')
+                ->selectRaw('SUM(GREATEST(COALESCE(od.cantidad_solicitada,0)-COALESCE(od.cantidad_despachada,0),0) * COALESCE(od.precio_unitario,0)) AS valor_no_despachado')
                 ->groupBy('c.id','c.nombre_comercial','c.razon_social')->orderBy('cliente')->get()
                 ->map(function($r){$r->atencion=(float)$r->solicitadas>0?((float)$r->despachadas/(float)$r->solicitadas)*100:0;return $r;});
             $tipoReporte = 'clientes';
