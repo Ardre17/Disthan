@@ -82,18 +82,18 @@
                 <div class="ci-legend"><span><i class="ci-dot" style="background:#ef4444"></i>ALTA: ≥ 70</span><span><i class="ci-dot" style="background:#f59e0b"></i>MEDIA: 45–69.99</span><span><i class="ci-dot" style="background:#3b82f6"></i>SEGUIMIENTO: menor de 45</span><span><i class="ci-dot" style="background:#16a34a"></i>ATENDIDO: sin faltante</span></div>
                 <p class="ci-foot" style="margin:8px 0 10px">Se muestra un solo registro por cliente. Seleccione «Ver productos» para consultar sus productos y prioridades.</p>
                 <div class="ci-table-wrap"><table class="ci-table ci-table--summary">
-                    <thead><tr><th>Cliente</th><th class="ci-num">Productos</th><th class="ci-num">Solicitado</th><th class="ci-num">Despachado</th><th class="ci-num">Faltante</th><th class="ci-num">Precio prom. (S/)</th><th class="ci-num">Venta despachada (S/)</th><th class="ci-num">Valor no despachado (S/)</th><th>Prioridad</th><th class="ci-num">Índice máx.</th><th class="ci-action-cell">Detalle</th></tr></thead>
+                    <thead><tr><th>Cliente</th><th class="ci-num">Productos</th><th class="ci-num">Solicitado</th><th class="ci-num">Despachado</th><th class="ci-num">Faltante</th><th class="ci-num">Precio prom. (S/)</th><th class="ci-num">Venta despachada (S/)</th><th class="ci-num">Valor no despachado (S/)</th><th class="ci-num">% Cumplimiento</th><th>Prioridad</th><th class="ci-num">Índice máx.</th><th class="ci-action-cell">Detalle</th></tr></thead>
                     <tbody>
                     @forelse($matrixClientes as $r)
                         @php $cls = $priorityClass[$r->prioridad] ?? 'p-atendido'; @endphp
                         <tr>
                             <td><strong>{{ $r->cliente }}</strong></td><td class="ci-num">{{ number_format($r->productos) }}</td>
                             <td class="ci-num">{{ number_format($r->solicitadas,0) }}</td><td class="ci-num">{{ number_format($r->despachadas,0) }}</td>
-                            <td class="ci-num"><strong>{{ number_format($r->faltantes,0) }}</strong></td><td class="ci-num">S/ {{ number_format($r->precio_unitario_promedio,2) }}</td><td class="ci-num ci-money">S/ {{ number_format($r->venta_despachada,2) }}</td><td class="ci-num ci-money-loss">S/ {{ number_format($r->valor_no_despachado,2) }}</td><td><span class="ci-pill {{ $cls }}">{{ $r->prioridad }}</span></td>
+                            <td class="ci-num"><strong>{{ number_format($r->faltantes,0) }}</strong></td><td class="ci-num">S/ {{ number_format($r->precio_unitario_promedio,2) }}</td><td class="ci-num ci-money">S/ {{ number_format($r->venta_despachada,2) }}</td><td class="ci-num ci-money-loss">S/ {{ number_format($r->valor_no_despachado,2) }}</td><td class="ci-num"><strong>{{ number_format((float)$r->solicitadas > 0 ? ((float)$r->despachadas / (float)$r->solicitadas) * 100 : 0, 2) }}%</strong></td><td><span class="ci-pill {{ $cls }}">{{ $r->prioridad }}</span></td>
                             <td class="ci-num">{{ number_format($r->indice,2) }}</td>
                             <td class="ci-action-cell"><a class="ci-link" href="{{ route('commercial-intelligence.index', array_merge($filterParams, ['vista'=>'matriz','cliente'=>$r->client_id])) }}">Ver productos →</a></td>
                         </tr>
-                    @empty<tr><td colspan="11" class="ci-empty">No hay clientes que coincidan con los filtros.</td></tr>@endforelse
+                    @empty<tr><td colspan="12" class="ci-empty">No hay clientes que coincidan con los filtros.</td></tr>@endforelse
                     </tbody>
                     @if($matrixClientes->isNotEmpty())
                         @php
@@ -107,6 +107,7 @@
                             <th class="ci-num">S/ {{ number_format($sumSol > 0 ? $sumVentaSol/$sumSol : 0,2) }}</th>
                             <th class="ci-num ci-money">S/ {{ number_format($matrixClientes->sum('venta_despachada'),2) }}</th>
                             <th class="ci-num ci-money-loss">S/ {{ number_format($matrixClientes->sum('valor_no_despachado'),2) }}</th>
+                            <th class="ci-num">{{ number_format((float)$matrixClientes->sum('solicitadas') > 0 ? ((float)$matrixClientes->sum('despachadas') / (float)$matrixClientes->sum('solicitadas')) * 100 : 0, 2) }}%</th>
                             <th colspan="3"></th>
                         </tr></tfoot>
                     @endif
